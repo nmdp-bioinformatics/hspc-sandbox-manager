@@ -1,0 +1,46 @@
+<div id="patient-results" class="col-md-12">
+    <div class="row">
+        <div class="col-md-12">Search for patients by name</div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <input
+                    id="patient-search"
+                    class="col-md-12 pull-left input-long "
+                    type="text"
+                    autofocus
+                    contenteditable
+                    focus-on-key="191"
+                    ng-model="$parent.searchterm"
+                    placeholder="john smith ..."/>
+        </div>
+    </div>
+    <br/>
+
+    <div class="row table-container" resize ng-style="resizeWithOffset(355)">
+        <div class="col-md-12 result">
+            <div id="patient-results-list" ng-cloak when-scrolling="loadMoreIfNeeded()">
+                <table class="table table-striped table-hover">
+                    <tr class="patient-row" ng-click="select($index)" ng-repeat="patient in patients" ng-class="{selected : patient === selectedPatient}">
+                        <td class="gender"
+                            ng-bind-html="genderglyph[patient.gender]"></td>
+                        <td class="name">
+                            <span ng-bind="patientHelper.name(patient)"></span>
+                        </td>
+                        <td>
+                            <i ng-bind="patient.birthDate | date"></i>
+                        </td>
+                    </tr>
+                </table>
+
+                <div ng-show="!showing.searchloading && (patients.length==0)">
+                    <p>No matches, try broadening your search.</p>
+                </div>
+
+                <div id="loading-patient-results" ng-show="showing.searchloading" class="ng-hide">
+                    <p>Loading...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

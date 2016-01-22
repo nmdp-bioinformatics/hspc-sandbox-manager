@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <!-- CSS (load bootstrap) -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <style>
+        .navbar { border-radius:0; }
+        .table>tbody>tr.selected td,
+        .table>tbody>tr.selected:hover td,
+        .table-striped tr.selected td,
+        .table-striped tr.selected:hover td{
+            background-color: #a9a9a9;
+            color: #fff;
+        }
+        .full-screen {
+            /*position: absolute;*/
+            overflow: hidden;
+        }
+        .table-container{
+            overflow-y: auto;
+        }
+    </style>
+
+    <!-- refresh after sign in -->
+    <script>
+        if (window.location.search.match("code=")){
+            var newHash = "/after-auth" + window.location.search;
+            if (window.history.replaceState){
+                window.history.replaceState(
+                        {},
+                        "",
+                        window.location.toString().replace(window.location.search, ""));
+            }
+            window.location.hash = newHash;
+        }
+    </script>
+
+    <!-- JS (load angular, ui-router, and our custom js file) -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-sanitize.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.8/angular-ui-router.min.js"></script>
+    <script src="static/sandbox-manager/fhir-client/underscore-min.js"></script>
+    <script src="static/sandbox-manager/fhir-client/fhir-client.js"></script>
+    <script src="static/sandbox-manager/js/app.js"></script>
+    <script src="static/sandbox-manager/js/controllers.js"></script>
+    <script src="static/sandbox-manager/js/services.js"></script>
+    <script src="static/sandbox-manager/js/filters.js"></script>
+    <script src="static/sandbox-manager/js/directives.js"></script>
+</head>
+
+<!-- apply our angular app to our site -->
+<body ng-app="sandManApp" class="full-screen">
+
+<!-- NAVIGATION -->
+<nav class="navbar navbar-inverse" role="navigation" ng-controller="navController">
+    <div class="pull-left">
+        <a class="navbar-brand" ui-sref="home">Sandbox Management Tool</a>
+        <ul class="nav navbar-nav" ng-show="showing.signout">
+            <li><a ui-sref="organization">Organizations</a></li>
+            <li><a ui-sref="practitioner">Practitioners</a></li>
+            <li><a ui-sref="patient">Patients</a></li>
+        </ul>
+    </div>
+    <div class="pull-right">
+        <div class="navbar-brand ng-hide" ng-show="showing.signout">OAuth User: {{oauthUser.name}}</div>
+        <div class="navbar-brand ng-hide" ng-show="showing.signout">Fhir User: {{fhirUser.name}}</div>
+        <a id="signin" class="navbar-brand ng-hide" ng-show="showing.signin" ng-click="signin()" >Sign
+            In</a>
+        <a id="signout" class="navbar-brand ng-hide" ng-show="showing.signout" ng-click="signout()" >Sign
+            Out</a>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<!-- THIS IS WHERE WE WILL INJECT OUR CONTENT ============================== -->
+<div class="container">
+    <div ui-view></div>
+</div>
+
+</body>
+</html>
