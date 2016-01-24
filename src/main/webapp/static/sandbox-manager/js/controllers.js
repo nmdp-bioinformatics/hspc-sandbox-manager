@@ -38,8 +38,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.oauthUser = oauthUser;
                 userServices.getFhirProfileUser().then(function(fhirUser){
                     $scope.fhirUser = fhirUser;
+                    $rootScope.$digest();
                 });
-                $rootScope.$digest();
             });
             $scope.showing.signin = false;
             $scope.showing.signout = true;

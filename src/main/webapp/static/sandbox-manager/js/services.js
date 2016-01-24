@@ -60,7 +60,7 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('fhirApiServices', function (patientDetails, $rootScope, $location) {
+    }).factory('fhirApiServices', function (oauth2, fhirSettings, patientDetails, $rootScope, $location) {
 
         /**
          *
@@ -109,6 +109,8 @@ angular.module('sandManApp.services', [])
                             $rootScope.$digest();
                         }
                     });
+                } else {
+                    oauth2.authorize(fhirSettings.get());
                 }
             },
             hasNext: function(lastSearch) {
@@ -199,8 +201,8 @@ angular.module('sandManApp.services', [])
             },
             getFhirProfileUser: function() {
                 var deferred = $.Deferred();
-                if (fhirApiServices.fhirClient().user_id === null ||
-                    typeof fhirApiServices.fhirClient().user_id === "undefined"){
+                if (fhirApiServices.fhirClient().userId === null ||
+                    typeof fhirApiServices.fhirClient().userId === "undefined"){
                     deferred.resolve(null);
                     return deferred;
                 }
@@ -215,7 +217,7 @@ angular.module('sandManApp.services', [])
                     .done(function(userResult){
 
                         var user = {name:""};
-                        user.id = patientDetails.name(userResult.data);
+                        user.name = patientDetails.name(userResult.data);
                         user.id  = patientDetails.id(userResult.data);
                         fhirUser = user;
                         deferred.resolve(user);
