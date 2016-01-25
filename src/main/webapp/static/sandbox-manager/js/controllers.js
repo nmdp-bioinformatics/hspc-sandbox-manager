@@ -11,11 +11,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             searchloading: false
         };
 
-//        if (sessionStorage.tokenResponse) {
-//            // access token is available, so sign-in now
-//            oauth2.authorize(fhirSettings.get());
-//        }
-//
+        if (sessionStorage.tokenResponse) {
+            // access token is available, so sign-in now
+            oauth2.authorize(fhirSettings.get());
+        }
+
         $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
             if (toState.authenticate && typeof window.fhirClient === "undefined"){
                 // User isn’t authenticated
