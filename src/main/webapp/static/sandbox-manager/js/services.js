@@ -187,7 +187,7 @@ angular.module('sandManApp.services', [])
                     type: 'POST',
                     data: JSON.stringify({
                         user_id: oauthUser.sub,
-                        profile_url: fhirUser.fullUrl
+                        profile_url: selectedUser.fullUrl
                     }),
                     contentType: "application/json"
                 }).done(function(result){
@@ -220,6 +220,7 @@ angular.module('sandManApp.services', [])
                         user.name = patientDetails.name(userResult.data);
                         user.id  = patientDetails.id(userResult.data);
                         fhirUser = user;
+                        fhirUser.fullUrl = userResult.config.url;
                         deferred.resolve(user);
                     });
                 return deferred;
