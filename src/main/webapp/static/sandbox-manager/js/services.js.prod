@@ -5,7 +5,7 @@ angular.module('sandManApp.services', [])
 
     var settings = {
             name: 'Local HSP dev server, oauth',
-            serviceUrl: 'https://sandbox.hspconsortium.org/dstu2/hsp-reference-api/data',
+            serviceUrl: 'https://sandbox.hspconsortium.org/dstu2/hspc-reference-api/data',
             auth: {
                 type: 'oauth2'
             }
@@ -183,7 +183,7 @@ angular.module('sandManApp.services', [])
             updateProfile: function(selectedUser){
                 $.ajax({
                     // TODO get the root path from the fhir url
-                    url: "https://sandbox.hspconsortium.org/dstu2/hsp-reference-messaging/sandboxuser/profileupdate",
+                    url: "https://sandbox.hspconsortium.org/dstu2/hspc-reference-messaging/sandboxuser/profileupdate",
                     type: 'POST',
                     data: JSON.stringify({
                         user_id: oauthUser.sub,

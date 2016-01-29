@@ -57,7 +57,7 @@
     </developers>
 
     <build>
-        <finalName>hsp-sandbox-manager</finalName>
+        <finalName>hspc-sandbox-manager</finalName>
     </build>
 
 </project>
