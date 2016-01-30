@@ -1,0 +1,10 @@
+<div id="patient-details" class="col-md-12">
+    <div class="row">
+        <div class="col-md-12 content-column">
+            <label class="dynamic-form-label">Name:</label>
+            <label class="dynamic-form-value">{{patientHelper.name(selectedPatient)}}</label>
+            <div class="btn btn-primary btn-lg" ng-click="updateProfile()" ng-disabled="!patientSelected">Launch With Curre</div>
+            <div class="btn btn-primary btn-lg" ui-sref="apps({source: 'patient'})" ng-disabled="!patientSelected">Launch App</div>
+        </div>
+    </div>
+</div>

@@ -1,23 +1,7 @@
 'use strict';
 
 angular.module('sandManApp.services', [])
-    .factory('fhirSettings', function() {
-
-    var settings = {
-            name: 'Local HSP dev server, oauth',
-            serviceUrl: 'http://54.213.219.198:9080/uat/hspc-reference-api/data',
-            auth: {
-                type: 'oauth2'
-            }
-        };
-
-    return {
-        get: function() {
-            return settings;
-        }
-    }
-
-}).factory('oauth2', function($rootScope, $location) {
+    .factory('oauth2', function($rootScope, $location) {
 
         var authorizing = false;
 
@@ -60,7 +44,7 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('fhirApiServices', function (oauth2, fhirSettings, patientDetails, $rootScope, $location) {
+    }).factory('fhirApiServices', function (oauth2, appsSettings, patientDetails, $rootScope, $location) {
 
         /**
          *
@@ -110,7 +94,9 @@ angular.module('sandManApp.services', [])
                         }
                     });
                 } else {
-                    oauth2.authorize(fhirSettings.get());
+                    appsSettings.getSettings().then(function(settings){
+                        oauth2.authorize(settings);
+                    });
                 }
             },
             hasNext: function(lastSearch) {
@@ -167,37 +153,150 @@ angular.module('sandManApp.services', [])
                         deferred.resolve(resourceResults, resourceSearchResult);
                     });
                 return deferred;
+            },
+            registerContext: function(app, params){
+                var deferred = $.Deferred();
+
+                var req = fhirClient.authenticated({
+                    url: fhirClient.server.serviceUrl + '/_services/smart/Launch',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        client_id: app.client_id,
+                        parameters:  params
+                    })
+                });
+
+                $.ajax(req)
+                    .done(deferred.resolve)
+                    .fail(deferred.reject);
+
+                return deferred;
             }
         }
-    }).factory('userServices', function($rootScope, fhirApiServices, patientDetails) {
-        var fhirUser = {};
+    }).factory('launchScenarios', function() {
+
+        var scenarioBuilder = {
+            description: '',
+            persona: '',
+            patient: '',
+            app: ''
+        };
+
+        var selectedScenario;
+
+        var recentLaunchScenarioList = [];
+        recentLaunchScenarioList.push({
+            desc: "Bilirubin",
+            persona: {name: "Kurtis Giles MD",
+                id: "COREPRACTITIONER1",
+                fullUrl: "http://localhost:8080/hsp-reference-api/data/Practitioner/COREPRACTITIONER1",
+                      resource: "Practitioner"},
+            patient: {name: "Bili Baby",
+                id: "BILIBABY",
+                resource: "Patient"},
+            app: {client_name: "Bilirubin"}
+        });
+
+        var fullLaunchScenarioList = [];
+        fullLaunchScenarioList.push({
+            desc: "Bilirubin",
+            persona: {name: "Kurtis Giles MD",
+                id: "COREPRACTITIONER1",
+                fullUrl: "http://localhost:8080/hsp-reference-api/data/Practitioner/COREPRACTITIONER1",
+                resource: "Practitioner"},
+            patient: {name: "Bili Baby",
+                id: "BILIBABY",
+                resource: "Patient"},
+            app: {client_name: "Bilirubin"}
+        });
+        fullLaunchScenarioList.push({
+            desc: "Appointment Viewer wo/ Patient",
+            persona: {name: "Kurtis Giles MD",
+                id: "COREPRACTITIONER1",
+                fullUrl: "http://localhost:8080/hsp-reference-api/data/Practitioner/COREPRACTITIONER1",
+                resource: "Practitioner"},
+            patient: {name: "None",
+                resource: "Patient"},
+            app: {client_name: "Appointment Viewer"}
+        });
+
+
+        return {
+            clearBuilder: function() {
+                scenarioBuilder = {
+                    description: '',
+                    persona: '',
+                    patient: '',
+                    app: ''
+                };
+            },
+            getBuilder: function() {
+                return scenarioBuilder;
+            },
+            setDescription: function(desc) {
+                scenarioBuilder.description = desc;
+            },
+            setPersona: function(persona) {
+                scenarioBuilder.persona = persona;
+            },
+            setPatient: function(patient) {
+                scenarioBuilder.patient = patient;
+            },
+            setApp: function(app) {
+                scenarioBuilder.app = app;
+            },
+            setSelectedScenario: function(scenario) {
+                selectedScenario = scenario;
+            },
+            getSelectedScenario: function() {
+                return selectedScenario;
+            },
+            getFullLaunchScenarioList: function() {
+                return fullLaunchScenarioList;
+            },
+            addFullLaunchScenarioList: function(launchScenario) {
+                fullLaunchScenarioList.push(launchScenario);
+            },
+            getRecentLaunchScenarioList: function() {
+                return recentLaunchScenarioList;
+            },
+            addRecentLaunchScenarioList: function(launchScenario) {
+                recentLaunchScenarioList.push(launchScenario);
+            }
+
+        }
+
+    }).factory('userServices', function($rootScope, fhirApiServices, patientDetails, appsSettings) {
+        var persona = {};
         var oauthUser = {};
 
         return {
-            fhirUser: function(){
-                return fhirUser;
+            persona: function(){
+                return persona;
             },
             oauthUser: function(){
                 return oauthUser;
             },
             updateProfile: function(selectedUser){
-                $.ajax({
-                    // TODO get the root path from the fhir url
-                    url: "http://54.213.219.198:9080/uat/hspc-reference-messaging/sandboxuser/profileupdate",
-                    type: 'POST',
-                    data: JSON.stringify({
-                        user_id: oauthUser.sub,
-                        profile_url: selectedUser.fullUrl
-                    }),
-                    contentType: "application/json"
-                }).done(function(result){
-                        //TODO check result value for 200 or 201
-                        fhirUser = selectedUser;
-                        $rootScope.$emit('profile-change');
-                        $rootScope.$digest();
-                    }).fail(function(){
-                    });
+                appsSettings.getSettings().then(function(settings){
 
+                    $.ajax({
+                        url: settings.profile_update_uri,
+                        type: 'POST',
+                        data: JSON.stringify({
+                            user_id: oauthUser.sub,
+                            profile_url: selectedUser.fullUrl
+                        }),
+                        contentType: "application/json"
+                    }).done(function(result){
+                            //TODO check result value for 200 or 201
+//                        persona = selectedUser;
+//                        $rootScope.$emit('profile-change');
+                            $rootScope.$digest();
+                        }).fail(function(){
+                        });
+                });
             },
             getFhirProfileUser: function() {
                 var deferred = $.Deferred();
@@ -219,8 +318,8 @@ angular.module('sandManApp.services', [])
                         var user = {name:""};
                         user.name = patientDetails.name(userResult.data);
                         user.id  = patientDetails.id(userResult.data);
-                        fhirUser = user;
-                        fhirUser.fullUrl = userResult.config.url;
+                        persona = user;
+                        persona.fullUrl = userResult.config.url;
                         deferred.resolve(user);
                     });
                 return deferred;
@@ -266,4 +365,94 @@ angular.module('sandManApp.services', [])
                 }
             }
         };
-    });
+    }).factory('customFhirApp', function() {
+
+        var app = localStorage.customFhirApp ?
+            JSON.parse(localStorage.customFhirApp) : {id: "", url: ""};
+
+        return {
+            get: function(){return app;},
+            set: function(app){
+                localStorage.customFhirApp = JSON.stringify(app);
+            }
+        };
+
+    }).factory('launchApp', function($rootScope, fhirApiServices, random) {
+
+        return {
+            /* Hack to get around the window popup behavior in modern web browsers
+             (The window.open needs to be synchronous with the click even to
+             avoid triggering  popup blockers. */
+
+            launch: function(app, patientContext) {
+                var key = random(32);
+                window.localStorage[key] = "requested-launch";
+                var appWindow = window.open('launch.html?'+key, '_blank');
+
+                var params = {};
+                if (patientContext !== undefined) {
+                    params = {patient: patientContext.id}
+                }
+
+                fhirApiServices
+                    .registerContext(app, params)
+                    .done(function(c){
+                        console.log(fhirApiServices.fhirClient());
+                        window.localStorage[key] = JSON.stringify({
+                            app: app,
+                            iss: fhirApiServices.fhirClient().server.serviceUrl,
+                            context: c
+                        });
+                    }).fail( function(err){
+                        console.log("Could not register launch context: ", err);
+                        appWindow.close();
+                        //                    $rootScope.$emit('reconnect-request');
+                        $rootScope.$emit('error', 'Could not register launch context (see console)');
+                        $rootScope.$digest();
+                    });
+            }
+        }
+
+    }).factory('random', function() {
+        var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        return function randomString(length) {
+            var result = '';
+            for (var i = length; i > 0; --i) {
+                result += chars[Math.round(Math.random() * (chars.length - 1))];
+            }
+            return result;
+        }
+    }).factory('apps', ['$http',function($http)  {
+        return {
+            getPatientApps: $http.get('static/js/config/patient-apps.json'),
+            getPractitionerPatientApps: $http.get('static/js/config/practitioner-patient-apps.json'),
+            getPractitionerApps: $http.get('static/js/config/practitioner-apps.json')
+        };
+
+    }]).factory('appsSettings', ['$http',function($http)  {
+
+    var settings;
+
+    return {
+        loadSettings: function(){
+            var deferred = $.Deferred();
+            $http.get('static/js/config/sandbox-manager.json').success(function(result){
+                    settings = result;
+                    deferred.resolve(result);
+                });
+            return deferred;
+        },
+        getSettings: function(){
+            var deferred = $.Deferred();
+            if (settings !== undefined) {
+                deferred.resolve(settings);
+            } else {
+                this.loadSettings().then(function(result){
+                    deferred.resolve(result);
+                });
+            }
+            return deferred;
+        }
+    };
+
+}]);

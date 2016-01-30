@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <script src="bootstrap/js/jquery.js"></script>
+    <script>
+      // A hack to get around the window popup behavior in modern web browsers
+      var launched = false;
+      var key = window.location.search.slice(1);
+      if (!(key in window.localStorage)){
+        console.log('Failed to launch app -- no launch key.');
+      }
+      onStorage();
+      window.addEventListener('storage', onStorage, false);
+      function onStorage(){
+      
+        if (launched || window.localStorage[key] === 'requested-launch') {
+          return;
+        }
+        
+        launched = true;
+        var details = JSON.parse(window.localStorage[key]);
+        window.localStorage.removeItem(key);
+        
+        // Session storage is inherited from opening window, so
+        // we need to purge the tokenResponse here to avoid passing
+        // the FHIR Starter's token credentials to the app
+        delete sessionStorage.tokenResponse;
+        
+        window.location = details.app.launch_uri + 
+        '?iss=' + encodeURIComponent(details.iss) + 
+        '&launch=' + encodeURIComponent(details.context.launch_id);
+      }
+    </script>
+  </head>
+  <body>
+    Launching...
+  </body>
+</html>

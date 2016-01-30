@@ -5,22 +5,8 @@
     <!-- CSS (load bootstrap) -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="static/css/app.css">
     <style>
-        .navbar { border-radius:0; }
-        .table>tbody>tr.selected td,
-        .table>tbody>tr.selected:hover td,
-        .table-striped tr.selected td,
-        .table-striped tr.selected:hover td{
-            background-color: #a9a9a9;
-            color: #fff;
-        }
-        .full-screen {
-            /*position: absolute;*/
-            overflow: hidden;
-        }
-        .table-container{
-            overflow-y: auto;
-        }
     </style>
 
     <!-- refresh after sign in -->
@@ -42,42 +28,43 @@
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-sanitize.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.8/angular-ui-router.min.js"></script>
-    <script src="static/sandbox-manager/fhir-client/underscore-min.js"></script>
-    <script src="static/sandbox-manager/fhir-client/fhir-client.js"></script>
-    <script src="static/sandbox-manager/js/app.js"></script>
-    <script src="static/sandbox-manager/js/controllers.js"></script>
-    <script src="static/sandbox-manager/js/services.js"></script>
-    <script src="static/sandbox-manager/js/filters.js"></script>
-    <script src="static/sandbox-manager/js/directives.js"></script>
+    <script src="static/fhir-client/underscore-min.js"></script>
+    <script src="static/fhir-client/fhir-client.js"></script>
+    <script src="static/js/app.js"></script>
+    <script src="static/js/controllers.js"></script>
+    <script src="static/js/services.js"></script>
+    <script src="static/js/filters.js"></script>
+    <script src="static/js/directives.js"></script>
 </head>
 
 <!-- apply our angular app to our site -->
-<body ng-app="sandManApp" class="full-screen">
+<body ng-app="sandManApp" class="full-screen" ng-controller="navController">
 
 <!-- NAVIGATION -->
-<nav class="navbar navbar-inverse" role="navigation" ng-controller="navController">
-    <div class="pull-left">
-        <a class="navbar-brand" ui-sref="home">Sandbox Management Tool</a>
-        <ul class="nav navbar-nav" ng-show="showing.signout">
-            <li><a ui-sref="organization">Organizations</a></li>
-            <li><a ui-sref="practitioner">Practitioners</a></li>
-            <li><a ui-sref="patient">Patients</a></li>
-        </ul>
-    </div>
+<nav class="navbar" role="navigation" ng-show="showing.navBar">
+    <div><img src="static/images/HSPC-logo.png"/></div>
+    <div class="navbar-brand">Sandbox Management Tool</div>
     <div class="pull-right">
-        <div class="navbar-brand ng-hide" ng-show="showing.signout">OAuth User: {{oauthUser.name}}</div>
-        <div class="navbar-brand ng-hide" ng-show="showing.signout">Fhir User: {{fhirUser.name}}</div>
-        <a id="signin" class="navbar-brand ng-hide" ng-show="showing.signin" ng-click="signin()" >Sign
-            In</a>
-        <a id="signout" class="navbar-brand ng-hide" ng-show="showing.signout" ng-click="signout()" >Sign
-            Out</a>
+        <div class="navbar-brand navbar-stack ng-hide" ng-show="showing.signout">Welcome {{oauthUser.name}}</div>
+        <!--<div class="navbar-brand ng-hide" ng-show="showing.signout">Persona: {{persona.name}}</div>-->
+        <div  class="navbar-brand navbar-stack ng-hide" ng-show="showing.signin" >
+            <a id="signin" ng-click="signin()" >Sign In</a>
+        </div>
+        <div class="navbar-brand navbar-stack ng-hide" ng-show="showing.signout" >
+            <a id="signout" ng-click="signout()" >Sign Out</a>
+        </div>
     </div>
 </nav>
 
-<!-- MAIN CONTENT -->
-<!-- THIS IS WHERE WE WILL INJECT OUR CONTENT ============================== -->
-<div class="container">
-    <div ui-view></div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-2 sidebar" ng-show="showing.navBar" resize ng-style="resizeWithOffset(81)">
+            <div ng-include src="'static/js/templates/sideNav.html'"></div>
+        </div>
+        <div ng-class="showing.navBar ? 'col-lg-10' : 'col-lg-12'">
+            <div ui-view></div>
+        </div>
+    </div>
 </div>
 
 </body>

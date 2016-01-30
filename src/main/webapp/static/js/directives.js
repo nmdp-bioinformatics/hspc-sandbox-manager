@@ -76,4 +76,9 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
             });
         }
     };
-}]);
+}]).directive("scrollableTable", function () {
+        return {
+            restrict: 'E',
+            templateUrl: 'static/js/templates/scrollableTable.html'
+        };
+    });

@@ -1,0 +1,16 @@
+[
+    {
+        "client_name" : "HSP Appointment Viewer",
+        "client_id" : "hsp_appointment_viewer",
+        "launch_uri" : "http://localhost:8080/hsp-appointment-viewer/launch",
+        "redirect_uri" : "http://localhost:8080/hsp-appointment-viewer/redirect",
+        "logo_uri" : "http://localhost:8080/hsp-appointment-viewer/images/appointment-viewer.png"
+    },
+    {
+        "client_name" : "My Web App",
+        "client_id" : "my_web_app",
+        "launch_uri" : "http://localhost:8000/fhir-app/launch.html",
+        "redirect_uri" : "http://localhost:8000/fhir-app/",
+        "logo_uri" : "https://fhir.smarthealthit.org/images/apps/my.png"
+    }
+]

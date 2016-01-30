@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hspconsortium</groupId>
-    <artifactId>sandbox-manager</artifactId>
+    <artifactId>hsp-sandbox-manager</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>war</packaging>
 
@@ -57,7 +57,7 @@
     </developers>
 
     <build>
-        <finalName>hspc-sandbox-manager</finalName>
+        <finalName>${project.artifactId}</finalName>
     </build>
 
 </project>
