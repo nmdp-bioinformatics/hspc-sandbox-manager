@@ -25,16 +25,16 @@ INSERT INTO whitelisted_site (creator_user_id, client_id) VALUES
   ('admin', 'sand_man');
 
 INSERT INTO whitelisted_site_scope (owner_id, scope) VALUES
-  ((SELECT id from client_details where client_id = 'sand_man'), 'user/*.*');
+  ((SELECT id from whitelisted_site where client_id = 'sand_man'), 'user/*.*');
 
 INSERT INTO whitelisted_site_scope (owner_id, scope) VALUES
-  ((SELECT id from client_details where client_id = 'sand_man'), 'smart/orchestrate_launch');
+  ((SELECT id from whitelisted_site where client_id = 'sand_man'), 'smart/orchestrate_launch');
 
 INSERT INTO whitelisted_site_scope (owner_id, scope) VALUES
-  ((SELECT id from client_details where client_id = 'sand_man'), 'openid');
+  ((SELECT id from whitelisted_site where client_id = 'sand_man'), 'openid');
 
 INSERT INTO whitelisted_site_scope (owner_id, scope) VALUES
-  ((SELECT id from client_details where client_id = 'sand_man'), 'profile');
+  ((SELECT id from whitelisted_site where client_id = 'sand_man'), 'profile');
 
 COMMIT;
 
