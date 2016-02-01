@@ -1,7 +1,7 @@
 <div class="scrollableContainer referenceTable">
     <div class="headerSpacer"></div>
     <div class="scrollArea">
-        <table st-table="launchScenarioList" class="table table-striped">
+        <table class="table table-striped">
             <thead class="fixedHeader">
             <tr>
                 <th><div class="th-inner" table-header-inner>Description</div></th>
@@ -11,9 +11,9 @@
             </tr>
             </thead>
             <tbody class="scrollContent">
-            <tr st-select-row="scenario" ng-click="scenarioSelected(scenario)" ng-repeat="scenario in launchScenarioList"
+            <tr ng-click="scenarioSelected(scenario)" ng-repeat="scenario in launchScenarioList"
                 ng-class="{selected: selectedScenario === scenario}">
-                <td>{{scenario.desc}}</td>
+                <td>{{scenario.description}}</td>
                 <td>{{scenario.persona.resource}}: {{scenario.persona.name}}</td>
                 <td>{{scenario.patient.name}}</td>
                 <td>{{scenario.app.client_name}}</td>

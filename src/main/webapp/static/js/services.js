@@ -80,6 +80,9 @@ angular.module('sandManApp.services', [])
             fhirClient: function(){
                 return fhirClient;
             },
+            clientInitialized: function(){
+                return (fhirClient !== undefined && fhirClient !== null);
+            },
             initClient: function(){
                 var params = getQueryParams($location.url());
                 if (params.code){
@@ -174,7 +177,7 @@ angular.module('sandManApp.services', [])
                 return deferred;
             }
         }
-    }).factory('launchScenarios', function() {
+    }).factory('launchScenarios', function($rootScope, $location, $filter, appsSettings) {
 
         var scenarioBuilder = {
             description: '',
@@ -184,43 +187,18 @@ angular.module('sandManApp.services', [])
         };
 
         var selectedScenario;
-
         var recentLaunchScenarioList = [];
-        recentLaunchScenarioList.push({
-            desc: "Bilirubin",
-            persona: {name: "Kurtis Giles MD",
-                id: "COREPRACTITIONER1",
-                fullUrl: "http://localhost:8080/hsp-reference-api/data/Practitioner/COREPRACTITIONER1",
-                      resource: "Practitioner"},
-            patient: {name: "Bili Baby",
-                id: "BILIBABY",
-                resource: "Patient"},
-            app: {client_name: "Bilirubin"}
-        });
-
         var fullLaunchScenarioList = [];
-        fullLaunchScenarioList.push({
-            desc: "Bilirubin",
-            persona: {name: "Kurtis Giles MD",
-                id: "COREPRACTITIONER1",
-                fullUrl: "http://localhost:8080/hsp-reference-api/data/Practitioner/COREPRACTITIONER1",
-                resource: "Practitioner"},
-            patient: {name: "Bili Baby",
-                id: "BILIBABY",
-                resource: "Patient"},
-            app: {client_name: "Bilirubin"}
-        });
-        fullLaunchScenarioList.push({
-            desc: "Appointment Viewer wo/ Patient",
-            persona: {name: "Kurtis Giles MD",
-                id: "COREPRACTITIONER1",
-                fullUrl: "http://localhost:8080/hsp-reference-api/data/Practitioner/COREPRACTITIONER1",
-                resource: "Practitioner"},
-            patient: {name: "None",
-                resource: "Patient"},
-            app: {client_name: "Appointment Viewer"}
-        });
 
+        function orderByLastLaunch() {
+            if(fullLaunchScenarioList){
+                fullLaunchScenarioList = $filter('orderBy')(fullLaunchScenarioList, "lastLaunchSeconds", true);
+                recentLaunchScenarioList = [];
+                for (var i=0; i < fullLaunchScenarioList.length && i < 3; i++) {
+                    recentLaunchScenarioList.push(fullLaunchScenarioList[i]);
+                }
+            }
+        }
 
         return {
             clearBuilder: function() {
@@ -256,13 +234,75 @@ angular.module('sandManApp.services', [])
                 return fullLaunchScenarioList;
             },
             addFullLaunchScenarioList: function(launchScenario) {
-                fullLaunchScenarioList.push(launchScenario);
+                this.addLaunchScenario(angular.copy(launchScenario));
+                this.clearBuilder();
             },
             getRecentLaunchScenarioList: function() {
                 return recentLaunchScenarioList;
             },
-            addRecentLaunchScenarioList: function(launchScenario) {
-                recentLaunchScenarioList.push(launchScenario);
+            addLaunchScenario: function(launchScenario){
+                var that = this;
+                appsSettings.getSettings().then(function(settings){
+                    $.ajax({
+                        url: settings.baseUrl + "/launchScenario",
+                        type: 'POST',
+                        data: JSON.stringify(launchScenario),
+                        contentType: "application/json"
+                    }).done(function(result){
+                            that.getLaunchScenarios();
+                        }).fail(function(){
+                        });
+                });
+            },
+            updateLaunchScenario: function(launchScenario){
+                var that = this;
+                appsSettings.getSettings().then(function(settings){
+                    $.ajax({
+                        url: settings.baseUrl + "/launchScenario",
+                        type: 'PUT',
+                        data: JSON.stringify(launchScenario),
+                        contentType: "application/json"
+                    }).done(function(result){
+                            that.getLaunchScenarios();
+                        }).fail(function(){
+                        });
+                });
+            },
+            deleteLaunchScenario: function(launchScenario){
+                var that = this;
+                appsSettings.getSettings().then(function(settings){
+                    $.ajax({
+                        url: settings.baseUrl + "/launchScenario",
+                        type: 'DELETE',
+                        data: JSON.stringify(launchScenario),
+                        contentType: "application/json"
+                    }).done(function(result){
+                            that.getLaunchScenarios();
+                        }).fail(function(){
+                        });
+                });
+            },
+            getLaunchScenarios: function() {
+                var deferred = $.Deferred();
+                appsSettings.getSettings().then(function(settings){
+                    $.ajax({
+                        url: settings.baseUrl + "/launchScenarios",
+                        type: 'GET',
+                        contentType: "application/json"
+                    }).done(function(launchScenarioList){
+                            fullLaunchScenarioList = [];
+                            if (launchScenarioList) {
+                                launchScenarioList.forEach(function(launchScenario){
+                                    fullLaunchScenarioList.push(launchScenario);
+                                });
+                                orderByLastLaunch();
+                                $rootScope.$emit('launch-scenario-list-update');
+                            }
+                            deferred.resolve();
+                        }).fail(function(){
+                        });
+                });
+                return deferred;
             }
 
         }
@@ -391,7 +431,7 @@ angular.module('sandManApp.services', [])
 
                 var params = {};
                 if (patientContext !== undefined) {
-                    params = {patient: patientContext.id}
+                    params = {patient: patientContext.fhirId}
                 }
 
                 fhirApiServices

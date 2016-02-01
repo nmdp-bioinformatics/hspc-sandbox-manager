@@ -81,4 +81,29 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
             restrict: 'E',
             templateUrl: 'static/js/templates/scrollableTable.html'
         };
+    }).directive('notification', function($timeout, $compile){
+
+        return {
+            restrict: 'A',
+            template: '<div></div>',
+            replace: true,
+            link: function(scope, element) {
+                var el = angular.element('<span/>');
+
+                scope.message.isVisible = true;
+                switch(scope.message.type) {
+                    case 'error':
+                        el.append('<div ng-if="message.isVisible" ng-click="message.isVisible=false" class="message_error"><div>{{message.text}}</div></div>');
+                        break;
+                    case 'message':
+                        el.append('<div ng-if="message.isVisible" ng-click="message.isVisible=false" class="message_info"><div>{{message.text}}</div></div>');
+                        break;
+                }
+                $compile(el)(scope);
+                element.append(el);
+                $timeout(function (){
+                    scope.message.isVisible = false;
+                }, 5000);
+            }
+        }
     });

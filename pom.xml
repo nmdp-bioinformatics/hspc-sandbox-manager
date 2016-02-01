@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.hspconsortium</groupId>
-    <artifactId>hsp-sandbox-manager</artifactId>
+    <artifactId>hspc-sandbox-manager</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>Context Launcher</name>
+    <name>Sandbox Manager</name>
     <description>Sandbox Management Tool</description>
     <url>https://healthservices.atlassian.net/wiki/display/HSPC/Healthcare+Services+Platform+Consortium</url>
 
@@ -25,21 +25,18 @@
         </license>
     </licenses>
 
-    <!-- SSH configuration -->
-    <!--
-        <scm>
-            <connection>scm:git:ssh://git@bitbucket.org/travistcummings/hspconsortium/reference-impl.git</connection>
-            <developerConnection>scm:git:ssh://git@bitbucket.org/travistcummings/hspconsortium/reference-impl.git</developerConnection>
-            <url>https://bitbucket.org/travistcummings/hspconsortium/reference-impl.git</url>
-        </scm>
-    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.3.1.RELEASE</version>
+    </parent>
 
-    <!-- HTTPS configuration -->
-    <!--<scm>-->
-        <!--<url>https://bitbucket.org/hspconsortium/patient-data-manager</url>-->
-        <!--<connection>scm:git:https://bitbucket.org/hspconsortium/patient-data-manager.git</connection>-->
-        <!--<developerConnection>scm:git:https://bitbucket.org/hspconsortium/patient-data-manager.git</developerConnection>-->
-    <!--</scm>-->
+    <properties>
+        <java.version>1.7</java.version>
+        <guava.version>16.0.1</guava.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
 
     <developers>
         <developer>
@@ -56,8 +53,87 @@
         </developer>
     </developers>
 
+    <dependencies>
+
+        <!-- Spring Boot -->
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Hibernate validator -->
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+        </dependency>
+
+        <!-- Guava -->
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+
+        <!-- Java EE -->
+
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+        </dependency>
+
+    </dependencies>
+
     <build>
         <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
 </project>
