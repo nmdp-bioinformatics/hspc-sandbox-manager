@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('sandManApp.services', [])
-    .factory('oauth2', function($rootScope, $location) {
+    .factory('oauth2', function($rootScope, $location, appsSettings) {
 
         var authorizing = false;
 
@@ -40,6 +40,25 @@ angular.module('sandManApp.services', [])
 //                        $location.url(loc);
 //                    }
 //                    $rootScope.$digest();
+                });
+            },
+            logout: function(){
+                var deferred = $.Deferred();
+                appsSettings.getSettings().then(function(settings){
+                    $.ajax({
+                        url: settings.oauthLogoutUrl
+//                    url: "http://localhost:8080/hspc-reference-authorization/logout"
+                }).done(function(){
+                            deferred.resolve();
+                        }).fail(function(){
+                        });
+                });
+                return deferred;
+            },
+            login: function(){
+                var that = this;
+                appsSettings.getSettings().then(function(settings){
+                    that.authorize(settings);
                 });
             }
         };

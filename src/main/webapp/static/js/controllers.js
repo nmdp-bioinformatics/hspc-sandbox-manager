@@ -12,17 +12,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             navBar: false
         };
 
-//        $rootScope.$on('hide-nav', function(){
-//            $scope.showing.navBar = false;
-//        });
-
-//        if (sessionStorage.tokenResponse) {
-//            // access token is available, so sign-in now
-//            appsSettings.getSettings().then(function(settings){
-//                oauth2.authorize(settings);
-//            });
-//        }
-
         $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
             if (toState.authenticate && typeof window.fhirClient === "undefined"){
                 // User isn’t authenticated
@@ -36,11 +25,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 oauth2.authorize(settings);
             });
         };
-
-//        $rootScope.$on('profile-change', function(){
-//                $scope.persona = {name: patientDetails.name(userServices.persona())};
-//                $rootScope.$digest();
-//        });
 
         $rootScope.$on('signed-in', function(){
             userServices.getOAuthUser().then(function(oauthUser){
@@ -59,19 +43,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.signout = function() {
             delete $rootScope.user;
             fhirApiServices.clearClient();
-
-            $scope.showing.signin = true;
-            $scope.showing.signout = false;
-            $scope.showing.navBar = false;
-            $state.go('login', {});
+            oauth2.logout().then(function(){
+                oauth2.login();
+            });
         };
-
-//        $rootScope.$on('fake-login', function(){
-//            $scope.showing.signin = false;
-//            $scope.showing.signout = true;
-//            $scope.showing.navBar = true;
-//            $state.go('launch-scenarios', {});
-//        });
 
     }]).controller("StartController",
         function(fhirApiServices){
@@ -79,20 +54,15 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     }).controller("LoginController",
     function($rootScope, $scope, oauth2, appsSettings, fhirApiServices){
 
-//        $rootScope.$emit('hide-nav');
-        if (sessionStorage.tokenResponse && !fhirApiServices.clientInitialized) {
+        if (sessionStorage.tokenResponse && !fhirApiServices.clientInitialized()) {
             // access token is available, so sign-in now
             appsSettings.getSettings().then(function(settings){
                 oauth2.authorize(settings);
             });
-        } else if (fhirApiServices.clientInitialized) {
+        } else if (fhirApiServices.clientInitialized()) {
             $rootScope.$emit('signed-in');
-        }
-
-        $scope.login = function() {
-            appsSettings.getSettings().then(function(settings){
-                oauth2.authorize(settings);
-            });
+        } else {
+            oauth2.login();
         }
 
     }).controller("SideBarController",
@@ -396,6 +366,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.delete = function(scenario){
             launchScenarios.deleteLaunchScenario(scenario);
+            $scope.selectedScenario = {};
         };
 
         $rootScope.$on('recent-selected', function(event, arg){
