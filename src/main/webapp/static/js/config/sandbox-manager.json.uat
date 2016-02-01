@@ -1,5 +1,5 @@
 {
     "profile_update_uri" : "http://54.213.219.198:9080/uat/hspc-reference-messaging/sandboxuser/profileupdate",
     "serviceUrl": "http://54.213.219.198:9080/uat/hspc-reference-api/data",
-    "baseUrl": "http://54.213.219.198:9080/uat/hsp-sandbox-manager"
+    "baseUrl": "http://54.213.219.198:9080/uat/hspc-sandbox-manager"
 }

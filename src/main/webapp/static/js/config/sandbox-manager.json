@@ -1,5 +1,5 @@
 {
-    "profile_update_uri" : "http://localhost:8080/hsp-reference-messaging/sandboxuser/profileupdate",
-    "serviceUrl": "http://localhost:8080/hsp-reference-api/data",
-    "baseUrl": "http://localhost:8080/hsp-sandbox-manager"
+    "profile_update_uri" : "http://localhost:8080/hspc-reference-messaging/sandboxuser/profileupdate",
+    "serviceUrl": "http://localhost:8080/hspc-reference-api/data",
+    "baseUrl": "http://localhost:8080/hspc-sandbox-manager"
 }
