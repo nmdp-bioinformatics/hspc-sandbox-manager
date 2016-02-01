@@ -1,0 +1,57 @@
+[
+    {
+        "client_name" : "Bilirubin Chart",
+        "client_id" : "bilirubin_chart",
+        "launch_uri" : "https://sandbox.hspconsortium.org/hspc-bilirubin-app/static/bilirubin-chart/launch.html",
+        "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-bilirubin-app/static/bilirubin-chart/",
+        "logo_uri" : "https://sandbox.hspconsortium.org/hspc-bilirubin-app/static/bilirubin-chart/images/bilirubin.png"
+    },
+    {
+        "client_name" : "Growth Chart",
+        "client_id" : "growth_chart",
+        "launch_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/growth-chart/launch.html",
+        "redirect_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/growth-chart/",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/growth-chart.png"
+    },
+    {
+        "client_name" : "BP Centiles",
+        "client_id" : "bp_centiles",
+        "launch_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/bp-centiles/launch.html",
+        "redirect_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/bp-centiles/",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/bpc.png"
+    },
+    {
+        "client_name" : "Cardiac Risk",
+        "client_id" : "cardiac_risk",
+        "launch_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/cardiac-risk/launch.html",
+        "redirect_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/cardiac-risk/",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/cardiac-risk.png"
+    },
+    {
+        "client_name" : "Patient Data Manager",
+        "client_id" : "patient_data_manager",
+        "launch_uri" : "https://sandbox.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/launch.html",
+        "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/redirect.html",
+        "logo_uri" : "https://sandbox.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png"
+    },
+    {
+        "client_name" : "HSPC Appointment Viewer",
+        "client_id" : "hspc_appointment_viewer",
+        "launch_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/launch",
+        "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/redirect",
+        "logo_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/images/appointment-viewer.png"
+    },
+    {
+        "client_name" : "My Web App",
+        "client_id" : "my_web_app",
+        "launch_uri" : "http://localhost:8000/fhir-app/launch.html",
+        "redirect_uri" : "http://localhost:8000/fhir-app/",
+        "logo_uri" : "https://fhir.smarthealthit.org/images/apps/my.png"
+    },
+    {
+        "client_name" : "FHIR Starter",
+        "client_id" : "fhir_starter",
+        "redirect_uri" : "",
+        "logo_uri" : "http://www.hl7.org/implement/standards/fhir/assets/images/fhir-logo-www.png"
+    }
+]

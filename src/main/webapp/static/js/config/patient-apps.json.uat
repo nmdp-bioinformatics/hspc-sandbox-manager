@@ -1,0 +1,22 @@
+[
+    {
+        "client_name" : "HSPC Appointment Viewer",
+        "client_id" : "hspc_appointment_viewer",
+        "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/launch",
+        "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/redirect",
+        "logo_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/images/appointment-viewer.png"
+    },
+    {
+        "client_name" : "My Web App",
+        "client_id" : "my_web_app",
+        "launch_uri" : "http://localhost:8000/fhir-app/launch.html",
+        "redirect_uri" : "http://localhost:8000/fhir-app/",
+        "logo_uri" : "https://fhir.smarthealthit.org/images/apps/my.png"
+    },
+    {
+        "client_name" : "FHIR Starter",
+        "client_id" : "fhir_starter",
+        "redirect_uri" : "",
+        "logo_uri" : "http://www.hl7.org/implement/standards/fhir/assets/images/fhir-logo-www.png"
+    }
+]
