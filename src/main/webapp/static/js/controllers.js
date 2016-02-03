@@ -90,15 +90,21 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         var source = $stateParams.source;
         $scope.showing = {patientDetail: false,
             noPatientContext: true,
+            createPatient: true,
             searchloading: true};
 
 
         if (source === 'patient') {
             $scope.title = "Select the Patient Context";
             $scope.showing.noPatientContext =  true;
-        } else {
+            $scope.showing.createPatient =  false;
+        } else if (source === 'persona') {
             $scope.title = "Select the Patient Persona";
             $scope.showing.noPatientContext =  false;
+            $scope.showing.createPatient =  false;
+        } else {
+            $scope.showing.noPatientContext =  false;
+            $scope.showing.createPatient =  true;
         }
 
         $scope.onSelected = function(p){
@@ -375,6 +381,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.delete = function(scenario){
             launchScenarios.deleteLaunchScenario(scenario);
             $scope.selectedScenario = {};
+            $scope.showing.detail = false;
         };
 
         $rootScope.$on('recent-selected', function(event, arg){
@@ -393,6 +400,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     function($rootScope, $scope, launchScenarios){
         $scope.selectedScenario = '';
         $scope.launchScenarioList = [];
+        $scope.fullTable = false;
 
         $scope.scenarioSelected = function(scenario) {
            $scope.selectedScenario = scenario;
@@ -412,6 +420,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     function($rootScope, $scope, launchScenarios){
         $scope.selectedScenario = '';
         $scope.launchScenarioList = [];
+        $scope.fullTable = true;
 
         $scope.scenarioSelected = function(scenario) {
 
@@ -440,14 +449,21 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         var action = $stateParams.action;
 
         if (source === 'patient') {
+            $scope.title = "Apps a Patient Can Launch";
+            $scope.name = launchScenarios.getBuilder().persona.name;
             apps.getPatientApps.success(function(apps){
                 $scope.all_user_apps = apps;
             });
         } else if (source === 'practitioner') {
+            $scope.title = "Apps a Practitioner Can Launch Without a Patient Context";
+            $scope.name = launchScenarios.getBuilder().persona.name;
             apps.getPractitionerApps.success(function(apps){
                 $scope.all_user_apps = apps;
             });
         } else {
+            $scope.title = "Apps a Practitioner Can Launch With a Patient Context";
+            $scope.name = " Practitioner: " + launchScenarios.getBuilder().persona.name +
+                " with Patient: " + launchScenarios.getBuilder().patient.name;
             apps.getPractitionerPatientApps.success(function(apps){
                 $scope.all_user_apps = apps;
             });
@@ -459,7 +475,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             if (action === 'choose') {
                 launchScenarios.setApp(app);
                 openModalDialog(launchScenarios.getBuilder());
-                $state.go('launch-scenarios', {});
             } else {  // Launch
                 if (source === 'patient' || source === 'practitioner-patient') {
                     launchApp.launch(app, launchScenarios.getSelectedScenario().patient);
@@ -486,6 +501,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             modalInstance.result.then(function (scenario) {
                 scenario.lastLaunchSeconds = new Date().getTime();
                 launchScenarios.addFullLaunchScenarioList(scenario);
+                $state.go('launch-scenarios', {});
             }, function () {
             });
         }
@@ -606,8 +622,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         function enableDisableCreatePatientButton() {
             isPatientValid()
-                ? changeClass("createPatientButton", "btn btn-default")
-                : changeClass("createPatientButton", "btn btn-default disabled");
+                ? changeClass("createPatientButton", "btn btn-basic")
+                : changeClass("createPatientButton", "btn btn-basic disabled");
         }
 
         function toggleFormControl(isValid, formControlId, formIconId) {

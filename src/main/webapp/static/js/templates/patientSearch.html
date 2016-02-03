@@ -1,13 +1,16 @@
-<div id="patient-results" class="col-md-12">
+<div id="patient-results">
+    <div class="box">
     <div class="row">
-        <div class="col-md-12">Search for patients by name</div>
-        <div class="btn btn-basic btn-sm pull-right" ng-click="skipPatient()" ng-show="showing.noPatientContext">No patient in context</div>
+        <div class="col-md-12 content-column-vertical">
+            <div class="pull-left">Search for patients by name</div>
+            <div class="btn btn-basic btn-md pull-right" ng-click="skipPatient()" ng-show="showing.noPatientContext">Continue without a patient ></div>
+        </div>
     </div>
     <div class="row">
         <div class="col-md-12">
             <input
                     id="patient-search"
-                    class="col-md-12 pull-left input-long "
+                    class="col-md-12 pull-left input-long"
                     type="text"
                     autofocus
                     contenteditable
@@ -16,14 +19,13 @@
                     placeholder="john smith ..."/>
         </div>
     </div>
-    <br/>
-    <div class="row">
-        <div class="col-md-12" ng-controller="CreateNewPatient">
+    <div class="row" ng-show="showing.createPatient && !showing.noPatientContext">
+        <div class="col-md-12 content-column-vertical" ng-controller="CreateNewPatient">
             <div ng-include="'static/js/templates/patientCreateModal.html'"></div>
-            <a class="pull-right" ng-click="open()">Create new patient</a>
+            <a class="pull-left" ng-click="open()">Create new patient</a>
         </div>
     </div>
-    <div class="row table-container" resize ng-style="resizeWithOffset(355)">
+    <div class="row table-container" resize ng-style="resizeWithOffset(300)">
         <div class="col-md-12 result">
             <div id="patient-results-list" ng-cloak when-scrolling="loadMoreIfNeeded()">
                 <table class="table table-striped table-hover">
@@ -48,5 +50,6 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </div>

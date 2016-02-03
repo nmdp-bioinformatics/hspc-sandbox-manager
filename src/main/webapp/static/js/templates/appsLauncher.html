@@ -1,11 +1,12 @@
-<div ng-controller="AppsViewController">
+<div class="container-fluid" ng-controller="AppsViewController">
     <div class="text-center">
-        <h1>Patient Apps View</h1>
+        <h1>{{title}}</h1>
     </div>
 
     <div class="row">
         <div class="col-md-12 content-column">
-            <h1>Choose an App for {{persona.name}}</h1>
+            <div class="box">
+            <h3>Choose an App for {{name}}</h3>
             <div class="app-gallery-container" resize ng-style="resizeWithOffset(240)">
                 <br style="clear: both;" />
                 <div  class="row-fluid">
@@ -16,7 +17,7 @@
                                     <img ng-src="{{app.logo_uri}}" width="100%">
                                 </div>
                                 <div class="caption">
-                                    <button ng-click="launch(app)" class="btn btn-primary btn-block">{{app.client_name}}</button>
+                                    <button ng-click="launch(app)" class="btn btn-basic btn-block">{{app.client_name}}</button>
                                 </div>
                             </div>
                         </li>
@@ -27,14 +28,14 @@
                                     <input type="text" ng-model="customapp.url" placeholder="Launch URL" required />
                                 </div>
                                 <div class="caption">
-                                    <button ng-click="launchCustom()" ng-disabled="!customapp.id || !customapp.url" class="btn btn-default btn-block">Custom App</button>
+                                    <button ng-click="launchCustom()" ng-disabled="!customapp.id || !customapp.url" class="btn btn-basic btn-block">Custom App</button>
                                 </div>
                             </div>
                         </li>
                     </ul>
                 </div>
             </div>
-
+            </div>
         </div>
     </div>
 </div>

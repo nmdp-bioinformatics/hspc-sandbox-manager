@@ -1,19 +1,25 @@
 <div class="container-fluid" ng-controller="LaunchScenariosController">
     <div class="row">
-        <div ng-class="showing.detail ? 'col-lg-9' : 'col-lg-12'">
-            <h3>Recent Launch Scenarios</h3>
-            <div ng-controller="RecentTableCtrl">
-                <scrollable-table></scrollable-table>
+        <div class="content-column" resize ng-style="resizeWithOffset(81)" ng-class="showing.detail ? 'col-lg-8 right-border' : 'col-lg-12'">
+            <div style="margin-bottom: 10px">
+                <h3>Build a new Launch Scenario</h3>
+                <div class="btn btn-basic btn-lg" ui-sref="patient-view({source: 'persona'})">Patient ></div>
+                <div class="btn btn-basic btn-lg" ui-sref="practitioner-view">Practitioner ></div>
             </div>
-            <h3>Launch Scenarios</h3>
-            <div ng-controller="FullTableCtrl">
-                <scrollable-table></scrollable-table>
+            <div class="box">
+                <h3>Recent Launch Scenarios</h3>
+                <div ng-controller="RecentTableCtrl">
+                    <scrollable-table></scrollable-table>
+                </div>
             </div>
-            <h3>Build a new Launch Scenario</h3>
-            <div class="btn btn-basic btn-lg" ui-sref="patient-view">Patient</div>
-            <div class="btn btn-basic btn-lg" ui-sref="practitioner-view">Practitioner</div>
+            <div class="box">
+                <h3>Launch Scenarios</h3>
+                <div ng-controller="FullTableCtrl">
+                    <scrollable-table></scrollable-table>
+                </div>
+            </div>
         </div>
-        <div class="col-lg-3" ng-show="showing.detail">
+        <div class="col-lg-4" ng-show="showing.detail">
             <h3>Details</h3>
             <div ng-include="'static/js/templates/launchScenarioDetail.html'"></div>
         </div>

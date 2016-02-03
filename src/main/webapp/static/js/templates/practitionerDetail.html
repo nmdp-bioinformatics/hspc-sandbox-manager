@@ -1,10 +1,15 @@
-<div id="patient-details" class="col-md-12">
+<div id="patient-details" class="col-md-12 detail-form">
     <div class="row">
         <div class="col-md-12 content-column">
-            <ul>
-                <li>Persona Name: {{patientHelper.name(selectedPatient)}}</li>
-            </ul>
+            <div class="form-group">
+                <label class="detail-form-label">Name:</label>
+                <label class="detail-form-value">{{patientHelper.name(selectedPatient)}}</label>
+            </div>
         </div>
-        <div class="btn btn-basic btn-sm" ng-click="setPatient(selectedPatient)" ng-disabled="!patientSelected">Next</div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 content-column">
+            <div class="btn btn-basic btn-md" ng-click="setPatient(selectedPatient)" ng-disabled="!patientSelected">Select this Practitioner ></div>
+        </div>
     </div>
 </div>

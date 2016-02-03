@@ -1,15 +1,15 @@
 <div class="modal-header">
     <h3 class="modal-title">Save Launch Scenario</h3>
 </div>
-<div class="modal-body form-group">
-    <div class="form-group">
-        <label class="dynamic-form-label">Description</label>
-        <div class="dynamic-form-label-input">
-            <input ng-model="scenario.description" class="form-control"/>
-        </div>
-    </div>
-
+<div class="modal-body">
     <div class="modalForm">
+        <div class="form-group">
+            <label class="dynamic-form-label">Description</label>
+            <div class="dynamic-form-label-input">
+                <input ng-model="scenario.description" class="form-control dynamic-form-label-input"/>
+            </div>
+        </div>
+
         <div class="form-group">
             <label class="dynamic-form-label">Persona</label>
             <label class="dynamic-form-value">{{scenario.persona.name}}</label>
@@ -28,6 +28,6 @@
 
 </div>
 <div class="modal-footer">
-    <button class="form-btn btn btn-primary" type="button" ng-click="saveLaunchScenario(scenario)">Save</button>
-    <button class="form-btn btn btn-primary" type="button" ng-click="cancel()">Cancel</button>
+    <button class="form-btn btn btn-basic" type="button" ng-click="saveLaunchScenario(scenario)">Save</button>
+    <button class="form-btn btn btn-basic" type="button" ng-click="cancel()">Cancel</button>
 </div>
