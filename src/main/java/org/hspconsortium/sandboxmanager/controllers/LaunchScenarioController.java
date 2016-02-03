@@ -20,14 +20,8 @@
 
 package org.hspconsortium.sandboxmanager.controllers;
 
-import org.hspconsortium.sandboxmanager.model.App;
-import org.hspconsortium.sandboxmanager.model.LaunchScenario;
-import org.hspconsortium.sandboxmanager.model.Patient;
-import org.hspconsortium.sandboxmanager.model.Persona;
-import org.hspconsortium.sandboxmanager.services.AppService;
-import org.hspconsortium.sandboxmanager.services.LaunchScenarioService;
-import org.hspconsortium.sandboxmanager.services.PatientService;
-import org.hspconsortium.sandboxmanager.services.PersonaService;
+import org.hspconsortium.sandboxmanager.model.*;
+import org.hspconsortium.sandboxmanager.services.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -37,6 +31,7 @@ import javax.validation.Valid;
 public class LaunchScenarioController {
 
     private final LaunchScenarioService launchScenarioService;
+    private final UserService userService;
     private final PatientService patientService;
     private final PersonaService personaService;
     private final AppService appService;
@@ -44,8 +39,9 @@ public class LaunchScenarioController {
     @Inject
     public LaunchScenarioController(final LaunchScenarioService launchScenarioService,
                                     final PatientService patientService, final PersonaService personaService,
-                                    final AppService appService) {
+                                    final AppService appService, final UserService userService) {
         this.launchScenarioService = launchScenarioService;
+        this.userService = userService;
         this.patientService = patientService;
         this.personaService = personaService;
         this.appService = appService;
@@ -53,16 +49,26 @@ public class LaunchScenarioController {
 
     @RequestMapping(value = "/launchScenario", method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
     public @ResponseBody LaunchScenario createLaunchScenario(@RequestBody @Valid final LaunchScenario launchScenario) {
+        User user = userService.findByLdapId(launchScenario.getOwner().getLdapId());
+        if (user == null) {
+            user = userService.save(launchScenario.getOwner());
+        }
+        launchScenario.setOwner(user);
+
         Persona persona = personaService.findByFhirId(launchScenario.getPersona().getFhirId());
         if (persona == null) {
             persona = personaService.save(launchScenario.getPersona());
         }
         launchScenario.setPersona(persona);
-        Patient patient = patientService.findByFhirId(launchScenario.getPatient().getFhirId());
-        if (patient == null) {
-            patient = patientService.save(launchScenario.getPatient());
+
+        if (launchScenario.getPatient() != null) {
+            Patient patient = patientService.findByFhirId(launchScenario.getPatient().getFhirId());
+            if (patient == null) {
+                patient = patientService.save(launchScenario.getPatient());
+            }
+            launchScenario.setPatient(patient);
         }
-        launchScenario.setPatient(patient);
+
         App app = appService.findByLaunchUri(launchScenario.getApp().getLaunch_uri());
         if (app == null) {
             app = appService.save(launchScenario.getApp());
@@ -82,8 +88,8 @@ public class LaunchScenarioController {
         launchScenarioService.delete(launchScenario);
     }
 
-    @RequestMapping(value = "/launchScenarios", method = RequestMethod.GET, produces ="application/json")
-    public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios() {
-        return launchScenarioService.findAll();
+    @RequestMapping(value = "/launchScenarios/{id}", method = RequestMethod.GET, produces ="application/json")
+    public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios(@PathVariable String id) {
+        return launchScenarioService.findByOwnerId(id);
     }
 }

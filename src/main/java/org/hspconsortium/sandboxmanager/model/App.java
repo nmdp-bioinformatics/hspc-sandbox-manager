@@ -9,17 +9,17 @@ import java.math.BigInteger;
                 query="SELECT c FROM App c WHERE c.launch_uri = :uri")
 })
 public class App {
-    private BigInteger id;
+    private Integer id;
     private String client_name;
     private String launch_uri;
 
-    public void setId(BigInteger id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
     @Id // @Id indicates that this it a unique primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public BigInteger getId() {
+    public Integer getId() {
         return id;
     }
 

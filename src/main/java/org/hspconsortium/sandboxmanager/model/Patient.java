@@ -9,18 +9,18 @@ import java.math.BigInteger;
                 query="SELECT c FROM Patient c WHERE c.fhirId = :id")
 })
 public class Patient {
-    private BigInteger id;
+    private Integer id;
     private String name;
     private String fhirId;
     private String resource;
 
-    public void setId(BigInteger id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
     @Id // @Id indicates that this it a unique primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public BigInteger getId() {
+    public Integer getId() {
         return id;
     }
 

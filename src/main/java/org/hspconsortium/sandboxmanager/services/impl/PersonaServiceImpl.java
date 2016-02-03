@@ -22,13 +22,7 @@ public class PersonaServiceImpl implements PersonaService {
     @Override
     @Transactional
     public Persona save(final Persona persona) {
-//        Persona existing = repository.findOne(persona.getId());
-//        if (existing != null) {
-////            throw new UserAlreadyExistsException(
-////                    String.format("There already exists a user with id=%s", user.getId()));
-//        } else {
         return repository.save(persona);
-//        }
     }
 
     public Persona findByFhirId(String fhirId) {

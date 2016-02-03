@@ -11,6 +11,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             searchloading: false,
             navBar: false
         };
+        $scope.messages = [];
+
+        $rootScope.$on('message-notify', function(event, messages){
+            $scope.messages = messages;
+        });
 
         $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
             if (toState.authenticate && typeof window.fhirClient === "undefined"){
@@ -27,12 +32,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $rootScope.$on('signed-in', function(){
-            userServices.getOAuthUser().then(function(oauthUser){
-                $scope.oauthUser = oauthUser;
-                userServices.getFhirProfileUser().then(function(persona){
-                    $scope.persona = persona;
-                    $rootScope.$digest();
-                });
+            $scope.oauthUser = userServices.getOAuthUser();
+            userServices.getFhirProfileUser().then(function(persona){
+                $scope.persona = persona;
+                $rootScope.$digest();
             });
             $scope.showing.signin = false;
             $scope.showing.signout = true;
@@ -82,7 +85,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
     }).controller("PatientSearchController",
-    function($scope, $rootScope, $state, $stateParams, fhirApiServices, userServices, patientDetails, launchScenarios) {
+    function($scope, $rootScope, $state, $stateParams, fhirApiServices, userServices, patientDetails, launchScenarios, launchApp, apps) {
 
         var source = $stateParams.source;
         $scope.showing = {patientDetail: false,
@@ -132,6 +135,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     resource: "None",
                     name: "None"});
             $state.go('apps', {source: 'practitioner', action: 'choose'});
+        };
+
+        $scope.launchPatientDataManager = function(patient){
+            launchApp.launchPatientDataManager(patient);
         };
 
         $scope.mayLoadMore = true;
@@ -336,11 +343,12 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             userServices.updateProfile($scope.selectedPatient);
         };
     }).controller("LaunchScenariosController",
-    function($rootScope, $scope, $state, launchScenarios, launchApp, userServices, $filter){
+    function($rootScope, $scope, $state, launchScenarios, launchApp, userServices){
         $scope.showing = {detail: false};
         $scope.selectedScenario = {};
         launchScenarios.getLaunchScenarios();
         launchScenarios.clearBuilder();
+        launchScenarios.getBuilder().owner = userServices.oauthUser();
 
         $scope.launch = function(scenario){
             userServices.updateProfile(scenario.persona);
@@ -517,5 +525,127 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $uibModalInstance.close(result);
             callback(result);
         };
-    }]);
+    }]).controller('CreateNewPatient', function($scope, $uibModal) {
+        var now = new Date();
+        now.setMilliseconds(0);
+        now.setSeconds(0);
+
+        var text =
+            '{"resourceType":"Patient",'
+                + '"active":"true",'
+                + '"name":['
+                + '{"given":"", "family":"", "text":""}'
+                + ']}';
+
+        $scope.master = JSON.parse(text);
+        $scope.master.birthDate = now;
+
+        $scope.newPatient = {};
+
+        $scope.reset = function() {
+            $scope.newPatient = angular.copy($scope.master);
+        };
+
+        $scope.reset();
+
+
+        $scope.open = function () {
+            var modalInstance = $uibModal.open({
+                animation: $scope.animationsEnabled,
+                templateUrl: 'createPatientModal',
+                controller: 'CreatePatientModalInstanceCtrl',
+                resolve: {
+                    modalPatient: function () {
+                        return $scope.newPatient;
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (modalPatient) {
+                $scope.newPatient = modalPatient;
+                // do something with new patient?
+                // reset for future calls to create
+                $scope.reset();
+            }, function () { // dismissed
+                $scope.reset();
+            });
+        };
+    }).controller('CreatePatientModalInstanceCtrl', function ($scope, $uibModalInstance, modalPatient, fhirApiServices) {
+
+        $scope.modalPatient = modalPatient;
+
+        function changeClass(elementId, className) {
+            if (elementId != null) {
+                var element = document.getElementById(elementId);
+                if (element != null) {
+                    element.className = className;
+                    $scope.isSaveDisabled = true;
+                }
+            }
+        }
+
+        function isGivenNameValid() {
+            return modalPatient.name[0].given != null && modalPatient.name[0].given != "";
+        }
+
+        function isFamilyNameValid() {
+            return modalPatient.name[0].family != null && modalPatient.name[0].family != "";
+        }
+
+        function isGenderValid() {
+            return modalPatient.gender != null;
+        }
+
+        function isBirthDateValid() {
+            return modalPatient.birthDate != null;
+        }
+
+        function isPatientValid() {
+            return isGivenNameValid() && isFamilyNameValid() && isGenderValid() && isBirthDateValid();
+        }
+
+        function enableDisableCreatePatientButton() {
+            isPatientValid()
+                ? changeClass("createPatientButton", "btn btn-default")
+                : changeClass("createPatientButton", "btn btn-default disabled");
+        }
+
+        function toggleFormControl(isValid, formControlId, formIconId) {
+            if (isValid) {
+                changeClass(formControlId, "form-group has-feedback");
+                changeClass(formIconId, "glyphicon glyphicon-ok form-control-feedback");
+            } else {
+                changeClass(formControlId, "form-group has-error has-feedback");
+                changeClass(formIconId, "glyphicon glyphicon-remove form-control-feedback");
+            }
+        }
+
+        $scope.$watchGroup(['modalPatient.name[0].given', 'modalPatient.name[0].family', 'modalPatient.gender', 'modalPatient.birthDate'], function() {
+            toggleFormControl(isGivenNameValid(), "givenNameHolder", "givenNameIcon");
+            toggleFormControl(isFamilyNameValid(), "familyNameHolder", "familyNameIcon");
+            toggleFormControl(isGenderValid(), "genderHolder", "genderIcon");
+            toggleFormControl(isBirthDateValid(), "birthDateHolder", "birthDateIcon");
+
+            enableDisableCreatePatientButton();
+        });
+
+        $scope.createPatient = function () {
+            if (isPatientValid()) {
+                $uibModalInstance.close();
+                $scope.modalPatient.name[0].text = $scope.modalPatient.name[0].given + " " + $scope.modalPatient.name[0].family;
+                if (fhirApiServices.create($scope.modalPatient)) {
+                    $uibModalInstance.close($scope.modalPatient);
+                    console.log("successful response from patientSearch.create", arguments);
+                } else {
+                    console.log("unsuccessful response from patientSearch.create", arguments);
+                }
+            } else {
+                console.log("sorry not valid", arguments);
+            }
+        };
+
+        $scope.cancel = function () {
+            $uibModalInstance.dismiss('cancel');
+        };
+    });
 

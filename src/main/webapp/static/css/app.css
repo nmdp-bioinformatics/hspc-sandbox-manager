@@ -21,6 +21,12 @@ span.title,
     cursor: pointer;
 }
 
+.navbar-brand.center-title {
+    position: absolute;
+    top: -20px;
+    font-size: 26px;
+}
+
 .nav-sidebar a {
     font-weight: bold;
     color: #58585A;
@@ -514,10 +520,10 @@ td {
 
 .message_info {
     font-size: 15px;
-    color: #666;
+    color: #fff;
     box-shadow: 0 0 10px #888;
     padding: 0;
-    background-color: #FFF;
+    background-color: #00AEEF;
     border-radius: 3px;
     border: 1px solid #fff;
     cursor:pointer
@@ -531,7 +537,7 @@ td {
 }
 .message_info div {
     padding: 5px 10px;
-    background-color: #fff;
+    background-color: #00AEEF;
     border-radius: 3px;
     border: 1px solid #B8B8B8;
 }

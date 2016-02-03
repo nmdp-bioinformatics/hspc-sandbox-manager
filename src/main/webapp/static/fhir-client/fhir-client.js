@@ -16977,6 +16977,7 @@ BBClient.ready = function(input, callback, errback){
         var id_token = tokenResponse.id_token;
         var payload = jwt.decode(id_token);
         fhirClientParams["userId"] = payload["profile"];
+        fhirClientParams["payload"] = payload;
     }
 
     if (tokenResponse.access_token !== undefined) {
@@ -17242,6 +17243,7 @@ function FhirClient(p) {
     var fhirAPI = (client.patient)?client.patient.api:client.api;
 
     client.userId = p.userId;
+    client.tokenIdPayload = p.payload;
 
     server.auth = server.auth ||  {
       type: 'none'

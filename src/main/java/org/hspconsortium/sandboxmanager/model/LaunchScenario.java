@@ -3,27 +3,31 @@ package org.hspconsortium.sandboxmanager.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(name="LaunchScenario.findByOwnerId",
+                query="SELECT c FROM LaunchScenario c WHERE c.owner.ldapId = :id")
+})
 public class LaunchScenario {
 
-    private BigInteger id;
+    private Integer id;
     private String description;
+    private User owner;
     private Patient patient;
     private Persona persona;
     private App app;
     private Timestamp lastLaunch;
     private Long lastLaunchSeconds;
 
-    public void setId(BigInteger id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
     @Id // @Id indicates that this it a unique primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public BigInteger getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -32,7 +36,16 @@ public class LaunchScenario {
     }
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
-//    @PrimaryKeyJoinColumn
+    @JoinColumn(name="owner_id")
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
+    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name="patient_id")
     public Patient getPatient() {
         return patient;
@@ -43,7 +56,6 @@ public class LaunchScenario {
     }
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
-//    @PrimaryKeyJoinColumn
     @JoinColumn(name="persona_id")
     public Persona getPersona() {
         return persona;
@@ -54,7 +66,6 @@ public class LaunchScenario {
     }
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
-//    @PrimaryKeyJoinColumn
     @JoinColumn(name="app_id")
     public App getApp() {
         return app;

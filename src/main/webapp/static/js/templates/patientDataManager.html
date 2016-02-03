@@ -1,0 +1,11 @@
+<div id="patient-details" class="col-md-12">
+    <div class="row">
+        <div class="col-md-12 content-column">
+            <ul>
+                <li>Name: {{patientHelper.name(selectedPatient)}}</li>
+            </ul>
+        </div>
+        <div class="btn btn-basic btn-sm" ng-click="launchPatientDataManager(selectedPatient)" ng-disabled="!patientSelected">Open Patient Data Manager</div>
+    </div>
+</div>
+

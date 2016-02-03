@@ -47,7 +47,6 @@ angular.module('sandManApp.services', [])
                 appsSettings.getSettings().then(function(settings){
                     $.ajax({
                         url: settings.oauthLogoutUrl
-//                    url: "http://localhost:8080/hspc-reference-authorization/logout"
                 }).done(function(){
                             deferred.resolve();
                         }).fail(function(){
@@ -176,6 +175,25 @@ angular.module('sandManApp.services', [])
                     });
                 return deferred;
             },
+            create: function(newPatient){
+                var req =fhirClient.authenticated({
+                    url: fhirClient.server.serviceUrl + '/Patient',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: JSON.stringify(newPatient)
+                });
+
+                $.ajax(req)
+                    .done(function(){
+                        console.log("Patient created!", arguments);
+//                        $route.reload();
+                    })
+                    .fail(function(){
+                        console.log("Failed to create patient", arguments);
+                    });
+
+                return true;
+            },
             registerContext: function(app, params){
                 var deferred = $.Deferred();
 
@@ -196,9 +214,10 @@ angular.module('sandManApp.services', [])
                 return deferred;
             }
         }
-    }).factory('launchScenarios', function($rootScope, $location, $filter, appsSettings) {
+    }).factory('launchScenarios', function($rootScope, $location, $filter, appsSettings, userServices, notification) {
 
         var scenarioBuilder = {
+            owner: userServices.getOAuthUser(),
             description: '',
             persona: '',
             patient: '',
@@ -269,8 +288,10 @@ angular.module('sandManApp.services', [])
                         contentType: "application/json"
                     }).done(function(result){
                             that.getLaunchScenarios();
+                            notification.message("Launch Scenario Created");
                         }).fail(function(){
-                        });
+                        notification.message({ type:"error", text: "Failed to Create Launch Scenario" });
+                    });
                 });
             },
             updateLaunchScenario: function(launchScenario){
@@ -296,6 +317,7 @@ angular.module('sandManApp.services', [])
                         data: JSON.stringify(launchScenario),
                         contentType: "application/json"
                     }).done(function(result){
+                            notification.message("Launch Scenario Deleted");
                             that.getLaunchScenarios();
                         }).fail(function(){
                         });
@@ -305,7 +327,7 @@ angular.module('sandManApp.services', [])
                 var deferred = $.Deferred();
                 appsSettings.getSettings().then(function(settings){
                     $.ajax({
-                        url: settings.baseUrl + "/launchScenarios",
+                        url: settings.baseUrl + "/launchScenarios/" + userServices.oauthUser().ldapId,
                         type: 'GET',
                         contentType: "application/json"
                     }).done(function(launchScenarioList){
@@ -344,14 +366,11 @@ angular.module('sandManApp.services', [])
                         url: settings.profile_update_uri,
                         type: 'POST',
                         data: JSON.stringify({
-                            user_id: oauthUser.sub,
+                            user_id: oauthUser.ldapId,
                             profile_url: selectedUser.fullUrl
                         }),
                         contentType: "application/json"
                     }).done(function(result){
-                            //TODO check result value for 200 or 201
-//                        persona = selectedUser;
-//                        $rootScope.$emit('profile-change');
                             $rootScope.$digest();
                         }).fail(function(){
                         });
@@ -384,21 +403,16 @@ angular.module('sandManApp.services', [])
                 return deferred;
             },
             getOAuthUser: function() {
-                var deferred = $.Deferred();
-                var userInfoEndpoint = fhirApiServices.fhirClient().state.provider.oauth2.authorize_uri.replace("authorize", "userinfo");
-                $.ajax({
-                    url: userInfoEndpoint,
-                    type: 'GET',
-                    contentType: "application/json",
-                    beforeSend : function( xhr ) {
-                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
-                    }
-                }).done(function(result){
-                        oauthUser = result;
-                        deferred.resolve(result);
-                    }).fail(function(){
-                    });
-                return deferred;
+                if (fhirApiServices.fhirClient().tokenIdPayload === null ||
+                    typeof fhirApiServices.fhirClient().tokenIdPayload === "undefined"){
+                    oauthUser = null;
+                } else {
+                    var payload = fhirApiServices.fhirClient().tokenIdPayload;
+                    oauthUser.ldapId = payload.sub;
+                    oauthUser.name = payload.displayName;
+                    oauthUser.email = payload.email;
+                }
+                return oauthUser;
             }
         };
     }).factory('patientDetails', function() {
@@ -408,17 +422,17 @@ angular.module('sandManApp.services', [])
             },
             name: function(p){
                 if (p.resourceType === "Patient") {
-                    var name = p && p.name && p.name[0];
-                    if (!name) return null;
+                    var patientName = p && p.name && p.name[0];
+                    if (!patientName) return null;
 
-                    return name.given.join(" ") + " " + name.family.join(" ");
+                    return patientName.given.join(" ") + " " + patientName.family.join(" ");
                 } else {
-                    var name = p && p.name;
-                    if (!name) return null;
+                    var practitionerName = p && p.name;
+                    if (!practitionerName) return null;
 
-                    var practitioner =  name.given.join(" ") + " " + name.family.join(" ");
-                    if (name.suffix) {
-                        practitioner = practitioner + " " + name.suffix.join(", ");
+                    var practitioner =  practitionerName.given.join(" ") + " " + practitionerName.family.join(" ");
+                    if (practitionerName.suffix) {
+                        practitioner = practitioner + " " + practitionerName.suffix.join(", ");
                     }
                     return practitioner;
                 }
@@ -436,7 +450,7 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('launchApp', function($rootScope, fhirApiServices, random) {
+    }).factory('launchApp', function($rootScope, fhirApiServices, apps, random) {
 
         return {
             /* Hack to get around the window popup behavior in modern web browsers
@@ -469,8 +483,23 @@ angular.module('sandManApp.services', [])
                         $rootScope.$emit('error', 'Could not register launch context (see console)');
                         $rootScope.$digest();
                     });
+            },
+            launchPatientDataManager: function(patient){
+                var that = this;
+                apps.getPractitionerPatientApps.success(function(patientApps){
+                    var pdm;
+                    for (var i=0; i < patientApps.length; i++) {
+                        if (patientApps[i]["client_id"] == "patient_data_manager") {
+                            pdm = patientApps[i];
+                        }
+                    }
+                    if (patient.fhirId === undefined){
+                        patient.fhirId = patient.id;
+                    }
+                    that.launch(pdm, patient);
+                });
             }
-        }
+    }
 
     }).factory('random', function() {
         var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -481,6 +510,32 @@ angular.module('sandManApp.services', [])
             }
             return result;
         }
+    }).factory('notification', function($rootScope) {
+        var messages = [];
+
+        return {
+            message: function(message ){
+                messages = messages.filter(function( obj ) {
+                    return (obj.isVisible !== false );
+                });
+
+                var finalMessage;
+                if (message.text === undefined) {
+                    finalMessage = {
+                        type: 'message',
+                        text: message
+                    }
+                } else {
+                    finalMessage = message;
+                }
+                messages.push(finalMessage);
+                $rootScope.$emit('message-notify', messages);
+            },
+            messages: function(){
+                return messages;
+            }
+        }
+
     }).factory('apps', ['$http',function($http)  {
         return {
             getPatientApps: $http.get('static/js/config/patient-apps.json'),

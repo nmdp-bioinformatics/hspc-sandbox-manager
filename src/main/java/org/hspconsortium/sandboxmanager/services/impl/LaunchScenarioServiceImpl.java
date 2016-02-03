@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class LaunchScenarioServiceImpl implements LaunchScenarioService {
@@ -33,6 +34,10 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
     public Iterable<LaunchScenario> findAll(){
         return repository.findAll();
 
+    }
+
+    public List<LaunchScenario> findByOwnerId(String id) {
+        return  repository.findByOwnerId(id);
     }
 
 }
