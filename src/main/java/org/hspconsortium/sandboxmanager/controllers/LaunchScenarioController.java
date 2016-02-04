@@ -90,11 +90,11 @@ public class LaunchScenarioController {
     }
 
     @RequestMapping(value = "/launchScenarios", method = RequestMethod.GET, produces ="application/json",
-            params = {"email"})
-    public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios(@RequestParam(value = "email") String email) {
+            params = {"id"})
+    public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios(@RequestParam(value = "id") String id) {
         String ownerId = null;
         try {
-            ownerId = java.net.URLDecoder.decode(email, "UTF-8");
+            ownerId = java.net.URLDecoder.decode(id, "UTF-8");
             return launchScenarioService.findByOwnerId(ownerId);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
