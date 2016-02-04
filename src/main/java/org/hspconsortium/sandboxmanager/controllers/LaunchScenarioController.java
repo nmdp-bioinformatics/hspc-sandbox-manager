@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 
 @RestController
 public class LaunchScenarioController {
@@ -88,8 +89,16 @@ public class LaunchScenarioController {
         launchScenarioService.delete(launchScenario);
     }
 
-    @RequestMapping(value = "/launchScenarios/{id}", method = RequestMethod.GET, produces ="application/json")
-    public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios(@PathVariable String id) {
-        return launchScenarioService.findByOwnerId(id);
+    @RequestMapping(value = "/launchScenarios", method = RequestMethod.GET, produces ="application/json",
+            params = {"email"})
+    public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios(@RequestParam(value = "email") String email) {
+        String ownerId = null;
+        try {
+            ownerId = java.net.URLDecoder.decode(email, "UTF-8");
+            return launchScenarioService.findByOwnerId(ownerId);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return null;
     }
 }

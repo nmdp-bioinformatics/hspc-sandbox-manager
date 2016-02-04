@@ -327,7 +327,7 @@ angular.module('sandManApp.services', [])
                 var deferred = $.Deferred();
                 appsSettings.getSettings().then(function(settings){
                     $.ajax({
-                        url: settings.baseUrl + "/launchScenarios/" + userServices.oauthUser().ldapId,
+                        url: settings.baseUrl + "/launchScenarios?email=" + encodeURIComponent(userServices.oauthUser().ldapId),
                         type: 'GET',
                         contentType: "application/json"
                     }).done(function(launchScenarioList){
