@@ -28,6 +28,27 @@
         "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/cardiac-risk.png"
     },
     {
+        "client_name" : "Duke Pillbox",
+        "client_id" : "f0ea39ca-9ad0-4676-baae-d28878baf75e",
+        "launch_uri" : "http://pillbox.medapptech.com/initapp/launch.html",
+        "redirect_uri" : "http://pillbox.medapptech.com/initapp/",
+        "logo_uri" : "https://gallery.smarthealthit.org/img/apps/14.png"
+    },
+    {
+        "client_name" : "ClinDat",
+        "client_id" : "26bc47e9-c182-4136-855b-6e7b1bb67e9f",
+        "launch_uri" : "https://apps.medapptech.com:9004/fhir-app/launch.html",
+        "redirect_uri" : "https://apps.medapptech.com:9004/fhir-app/authorize.html",
+        "logo_uri" : "https://gallery.smarthealthit.org/img/apps/16.png"
+    },
+    {
+        "client_name" : "Meducation RS",
+        "client_id" : "meducation",
+        "launch_uri" : "https://fhir-dstu2.meducation.com/launch.html",
+        "redirect_uri" : "https://fhir-dstu2.meducation.com/index.html",
+        "logo_uri" : ""
+    },
+    {
         "client_name" : "Patient Data Manager",
         "client_id" : "patient_data_manager",
         "launch_uri" : "https://sandbox.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/launch.html",
