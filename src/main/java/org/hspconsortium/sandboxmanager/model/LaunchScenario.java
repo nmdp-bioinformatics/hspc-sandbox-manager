@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @NamedQueries({
@@ -18,6 +19,7 @@ public class LaunchScenario {
     private Patient patient;
     private Persona persona;
     private App app;
+    private List<ContextParams> contextParams;
     private Timestamp lastLaunch;
     private Long lastLaunchSeconds;
 
@@ -69,6 +71,15 @@ public class LaunchScenario {
     @JoinColumn(name="app_id")
     public App getApp() {
         return app;
+    }
+
+    public void setContextParams(List<ContextParams> contextParams) {
+        this.contextParams = contextParams;
+    }
+
+    @OneToMany(cascade={CascadeType.ALL})
+    public List<ContextParams> getContextParams() {
+        return contextParams;
     }
 
     public void setDescription(String description) {

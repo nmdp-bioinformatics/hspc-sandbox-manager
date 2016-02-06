@@ -28,4 +28,8 @@ public class AppServiceImpl implements AppService {
         return  repository.findByLaunchUri(uri);
     }
 
+    public App findByClientId(String clientId) {
+        return  repository.findByLaunchUri(clientId);
+    }
+
 }

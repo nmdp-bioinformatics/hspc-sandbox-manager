@@ -6,12 +6,16 @@ import java.math.BigInteger;
 @Entity
 @NamedQueries({
         @NamedQuery(name="App.findByLaunchUri",
-                query="SELECT c FROM App c WHERE c.launch_uri = :uri")
+                query="SELECT c FROM App c WHERE c.launch_uri = :uri"),
+        @NamedQuery(name="App.findByClientId",
+        query="SELECT c FROM App c WHERE c.client_id = :client_id")
 })
 public class App {
     private Integer id;
     private String client_name;
+    private String client_id;
     private String launch_uri;
+    private String logo_uri;
 
     public void setId(Integer id) {
         this.id = id;
@@ -31,12 +35,29 @@ public class App {
         return client_name;
     }
 
+
+    public String getClient_id() {
+        return client_id;
+    }
+
+    public void setClient_id(String client_id) {
+        this.client_id = client_id;
+    }
+
     public void setLaunch_uri(String launch_uri) {
         this.launch_uri = launch_uri;
     }
 
     public String getLaunch_uri() {
         return launch_uri;
+    }
+
+    public String getLogo_uri() {
+        return logo_uri;
+    }
+
+    public void setLogo_uri(String logo_uri) {
+        this.logo_uri = logo_uri;
     }
 
 }

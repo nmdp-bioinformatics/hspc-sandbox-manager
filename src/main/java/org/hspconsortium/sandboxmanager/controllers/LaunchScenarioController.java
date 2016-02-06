@@ -70,7 +70,7 @@ public class LaunchScenarioController {
             launchScenario.setPatient(patient);
         }
 
-        App app = appService.findByLaunchUri(launchScenario.getApp().getLaunch_uri());
+        App app = appService.findByClientId(launchScenario.getApp().getClient_id());
         if (app == null) {
             app = appService.save(launchScenario.getApp());
         }

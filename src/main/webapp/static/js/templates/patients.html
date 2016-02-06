@@ -1,14 +1,13 @@
-<div class="container-fluid" ng-controller="PatientSearchController">
+<div class="container-fluid" ng-controller="PatientsController">
     <div class="row">
-        <div class="content-column" resize ng-style="resizeWithOffset(81)" ng-class="showing.patientDetail ? 'col-lg-8 right-border' : 'col-lg-12'">
+        <div class="content-column" resize ng-style="resizeWithOffset(80)" ng-class="showing.patientDetail ? 'col-lg-8 right-border' : 'col-lg-12'">
             <div class="text-center">
                 <h1>Patients View</h1>
             </div>
-
             <div ng-include="'static/js/templates/patientSearch.html'"></div>
         </div>
         <div class="col-lg-4 content-column" ng-show="showing.patientDetail">
-        <h3>Details</h3>
+            <h3>Details</h3>
             <div ng-include="'static/js/templates/patientDataManager.html'"></div>
         </div>
     </div>

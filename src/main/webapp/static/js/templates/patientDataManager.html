@@ -1,15 +1,15 @@
-<div id="patient-details" class="col-md-12">
+<div id="patient-details" class="col-md-12"  ng-controller="PatientDataManagerController">
     <div class="row">
         <div class="col-md-12 content-column">
             <div class="form-group">
                 <label class="detail-form-label">Name:</label>
-                <label class="detail-form-value">{{patientHelper.name(selectedPatient)}}</label>
+                <label class="detail-form-value">{{patientHelper.name(selected.selectedPatient)}}</label>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12 content-column">
-            <div class="btn btn-basic btn-md" ng-click="launchPatientDataManager(selectedPatient)" ng-disabled="!patientSelected">Open Patient Data Manager</div>
+            <div class="btn btn-basic btn-md" ng-click="launchPatientDataManager(selected.selectedPatient)" ng-disabled="!selected.patientSelected">Open Patient Data Manager</div>
         </div>
     </div>
 </div>

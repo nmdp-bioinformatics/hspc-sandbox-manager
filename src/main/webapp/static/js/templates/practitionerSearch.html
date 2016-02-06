@@ -1,4 +1,4 @@
-<div id="user-results">
+<div id="practitioner-results" ng-controller="PractitionerSearchController">
     <div class="box">
     <div class="row">
         <div class="col-md-12">Search for practitioners by name</div>
@@ -6,13 +6,13 @@
     <div class="row">
         <div class="col-md-12">
             <input
-                    id="patient-search"
+                    id="practitioner-search"
                     class="col-md-12 pull-left input-long "
                     type="text"
                     autofocus
                     contenteditable
                     focus-on-key="191"
-                    ng-model="$parent.searchterm"
+                    ng-model="searchterm"
                     placeholder="john smith ..."/>
         </div>
     </div>
@@ -20,20 +20,20 @@
 
     <div class="row">
         <div class="col-md-12 result">
-            <div id="patient-results-list" ng-cloak when-scrolling="loadMoreIfNeeded()">
+            <div id="practitioner-results-list" ng-cloak when-scrolling="loadMoreIfNeeded()">
                 <table class="table table-striped table-hover">
-                    <tr class="patient-row" ng-click="select($index)" ng-repeat="patient in patients" ng-class="{selected : patient === selectedPatient}">
+                    <tr class="practitioner-row" ng-click="select($index)" ng-repeat="practitioner in practitioners" ng-class="{selected : practitioner === selected.selectedPractitioner}">
                         <td class="name">
-                            <span ng-bind="patientHelper.name(patient)"></span>
+                            <span ng-bind="practitionerHelper.name(practitioner)"></span>
                         </td>
                     </tr>
                 </table>
 
-                <div ng-show="!showing.searchloading && (patients.length==0)">
+                <div ng-show="!showing.searchloading && (practitioners.length==0)">
                     <p>No matches, try broadening your search.</p>
                 </div>
 
-                <div id="loading-patient-results" ng-show="showing.searchloading" class="ng-hide">
+                <div id="loading-practitioner-results" ng-show="showing.searchloading" class="ng-hide">
                     <p>Loading...</p>
                 </div>
             </div>

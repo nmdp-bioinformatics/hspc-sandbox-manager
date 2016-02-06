@@ -1,28 +1,76 @@
 <div id="patient-details" class="col-md-12">
     <div class="row">
         <div class="col-md-12 content-column">
-            <div class="form-group">
-                <label class="detail-form-label">Description:</label>
-                <label class="detail-form-value">{{selectedScenario.description}}</label>
+            <div class="detail-description">{{desc.title}}</div>
+
+            <div class="title_box">
+                <div class="title">Persona</div>
+                <div class="content">
+                <div class="detail-form">
+                        <label class="detail-form-label">Launch As:</label>
+                        <label class="detail-form-value">{{selectedScenario.persona.name}}</label>
+                    </div>
+                    <div class="detail-form">
+                        <label class="detail-form-label">Persona Type:</label>
+                        <label class="detail-form-value"><i class='fa fa-lg' ng-class="selectedScenario.persona.resource == 'Patient' ? 'fa-bed' : 'fa-medkit'"></i> {{selectedScenario.persona.resource}}</label>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label class="detail-form-label">Persona:</label>
-                <label class="detail-form-value">{{selectedScenario.persona.name}}</label>
+
+            <div class="title_box">
+                <div class="title">With Context</div>
+                <div class="content">
+                    <div class="detail-form">
+                        <label class="detail-form-label">Patient:</label>
+                        <label class="detail-form-value">{{selectedScenario.patient.name}}</label>
+                    </div>
+                    <div class="detail-form">
+                        <label class="detail-form-label">Encounter:</label>
+                        <label class="detail-form-value">None</label>
+                    </div>
+                    <div class="detail-form">
+                        <label class="detail-form-label">Location:</label>
+                        <label class="detail-form-value">None</label>
+                    </div>
+
+                    <div style="height: 200px">
+                        <div class="detail-form">
+                            <label class="detail-form-label full-line">Additional Context Parameters</label>
+                        </div>
+                        <div ng-include="'static/js/templates/contextKeyValueTable.html'"></div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label class="detail-form-label">Patient:</label>
-                <label class="detail-form-value">{{selectedScenario.patient.name}}</label>
+
+            <div class="title_box">
+                <div class="title">App</div>
+                <div class="content">
+                    <div class="detail-form">
+                        <label class="detail-form-label full-line">{{selectedScenario.app.client_name}}</label>
+                    </div>
+                    <div class="thumb-holder">
+                        <img ng-src="{{selectedScenario.app.logo_uri}}">
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label class="detail-form-label">App:</label>
-                <label class="detail-form-value">{{selectedScenario.app.client_name}}</label>
-            </div>
+
+
         </div>
     </div>
+    <!--<div class="row">-->
+        <!--<div class="col-md-12 content-column">-->
+            <!--<div style="text-align: center">App {{selectedScenario.app.client_name}}</div>-->
+            <!--<div class="thumbnail">-->
+                <!--<div class="thumb-holder">-->
+                    <!--<img ng-src="{{selectedScenario.app.logo_uri}}">-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
     <div class="row">
         <div class="col-md-12 content-column">
-            <div class="btn btn-basic btn-md" ng-click="launch(selectedScenario)">Launch!</div>
-            <div class="btn btn-basic btn-md" ng-click="delete(selectedScenario)">Delete</div>
+            <div class="btn btn-basic btn-md" ng-click="launch(selectedScenario)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
+            <div class="btn btn-basic btn-md" ng-click="delete(selectedScenario)"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
         </div>
     </div>
 </div>

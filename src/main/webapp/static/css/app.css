@@ -6,16 +6,18 @@
 
 .navbar {
 	background-color: #f5f5f5;
+    /*border-width: 0 0 1px 0;*/
+    /*border-color: #080808;*/
     border-radius: 0;
-    border-width: 0 0 1px 0;
-    border-color: #080808;
+    border-width: 0 0 4px 0;
+    border-color: #bfbfc0;
 }
 
 span.title,
 .navbar .navbar-brand,
 .navbar .navbar-brand a{
 	color: #58585A;
-	font-weight: bold;
+	font-weight: normal;
     height: 80px;
     padding: 45px 15px 25px 15px;
     text-decoration: none;
@@ -29,6 +31,7 @@ span.title,
 
 .navbar-brand.center-title {
     position: absolute;
+    font-weight: bold;
     top: -20px;
     font-size: 26px;
 }
@@ -48,7 +51,8 @@ span.title,
 }
 .sidebar {
     background-color: #f5f5f5;
-    border-right: 1px solid #080808;
+    border-right: 4px solid #bfbfc0;
+    /*border-radius: 4px;*/
     z-index: 1000;
     padding-top: 10px;
 }
@@ -66,11 +70,13 @@ span.title,
 }
 
 .right-border {
-    border-right: 1px solid #080808;
+    /*border-radius: 4px;*/
+    border-right: 4px solid #bfbfc0;
 }
 
 .left-border {
-    border-left: 1px solid #080808;
+    /*border-radius: 4px;*/
+    border-left: 4px solid #bfbfc0;
 }
 
 .nav > li > a:hover,
@@ -92,15 +98,34 @@ span.title,
     margin-right: auto;
 }
 
-.navbar-stack:first-child {
-    right: 15px;
-    padding-top: 15px;
+.navbar-stack-sign-in,
+.navbar-stack-sign-in a,
+.navbar-stack-name,
+.navbar-stack-name a{
+    color: #58585A;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 20px;
+    text-decoration: none;
 }
 
-.navbar-stack:last-child {
+.navbar-stack-sign-in  a:hover,
+.navbar-stack-name a:hover {
+    color: #00AEEF;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.navbar-stack-name {
     position: absolute;
-    right: 0;
-    padding-right: 0px;
+    right: 15px;
+    top: 15px;
+}
+
+.navbar-stack-sign-in {
+    position: absolute;
+    right: 15px;
+    top: 45px;
 }
 
 a {
@@ -145,9 +170,9 @@ a:hover {
 .table>tbody>tr.selected:hover td,
 .table-striped tr.selected td,
 .table-striped tr.selected:hover td{
-    background-color: #00AEEF;
+    background-color: #ccf1ff;
     /*background-color: #58585A;*/
-    color: #fff;
+    color: #58585A;
 }
 .table-container{
     overflow-y: auto;
@@ -334,11 +359,12 @@ td {
 .form-control {
     display: block;
     width: 100%;
-    height: 34px;
+    height: 24px;
     padding: 2px 4px;
     font-size: 14px;
     line-height: 1.428571429;
     color: #555;
+    outline: none;
     background-color: #fff;
     background-image: none;
     border: 1px solid #ccc;
@@ -352,12 +378,13 @@ td {
 .invalid-form-control {
     display: block;
     width: 100%;
-    height: 34px;
+    height: 24px;
     padding: 2px 4px;
     font-size: 14px;
     line-height: 1.428571429;
     color: #555;
-    background-color: #FFBABA;
+    outline: none;
+    background-color: #ffe5e5;
     background-image: none;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -389,13 +416,13 @@ td {
 }
 
 .thumb-holder {
-    height: 160px;
-    width: 100%;
+    height: 180px;
+    /*width: 100%;*/
     text-align: center;
 }
 
-.thumbnail img {
-    max-height: 100%;
+.thumb-holder img {
+    height: 100%;
 }
 
 .detail-form {
@@ -612,6 +639,105 @@ td {
     line-height: 1.428571429;
     vertical-align: top;
     border-top: 1px solid #ddd;
+}
+
+.contextTable{
+    float: left;
+    width: 100%;
+    height: 175px;
+    border: 1px solid #bbb;
+    border-radius: 4px;
+}
+.contextTable.scrollableContainer {
+    padding-top: 27px;
+    margin-bottom: 4px;
+}
+
+.contextTable.scrollableContainer .headerSpacer {
+    height: 26px;
+}
+
+.contextTable .scrollArea table .th-inner {
+    height: 26px;
+    line-height: 26px;
+    width:50%;
+}
+
+.contextTable .table>thead>tr>th,
+.contextTable .table>tbody>tr>th,
+.contextTable .table>tfoot>tr>th,
+.contextTable .table>thead>tr>td,
+.contextTable .table>tbody>tr>td,
+.contextTable .table>tfoot>tr>td {
+    line-height: 10px;
+    font-size: 14px;
+    border: none;
+}
+
+.contextTable .table>tfoot>tr>td{
+    width:50%;
+    float:left;
+    word-wrap:break-word;
+}
+
+.title_box {
+    margin: 25px 0 5px 0;
+    padding: 5px;
+    border: #ddd 1px solid;
+    border-radius: 4px;
+}
+
+.title_box .title {
+    position: relative;
+    top: -15px;
+    margin-left: 15px;
+    padding: 0 2px 0 2px;
+    display: inline;
+    background-color: white;
+    font-weight: bold;
+}
+
+.title_box .content {
+    margin-top: -15px;
+    padding-bottom: 5px;
+    width: 100%;
+}
+
+.title_box .content .detail-form {
+    height: 25px;
+}
+
+.title_box .content .detail-form-label {
+    font-weight: normal;
+    margin: 0;
+    padding: 5px 0 0 5px;
+    min-height: 20px;
+}
+
+.title_box .content .detail-form-value {
+    border: none;
+    margin: 0;
+    padding: 5px 0 0 5px;
+    min-height: 20px;
+}
+
+.title_box .content .detail-form-label.full-line {
+    border: none;
+    width: 100%;
+    margin: 0;
+    padding: 5px 0 5px 5px;
+    min-height: 20px;
+}
+
+.detail-description {
+    font-size: 16px;
+}
+
+.image-btn {
+    display: block;
+    height: 24px;
+    padding: 2px 6px;
+    outline: none;
 }
 
 .message_area {

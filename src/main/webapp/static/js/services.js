@@ -217,7 +217,7 @@ angular.module('sandManApp.services', [])
     }).factory('launchScenarios', function($rootScope, $location, $filter, appsSettings, userServices, notification) {
 
         var scenarioBuilder = {
-            owner: userServices.getOAuthUser(),
+            owner: '',
             description: '',
             persona: '',
             patient: '',
@@ -241,6 +241,7 @@ angular.module('sandManApp.services', [])
         return {
             clearBuilder: function() {
                 scenarioBuilder = {
+                    owner: userServices.getOAuthUser(),
                     description: '',
                     persona: '',
                     patient: '',
@@ -501,6 +502,27 @@ angular.module('sandManApp.services', [])
             }
     }
 
+    }).factory('descriptionBuilder', function() {
+        return  {
+            launchScenarioDescription: function(scenario){
+
+                var desc = {title: "", detail: ""};
+
+                if (scenario.persona.resource === 'Practitioner') {
+                    desc.title = "Launch App as a Practitioner";
+                    if (scenario.patient !== "") {
+                        desc.title = desc.title + " with Patient Context";
+                    } else {
+                        desc.title = desc.title + " with NO Patient Context";
+                    }
+                } else {
+                    desc.title = "Launch an App As a Patient";
+                }
+
+                return desc;
+            }
+
+        }
     }).factory('random', function() {
         var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         return function randomString(length) {
@@ -510,6 +532,35 @@ angular.module('sandManApp.services', [])
             }
             return result;
         }
+    }).factory('tools', function() {
+
+        return {
+            decodeURLParam: function (url, param) {
+                var query;
+                var data;
+                var result = [];
+
+                try {
+                    query = decodeURIComponent(url).split("?")[1];
+                    data = query.split("&");
+                } catch (err) {
+                    return null;
+                }
+
+                for(var i=0; i<data.length; i++) {
+                    var item = data[i].split("=");
+                    if (item[0] === param) {
+                        result.push(item[1]);
+                    }
+                }
+
+                if (result.length === 0){
+                    return null;
+                }
+                return result[0];
+            }
+        };
+
     }).factory('notification', function($rootScope) {
         var messages = [];
 

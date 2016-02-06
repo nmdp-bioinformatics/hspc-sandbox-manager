@@ -1,0 +1,38 @@
+<div class="scrollableContainer contextTable">
+    <div class="headerSpacer"></div>
+    <div class="scrollArea">
+        <table class="table table-striped">
+            <thead class="fixedHeader">
+            <tr>
+                <th><div class="th-inner" table-header-inner>Key</div></th>
+                <th><div class="th-inner" table-header-inner>Value</div></th>
+            </tr>
+            </thead>
+            <tbody class="scrollContent">
+            <tr ng-repeat="contextItem in selectedScenario.contextParams">
+                <td>{{contextItem.name}}</td>
+                <td>{{contextItem.value}}</td>
+            </tr>
+            <tr ng-show="showing.addingContext">
+                <td>
+                    <div class="form-group">
+                        <input id="contextName" type="text" ng-model="$parent.$parent.contextName" ng-class="$parent.$parent.contextNameIsValid ? 'form-control' : 'invalid-form-control'" ng-blur="saveContextParam()" ng-focus="hasFocus('name')">
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <input id="contextValue" type="text" ng-model="$parent.$parent.contextValue" ng-class="$parent.$parent.contextValueIsValid ? 'form-control' : 'invalid-form-control'" ng-blur="saveContextParam()" ng-focus="hasFocus('value')">
+                    </div>
+                </td>
+            </tr>
+            <tr ng-hide="showing.addingContext"></tr>
+            <tr ng-hide="showing.addingContext">
+                <td colspan="2">
+                    <input type="image" src="static/images/32x32_circle_add_plus.png" ng-click="toggleAddingContext()" class="image-btn" />
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+

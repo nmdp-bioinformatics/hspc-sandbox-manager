@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('sandManApp.controllers', []).controller('navController',[
-    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "patientDetails", "oauth2", "$location", "$state",
-    function($rootScope, $scope, appsSettings, fhirApiServices, userServices, patientDetails, oauth2, $location, $state) {
+    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "patientDetails", "oauth2", "launchScenarios", "$location", "$state",
+    function($rootScope, $scope, appsSettings, fhirApiServices, userServices, patientDetails, oauth2, launchScenarios, $location, $state) {
 
         $scope.showing = {
             signout: false,
@@ -21,6 +21,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             if (toState.authenticate && typeof window.fhirClient === "undefined"){
                 // User isn’t authenticated
                 $scope.signin();
+                event.preventDefault();
+            }
+            if (toState.scenarioBuilderStep && launchScenarios.getBuilder().persona === "") {
+                $state.go('launch-scenarios', {});
                 event.preventDefault();
             }
         });
@@ -43,12 +47,20 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $state.go('launch-scenarios', {});
         });
 
+        $rootScope.$on('hide-nav', function(){
+            $scope.showing.navBar = false;
+        });
+
         $scope.signout = function() {
             delete $rootScope.user;
             fhirApiServices.clearClient();
             oauth2.logout().then(function(){
                 oauth2.login();
             });
+        };
+
+        $scope.manageUserAccount = function() {
+            window.open("https://sandbox.hspconsortium.org/pwm/private/");
         };
 
     }]).controller("StartController",
@@ -84,55 +96,106 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.selected = selection;
         }
 
-    }).controller("PatientSearchController",
-    function($scope, $rootScope, $state, $stateParams, fhirApiServices, userServices, patientDetails, launchScenarios, launchApp, apps) {
-
-        var source = $stateParams.source;
+    }).controller("PatientsController",
+    function($scope){
         $scope.showing = {patientDetail: false,
             noPatientContext: true,
             createPatient: true,
-            searchloading: true};
+            searchloading: true
+        };
 
+        $scope.page = {
+            title: ""
+        };
 
-        if (source === 'patient') {
-            $scope.title = "Select the Patient Context";
-            $scope.showing.noPatientContext =  true;
-            $scope.showing.createPatient =  false;
-        } else if (source === 'persona') {
-            $scope.title = "Select the Patient Persona";
-            $scope.showing.noPatientContext =  false;
-            $scope.showing.createPatient =  false;
-        } else {
-            $scope.showing.noPatientContext =  false;
-            $scope.showing.createPatient =  true;
+        $scope.selected = {
+            selectedPatient: {},
+            patientSelected: false
         }
 
-        $scope.onSelected = function(p){
-            $scope.selectedPatient = p;
-            $scope.patientSelected = true;
-            $scope.showing.patientDetail =  true;
+    }).controller("PatientDataManagerController",
+    function($scope, $rootScope, $state, launchScenarios, patientDetails, launchApp){
+
+        $scope.patientHelper = patientDetails;
+
+        $scope.launchPatientDataManager = function(patient){
+            launchApp.launchPatientDataManager(patient);
         };
+
+    }).controller("PatientViewController",
+    function($scope){
+        $scope.showing = {patientDetail: false,
+            noPatientContext: true,
+            createPatient: true,
+            searchloading: true
+        };
+
+        $scope.page = {
+            title: ""
+        };
+
+        $scope.selected = {
+            selectedPatient: {},
+            patientSelected: false
+        }
+
+    }).controller("PatientDetailController",
+    function($scope, $rootScope, $state, launchScenarios, patientDetails, launchApp){
+
+        $scope.patientHelper = patientDetails;
 
         $scope.setPatient = function(p){
             if (launchScenarios.getBuilder().persona === '') {
                 launchScenarios.setPersona(
-                    {fhirId: $scope.selectedPatient.id,
-                     resource: $scope.selectedPatient.resourceType,
-                        fullUrl: $scope.selectedPatient.fullUrl,
-                        name: patientDetails.name($scope.selectedPatient)});
+                    {fhirId: p.id,
+                        resource: p.resourceType,
+                        fullUrl: p.fullUrl,
+                        name: patientDetails.name(p)});
                 launchScenarios.setPatient(
-                    {fhirId: $scope.selectedPatient.id,
-                        resource: $scope.selectedPatient.resourceType,
-                        name: patientDetails.name($scope.selectedPatient)});
+                    {fhirId: p.id,
+                        resource: p.resourceType,
+                        name: patientDetails.name(p)});
                 $state.go('apps', {source: 'patient', action: 'choose'});
 //                $state.go($state.current, {source: 'patient'}, {reload: true});
             } else {
                 launchScenarios.setPatient(
-                    {fhirId: $scope.selectedPatient.id,
-                        resource: $scope.selectedPatient.resourceType,
-                        name: patientDetails.name($scope.selectedPatient)});
+                    {fhirId: p.id,
+                        resource: p.resourceType,
+                        name: patientDetails.name(p)});
                 $state.go('apps', {source: 'practitioner-patient', action: 'choose'});
             }
+        };
+
+        $scope.launchPatientDataManager = function(patient){
+            launchApp.launchPatientDataManager(patient);
+        };
+
+    }).controller("PatientSearchController",
+    function($scope, $rootScope, $state, $stateParams, fhirApiServices, patientDetails, launchScenarios) {
+
+        var source = $stateParams.source;
+
+        if (source === 'patient') {
+            $scope.page.title = "Select the Patient Context";
+            $scope.showing.noPatientContext =  true;
+            $scope.showing.createPatient =  false;
+        } else if (source === 'persona') {
+            $scope.page.title = "Select the Patient Persona";
+            $scope.showing.noPatientContext =  false;
+            $scope.showing.createPatient =  false;
+        } else if ($state.current.name === 'resolve') {
+            $scope.showing.noPatientContext =  false;
+            $scope.showing.createPatient =  false;
+            $rootScope.$emit('hide-nav');
+        } else { // Patient View
+            $scope.showing.noPatientContext =  false;
+            $scope.showing.createPatient =  true;
+        }
+
+        $scope.onSelected = $scope.onSelected || function(p){
+            $scope.selected.selectedPatient = p;
+            $scope.selected.patientSelected = true;
+            $scope.showing.patientDetail = true;
         };
 
         $scope.skipPatient = function(){
@@ -143,17 +206,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $state.go('apps', {source: 'practitioner', action: 'choose'});
         };
 
-        $scope.launchPatientDataManager = function(patient){
-            launchApp.launchPatientDataManager(patient);
-        };
-
         $scope.mayLoadMore = true;
         $scope.patients = [];
         $scope.genderglyph = {"female" : "&#9792;", "male": "&#9794;"};
         $scope.searchterm = "";
         $scope.patientHelper = patientDetails;
-        $scope.selectedPatient = {};
-        $scope.patientSelected = false;
         var lastQueryResult;
 
         $rootScope.$on('set-loading', function(){
@@ -234,37 +291,44 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             search(++loadCount);
         };
 
-        $scope.updateProfile = function(){
-            userServices.updateProfile($scope.selectedPatient);
-        };
-    }).controller("PractitionerSearchController",
-    function($scope, $rootScope, $state, $stateParams, fhirApiServices, userServices, patientDetails, launchScenarios) {
-
-        $scope.showing = {patientDetail: false};
-
-        $scope.onSelected = function(p){
-            $scope.selectedPatient = p;
-            $scope.patientSelected = true;
-            $scope.showing.patientDetail =  true;
+    }).controller("PractitionerViewController",
+    function($scope){
+        $scope.showing = {
+            practitionerDetail: false,
+            searchloading: true
         };
 
-        $scope.setPatient = function(p){
+        $scope.selected = {
+            selectedPractitioner: {},
+            practitionerSelected: false
+        }
+
+    }).controller("PractitionerDetailController",
+    function($scope, $rootScope, $state, launchScenarios, patientDetails){
+
+        $scope.practitionerHelper = patientDetails;
+
+        $scope.setPractitioner = function(p){
             launchScenarios.setPersona(
-                {fhirId: $scope.selectedPatient.id,
-                    resource: $scope.selectedPatient.resourceType,
-                    fullUrl: $scope.selectedPatient.fullUrl,
-                    name: patientDetails.name($scope.selectedPatient)});
+                {fhirId: p.id,
+                    resource: p.resourceType,
+                    fullUrl: p.fullUrl,
+                    name: patientDetails.name(p)});
             $state.go('patient-view', {source: 'patient'});
         };
+    }).controller("PractitionerSearchController",
+    function($scope, $rootScope, $state, $stateParams, fhirApiServices, patientDetails) {
 
-        $scope.showing = {searchloading: true};
+        $scope.onSelected = function(p){
+            $scope.selected.selectedPractitioner = p;
+            $scope.selected.practitionerSelected = true;
+            $scope.showing.practitionerDetail = true;
+        };
+
         $scope.mayLoadMore = true;
-        $scope.patients = [];
-        $scope.genderglyph = {"female" : "&#9792;", "male": "&#9794;"};
+        $scope.practitioners = [];
         $scope.searchterm = "";
-        $scope.patientHelper = patientDetails;
-        $scope.selectedPatient = {};
-        $scope.patientSelected = false;
+        $scope.practitionerHelper = patientDetails;
         var lastQueryResult;
 
         $rootScope.$on('set-loading', function(){
@@ -280,7 +344,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             // Normalize scrollTop to account for variations in browser behavior (NJS 2015-03-04)
             var scrollTop = (document.documentElement.scrollTop > document.body.scrollTop) ? document.documentElement.scrollTop : document.body.scrollTop;
 
-            var list = $('#user-results');
+            var list = $('#practitioner-results');
             if (list.offset().top + list.height() - 200 - scrollTop <= window.innerHeight) {
                 $scope.mayLoadMore = false;
                 $scope.loadMoreIfHasMore();
@@ -297,7 +361,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.searchloading = true;
             fhirApiServices.getNextOrPrevPage("nextPage", lastQueryResult).then(function(p, queryResult){
                 lastQueryResult = queryResult;
-                p.forEach(function(v) { $scope.patients.push(v) }, p);
+                p.forEach(function(v) { $scope.practitioners.push(v) }, p);
                 $scope.showing.searchloading = false;
                 $scope.mayLoadMore = true;
                 $scope.loadMoreIfNeeded();
@@ -306,7 +370,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.select = function(i){
-            $scope.onSelected($scope.patients[i]);
+            $scope.onSelected($scope.practitioners[i]);
         };
 
         $scope.hasNext = function(){
@@ -332,7 +396,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     if (thisLoad < loadCount) {   // not sure why this is needed (pp)
                         return;
                     }
-                    $scope.patients = p;
+                    $scope.practitioners = p;
                     $scope.showing.searchloading = false;
                     $scope.mayLoadMore = true;
                     $scope.loadMoreIfNeeded();
@@ -345,13 +409,14 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             search(++loadCount);
         };
 
-        $scope.updateProfile = function(){
-            userServices.updateProfile($scope.selectedPatient);
-        };
     }).controller("LaunchScenariosController",
-    function($rootScope, $scope, $state, launchScenarios, launchApp, userServices){
-        $scope.showing = {detail: false};
+    function($rootScope, $scope, $state, launchScenarios, launchApp, userServices, descriptionBuilder){
+        $scope.showing = {detail: false, addingContext: false};
         $scope.selectedScenario = {};
+        $scope.contextName = "";
+        $scope.contextValue = "";
+        $scope.contextNameFocus = false;
+        $scope.contextValueFocus = false;
         launchScenarios.getLaunchScenarios();
         launchScenarios.clearBuilder();
         launchScenarios.getBuilder().owner = userServices.oauthUser();
@@ -384,15 +449,50 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.detail = false;
         };
 
+        $scope.toggleAddingContext = function() {
+            $scope.showing.addingContext = !$scope.showing.addingContext;
+        };
+
+        $scope.$watchGroup(['contextName', 'contextValue'], function() {
+            $scope.contextNameIsValid = $scope.contextName.trim() !== "";
+            $scope.contextValueIsValid = $scope.contextValue.trim() !== "";
+        });
+
+        $scope.hasFocus = function (focus) {
+            if (focus === 'name') {
+                $scope.contextNameFocus = true;
+                $scope.contextValueFocus = false;
+            } else {
+                $scope.contextNameFocus = false;
+                $scope.contextValueFocus = true;
+            }
+        };
+
+        $scope.saveContextParam = function() {
+            if (!$scope.contextNameFocus && !$scope.contextValueFocus &&
+                $scope.contextNameIsValid && $scope.contextValueIsValid){
+                $scope.selectedScenario.contextParams.push({name: $scope.contextName, value: $scope.contextValue});
+                $scope.contextName = "";
+                $scope.contextValue = "";
+                $scope.showing.addingContext = false;
+            } else if (!$scope.contextNameFocus && !$scope.contextValueFocus) {
+                $scope.contextName = "";
+                $scope.contextValue = "";
+                $scope.showing.addingContext = false;
+            }
+        };
+
         $rootScope.$on('recent-selected', function(event, arg){
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
+            $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             launchScenarios.setSelectedScenario(arg);
         });
 
         $rootScope.$on('full-selected', function(event, arg){
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
+            $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             launchScenarios.setSelectedScenario(arg);
         });
 
@@ -436,12 +536,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $rootScope.$on('recent-selected', function(){
             $scope.selectedScenario = '';
         });
-
-    }).controller("PractitionerDetailsController",
-    function(fhirApiServices){
-
-    }).controller("PractitionerDetailsController",
-    function(fhirApiServices){
 
     }).controller("AppsViewController", function($rootScope, $scope, $state, $stateParams, apps, customFhirApp, launchApp, launchScenarios, $uibModal) {
         $scope.all_user_apps = [];
@@ -500,6 +594,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
             modalInstance.result.then(function (scenario) {
                 scenario.lastLaunchSeconds = new Date().getTime();
+                scenario.contextParams = [{name: "one", value: "two"}];
                 launchScenarios.addFullLaunchScenarioList(scenario);
                 $state.go('launch-scenarios', {});
             }, function () {
@@ -662,6 +757,45 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
+        };
+    }).controller("BindContextController",
+    function($scope, fhirApiServices, $stateParams, oauth2, tools) {
+
+        $scope.showing = {
+            noPatientContext: true,
+            createPatient: false,
+            searchloading: true
+        };
+
+        $scope.selected = {
+            selectedPatient: {},
+            patientSelected: false
+        };
+
+        if (fhirApiServices.clientInitialized()) {
+            // all is good
+            $scope.showing.content = true;
+        } else {
+            // need to complete authorization cycle
+            oauth2.login();
+//            $scope.signin();
+        }
+
+        $scope.clientName = decodeURIComponent($stateParams.clientName)
+            .replace(/\+/, " ");
+
+        $scope.onSelected = $scope.onSelected || function(p){
+            var pid = p.id;
+            var client_id = tools.decodeURLParam($stateParams.endpoint, "client_id");
+
+            fhirApiServices
+                .registerContext({ client_id: client_id}, {patient: pid})
+                .then(function(c){
+                    var to = decodeURIComponent($stateParams.endpoint);
+                    to = to.replace(/scope=/, "launch="+c.launch_id+"&scope=");
+                    return window.location = to;
+                });
+
         };
     });
 

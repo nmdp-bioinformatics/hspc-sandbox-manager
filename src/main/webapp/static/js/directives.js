@@ -117,6 +117,23 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
                 );
             }
         }
+    }).directive( 'tableFixedWidthColumn', function() {
+        return {
+            link: function( scope, elem, attrs ) {
+                scope.$watch(function () {
+                        return {
+                            width: elem.parent().width()
+                        }
+                    },
+                    function( width ) {
+                        elem.css({
+                            width: elem.parent()[0].clientWidth + 'px'
+                        });
+                    }, //listener
+                    true  //deep watch
+                );
+            }
+        }
     }).directive('arrowSelector',['$document',function($document){
     return{
         restrict:'A',

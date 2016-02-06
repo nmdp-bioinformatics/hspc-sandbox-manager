@@ -48,20 +48,33 @@
     <div><img src="static/images/HSPC-logo.png"/></div>
     <div class="navbar-brand center-title" center ng-style="centerWithOffset(182)">Sandbox Management Tool</div>
     <div class="pull-right">
-        <div class="navbar-brand navbar-stack ng-hide" ng-show="showing.signout">Welcome {{oauthUser.name}}</div>
-        <!--<div class="navbar-brand ng-hide" ng-show="showing.signout">Persona: {{persona.name}}</div>-->
-        <div  class="navbar-brand navbar-stack ng-hide" ng-show="showing.signin" >
+        <div class="navbar-stack-name ng-hide" ng-show="showing.signout">
+            Welcome <a id="welcome" ng-click="manageUserAccount()"><span style="font-weight: bold">{{oauthUser.name}}</span></a></div>
+        <div  class="navbar-stack-sign-in ng-hide" ng-show="showing.signin" >
             <a id="signin" ng-click="signin()" >Sign In</a>
         </div>
-        <div class="navbar-brand navbar-stack ng-hide" ng-show="showing.signout" >
+        <div class="navbar-stack-sign-in ng-hide" ng-show="showing.signout" >
             <a id="signout" ng-click="signout()" >Sign Out</a>
         </div>
     </div>
 </nav>
 
+<!--<div class="container-fluid">-->
+    <!--<div class="row">-->
+        <!--<div class="col-lg-12">-->
+        <!--<div class="sidebar" style="width:100px" ng-show="showing.navBar" resize ng-style="resizeWithOffset(80)">-->
+            <!--<div ng-include src="'static/js/templates/sideNav.html'"></div>-->
+        <!--</div>-->
+        <!--<div style="min-width: 500px; overflow-x: auto;">-->
+            <!--<div ui-view></div>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+
 <div class="container-fluid">
     <div class="row">
-        <div class="col-lg-2 sidebar" ng-show="showing.navBar" resize ng-style="resizeWithOffset(81)">
+        <div class="col-lg-2 sidebar" ng-show="showing.navBar" resize ng-style="resizeWithOffset(80)">
             <div ng-include src="'static/js/templates/sideNav.html'"></div>
         </div>
         <div ng-class="showing.navBar ? 'col-lg-10' : 'col-lg-12'">

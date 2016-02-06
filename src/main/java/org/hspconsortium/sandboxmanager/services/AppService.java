@@ -7,4 +7,6 @@ public interface AppService {
     App save(App app);
 
     App findByLaunchUri(String uri);
+
+    App findByClientId(String clientId);
 }

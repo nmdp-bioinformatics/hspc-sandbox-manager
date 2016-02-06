@@ -18,21 +18,9 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
             authenticate: true
         })
 
-        .state('patient-search', {
-            url: '/patient-search',
-            templateUrl: 'static/js/templates/patientSearch.html',
-            authenticate: true
-        })
-
         .state('practitioner-view', {
             url: '/practitioner-view',
             templateUrl: 'static/js/templates/practitionerView.html',
-            authenticate: true
-        })
-
-        .state('practitioner-search', {
-            url: '/practitioner-search',
-            templateUrl: 'static/js/templates/practitionerSearch.html',
             authenticate: true
         })
 
@@ -45,6 +33,7 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
         .state('apps', {
             url: '/apps/:source/:action',
             templateUrl: 'static/js/templates/appsLauncher.html',
+            scenarioBuilderStep: true,
             authenticate: true
         })
 
@@ -69,6 +58,11 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
         .state('after-auth', {
             url: '/after-auth',
             templateUrl:'static/js/templates/start.html'
+        })
+
+        .state('resolve', {
+            url: '/resolve/:context/against/:iss/for/:clientName/then/:endpoint',
+            templateUrl:'static/js/templates/resolve.html'
         });
 
 });
