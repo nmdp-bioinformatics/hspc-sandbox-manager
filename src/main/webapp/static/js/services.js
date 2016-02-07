@@ -471,7 +471,7 @@ angular.module('sandManApp.services', [])
 
                 if (contextParams !== undefined) {
                     for (var i=0; i < contextParams.length; i++) {
-                        params.push(contextParams[i]);
+                        params[contextParams[i].name] = contextParams[i].value;
                     }
                 }
 
