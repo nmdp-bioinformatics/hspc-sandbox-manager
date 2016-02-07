@@ -6,7 +6,7 @@
                 <div class="content">
                     <div class="detail-form">
                         <label class="detail-form-label">Name:</label>
-                        <label class="detail-form-value">{{patientHelper.name(selected.selectedPatient)}}</label>
+                        <label class="detail-form-value">{{selected.selectedPatient | nameGivenFamily}}</label>
                     </div>
                     <div class="detail-form">
                         <label class="detail-form-label">Gender:</label>

@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('sandManApp.controllers', []).controller('navController',[
-    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "patientDetails", "oauth2", "launchScenarios", "$location", "$state",
-    function($rootScope, $scope, appsSettings, fhirApiServices, userServices, patientDetails, oauth2, launchScenarios, $location, $state) {
+    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "launchScenarios", "$location", "$state",
+    function($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, launchScenarios, $location, $state) {
 
         $scope.showing = {
             signout: false,
@@ -122,9 +122,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
     }).controller("PatientDetailController",
-    function($scope, $rootScope, $state, launchScenarios, patientDetails, launchApp){
-
-        $scope.patientHelper = patientDetails;
+    function($scope, $rootScope, $state, launchScenarios, $filter, launchApp){
 
         if ($state.current.name === 'patients') {
             $scope.showing.patientDataManager = true;
@@ -140,18 +138,18 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     {fhirId: p.id,
                         resource: p.resourceType,
                         fullUrl: p.fullUrl,
-                        name: patientDetails.name(p)});
+                        name: $filter('nameGivenFamily')(p)});
                 launchScenarios.setPatient(
                     {fhirId: p.id,
                         resource: p.resourceType,
-                        name: patientDetails.name(p)});
+                        name: $filter('nameGivenFamily')(p)});
                 $state.go('apps', {source: 'patient', action: 'choose'});
 //                $state.go($state.current, {source: 'patient'}, {reload: true});
             } else {
                 launchScenarios.setPatient(
                     {fhirId: p.id,
                         resource: p.resourceType,
-                        name: patientDetails.name(p)});
+                        name: $filter('nameGivenFamily')(p)});
                 $state.go('apps', {source: 'practitioner-patient', action: 'choose'});
             }
         };
@@ -161,7 +159,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
     }).controller("PatientSearchController",
-    function($scope, $rootScope, $state, $stateParams, fhirApiServices, patientDetails, launchScenarios) {
+    function($scope, $rootScope, $state, $stateParams, fhirApiServices, launchScenarios) {
 
         var source = $stateParams.source;
 
@@ -200,7 +198,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.patients = [];
         $scope.genderglyph = {"female" : "&#9792;", "male": "&#9794;"};
         $scope.searchterm = "";
-        $scope.patientHelper = patientDetails;
         var lastQueryResult;
 
         $rootScope.$on('set-loading', function(){
@@ -262,7 +259,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         var loadCount = 0;
         var search = _.debounce(function(thisLoad){
-            fhirApiServices.queryResourceInstances("Patient", undefined, $scope.tokens, [['given','asc'],['family','asc']])
+            fhirApiServices.queryResourceInstances("Patient", undefined, $scope.tokens, [['family','asc'],['given','asc']])
                 .then(function(p, queryResult){
                     lastQueryResult = queryResult;
                     if (thisLoad < loadCount) {   // not sure why this is needed (pp)
@@ -296,9 +293,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
     }).controller("PractitionerDetailController",
-    function($scope, $rootScope, $state, launchScenarios, patientDetails){
-
-        $scope.practitionerHelper = patientDetails;
+    function($scope, $rootScope, $state, $filter, launchScenarios){
 
         if ($state.current.name === 'practitioner-view') {
             $scope.showing.selectForScenario = true;
@@ -327,11 +322,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 {fhirId: p.id,
                     resource: p.resourceType,
                     fullUrl: p.fullUrl,
-                    name: patientDetails.name(p)});
+                    name: $filter('nameGivenFamily')(p)});
             $state.go('patient-view', {source: 'patient'});
         };
     }).controller("PractitionerSearchController",
-    function($scope, $rootScope, $state, $stateParams, fhirApiServices, patientDetails) {
+    function($scope, $rootScope, $state, $stateParams, fhirApiServices) {
 
         $scope.onSelected = function(p){
             $scope.selected.selectedPractitioner = p;
@@ -347,7 +342,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.mayLoadMore = true;
         $scope.practitioners = [];
         $scope.searchterm = "";
-        $scope.practitionerHelper = patientDetails;
         var lastQueryResult;
 
         $rootScope.$on('set-loading', function(){
@@ -409,7 +403,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         var loadCount = 0;
         var search = _.debounce(function(thisLoad){
-            fhirApiServices.queryResourceInstances("Practitioner", undefined, $scope.tokens, [['given','asc'],['family','asc']])
+            fhirApiServices.queryResourceInstances("Practitioner", undefined, $scope.tokens, [['family','asc'],['given','asc']])
                 .then(function(p, queryResult){
                     lastQueryResult = queryResult;
                     if (thisLoad < loadCount) {   // not sure why this is needed (pp)
@@ -725,7 +719,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             });
         };
 
-    }).controller('CreatePatientModalInstanceCtrl', function ($scope, $uibModalInstance, modalPatient) {
+    }).controller('CreatePatientModalInstanceCtrl', function ($scope, $filter, $uibModalInstance, modalPatient) {
 
         $scope.modalPatient = modalPatient;
 
@@ -751,9 +745,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.createPatient = function () {
             if ($scope.isPatientValid()) {
-                $scope.modalPatient.name[0].text = $scope.modalPatient.name[0].given + " " + $scope.modalPatient.name[0].family;
+                $scope.modalPatient.name[0].text = $filter('nameGivenFamily')($scope.modalPatient);
                 $uibModalInstance.close($scope.modalPatient);
-                    console.log("successful response from patientSearch.create", arguments);
             } else {
                 console.log("sorry not valid", arguments);
             }
@@ -799,7 +792,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             });
         };
 
-    }).controller('CreatePractitionerModalInstanceCtrl', function ($scope, $uibModalInstance, modalPractitioner) {
+    }).controller('CreatePractitionerModalInstanceCtrl', function ($scope, $filter, $uibModalInstance, modalPractitioner) {
 
         $scope.modalPractitioner = modalPractitioner;
 
@@ -817,9 +810,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.createPractitioner = function () {
             if ($scope.isPractitionerValid()) {
-                $scope.modalPractitioner.name.text = $scope.modalPractitioner.name.given + " " + $scope.modalPractitioner.name.family;
+                $scope.modalPractitioner.name.text = $filter('nameGivenFamily')($scope.modalPractitioner);
                 $uibModalInstance.close($scope.modalPractitioner);
-                console.log("successful response from patientSearch.create", arguments);
             } else {
                 console.log("sorry not valid", arguments);
             }

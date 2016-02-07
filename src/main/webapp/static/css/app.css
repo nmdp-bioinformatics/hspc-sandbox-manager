@@ -448,8 +448,24 @@ td {
     width: 100px;
 }
 
+/*.thumb-holder*/
+/*{*/
+    /*width:300px;*/
+    /*height:200px;*/
+    /*display:block;*/
+    /*position:relative;*/
+    /*overflow:hidden;*/
+/*}*/
+/*.thumb-holder img*/
+/*{*/
+    /*position:absolute;*/
+    /*top:0;*/
+    /*left:0;*/
+    /*width:100%;*/
+/*}*/
+
 .thumb-holder {
-    height: 180px;
+    height: 150px;
     /*width: 100%;*/
     text-align: center;
 }

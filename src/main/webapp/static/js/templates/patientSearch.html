@@ -32,7 +32,7 @@
                         <td class="gender"
                             ng-bind-html="genderglyph[patient.gender]"></td>
                         <td class="name">
-                            <span ng-bind="patientHelper.name(patient)"></span>
+                            <span ng-bind="patient | nameFamilyGiven"></span>
                         </td>
                         <td>
                             <i ng-bind="patient.birthDate | date"></i>

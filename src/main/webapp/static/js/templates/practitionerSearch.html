@@ -27,7 +27,7 @@
                 <table class="table table-striped table-hover">
                     <tr class="practitioner-row" ng-click="select($index)" ng-repeat="practitioner in practitioners" ng-class="{selected : practitioner === selected.selectedPractitioner}">
                         <td class="name">
-                            <span ng-bind="practitionerHelper.name(practitioner)"></span>
+                            <span ng-bind="practitioner | nameGivenFamily"></span>
                         </td>
                     </tr>
                 </table>

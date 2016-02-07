@@ -6,7 +6,7 @@
                 <div class="content">
                     <div class="detail-form">
                         <label class="detail-form-label">Name:</label>
-                        <label class="detail-form-value">{{practitionerHelper.name(selected.selectedPractitioner)}}</label>
+                        <label class="detail-form-value">{{selected.selectedPractitioner | nameGivenFamily}}</label>
                     </div>
                     <div class="detail-form" ng-show="practitionerSpecialty() !== false">
                         <label class="detail-form-label">Speciality:</label>

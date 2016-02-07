@@ -62,7 +62,7 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('fhirApiServices', function (oauth2, appsSettings, patientDetails, notification, $rootScope, $location) {
+    }).factory('fhirApiServices', function (oauth2, appsSettings, notification, $rootScope, $location) {
 
         /**
          *
@@ -350,7 +350,7 @@ angular.module('sandManApp.services', [])
 
         }
 
-    }).factory('userServices', function($rootScope, fhirApiServices, patientDetails, appsSettings) {
+    }).factory('userServices', function($rootScope, fhirApiServices, $filter, appsSettings) {
         var persona = {};
         var oauthUser = {};
 
@@ -400,8 +400,8 @@ angular.module('sandManApp.services', [])
                     .done(function(userResult){
 
                         var user = {name:""};
-                        user.name = patientDetails.name(userResult.data);
-                        user.id  = patientDetails.id(userResult.data);
+                        user.name = $filter('nameGivenFamily')(userResult.data)
+                        user.id  = userResult.data.id;
                         persona = user;
                         persona.fullUrl = userResult.config.url;
                         deferred.resolve(user);
@@ -419,29 +419,6 @@ angular.module('sandManApp.services', [])
                     oauthUser.email = payload.email;
                 }
                 return oauthUser;
-            }
-        };
-    }).factory('patientDetails', function() {
-        return {
-            id: function(p){
-                return p.id;
-            },
-            name: function(p){
-                if (p.resourceType === "Patient") {
-                    var patientName = p && p.name && p.name[0];
-                    if (!patientName) return null;
-
-                    return patientName.given.join(" ") + " " + patientName.family.join(" ");
-                } else {
-                    var practitionerName = p && p.name;
-                    if (!practitionerName) return null;
-
-                    var practitioner =  practitionerName.given.join(" ") + " " + practitionerName.family.join(" ");
-                    if (practitionerName.suffix) {
-                        practitioner = practitioner + " " + practitionerName.suffix.join(", ");
-                    }
-                    return practitioner;
-                }
             }
         };
     }).factory('customFhirApp', function() {

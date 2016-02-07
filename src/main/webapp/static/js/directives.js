@@ -27,38 +27,20 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
 
                 return newSize;
             };
+            scope.$parent.resizeTable = function (offsetH) {
+
+                scope.$parent.$eval(attr.notifier);
+
+                return  (newValue.h - offsetH) + 'px'
+            };
+
         }, true);
 
         w.bind('resize', function () {
             scope.$parent.$apply();
         });
     }
-}).directive('tableResize', function ($window) {
-        return function (scope, element, attr) {
-
-            var w = angular.element($window);
-            scope.$parent.$watch(function () {
-                return {
-                    'h': w.height(),
-                    'w': w.width()
-                };
-            }, function (newValue, oldValue) {
-                scope.$parent.windowHeight = newValue.h;
-                scope.$parent.windowWidth = newValue.w;
-
-                scope.$parent.resizeTable = function (offsetH) {
-
-                    scope.$parent.$eval(attr.notifier);
-
-                    return  (newValue.h - offsetH) + 'px'
-                };
-            }, true);
-
-            w.bind('tableResize', function () {
-                scope.$parent.$apply();
-            });
-        }
-    }).directive('center', function ($window) {
+}).directive('center', function ($window) {
         return function (scope, element, attr) {
 
             var w = angular.element($window);
