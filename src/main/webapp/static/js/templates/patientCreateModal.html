@@ -1,71 +1,64 @@
-<!-- Modal content-->
-<script type="text/ng-template" id="createPatientModal">
-    <div class="modal-header">
-        <h3 class="modal-title">Create New Patient</h3>
-    </div>
-    <div class="modal-body">
-        <form name="CreatePatientForm" class="form-horizontal" role="form">
-            <div id="givenNameHolder" class="form-group has-feedback">
-                <label class="control-label col-sm-3">Given Name:</label>
-                <div class="col-sm-9">
-                    <input type="text" class="form-control" id="given"
-                           required ng-model="modalPatient.name[0].given" placeholder="John ..."
-                           aria-describedby="patientGivenNameErrorStatus">
-                    <span id="givenNameIcon" class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
-                    <span id="patientGivenNameErrorStatus" class="sr-only">(error)</span>
-                </div>
+<div class="modal-header">
+    <h3 class="modal-title">Create New Patient</h3>
+</div>
+<div class="modal-body">
+    <form name="CreatePatientForm" class="form-horizontal" role="form">
+        <div id="givenNameHolder" ng-class="isGivenNameValid() ? 'form-group has-feedback' : 'form-group has-error has-feedback'">
+            <label class="control-label col-sm-3">Given Name:</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="given"
+                       required ng-model="modalPatient.name[0].given" placeholder="John ..."
+                       aria-describedby="patientGivenNameErrorStatus">
+                <span id="givenNameIcon" ng-class="isGivenNameValid() ? 'glyphicon glyphicon-ok form-control-feedback' : 'glyphicon glyphicon-remove form-control-feedback'" aria-hidden="true"></span>
             </div>
-            <div id="familyNameHolder" class="form-group has-feedback">
-                <label class="control-label col-sm-3">Family Name:</label>
-                <div class="col-sm-9">
-                    <input type="text" class="form-control" id="family"
-                           required ng-model="modalPatient.name[0].family" placeholder="Smith ..."
-                           aria-describedby="patientFamilyNameErrorStatus">
-                    <span id="familyNameIcon" class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>
-                    <span id="patientFamilyNameErrorStatus" class="sr-only">(error)</span>
-                </div>
+        </div>
+        <div id="familyNameHolder" ng-class="isFamilyNameValid() ? 'form-group has-feedback' : 'form-group has-error has-feedback'">
+            <label class="control-label col-sm-3">Family Name:</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control" id="family"
+                       required ng-model="modalPatient.name[0].family" placeholder="Smith ..."
+                       aria-describedby="patientFamilyNameErrorStatus">
+                <span id="familyNameIcon" ng-class="isFamilyNameValid() ? 'glyphicon glyphicon-ok form-control-feedback' : 'glyphicon glyphicon-remove form-control-feedback'" aria-hidden="true"></span>
             </div>
-            <div id="genderHolder" class="form-group">
-                <label class="control-label col-sm-3">Gender:</label>
+        </div>
+        <div id="genderHolder" ng-class="isGenderValid() ? 'form-group has-feedback' : 'form-group has-error has-feedback'">
+            <label class="control-label col-sm-3">Gender:</label>
 
-                <div class="col-sm-9">
-                    <label class="radio-inline">
-                        <input type="radio" name="gender" id="gender-male" value="male"
-                               ng-model="modalPatient.gender"> Male
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="gender" id="gender-female" value="female"
-                               ng-model="modalPatient.gender"> Female
-                    </label>
-                    <div>
-                        <span id="genderIcon" class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                        <span id="genderErrorStatus" class="sr-only">(success)</span>
-                    </div>
+            <div class="col-sm-9">
+                <label class="radio-inline">
+                    <input type="radio" name="gender" id="gender-male" value="male"
+                           ng-model="modalPatient.gender"> Male
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="gender" id="gender-female" value="female"
+                           ng-model="modalPatient.gender"> Female
+                </label>
+                <div>
+                    <span id="genderIcon" ng-class="isGenderValid() ? 'glyphicon glyphicon-ok form-control-feedback' : 'glyphicon glyphicon-remove form-control-feedback'" aria-hidden="true"></span>
                 </div>
             </div>
-            <div id="birthDateHolder" class="form-group has-feedback">
-                <label class="control-label col-sm-3" >Birth Date:</label>
+        </div>
+        <div id="birthDateHolder" ng-class="isBirthDateValid() ? 'form-group has-feedback' : 'form-group has-error has-feedback'">
+            <label class="control-label col-sm-3" >Birth Date:</label>
 
-                <div class="col-sm-9">
-                    <input type="datetime-local" class="form-control" id="birthDate"
-                           required ng-model="modalPatient.birthDate"
-                           aria-describedby="birthDateErrorStatus"
-                           placeholder="yyyy-MM-ddTHH:mm:ss" >
-                    <span id="birthDateIcon" class="glyphicon form-control-feedback" aria-hidden="true"></span>
-                    <span id="birthDateErrorStatus" class="sr-only">(success)</span>
-                </div>
+            <div class="col-sm-9">
+                <input type="datetime-local" class="form-control" id="birthDate"
+                       required ng-model="modalPatient.birthDate"
+                       aria-describedby="birthDateErrorStatus"
+                       placeholder="yyyy-MM-ddTHH:mm:ss" >
+                <span id="birthDateIcon" ng-class="isBirthDateValid() ? 'glyphicon glyphicon-ok form-control-feedback' : 'glyphicon glyphicon-remove form-control-feedback'" aria-hidden="true"></span>
             </div>
-            <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-2">
-                    <button id="createPatientButton" type="button" class="btn btn-basic" ng-click="createPatient()" tabindex="104">Create
-                    </button>
-                </div>
-                <div class="col-sm-6 pull-left">
-                    <button id="cancelButton" type="button" class="btn btn-basic" data-dismiss="modal" ng-click="cancel()" tabindex="105">Cancel</button>
-                </div>
-            </div>
-        </form>
-        <!--<pre>modalPatient = {{modalPatient | json}}</pre>-->
-        <!--<pre>master = {{master | json}}</pre>-->
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <div class="form-group">
+        <div class="col-sm-offset-4 col-sm-2">
+            <button id="createPatientButton" ng-class="{'disabled' : !isPatientValid()}" type="button" class="btn btn-basic" ng-click="createPatient()" tabindex="104">Create
+            </button>
+        </div>
+        <div class="col-sm-6 pull-left">
+            <button id="cancelButton" type="button" class="btn btn-basic" data-dismiss="modal" ng-click="cancel()" tabindex="105">Cancel</button>
+        </div>
     </div>
-</script>
+</div>

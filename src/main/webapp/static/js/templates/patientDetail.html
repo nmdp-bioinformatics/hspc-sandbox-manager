@@ -1,15 +1,33 @@
 <div id="patient-details" class="col-md-12" ng-controller="PatientDetailController">
     <div class="row">
         <div class="col-md-12 content-column">
-            <div class="form-group">
-                <label class="detail-form-label">Name:</label>
-                <label class="detail-form-value">{{patientHelper.name(selected.selectedPatient)}}</label>
+            <div class="title_box">
+                <div class="title">Patient</div>
+                <div class="content">
+                    <div class="detail-form">
+                        <label class="detail-form-label">Name:</label>
+                        <label class="detail-form-value">{{patientHelper.name(selected.selectedPatient)}}</label>
+                    </div>
+                    <div class="detail-form">
+                        <label class="detail-form-label">Gender:</label>
+                        <label class="detail-form-value">{{selected.selectedPatient.gender}}</label>
+                    </div>
+                    <div class="detail-form">
+                        <label class="detail-form-label">Birth Date:</label>
+                        <label class="detail-form-value">{{selected.selectedPatient.birthDate | date:'MM/dd/yyyy'}}</label>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12 content-column">
+        <div class="col-md-12 content-column" ng-show="showing.selectForScenario">
             <div class="btn btn-basic btn-md" ng-click="setPatient(selected.selectedPatient)" ng-disabled="!selected.patientSelected">Select this Patient <i class="fa fa-chevron-right fa-lg"></i></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 content-column" ng-show="showing.patientDataManager">
+            <div class="btn btn-basic btn-md" ng-click="launchPatientDataManager(selected.selectedPatient)" ng-disabled="!selected.patientSelected">Open Patient Data Manager</div>
         </div>
     </div>
 </div>

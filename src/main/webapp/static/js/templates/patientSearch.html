@@ -20,8 +20,7 @@
         </div>
     </div>
     <div class="row" ng-show="showing.createPatient && !showing.noPatientContext">
-        <div class="col-md-12 content-column-vertical" ng-controller="CreateNewPatient">
-            <div ng-include="'static/js/templates/patientCreateModal.html'"></div>
+        <div class="col-md-12 content-column-vertical" ng-controller="CreateNewPatientCtrl">
             <a class="pull-left" ng-click="open()">Create new patient</a>
         </div>
     </div>

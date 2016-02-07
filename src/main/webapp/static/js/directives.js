@@ -1,40 +1,38 @@
 /* Directives */
 
 angular.module('sandManApp.directives', []).directive('resize', function ($window) {
-        return function (scope, element, attr) {
+    return function (scope, element, attr) {
 
-            var w = angular.element($window);
-            scope.$parent.$watch(function () {
-                return {
-                    'h': w.height(),
-                    'w': w.width()
-                };
-            }, function (newValue, oldValue) {
-                scope.$parent.windowHeight = newValue.h;
-                scope.$parent.windowWidth = newValue.w;
+        var w = angular.element($window);
+        scope.$parent.$watch(function () {
+            return {
+                'h': w.height(),
+                'w': w.width()
+            };
+        }, function (newValue, oldValue) {
+            scope.$parent.windowHeight = newValue.h;
+            scope.$parent.windowWidth = newValue.w;
 
-                scope.$parent.resizeWithOffset = function (offsetH) {
+            scope.$parent.resizeWithOffset = function (offsetH, offsetW) {
 
-                    scope.$parent.$eval(attr.notifier);
+                scope.$parent.$eval(attr.notifier);
 
-                    return {
-                        'height': (newValue.h - offsetH) + 'px'
-                        //,'width': (newValue.w - 100) + 'px'
-                    };
-                };
-                scope.$parent.resizeTable = function (offsetH) {
-
-                    scope.$parent.$eval(attr.notifier);
-
-                    return  (newValue.h - offsetH) + 'px'
+                var newSize = {
+                    'height': (newValue.h - offsetH) + 'px'
                 };
 
-            }, true);
+                if (offsetW !== undefined) {
+                    newSize.width = (newValue.w - offsetW) + 'px'
+                }
 
-            w.bind('resize', function () {
-                scope.$parent.$apply();
-            });
-        }
+                return newSize;
+            };
+        }, true);
+
+        w.bind('resize', function () {
+            scope.$parent.$apply();
+        });
+    }
 }).directive('tableResize', function ($window) {
         return function (scope, element, attr) {
 

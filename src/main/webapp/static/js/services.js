@@ -62,7 +62,7 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('fhirApiServices', function (oauth2, appsSettings, patientDetails, $rootScope, $location) {
+    }).factory('fhirApiServices', function (oauth2, appsSettings, patientDetails, notification, $rootScope, $location) {
 
         /**
          *
@@ -175,21 +175,22 @@ angular.module('sandManApp.services', [])
                     });
                 return deferred;
             },
-            create: function(newPatient){
+            create: function(resource){
                 var req =fhirClient.authenticated({
-                    url: fhirClient.server.serviceUrl + '/Patient',
+                    url: fhirClient.server.serviceUrl + '/' + resource.resourceType,
                     type: 'POST',
                     contentType: "application/json",
-                    data: JSON.stringify(newPatient)
+                    data: JSON.stringify(resource)
                 });
 
                 $.ajax(req)
                     .done(function(){
-                        console.log("Patient created!", arguments);
-//                        $route.reload();
+                        console.log(resource.resourceType + " created!", arguments);
+                        notification.message(resource.resourceType + " Created");
                     })
                     .fail(function(){
-                        console.log("Failed to create patient", arguments);
+                        console.log("Failed to create " + resource.resourceType, arguments);
+                        notification.message({ type:"error", text: "Failed to Create " + resource.resourceType });
                     });
 
                 return true;
@@ -466,6 +467,9 @@ angular.module('sandManApp.services', [])
                 var params = {};
                 if (patientContext !== undefined) {
                     params = {patient: patientContext.fhirId}
+                }
+                for (var i=0; i < app.contextParams.length; i++) {
+                    params.push(app.contextParams[i]);
                 }
 
                 fhirApiServices

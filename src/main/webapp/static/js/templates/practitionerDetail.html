@@ -1,13 +1,26 @@
 <div id="practitioner-details" class="col-md-12 detail-form" ng-controller="PractitionerDetailController">
     <div class="row">
         <div class="col-md-12 content-column">
-            <div class="form-group">
-                <label class="detail-form-label">Name:</label>
-                <label class="detail-form-value">{{practitionerHelper.name(selected.selectedPractitioner)}}</label>
+            <div class="title_box">
+                <div class="title">Practitioner</div>
+                <div class="content">
+                    <div class="detail-form">
+                        <label class="detail-form-label">Name:</label>
+                        <label class="detail-form-value">{{practitionerHelper.name(selected.selectedPractitioner)}}</label>
+                    </div>
+                    <div class="detail-form" ng-show="practitionerSpecialty() !== false">
+                        <label class="detail-form-label">Speciality:</label>
+                        <label class="detail-form-value">{{practitionerSpecialty()}}</label>
+                    </div>
+                    <div class="detail-form" ng-show="practitionerRole() !== false">
+                        <label class="detail-form-label">Role:</label>
+                        <label class="detail-form-value">{{practitionerRole()}}</label>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row" ng-show="showing.selectForScenario">
         <div class="col-md-12 content-column">
             <div class="btn btn-basic btn-md" ng-click="setPractitioner(selected.selectedPractitioner)" ng-disabled="!selected.practitionerSelected">Select this Practitioner <i class="fa fa-chevron-right fa-lg"></i></div>
         </div>

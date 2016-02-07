@@ -1,4 +1,4 @@
-<div class="container-fluid" ng-controller="PatientsController">
+<div class="container-fluid" ng-controller="PatientViewController">
     <div class="row">
         <div class="content-column" resize ng-style="resizeWithOffset(80)" ng-class="showing.patientDetail ? 'col-lg-8 right-border' : 'col-lg-12'">
             <div class="text-center">
@@ -8,7 +8,7 @@
         </div>
         <div class="col-lg-4 content-column" ng-show="showing.patientDetail">
             <h3>Details</h3>
-            <div ng-include="'static/js/templates/patientDataManager.html'"></div>
+            <div ng-include="'static/js/templates/patientDetail.html'"></div>
         </div>
     </div>
 </div>
