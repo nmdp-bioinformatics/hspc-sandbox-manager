@@ -362,6 +362,7 @@ angular.module('sandManApp.services', [])
                 return oauthUser;
             },
             updateProfile: function(selectedUser){
+                var deferred = $.Deferred();
                 appsSettings.getSettings().then(function(settings){
 
                     $.ajax({
@@ -373,10 +374,13 @@ angular.module('sandManApp.services', [])
                         }),
                         contentType: "application/json"
                     }).done(function(result){
+                            deferred.resolve();
                             $rootScope.$digest();
                         }).fail(function(){
+                            deferred.reject();
                         });
                 });
+                return deferred;
             },
             getFhirProfileUser: function() {
                 var deferred = $.Deferred();
@@ -452,42 +456,55 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('launchApp', function($rootScope, fhirApiServices, apps, random) {
+    }).factory('launchApp', function($rootScope, fhirApiServices, apps, random, userServices) {
+
+        function registerContext(app, params, key) {
+            fhirApiServices
+                .registerContext(app, params)
+                .done(function(c){
+                    console.log(fhirApiServices.fhirClient());
+                    window.localStorage[key] = JSON.stringify({
+                        app: app,
+                        iss: fhirApiServices.fhirClient().server.serviceUrl,
+                        context: c
+                    });
+                }).fail( function(err){
+                    console.log("Could not register launch context: ", err);
+                    appWindow.close();
+                    //                    $rootScope.$emit('reconnect-request');
+                    $rootScope.$emit('error', 'Could not register launch context (see console)');
+                    $rootScope.$digest();
+                });
+        }
 
         return {
             /* Hack to get around the window popup behavior in modern web browsers
-             (The window.open needs to be synchronous with the click even to
+             (The window.open needs to be synchronous with the click event to
              avoid triggering  popup blockers. */
 
-            launch: function(app, patientContext) {
+            launch: function(app, patientContext, contextParams, persona) {
                 var key = random(32);
                 window.localStorage[key] = "requested-launch";
                 var appWindow = window.open('launch.html?'+key, '_blank');
 
                 var params = {};
-                if (patientContext !== undefined) {
+                if (patientContext !== undefined && patientContext !== {}) {
                     params = {patient: patientContext.fhirId}
                 }
-                for (var i=0; i < app.contextParams.length; i++) {
-                    params.push(app.contextParams[i]);
+
+                if (contextParams !== undefined) {
+                    for (var i=0; i < contextParams.length; i++) {
+                        params.push(contextParams[i]);
+                    }
                 }
 
-                fhirApiServices
-                    .registerContext(app, params)
-                    .done(function(c){
-                        console.log(fhirApiServices.fhirClient());
-                        window.localStorage[key] = JSON.stringify({
-                            app: app,
-                            iss: fhirApiServices.fhirClient().server.serviceUrl,
-                            context: c
-                        });
-                    }).fail( function(err){
-                        console.log("Could not register launch context: ", err);
-                        appWindow.close();
-                        //                    $rootScope.$emit('reconnect-request');
-                        $rootScope.$emit('error', 'Could not register launch context (see console)');
-                        $rootScope.$digest();
+                if (persona !== {}) {
+                    userServices.updateProfile(persona).then(function(){
+                        registerContext(app, params, key);
                     });
+                } else {
+                    registerContext(app, params, key);
+                }
             },
             launchPatientDataManager: function(patient){
                 var that = this;
@@ -595,7 +612,8 @@ angular.module('sandManApp.services', [])
         return {
             getPatientApps: $http.get('static/js/config/patient-apps.json'),
             getPractitionerPatientApps: $http.get('static/js/config/practitioner-patient-apps.json'),
-            getPractitionerApps: $http.get('static/js/config/practitioner-apps.json')
+            getPractitionerApps: $http.get('static/js/config/practitioner-apps.json'),
+            getGalleryApps: $http.get('static/js/config/gallery-apps.json')
         };
 
     }]).factory('appsSettings', ['$http',function($http)  {

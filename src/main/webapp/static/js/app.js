@@ -55,6 +55,12 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
             authenticate: true
         })
 
+        .state('app-gallery', {
+            url: '/app-gallery',
+            templateUrl: 'static/js/templates/appsGallery.html',
+            authenticate: true
+        })
+
         .state('after-auth', {
             url: '/after-auth',
             templateUrl:'static/js/templates/start.html'

@@ -1,0 +1,28 @@
+<div class="container-fluid" ng-controller="AppsGalleryController">
+    <div class="text-center">
+        <h3>Choose an App</h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 content-column">
+            <div class="box">
+            <div class="app-gallery-container" resize ng-style="resizeWithOffset(180)">
+                <br style="clear: both;" />
+                <div  class="row-fluid">
+                    <ul class="list-unstyled thumbnails">
+                        <li class="col-md-3" ng-repeat="app in all_user_apps|filter:{launch_uri:'!!'}">
+                            <div class="thumbnail">
+                                <div class="thumb-holder">
+                                    <img ng-src="{{app.logo_uri}}" width="100%">
+                                </div>
+                                <div class="caption">
+                                    <button ng-click="launch(app)" class="btn btn-basic btn-block">{{app.client_name}}</button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>

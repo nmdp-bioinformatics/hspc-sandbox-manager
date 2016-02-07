@@ -85,7 +85,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     }).controller("SideBarController",
     function($rootScope, $scope){
 
-        var sideBarStates = ['launch-scenarios','users', 'patients', 'practitioners'];
+        var sideBarStates = ['launch-scenarios','users', 'patients', 'practitioners', 'app-gallery'];
 
         $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
             if ( sideBarStates.indexOf(toState.name) > -1) {
@@ -437,24 +437,24 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         launchScenarios.getBuilder().owner = userServices.oauthUser();
 
         $scope.launch = function(scenario){
-            userServices.updateProfile(scenario.persona);
             scenario.lastLaunchSeconds = new Date().getTime();
             launchScenarios.updateLaunchScenario(scenario);
 
-            if (scenario.app.launch_uri === undefined){
-                if (scenario.persona.resource === "Patient") {
-                    $state.go('apps', {source: 'patient'});
-                } else if (scenario.persona.resource === "Practitioner"){
-                    if (scenario.patient.name === "None") {
-                        $state.go('apps', {source: 'practitioner'});
-                    } else {
-                        $state.go('apps', {source: 'practitioner-patient'});
-                    }
-                }
-            } else if (scenario.patient.name === 'None'){
-                launchApp.launch(scenario.app);
+//            if (scenario.app.launch_uri === undefined){
+//                if (scenario.persona.resource === "Patient") {
+//                    $state.go('apps', {source: 'patient'});
+//                } else if (scenario.persona.resource === "Practitioner"){
+//                    if (scenario.patient.name === "None") {
+//                        $state.go('apps', {source: 'practitioner'});
+//                    } else {
+//                        $state.go('apps', {source: 'practitioner-patient'});
+//                    }
+//                }
+//            } else
+            if (scenario.patient.name === 'None'){
+                launchApp.launch(scenario.app, undefined, scenario.contextParams, scenario.persona);
             } else {
-                launchApp.launch(scenario.app, scenario.patient);
+                launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.persona);
             }
         };
 
@@ -652,6 +652,17 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 logo_uri: "http://www.hl7.org/implement/standards/fhir/assets/images/fhir-logo-www.png"
             });
         };
+
+    }).controller("AppsGalleryController", function($scope, apps, userServices, launchApp) {
+        $scope.all_user_apps = [];
+        apps.getGalleryApps.success(function(apps){
+            $scope.all_user_apps = apps;
+        });
+
+        $scope.launch = function(app){
+            launchApp.launch(app, app.patient, undefined, app.persona);
+        };
+
 
     }).controller('ModalInstanceCtrl',['$scope', '$uibModalInstance', "getScenario",
     function ($scope, $uibModalInstance, getScenario) {

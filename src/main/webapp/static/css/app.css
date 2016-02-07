@@ -70,10 +70,7 @@ span.title,
 .sidebar {
     background-color: #f5f5f5;
     border-right: 4px solid #bfbfc0;
-    /*border-radius: 4px;*/
-    /*z-index: 1000;*/
     padding-top: 10px;
-    padding-left: 20px;
 }
 
 .nav-sidebar-bottom {
