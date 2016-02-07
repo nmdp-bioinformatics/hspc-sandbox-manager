@@ -41,7 +41,7 @@
 </head>
 
 <!-- apply our angular app to our site -->
-<body ng-app="sandManApp" class="full-screen" ng-controller="navController">
+<body ng-app="sandManApp" ng-class="scrollScreen(400, 1200) ? 'full-screen-scroll' : 'full-screen'" screen-size ng-controller="navController">
 
 <!-- NAVIGATION -->
 <nav class="navbar" role="navigation" ng-show="showing.navBar">

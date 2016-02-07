@@ -278,6 +278,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             search(++loadCount);
         };
 
+        $rootScope.$on('patient-created', function(){
+            $scope.getMore();
+        });
+
     }).controller("PractitionerViewController",
     function($scope){
         $scope.showing = {
@@ -421,6 +425,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.searchloading = true;
             search(++loadCount);
         };
+
+        $rootScope.$on('practitioner-created', function(){
+            $scope.getMore();
+        });
 
     }).controller("LaunchScenariosController",
     function($rootScope, $scope, $state, launchScenarios, launchApp, userServices, descriptionBuilder){
@@ -683,7 +691,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $uibModalInstance.close(result);
             callback(result);
         };
-    }]).controller('CreateNewPatientCtrl', function($scope, $uibModal, fhirApiServices) {
+    }]).controller('CreateNewPatientCtrl', function($scope, $rootScope, $uibModal, fhirApiServices) {
         var now = new Date();
         now.setMilliseconds(0);
         now.setSeconds(0);
@@ -715,6 +723,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
             modalInstance.result.then(function (modalPatient) {
                 fhirApiServices.create(modalPatient);
+                $rootScope.$emit('patient-created');
             }, function () {
             });
         };
@@ -724,11 +733,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.modalPatient = modalPatient;
 
         $scope.isGivenNameValid = function() {
-            return $scope.modalPatient.name[0].given != null && $scope.modalPatient.name[0].given != "";
+            return $scope.modalPatient.name[0].given[0] != null && $scope.modalPatient.name[0].given[0] != "";
         };
 
         $scope.isFamilyNameValid = function() {
-            return $scope.modalPatient.name[0].family != null && $scope.modalPatient.name[0].family != "";
+            return $scope.modalPatient.name[0].family[0] != null && $scope.modalPatient.name[0].family[0] != "";
         };
 
         $scope.isGenderValid = function() {
@@ -755,7 +764,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
         };
-    }).controller('CreateNewPractitionerCtrl', function($scope, $uibModal, fhirApiServices) {
+    }).controller('CreateNewPractitionerCtrl', function($scope, $rootScope, $uibModal, fhirApiServices) {
         var now = new Date();
         now.setMilliseconds(0);
         now.setSeconds(0);
@@ -763,7 +772,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.master = {
             resourceType: "Practitioner",
             active: true,
-            name:{given:[], family:[], text:""},
+            name:{given:[], family:[], text:"", suffix:[]},
             practitionerRole: [
                 {specialty: [{coding: [{display: ""}] }],
                 role: {coding: [{display: ""}] }}
@@ -788,6 +797,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
             modalInstance.result.then(function (modalPractitioner) {
                 fhirApiServices.create(modalPractitioner);
+                $rootScope.$emit('practitioner-created');
             }, function () {
             });
         };
@@ -797,11 +807,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.modalPractitioner = modalPractitioner;
 
         $scope.isGivenNameValid = function() {
-            return $scope.modalPractitioner.name.given != null && $scope.modalPractitioner.name.given != "";
+            return $scope.modalPractitioner.name.given[0] != null && $scope.modalPractitioner.name.given[0] != "";
         };
 
         $scope.isFamilyNameValid = function() {
-            return $scope.modalPractitioner.name.family != null && $scope.modalPractitioner.name.family != "";
+            return $scope.modalPractitioner.name.family[0] != null && $scope.modalPractitioner.name.family[0] != "";
         };
 
         $scope.isPractitionerValid = function() {

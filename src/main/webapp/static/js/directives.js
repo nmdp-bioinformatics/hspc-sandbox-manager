@@ -27,11 +27,16 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
 
                 return newSize;
             };
-            scope.$parent.resizeTable = function (offsetH) {
+            scope.$parent.resizeTable = function (offsetH, minH) {
 
                 scope.$parent.$eval(attr.notifier);
 
-                return  (newValue.h - offsetH) + 'px'
+                var height = (newValue.h - offsetH);
+                if (height < minH) {
+                    height = minH;
+                }
+
+                return height + 'px'
             };
 
         }, true);
@@ -40,7 +45,33 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
             scope.$parent.$apply();
         });
     }
-}).directive('center', function ($window) {
+}).directive('screenSize', function ($window) {
+        return function (scope, element, attr) {
+
+            var w = angular.element($window);
+            scope.$parent.$watch(function () {
+                return {
+                    'h': w.height(),
+                    'w': w.width()
+                };
+            }, function (newValue, oldValue) {
+                scope.$parent.windowHeight = newValue.h;
+                scope.$parent.windowWidth = newValue.w;
+
+                scope.$parent.scrollScreen = function (height, width) {
+
+                    scope.$parent.$eval(attr.notifier);
+
+                    return (newValue.h < height) || (newValue.w < width)
+                };
+
+            }, true);
+
+            w.bind('screenSize', function () {
+                scope.$parent.$apply();
+            });
+        }
+    }).directive('center', function ($window) {
         return function (scope, element, attr) {
 
             var w = angular.element($window);
@@ -89,8 +120,33 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
                         }
                     },
                     function( width ) {
+                        var newWidth = elem.parent()[0].clientWidth;
+                        if (newWidth < 50){
+                            newWidth = 50;
+                        }
                         elem.css({
-                            width: elem.parent()[0].clientWidth + 'px'
+                            width: newWidth + 'px'
+                        });
+                    }, //listener
+                    true  //deep watch
+                );
+            }
+        }
+    }).directive( 'tableContextHeaderInner', function() {
+        return {
+            link: function( scope, elem, attrs ) {
+                scope.$watch(function () {
+                        return {
+                            width: elem.parent().width()
+                        }
+                    },
+                    function( width ) {
+                        var newWidth = elem.parent()[0].clientWidth;
+                        if (newWidth < 100){
+                            newWidth = 100;
+                        }
+                        elem.css({
+                            width: newWidth + 'px'
                         });
                     }, //listener
                     true  //deep watch

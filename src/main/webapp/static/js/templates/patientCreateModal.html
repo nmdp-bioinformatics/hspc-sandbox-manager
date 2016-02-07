@@ -7,7 +7,7 @@
             <label class="control-label col-sm-3">Given Name:</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control" id="given"
-                       required ng-model="modalPatient.name[0].given" placeholder="John ..."
+                       required ng-model="modalPatient.name[0].given[0]" placeholder="John ..."
                        aria-describedby="patientGivenNameErrorStatus">
                 <span id="givenNameIcon" ng-class="isGivenNameValid() ? 'glyphicon glyphicon-ok form-control-feedback' : 'glyphicon glyphicon-remove form-control-feedback'" aria-hidden="true"></span>
             </div>
@@ -16,7 +16,7 @@
             <label class="control-label col-sm-3">Family Name:</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control" id="family"
-                       required ng-model="modalPatient.name[0].family" placeholder="Smith ..."
+                       required ng-model="modalPatient.name[0].family[0]" placeholder="Smith ..."
                        aria-describedby="patientFamilyNameErrorStatus">
                 <span id="familyNameIcon" ng-class="isFamilyNameValid() ? 'glyphicon glyphicon-ok form-control-feedback' : 'glyphicon glyphicon-remove form-control-feedback'" aria-hidden="true"></span>
             </div>
