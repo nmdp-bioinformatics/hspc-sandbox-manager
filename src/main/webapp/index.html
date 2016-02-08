@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sandbox Manager Manager</title>
+    <link href="static/images/favicon.ico" rel="icon" type="image/x-icon" />
 
     <!-- CSS (load bootstrap) -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
@@ -51,10 +56,10 @@
         <div class="navbar-stack-name ng-hide" ng-show="showing.signout">
             Welcome <a id="welcome" ng-click="manageUserAccount()"><span style="font-weight: bold">{{oauthUser.name}}</span></a></div>
         <div  class="navbar-stack-sign-in ng-hide" ng-show="showing.signin" >
-            <a id="signin" ng-click="signin()" >Sign In</a>
+            <a id="signin" ng-click="signin()"><i class="fa fa-sign-in"></i> Sign In</a>
         </div>
         <div class="navbar-stack-sign-in ng-hide" ng-show="showing.signout" >
-            <a id="signout" ng-click="signout()" >Sign Out</a>
+            <a id="signout" ng-click="signout()"><i class="fa fa-sign-out"></i> Sign Out</a>
         </div>
     </div>
 </nav>

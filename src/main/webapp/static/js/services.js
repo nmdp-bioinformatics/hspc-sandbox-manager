@@ -475,7 +475,7 @@ angular.module('sandManApp.services', [])
                     }
                 }
 
-                if (persona !== {}) {
+                if (persona !== undefined && persona !== {}) {
                     userServices.updateProfile(persona).then(function(){
                         registerContext(app, params, key);
                     });

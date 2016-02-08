@@ -17,6 +17,9 @@
     border-radius: 0;
     border-width: 0 0 4px 0;
     border-color: #bfbfc0;
+    height: 80px;
+    margin-bottom: 0;
+    min-height: 80px;
 }
 
 span.title,
@@ -24,7 +27,6 @@ span.title,
 .navbar .navbar-brand a{
 	color: #58585A;
 	font-weight: normal;
-    height: 80px;
     padding: 45px 15px 25px 15px;
     text-decoration: none;
 }
@@ -117,12 +119,6 @@ span.title,
 .nav > li > a:focus {
     text-decoration: none;
     background-color: #f5f5f5;
-}
-
-.navbar {
-    border-radius:0;
-    margin-bottom: 0;
-    min-height: 80px;
 }
 
 .navbar-title {
