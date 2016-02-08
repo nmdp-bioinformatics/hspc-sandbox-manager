@@ -5,34 +5,34 @@
         "launch_uri" : "https://sandbox.hspconsortium.org/hspc-bilirubin-app/static/bilirubin-chart/launch.html",
         "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-bilirubin-app/static/bilirubin-chart/",
         "logo_uri" : "https://sandbox.hspconsortium.org/hspc-bilirubin-app/static/bilirubin-chart/images/bilirubin.png",
-        "patient" : {"fhirId": "BILIBABY"},
+        "patient" : {"fhirId": "ID549614829"},
         "persona" : {}
     },
     {
         "client_name" : "Growth Chart",
         "client_id" : "growth_chart",
-        "launch_uri" : "https://sandbox.hspconsortium.org/hspc-reference-apps/static/apps/growth-chart/launch.html",
-        "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-reference-apps/static/apps/growth-chart/",
-        "logo_uri" : "https://sandbox.hspconsortium.org/hspc-reference-apps/static/images/apps/growth-chart.png",
-        "patient" : {"fhirId": "13514"},
+        "launch_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/growth-chart/launch.html",
+        "redirect_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/growth-chart/",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/growth-chart.png",
+        "patient" : {"fhirId": "13663"},
         "persona" : {}
     },
     {
         "client_name" : "BP Centiles",
         "client_id" : "bp_centiles",
-        "launch_uri" : "https://sandbox.hspconsortium.org/hspc-reference-apps/static/apps/bp-centiles/launch.html",
-        "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-reference-apps/static/apps/bp-centiles/",
-        "logo_uri" : "https://sandbox.hspconsortium.org/hspc-reference-apps/static/images/apps/bpc.png",
-        "patient" : {"fhirId": "13514"},
+        "launch_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/bp-centiles/launch.html",
+        "redirect_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/bp-centiles/",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/bpc.png",
+        "patient" : {"fhirId": "13663"},
         "persona" : {}
     },
     {
         "client_name" : "Cardiac Risk",
         "client_id" : "cardiac_risk",
-        "launch_uri" : "https://sandbox.hspconsortium.org/hspc-reference-apps/static/apps/cardiac-risk/launch.html",
-        "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-reference-apps/static/apps/cardiac-risk/",
-        "logo_uri" : "https://sandbox.hspconsortium.org/hspc-reference-apps/static/images/apps/cardiac-risk.png",
-        "patient" : {"fhirId": "55744"},
+        "launch_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/cardiac-risk/launch.html",
+        "redirect_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/cardiac-risk/",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/cardiac-risk.png",
+        "patient" : {"fhirId": "55893"},
         "persona" : {}
     },
     {
@@ -68,7 +68,7 @@
         "launch_uri" : "https://sandbox.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/launch.html",
         "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/",
         "logo_uri" : "https://sandbox.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png",
-        "patient" : {"fhirId": "BILIBABY"},
+        "patient" : {"fhirId": "ID549614829"},
         "persona" : {}
     },
     {
@@ -78,7 +78,7 @@
         "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/redirect",
         "logo_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/images/appointment-viewer.png",
         "patient" : {"fhirId": "COREPATIENT1"},
-        "persona" : {"fullUrl": "https://sandbox.hspconsortium.org/hspc-reference-api/data/Practitioner/COREPRACTITIONER1"}
+        "persona" : {"fullUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-api/data/Practitioner/COREPRACTITIONER1"}
     },
     {
         "client_name" : "HSPC Appointments Patient",
@@ -87,7 +87,7 @@
         "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/redirect",
         "logo_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/images/appointment-viewer.png",
         "patient" : {"fhirId": "COREPATIENT1"},
-        "persona" : {"fullUrl": "https://sandbox.hspconsortium.org/hspc-reference-api/data/Patient/COREPATIENT1"}
+        "persona" : {"fullUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-api/data/Patient/COREPATIENT1"}
     },
     {
         "client_name" : "HSPC Appointments no Patient",
@@ -96,6 +96,6 @@
         "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/redirect",
         "logo_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/images/appointment-viewer.png",
         "patient" : {},
-        "persona" : {"fullUrl": "https://sandbox.hspconsortium.org/hspc-reference-api/data/Practitioner/COREPRACTITIONER1"}
+        "persona" : {"fullUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-api/data/Practitioner/COREPRACTITIONER1"}
     }
 ]
