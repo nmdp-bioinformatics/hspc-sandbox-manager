@@ -41,7 +41,7 @@
         "launch_uri" : "http://pillbox.medapptech.com/initapp/launch.html",
         "redirect_uri" : "http://pillbox.medapptech.com/initapp/",
         "logo_uri" : "https://gallery.smarthealthit.org/img/apps/14.png",
-        "patient" : "",
+        "patient" : {"fhirId": "8569"},
         "persona" : {}
     },
     {
@@ -51,7 +51,7 @@
         "redirect_uri" : "https://apps.medapptech.com:9004/fhir-app/authorize.html",
         "logo_uri" : "https://gallery.smarthealthit.org/img/apps/16.png",
         "patient" : "",
-        "persona" : {}
+        "persona" : {"fhirId": "8569"}
     },
     {
         "client_name" : "Meducation RS",
