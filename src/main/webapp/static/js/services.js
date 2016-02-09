@@ -465,7 +465,7 @@ angular.module('sandManApp.services', [])
                 var appWindow = window.open('launch.html?'+key, '_blank');
 
                 var params = {};
-                if (patientContext !== undefined && patientContext !== {}) {
+                if (patientContext !== undefined && patientContext !== "") {
                     params = {patient: patientContext.fhirId}
                 }
 
@@ -475,7 +475,7 @@ angular.module('sandManApp.services', [])
                     }
                 }
 
-                if (persona !== undefined && persona !== {}) {
+                if (persona !== undefined && persona !== "" ) {
                     userServices.updateProfile(persona).then(function(){
                         registerContext(app, params, key);
                     });

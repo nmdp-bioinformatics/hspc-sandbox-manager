@@ -62,7 +62,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.manageUserAccount = function() {
-            window.open("https://sandbox.hspconsortium.org/pwm/private/");
+            appsSettings.getSettings().then(function(settings){
+                window.open(settings.userManagementUrl);
+            });
         };
 
     }]).controller("StartController",
@@ -174,6 +176,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         } else if ($state.current.name === 'resolve') {
             $scope.showing.noPatientContext =  false;
             $scope.showing.createPatient =  false;
+            $scope.showing.navBar = false;
             $rootScope.$emit('hide-nav');
         } else { // Patient View
             $scope.showing.noPatientContext =  false;

@@ -54,6 +54,10 @@ span.title,
     float: left;
 }
 
+.center-text {
+    text-align: center
+}
+
 .main-page-content {
     width: 100%;
     float: left;
