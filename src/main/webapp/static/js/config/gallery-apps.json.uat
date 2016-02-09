@@ -58,7 +58,7 @@
         "client_id" : "meducation",
         "launch_uri" : "https://fhir-dstu2.meducation.com/launch.html",
         "redirect_uri" : "https://fhir-dstu2.meducation.com/index.html",
-        "logo_uri" : "",
+        "logo_uri" : "https://fhir-dstu2.meducation.com/images/meducation_icon.png",
         "patient" : "",
         "persona" : {}
     },
