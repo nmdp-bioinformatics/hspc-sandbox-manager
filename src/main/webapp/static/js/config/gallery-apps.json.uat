@@ -6,7 +6,7 @@
         "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-bilirubin-app/static/bilirubin-chart/",
         "logo_uri" : "http://54.213.219.198:9080/uat/hspc-bilirubin-app/static/bilirubin-chart/images/bilirubin.png",
         "patient" : {"fhirId": "BILIBABY"},
-        "persona" : {}
+        "persona" : ""
     },
     {
         "client_name" : "Growth Chart",
@@ -15,7 +15,7 @@
         "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-reference-apps/static/apps/growth-chart/",
         "logo_uri" : "http://54.213.219.198:9080/uat/hspc-reference-apps/static/images/apps/growth-chart.png",
         "patient" : {"fhirId": "13514"},
-        "persona" : {}
+        "persona" : ""
     },
     {
         "client_name" : "BP Centiles",
@@ -24,7 +24,7 @@
         "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-reference-apps/static/apps/bp-centiles/",
         "logo_uri" : "http://54.213.219.198:9080/uat/hspc-reference-apps/static/images/apps/bpc.png",
         "patient" : {"fhirId": "13514"},
-        "persona" : {}
+        "persona" : ""
     },
     {
         "client_name" : "Cardiac Risk",
@@ -33,7 +33,7 @@
         "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-reference-apps/static/apps/cardiac-risk/",
         "logo_uri" : "http://54.213.219.198:9080/uat/hspc-reference-apps/static/images/apps/cardiac-risk.png",
         "patient" : {"fhirId": "55744"},
-        "persona" : {}
+        "persona" : ""
     },
     {
         "client_name" : "Duke Pillbox",
@@ -42,7 +42,7 @@
         "redirect_uri" : "http://pillbox.medapptech.com/initapp/",
         "logo_uri" : "https://gallery.smarthealthit.org/img/apps/14.png",
         "patient" : {"fhirId": "8718"},
-        "persona" : {}
+        "persona" : ""
     },
     {
         "client_name" : "ClinDat",
@@ -51,7 +51,7 @@
         "redirect_uri" : "https://apps.medapptech.com:9004/fhir-app/authorize.html",
         "logo_uri" : "https://gallery.smarthealthit.org/img/apps/16.png",
         "patient" : {"fhirId": "8718"},
-        "persona" : {}
+        "persona" : ""
     },
     {
         "client_name" : "Meducation RS",
@@ -60,7 +60,7 @@
         "redirect_uri" : "https://fhir-dstu2.meducation.com/index.html",
         "logo_uri" : "https://fhir-dstu2.meducation.com/images/meducation_icon.png",
         "patient" : "",
-        "persona" : {}
+        "persona" : ""
     },
     {
         "client_name" : "Patient Data Manager",
@@ -69,7 +69,7 @@
         "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-patient-data-manager/static/patient-data-manager/",
         "logo_uri" : "http://54.213.219.198:9080/uat/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png",
         "patient" : {"fhirId": "BILIBABY"},
-        "persona" : {}
+        "persona" : ""
     },
     {
         "client_name" : "HSPC Appointment Viewer",
@@ -95,7 +95,7 @@
         "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/launch",
         "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/redirect",
         "logo_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/images/appointment-viewer.png",
-        "patient" : {},
+        "patient" : "",
         "persona" : {"fullUrl": "http://54.213.219.198:9080/uat/hspc-reference-api/data/Practitioner/COREPRACTITIONER1"}
     }
 ]
