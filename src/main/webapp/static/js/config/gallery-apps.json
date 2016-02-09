@@ -50,8 +50,8 @@
         "launch_uri" : "https://apps.medapptech.com:9004/fhir-app/launch.html",
         "redirect_uri" : "https://apps.medapptech.com:9004/fhir-app/authorize.html",
         "logo_uri" : "https://gallery.smarthealthit.org/img/apps/16.png",
-        "patient" : "",
-        "persona" : {"fhirId": "8569"}
+        "patient" : {"fhirId": "8569"},
+        "persona" : {}
     },
     {
         "client_name" : "Meducation RS",
