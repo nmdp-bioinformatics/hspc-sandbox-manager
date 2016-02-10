@@ -1,13 +1,11 @@
 <div class="container-fluid" ng-controller="PractitionerViewController">
     <div class="row">
         <div class="content-column" resize ng-style="resizeWithOffset(80)" ng-class="showing.practitionerDetail ? 'col-lg-8 right-border' : 'col-lg-12'">
-            <div class="text-center">
-                <h1>Practitioners View</h1>
-            </div>
+            <div class="slim-page-header">Practitioners View</div>
             <div ng-include="'static/js/templates/practitionerSearch.html'"></div>
         </div>
         <div class="col-lg-4 content-column" ng-show="showing.practitionerDetail">
-            <h3>Details</h3>
+            <div class="slim-page-header">Details</div>
             <div ng-include="'static/js/templates/practitionerDetail.html'"></div>
         </div>
     </div>

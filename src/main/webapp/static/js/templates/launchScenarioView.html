@@ -2,20 +2,20 @@
     <div class="row">
         <div class="content-column" resize ng-style="resizeWithOffset(80)" ng-class="showing.detail ? 'col-lg-8 right-border' : 'col-lg-12'">
             <div style="margin-bottom: 10px">
-                <h3>Build a new Launch Scenario</h3>
-                <div class="btn btn-basic btn-md" ui-sref="patient-view({source: 'persona'})">As Patient <i class="fa fa-chevron-right fa-lg"></i></div>
-                <div class="btn btn-basic btn-md" ui-sref="practitioner-view">As Practitioner <i class="fa fa-chevron-right fa-lg"></i></div>
+                <div class="slim-page-header">Build a new Launch Scenario</div>
+                <div class="btn btn-basic btn-md" ui-sref="patient-view({source: 'persona'})">As Patient <i class="fa fa-chevron-right"></i></div>
+                <div class="btn btn-basic btn-md" ui-sref="practitioner-view">As Practitioner <i class="fa fa-chevron-right"></i></div>
             </div>
             <div class="row horizontal-scroll" resize ng-style="resizeWithOffset(200)">
             <div class="col-lg-12">
                 <div class="box">
-                    <h3>Recent Launch Scenarios</h3>
+                    <div class="sub-header">Recent Launch Scenarios</div>
                     <div ng-controller="RecentTableCtrl">
                         <scrollable-table></scrollable-table>
                     </div>
                 </div>
                 <div class="box">
-                    <h3>Launch Scenarios</h3>
+                    <div class="sub-header">Launch Scenarios</div>
                     <div ng-controller="FullTableCtrl">
                         <scrollable-table></scrollable-table>
                     </div>
@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="col-lg-4" ng-show="showing.detail">
-            <h3>Details</h3>
+            <div class="slim-page-header">Details</div>
             <div ng-include="'static/js/templates/launchScenarioDetail.html'"></div>
         </div>
     </div>

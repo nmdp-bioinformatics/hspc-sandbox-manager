@@ -1,7 +1,7 @@
 <div class="modal-header">
-    <h3 class="modal-title">Create New Patient</h3>
+    <div class="slim-page-header modal-title">Create New Patient</div>
 </div>
-<div class="modal-body">
+<div class="modal-body modal-body-style">
     <form name="CreatePatientForm" class="form-horizontal" role="form">
         <div id="givenNameHolder" ng-class="isGivenNameValid() ? 'form-group has-feedback' : 'form-group has-error has-feedback'">
             <label class="control-label col-sm-3">Given Name:</label>
@@ -53,12 +53,8 @@
 </div>
 <div class="modal-footer">
     <div class="form-group">
-        <div class="col-sm-offset-4 col-sm-2">
             <button id="createPatientButton" ng-class="{'disabled' : !isPatientValid()}" type="button" class="btn btn-basic" ng-click="createPatient()" tabindex="104">Create
             </button>
-        </div>
-        <div class="col-sm-6 pull-left">
             <button id="cancelButton" type="button" class="btn btn-basic" data-dismiss="modal" ng-click="cancel()" tabindex="105">Cancel</button>
-        </div>
     </div>
 </div>

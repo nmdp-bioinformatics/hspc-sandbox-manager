@@ -34,14 +34,14 @@
     </div>
     <div class="col-md-12 content-column">
         <div ng-show="!showing.addingContext && !contextSelected">
-            <a ng-click="toggleAddingContext()"><i class="fa fa-plus fa-lg"></i> Add</a>
+            <a ng-click="toggleAddingContext()"><i class="fa fa-plus"></i> Add</a>
         </div>
         <div ng-show="!showing.addingContext && contextSelected">
-            <a ng-click="delete()"><i class="fa fa-remove fa-lg"></i> Delete</a>
+            <a ng-click="delete()"><i class="fa fa-remove"></i> Delete</a>
         </div>
         <div ng-show="showing.addingContext">
-            <a ng-click="saveContextParam()" ng-class="{'disabled' : !contextIsValid()}"><i class="fa fa-check fa-lg"></i> Save</a>
-            <a class="pull-right" ng-click="cancel()"><i class="fa fa-remove fa-lg"></i> Cancel</a>
+            <a ng-click="saveContextParam()" ng-class="{'disabled' : !contextIsValid()}"><i class="fa fa-check"></i> Save</a>
+            <a class="pull-right" ng-click="cancel()"><i class="fa fa-remove"></i> Cancel</a>
         </div>
     </div>
 </div>
