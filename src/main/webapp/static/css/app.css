@@ -441,6 +441,17 @@ fieldset[disabled] .btn-basic.active {
     font-weight: 300;
 }
 
+.detail-form-value a {
+    color: #00AEEF;
+    font-size: 12px;
+    font-weight: 600;
+}
+.detail-form-value a:hover {
+    color: #0095cc;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 .detail-form-value {
     border: 1px solid #e6e6e6;
     border-radius: 4px;

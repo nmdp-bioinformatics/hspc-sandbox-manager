@@ -6,7 +6,7 @@
                 <div class="content">
                     <div class="detail-form">
                         <label class="detail-form-label">Name:</label>
-                        <label class="detail-form-value">{{selected.selectedPatient | nameGivenFamily}}</label>
+                        <label class="detail-form-value"><a ng-click="launchPatientDataManager(selected.selectedPatient)">{{selected.selectedPatient | nameGivenFamily}}</a></label>
                     </div>
                     <div class="detail-form">
                         <label class="detail-form-label">Gender:</label>
@@ -15,6 +15,17 @@
                     <div class="detail-form">
                         <label class="detail-form-label">Birth Date:</label>
                         <label class="detail-form-value">{{selected.selectedPatient.birthDate | date:'MM/dd/yyyy'}}</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="title_box">
+                <div class="title">Data Summary</div>
+                <div class="content">
+                    <div ng-repeat="resource in selected.patientResources">
+                        <div class="detail-form">
+                            <label class="detail-form-value">{{resource.resourceType}} ({{resource.count}})</label>
+                        </div>
                     </div>
                 </div>
             </div>

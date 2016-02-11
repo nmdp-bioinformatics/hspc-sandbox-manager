@@ -147,10 +147,14 @@ angular.module('sandManApp.services', [])
                     });
                 return deferred;
             },
-            queryResourceInstances: function(resource, searchValue, tokens, sort) {
+            queryResourceInstances: function(resource, searchValue, tokens, sort, count) {
                 var deferred = $.Deferred();
 
-                var searchParams = {type: resource, count: 50};
+                if (count === undefined) {
+                    count = 50;
+                }
+
+                var searchParams = {type: resource, count: count};
                 searchParams.query = {};
                 if (searchValue !== undefined) {
                     searchParams.query = searchValue;
@@ -593,7 +597,12 @@ angular.module('sandManApp.services', [])
             getGalleryApps: $http.get('static/js/config/gallery-apps.json')
         };
 
-    }]).factory('appsSettings', ['$http',function($http)  {
+    }]).factory('patientResources', ['$http',function($http)  {
+    return {
+        getSupportedResources: $http.get('static/js/config/supported-patient-resources.json')
+    };
+
+}]).factory('appsSettings', ['$http',function($http)  {
 
     var settings;
 

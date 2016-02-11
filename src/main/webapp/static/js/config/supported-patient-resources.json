@@ -1,0 +1,6 @@
+[
+    {"resourceType": "Observation", "patientSearch": "subject"},
+    {"resourceType": "Encounter", "patientSearch": "patient"},
+    {"resourceType": "MedicationOrder", "patientSearch": "patient"},
+    {"resourceType": "MedicationDispense", "patientSearch": "patient"}
+]

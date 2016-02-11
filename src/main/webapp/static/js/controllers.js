@@ -106,6 +106,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
     }).controller("PatientViewController",
     function($scope){
+
         $scope.showing = {patientDetail: false,
             noPatientContext: true,
             createPatient: true,
@@ -120,7 +121,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.selected = {
             selectedPatient: {},
-            patientSelected: false
+            patientSelected: false,
+            patientResources: []
         }
 
     }).controller("PatientDetailController",
@@ -161,7 +163,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
     }).controller("PatientSearchController",
-    function($scope, $rootScope, $state, $stateParams, fhirApiServices, launchScenarios) {
+    function($scope, $rootScope, $state, $filter, $stateParams, fhirApiServices, launchScenarios, patientResources) {
 
         var source = $stateParams.source;
 
@@ -187,6 +189,20 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.selected.selectedPatient = p;
             $scope.selected.patientSelected = true;
             $scope.showing.patientDetail = true;
+
+            patientResources.getSupportedResources.success(function(resources){
+                $scope.selected.patientResources = [];
+                for (var i = 0; i < resources.length; i++) {
+                    var query = {};
+                    query[resources[i].patientSearch] = "Patient/"+ p.id;
+                    fhirApiServices.queryResourceInstances(resources[i].resourceType, query, undefined, undefined, 1)
+                        .then(function(resource, queryResult){
+                            $scope.selected.patientResources.push({resourceType: queryResult.config.type, count: queryResult.data.total});
+                            $scope.selected.patientResources = $filter('orderBy')($scope.selected.patientResources, "resourceType");
+                            $rootScope.$digest();
+                        });
+                }
+            });
         };
 
         $scope.skipPatient = function(){
@@ -461,6 +477,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             } else {
                 launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.persona);
             }
+        };
+
+        $scope.launchPatientDataManager = function(patient){
+            launchApp.launchPatientDataManager(patient);
         };
 
         $scope.delete = function(scenario){
