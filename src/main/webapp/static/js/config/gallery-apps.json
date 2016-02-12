@@ -59,7 +59,7 @@
         "launch_uri" : "https://fhir-dstu2.meducation.com/launch.html",
         "redirect_uri" : "https://fhir-dstu2.meducation.com/index.html",
         "logo_uri" : "https://fhir-dstu2.meducation.com/images/meducation_icon.png",
-        "patient" : {"fhirId": "124972"},
+        "patient" : {"fhirId": "72003"},
         "persona" : ""
     },
     {
