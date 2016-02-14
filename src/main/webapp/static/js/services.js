@@ -425,19 +425,9 @@ angular.module('sandManApp.services', [])
                 return oauthUser;
             },
             userSettings: function() {
-                appsSettings.getSettings().then(function(settings){
-                    $.ajax({
-                        url: settings.baseUrl + "/User?id=" + encodeURIComponent(oauthUser.ldapId),
-                        type: 'GET',
-                        contentType: "application/json",
-                        beforeSend : function( xhr ) {
-                            xhr.setRequestHeader( 'c8381465-a7f8-4ecc-958d-ec296d6e8671', oauthUser.ldapId);
-                            xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
-                        }
 
-                    }).done(function(){
-                        }).fail(function(){
-                        });
+                appsSettings.getSettings().then(function(settings){
+                    window.location.href = settings.baseUrl + "/User?id=" + encodeURIComponent(oauthUser.ldapId);
                 });
             }
         };
