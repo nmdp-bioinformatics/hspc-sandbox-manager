@@ -58,16 +58,19 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
         .state('app-gallery', {
             url: '/app-gallery',
             templateUrl: 'static/js/templates/appsGallery.html',
+            demoOnly: true,
             authenticate: true
         })
 
         .state('after-auth', {
             url: '/after-auth',
+            demoOnly: true,
             templateUrl:'static/js/templates/start.html'
         })
 
         .state('resolve', {
             url: '/resolve/:context/against/:iss/for/:clientName/then/:endpoint',
+            demoOnly: true,
             templateUrl:'static/js/templates/resolve.html'
         });
 

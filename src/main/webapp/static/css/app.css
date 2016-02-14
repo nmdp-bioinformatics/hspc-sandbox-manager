@@ -314,8 +314,9 @@ fieldset[disabled] .btn-basic.active {
 }
 
 .app-gallery-container {
-    overflow-y: auto;
+    overflow: auto;
     max-width: 1020px;
+    min-width: 900px;
     display: block;
     padding: 4px;
     margin-bottom: 20px;
@@ -400,9 +401,23 @@ fieldset[disabled] .btn-basic.active {
     width: 100px;
 }
 
+.thumbnail {
+    height: 200px;
+    width: 220px;
+    display: block;
+    padding: 4px;
+    margin-bottom: 20px;
+    line-height: 1.42857143;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    -webkit-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+
 .thumb-holder {
     height: 150px;
-    /*width: 100%;*/
+    width: 210px;
     text-align: center;
 }
 
@@ -415,7 +430,8 @@ fieldset[disabled] .btn-basic.active {
     padding-right: 0;
 }
 
-.detail-form-label-input, .detail-form-value {
+.detail-form-label-input,
+.detail-form-value {
     border-radius: 4px;
     width: 65%;
     float: left;
@@ -425,6 +441,54 @@ fieldset[disabled] .btn-basic.active {
     padding: 5px 5px 5px;
     font-size: 12px;
     font-weight: 600;
+}
+
+.detail-form-label-inline {
+    width: 35%;
+    float: left;
+    position: relative;
+    color: #58585A;
+    min-height: 25px;
+    padding: 10px 5px 5px;
+    display: inline-block;
+    margin-bottom: 0;
+    font-size: 12px;
+    font-weight: 300;
+}
+
+.detail-form-label-input-inline {
+    border-radius: 4px;
+    width: 65%;
+    float: left;
+    position: relative;
+    display: inline-block;
+    min-height: 25px;
+    padding: 5px 5px 5px;
+    margin-bottom: 0;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.detail-form-label-input-inline select,
+.detail-form-label-input-inline input {
+    width: 80%;
+    float: left;
+    position: relative;
+    display: inline-block;
+    min-height: 25px;
+    padding: 5px 5px 5px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.detail-form-label-input-inline a {
+    padding: 5px 5px 0;
+    float: left;
+    width: 10%;
+}
+
+.detail-form-label-input-inline a>i {
+    width: 100%;
 }
 
 .detail-form-label {
@@ -670,25 +734,25 @@ td {
     word-wrap:break-word;
 }
 
-.title_box {
+.title-box {
     margin: 25px 0 5px 0;
     padding: 5px;
     border: #e6e6e6 1px solid;
     border-radius: 4px;
 }
 
-.title_box .title {
+.title-box .title {
     position: relative;
     font-size: 12px;
     font-weight: 400;
-    top: -15px;
+    top: -16px;
     margin-left: 15px;
     padding: 0 2px 0 2px;
     display: inline;
     background-color: white;
 }
 
-.title_box .content {
+.title-box .content {
     margin-top: -15px;
     padding-bottom: 5px;
     font-size: 12px;
@@ -696,18 +760,17 @@ td {
     width: 100%;
 }
 
-.title_box .content .detail-form {
+.title-box .content .detail-form {
     height: 25px;
 }
 
-.title_box .content .detail-form-label {
-    font-weight: normal;
+.title-box .content .detail-form-label {
     margin: 0;
     padding: 5px 0 0 5px;
     min-height: 20px;
 }
 
-.title_box .content .detail-form-value {
+.title-box .content .detail-form-value {
     border: none;
     margin: 0;
     padding: 5px 0 0 5px;
@@ -715,7 +778,7 @@ td {
     font-weight: bold;
 }
 
-.title_box .content .detail-form-label.full-line {
+.title-box .content .detail-form-label.full-line {
     border: none;
     width: 100%;
     margin: 0;

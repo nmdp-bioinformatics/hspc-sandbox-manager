@@ -404,7 +404,7 @@ angular.module('sandManApp.services', [])
                     .done(function(userResult){
 
                         var user = {name:""};
-                        user.name = $filter('nameGivenFamily')(userResult.data)
+                        user.name = $filter('nameGivenFamily')(userResult.data);
                         user.id  = userResult.data.id;
                         persona = user;
                         persona.fullUrl = userResult.config.url;
@@ -423,6 +423,22 @@ angular.module('sandManApp.services', [])
                     oauthUser.email = payload.email;
                 }
                 return oauthUser;
+            },
+            userSettings: function() {
+                appsSettings.getSettings().then(function(settings){
+                    $.ajax({
+                        url: settings.baseUrl + "/User?id=" + encodeURIComponent(oauthUser.ldapId),
+                        type: 'GET',
+                        contentType: "application/json",
+                        beforeSend : function( xhr ) {
+                            xhr.setRequestHeader( 'c8381465-a7f8-4ecc-958d-ec296d6e8671', oauthUser.ldapId);
+                            xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+                        }
+
+                    }).done(function(){
+                        }).fail(function(){
+                        });
+                });
             }
         };
     }).factory('customFhirApp', function() {

@@ -10,7 +10,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             loading: false,
             searchloading: false,
             navBar: false,
-            largeSidebar: true
+            largeSidebar: true,
+            demoOnly: false
         };
         $scope.messages = [];
 
@@ -29,6 +30,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $state.go('launch-scenarios', {});
                 event.preventDefault();
             }
+            if ($scope.showing.demoOnly && !toState.demoOnly) {
+                $state.go('app-gallery', {});
+                event.preventDefault();
+            }
         });
 
         $scope.signin = function() {
@@ -43,6 +48,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.persona = persona;
                 $rootScope.$digest();
             });
+            if ($scope.oauthUser.ldapId === 'demo') {
+                $scope.showing.demoOnly = true;
+            }
             $scope.showing.signin = false;
             $scope.showing.signout = true;
             $scope.showing.navBar = true;
@@ -62,9 +70,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.manageUserAccount = function() {
-            appsSettings.getSettings().then(function(settings){
-                window.open(settings.userManagementUrl);
-            });
+            userServices.userSettings();
         };
 
     }]).controller("StartController",
@@ -123,7 +129,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             selectedPatient: {},
             patientSelected: false,
             patientResources: []
-        }
+        };
 
     }).controller("PatientDetailController",
     function($scope, $rootScope, $state, launchScenarios, $filter, launchApp){
@@ -186,23 +192,23 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
         $scope.onSelected = $scope.onSelected || function(p){
-            $scope.selected.selectedPatient = p;
-            $scope.selected.patientSelected = true;
-            $scope.showing.patientDetail = true;
+                $scope.selected.selectedPatient = p;
+                $scope.selected.patientSelected = true;
+                $scope.showing.patientDetail = true;
 
-            patientResources.getSupportedResources.success(function(resources){
-                $scope.selected.patientResources = [];
-                for (var i = 0; i < resources.length; i++) {
-                    var query = {};
-                    query[resources[i].patientSearch] = "Patient/"+ p.id;
-                    fhirApiServices.queryResourceInstances(resources[i].resourceType, query, undefined, undefined, 1)
-                        .then(function(resource, queryResult){
-                            $scope.selected.patientResources.push({resourceType: queryResult.config.type, count: queryResult.data.total});
-                            $scope.selected.patientResources = $filter('orderBy')($scope.selected.patientResources, "resourceType");
-                            $rootScope.$digest();
-                        });
-                }
-            });
+                patientResources.getSupportedResources.success(function(resources){
+                    $scope.selected.patientResources = [];
+                    for (var i = 0; i < resources.length; i++) {
+                        var query = {};
+                        query[resources[i].patientSearch] = "Patient/"+ p.id;
+                        fhirApiServices.queryResourceInstances(resources[i].resourceType, query, undefined, undefined, 1)
+                            .then(function(resource, queryResult){
+                                $scope.selected.patientResources.push({resourceType: queryResult.config.type, count: queryResult.data.total});
+                                $scope.selected.patientResources = $filter('orderBy')($scope.selected.patientResources, "resourceType");
+                                $rootScope.$digest();
+                            });
+                    }
+                });
         };
 
         $scope.skipPatient = function(){
@@ -674,7 +680,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 client_id: $scope.customapp.id,
                 launch_uri: $scope.customapp.url,
                 client_name: "Custom App",
-                logo_uri: "http://www.hl7.org/implement/standards/fhir/assets/images/fhir-logo-www.png"
+                logo_uri: "static/images/fhir-logo-www.png"
             });
         };
 
@@ -682,12 +688,16 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.all_user_apps = [];
         apps.getGalleryApps.success(function(apps){
             $scope.all_user_apps = apps;
+            if ($scope.showing.demoOnly) {
+                $scope.all_user_apps = $scope.all_user_apps.filter(function( app ) {
+                    return app.client_id !== "hspc_appointment_viewer";
+                });
+            }
         });
 
         $scope.launch = function(app){
             launchApp.launch(app, app.patient, undefined, app.persona);
         };
-
 
     }).controller('ModalInstanceCtrl',['$scope', '$uibModalInstance', "getScenario",
     function ($scope, $uibModalInstance, getScenario) {
