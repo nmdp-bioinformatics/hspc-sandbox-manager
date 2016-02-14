@@ -50,7 +50,7 @@
         "launch_uri" : "https://apps.medapptech.com:9004/fhir-app/launch.html",
         "redirect_uri" : "https://apps.medapptech.com:9004/fhir-app/authorize.html",
         "logo_uri" : "https://gallery.smarthealthit.org/img/apps/16.png",
-        "patient" : {"fhirId": "8718"},
+        "patient" : {"fhirId": "124972"},
         "persona" : ""
     },
     {
@@ -59,7 +59,7 @@
         "launch_uri" : "https://fhir-dstu2.meducation.com/launch.html",
         "redirect_uri" : "https://fhir-dstu2.meducation.com/index.html",
         "logo_uri" : "https://fhir-dstu2.meducation.com/images/meducation_icon.png",
-        "patient" : "",
+        "patient" : {"fhirId": "72003"},
         "persona" : ""
     },
     {
