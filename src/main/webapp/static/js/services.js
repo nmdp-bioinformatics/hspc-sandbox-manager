@@ -441,11 +441,7 @@ angular.module('sandManApp.services', [])
                         }
 
                     }).done(function(data){
-                                if (data.redirect) {
-                                    // data.redirect contains the string URL to redirect to
-//                                    window.location.href = data.redirect;
-                                    window.location.href = "https://sandbox.hspconsortium.org/pwm/private/"
-                                }
+                            window.location.href = "https://sandbox.hspconsortium.org/pwm/private/"
                         }).fail(function(){
                         });
                 });
