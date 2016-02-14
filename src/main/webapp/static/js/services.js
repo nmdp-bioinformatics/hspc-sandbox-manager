@@ -432,8 +432,9 @@ angular.module('sandManApp.services', [])
 
                 appsSettings.getSettings().then(function(settings){
                     $.ajax({
-                        url: settings.baseUrl + "/User?id=" + encodeURIComponent(oauthUser.ldapId),
-                        type: 'POST',
+//                        url: settings.baseUrl + "/User?id=" + encodeURIComponent(oauthUser.ldapId),
+                        url: "https://sandbox.hspconsortium.org/pwm",
+                        type: 'GET',
                         beforeSend : function( xhr ) {
                             xhr.setRequestHeader( 'c8381465-a7f8-4ecc-958d-ec296d6e8671', oauthUser.ldapId);
                             xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
