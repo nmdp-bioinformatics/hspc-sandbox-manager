@@ -20,13 +20,14 @@
 
 package org.hspconsortium.sandboxmanager.controllers;
 
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.net.URISyntaxException;
 
 @RestController
 public class UserEndpoint {
@@ -37,10 +38,8 @@ public class UserEndpoint {
     @Value("${hspc.platform.user-support.endpoint}")
     private String userSupportEndpoint;
 
-    @RequestMapping(value = "/User", method = RequestMethod.GET, params = {"id"})
-    public void userServices(HttpServletResponse response, @RequestParam(value = "id") String id) {
-        response.addHeader(this.userSupportKey, id);
-        response.addHeader("Access-Control-Allow-Origin", "*");
+    @RequestMapping(value = "/User", method = RequestMethod.POST)
+    public void userServices(HttpServletResponse response) throws URISyntaxException {
         response.addHeader("Location", this.userSupportEndpoint);
         response.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
     }

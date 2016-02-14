@@ -426,8 +426,26 @@ angular.module('sandManApp.services', [])
             },
             userSettings: function() {
 
+//                appsSettings.getSettings().then(function(settings){
+//                    window.location.href = settings.baseUrl + "/User?id=" + encodeURIComponent(oauthUser.ldapId);
+//                });
+
                 appsSettings.getSettings().then(function(settings){
-                    window.location.href = settings.baseUrl + "/User?id=" + encodeURIComponent(oauthUser.ldapId);
+                    $.ajax({
+                        url: settings.baseUrl + "/User?id=" + encodeURIComponent(oauthUser.ldapId),
+                        type: 'POST',
+                        beforeSend : function( xhr ) {
+                            xhr.setRequestHeader( 'c8381465-a7f8-4ecc-958d-ec296d6e8671', oauthUser.ldapId);
+                            xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+                        }
+
+                    }).done(function(data){
+                                if (data.redirect) {
+                                    // data.redirect contains the string URL to redirect to
+                                    window.location.href = data.redirect;
+                                }
+                        }).fail(function(){
+                        });
                 });
             }
         };
