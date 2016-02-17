@@ -63,6 +63,15 @@
         "persona" : ""
     },
     {
+        "client_name" : "Meducation Timeview",
+        "client_id" : "timeview",
+        "launch_uri" : "https://timeviewfhir-dstu2.meducation.com/launch.html",
+        "redirect_uri" : "https://timeviewfhir-dstu2.meducation.com/index.html",
+        "logo_uri" : "",
+        "patient" : {"fhirId": "72003"},
+        "persona" : ""
+    },
+    {
         "client_name" : "Patient Data Manager",
         "client_id" : "patient_data_manager",
         "launch_uri" : "https://sandbox.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/launch.html",
