@@ -67,7 +67,7 @@
         "client_id" : "timeview",
         "launch_uri" : "https://timeviewfhir-dstu2.meducation.com/launch.html",
         "redirect_uri" : "https://timeviewfhir-dstu2.meducation.com/index.html",
-        "logo_uri" : "",
+        "logo_uri" : "http://timeviewfhir-dstu2.meducation.com/images/MeducationTimeview251x160.png",
         "patient" : {"fhirId": "72003"},
         "persona" : ""
     },
