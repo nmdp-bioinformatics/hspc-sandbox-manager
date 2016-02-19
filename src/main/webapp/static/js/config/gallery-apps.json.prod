@@ -72,6 +72,15 @@
         "persona" : ""
     },
     {
+        "client_name" : "Premier AKI Staging",
+        "client_id" : "1396ff99-8012-4043-8d33-7a1139f08ccc",
+        "launch_uri" : "http://premiersmartapps-env.us-west-2.elasticbeanstalk.com/PremierSmartApp/launchFromHSPC.html",
+        "redirect_uri" : "http://premiersmartapps-env.us-west-2.elasticbeanstalk.com/PremierSmartApp/PRPHome.html",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/AKIStagingApp.png",
+        "patient" : {"fhirId": "8718"},
+        "persona" : ""
+    },
+    {
         "client_name" : "Patient Data Manager",
         "client_id" : "patient_data_manager",
         "launch_uri" : "https://sandbox.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/launch.html",
