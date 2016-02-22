@@ -81,6 +81,15 @@
         "persona" : ""
     },
     {
+        "client_name" : "Visual DX",
+        "client_id" : "040c7a59-7250-43e6-946d-941e765320a6",
+        "launch_uri" : "https://clupea.visualdx.com/smart/v2/launch.html",
+        "redirect_uri" : "https://clupea.visualdx.com/smart/v2/fhir.html",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/visualdx_logo.gif",
+        "patient" : {"fhirId": "8718"},
+        "persona" : ""
+    },
+    {
         "client_name" : "Patient Data Manager",
         "client_id" : "patient_data_manager",
         "launch_uri" : "http://54.213.219.198:9080/uat/hspc-patient-data-manager/static/patient-data-manager/launch.html",
