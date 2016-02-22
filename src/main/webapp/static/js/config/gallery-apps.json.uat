@@ -91,28 +91,28 @@
     },
     {
         "client_name" : "HSPC Appointment Viewer",
-        "client_id" : "hspc_appointment_viewer",
-        "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/launch",
-        "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/redirect",
-        "logo_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/images/appointment-viewer.png",
+        "client_id" : "hspc_appointments",
+        "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/launch.html",
+        "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/index.html",
+        "logo_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/images/appointments.png",
         "patient" : {"fhirId": "COREPATIENT1"},
         "persona" : {"fullUrl": "http://54.213.219.198:9080/uat/hspc-reference-api/data/Practitioner/COREPRACTITIONER1"}
     },
     {
         "client_name" : "HSPC Appointments Patient",
-        "client_id" : "hspc_appointment_viewer",
-        "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/launch",
-        "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/redirect",
-        "logo_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/images/appointment-viewer.png",
+        "client_id" : "hspc_appointments",
+        "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/launch.html",
+        "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/index.html",
+        "logo_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/images/appointments.png",
         "patient" : {"fhirId": "COREPATIENT1"},
         "persona" : {"fullUrl": "http://54.213.219.198:9080/uat/hspc-reference-api/data/Patient/COREPATIENT1"}
     },
     {
         "client_name" : "HSPC Appointments no Patient",
-        "client_id" : "hspc_appointment_viewer",
-        "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/launch",
-        "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/redirect",
-        "logo_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/images/appointment-viewer.png",
+        "client_id" : "hspc_appointments",
+        "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/launch.html",
+        "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/index.html",
+        "logo_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/images/appointments.png",
         "patient" : "",
         "persona" : {"fullUrl": "http://54.213.219.198:9080/uat/hspc-reference-api/data/Practitioner/COREPRACTITIONER1"}
     }

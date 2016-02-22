@@ -70,11 +70,11 @@
         "logo_uri" : "https://sandbox.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png"
     },
     {
-        "client_name" : "HSPC Appointment Viewer",
-        "client_id" : "hspc_appointment_viewer",
-        "launch_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/launch",
-        "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/redirect",
-        "logo_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/images/appointment-viewer.png"
+        "client_name" : "HSPC Appointments",
+        "client_id" : "hspc_appointments",
+        "launch_uri" : "https://sandbox.hspconsortium.org/hspc-appointments/static/appointments/launch.html",
+        "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-appointments/static/appointments/index.html",
+        "logo_uri" : "https://sandbox.hspconsortium.org/hspc-appointments/static/appointments/images/appointments.png"
     },
     {
         "client_name" : "My Web App",
