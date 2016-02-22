@@ -16,9 +16,3 @@ spring:
       ddl-auto: update
       dialect: org.hibernate.dialect.MySQL5InnoDBDialect
       naming_strategy: org.hibernate.cfg.ImprovedNamingStrategy
-
-hspc:
-  platform:
-    user-support:
-      key: c8381465-a7f8-4ecc-958d-ec296d6e8671
-      endpoint: https://sandbox.hspconsortium.org/pwm

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootstrap', 'sandManApp.filters', 'sandManApp.services',
+angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootstrap', 'highcharts-ng', 'sandManApp.filters', 'sandManApp.services',
     'sandManApp.controllers', 'sandManApp.directives'], function($stateProvider, $urlRouterProvider){
 
     $urlRouterProvider.otherwise('/login');

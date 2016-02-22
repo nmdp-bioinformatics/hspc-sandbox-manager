@@ -2,5 +2,9 @@
     {"resourceType": "Observation", "patientSearch": "subject"},
     {"resourceType": "Encounter", "patientSearch": "patient"},
     {"resourceType": "MedicationOrder", "patientSearch": "patient"},
-    {"resourceType": "MedicationDispense", "patientSearch": "patient"}
+    {"resourceType": "MedicationDispense", "patientSearch": "patient"},
+    {"resourceType": "AllergyIntolerance", "patientSearch": "patient"},
+    {"resourceType": "Condition", "patientSearch": "patient"},
+    {"resourceType": "Procedure", "patientSearch": "patient"},
+    {"resourceType": "Immunization", "patientSearch": "patient"}
 ]

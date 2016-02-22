@@ -426,13 +426,8 @@ angular.module('sandManApp.services', [])
             },
             userSettings: function() {
 
-//                appsSettings.getSettings().then(function(settings){
-//                    window.location.href = settings.baseUrl + "/User?id=" + encodeURIComponent(oauthUser.ldapId);
-//                });
-
                 appsSettings.getSettings().then(function(settings){
                     $.ajax({
-//                        url: settings.baseUrl + "/User?id=" + encodeURIComponent(oauthUser.ldapId),
                         url: "https://sandbox.hspconsortium.org/pwm",
                         type: 'GET',
                         beforeSend : function( xhr ) {
@@ -461,6 +456,10 @@ angular.module('sandManApp.services', [])
 
     }).factory('launchApp', function($rootScope, fhirApiServices, apps, random, userServices) {
 
+        var patientDataManagerApp;
+
+        getPatientDataManagerApp();
+
         function registerContext(app, params, key) {
             fhirApiServices
                 .registerContext(app, params)
@@ -478,6 +477,18 @@ angular.module('sandManApp.services', [])
                     $rootScope.$emit('error', 'Could not register launch context (see console)');
                     $rootScope.$digest();
                 });
+        }
+
+        function getPatientDataManagerApp() {
+            apps.getPractitionerPatientApps().done(function(patientApps){
+                var pdm;
+                for (var i=0; i < patientApps.length; i++) {
+                    if (patientApps[i]["client_id"] == "patient_data_manager") {
+                        pdm = patientApps[i];
+                    }
+                }
+                patientDataManagerApp = pdm;
+            });
         }
 
         return {
@@ -510,19 +521,10 @@ angular.module('sandManApp.services', [])
                 }
             },
             launchPatientDataManager: function(patient){
-                var that = this;
-                apps.getPractitionerPatientApps.success(function(patientApps){
-                    var pdm;
-                    for (var i=0; i < patientApps.length; i++) {
-                        if (patientApps[i]["client_id"] == "patient_data_manager") {
-                            pdm = patientApps[i];
-                        }
-                    }
-                    if (patient.fhirId === undefined){
-                        patient.fhirId = patient.id;
-                    }
-                    that.launch(pdm, patient);
-                });
+                if (patient.fhirId === undefined){
+                    patient.fhirId = patient.id;
+                }
+                this.launch(patientDataManagerApp, patient);
             }
     }
 
@@ -612,16 +614,99 @@ angular.module('sandManApp.services', [])
         }
 
     }).factory('apps', ['$http',function($http)  {
-        return {
-            getPatientApps: $http.get('static/js/config/patient-apps.json'),
-            getPractitionerPatientApps: $http.get('static/js/config/practitioner-patient-apps.json'),
-            getPractitionerApps: $http.get('static/js/config/practitioner-apps.json'),
-            getGalleryApps: $http.get('static/js/config/gallery-apps.json')
+
+    var patientApps;
+    var practitionerPatientApps;
+    var practitionerApps;
+    var galleryApps;
+
+    return {
+        getPatientApps : function() {
+            var deferred = $.Deferred();
+            if (patientApps !== undefined) {
+                deferred.resolve(patientApps);
+            } else {
+                this.loadSettings().then(function(){
+                    deferred.resolve(patientApps);
+                });
+            }
+            return deferred;
+        },
+        getPractitionerPatientApps : function() {
+            var deferred = $.Deferred();
+            if (practitionerPatientApps !== undefined) {
+                deferred.resolve(practitionerPatientApps);
+            } else {
+                this.loadSettings().then(function(){
+                    deferred.resolve(practitionerPatientApps);
+                });
+            }
+            return deferred;
+        },
+        getPractitionerApps : function() {
+            var deferred = $.Deferred();
+            if (practitionerApps !== undefined) {
+                deferred.resolve(practitionerApps);
+            } else {
+                this.loadSettings().then(function(){
+                    deferred.resolve(practitionerApps);
+                });
+            }
+            return deferred;
+        },
+        getGalleryApps : function() {
+            var deferred = $.Deferred();
+            if (galleryApps !== undefined) {
+                deferred.resolve(galleryApps);
+            } else {
+                this.loadSettings().then(function(){
+                    deferred.resolve(galleryApps);
+                });
+            }
+            return deferred;
+        },
+        loadSettings: function(){
+            var deferred = $.Deferred();
+            $http.get('static/js/config/patient-apps.json').success(function(result){
+                patientApps = result;
+                $http.get('static/js/config/practitioner-patient-apps.json').success(function(result){
+                    practitionerPatientApps = result;
+                    $http.get('static/js/config/practitioner-apps.json').success(function(result){
+                        practitionerApps = result;
+                        $http.get('static/js/config/gallery-apps.json').success(function(result){
+                            galleryApps = result;
+                            deferred.resolve();
+                        });
+                    });
+                });
+            });
+            return deferred;
+            }
         };
 
     }]).factory('patientResources', ['$http',function($http)  {
+    var resources;
+
     return {
-        getSupportedResources: $http.get('static/js/config/supported-patient-resources.json')
+        loadSettings: function(){
+            var deferred = $.Deferred();
+            $http.get('static/js/config/supported-patient-resources.json').success(function(result){
+                resources = result;
+                deferred.resolve(result);
+            });
+            return deferred;
+        },
+        getSupportedResources: function(){
+            var deferred = $.Deferred();
+            if (resources !== undefined) {
+                deferred.resolve(resources);
+            } else {
+                this.loadSettings().then(function(result){
+                    deferred.resolve(result);
+                });
+            }
+            return deferred;
+        }
     };
 
 }]).factory('appsSettings', ['$http',function($http)  {

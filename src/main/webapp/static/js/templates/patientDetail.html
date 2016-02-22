@@ -19,14 +19,19 @@
                 </div>
             </div>
 
+            <!--<div class="box">-->
+                <!--<highchart config="selected.chartConfig" style="width: 350px "></highchart>-->
+            <!--</div>-->
             <div class="title-box">
                 <div class="title">Data Summary</div>
                 <div class="content">
-                    <div ng-repeat="resource in selected.patientResources">
-                        <div class="detail-form">
-                            <label class="detail-form-value">{{resource.resourceType}} ({{resource.count}})</label>
-                        </div>
-                    </div>
+                    <!--<div ng-repeat="resource in selected.patientResources">-->
+                        <!--<div class="detail-form">-->
+                            <!--<label class="detail-form-value">{{resource.resourceType}} ({{resource.count}})-->
+                                <highchart config="selected.chartConfig" style="min-width: 250px; max-width: 350px; height: 250px"></highchart>
+                            <!--</label>-->
+                        <!--</div>-->
+                    <!--</div>-->
                 </div>
             </div>
         </div>

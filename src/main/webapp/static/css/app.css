@@ -129,7 +129,9 @@ span.title,
 .navbar-stack-sign-in,
 .navbar-stack-sign-in a,
 .navbar-stack-name,
-.navbar-stack-name a{
+.navbar-stack-name a,
+.navbar-stack-name.disabled,
+.navbar-stack-name a.disabled{
     color: #58585A;
     font-weight: normal;
     font-size: 14px;
@@ -397,7 +399,7 @@ fieldset[disabled] .btn-basic.active {
 }
 
 .form-btn {
-    height: 35px;
+    /*height: 35px;*/
     width: 100px;
 }
 

@@ -38,6 +38,9 @@
 
     <script src="static/fhir-client/underscore-min.js"></script>
     <script src="static/fhir-client/fhir-client.js"></script>
+    <script src="static/highcharts/highcharts.js"></script>
+    <script src="static/highcharts/highcharts-more.js"></script>
+    <script src="static/highcharts/highcharts-ng.min.js"></script>
     <script src="static/js/app.js"></script>
     <script src="static/js/controllers.js"></script>
     <script src="static/js/services.js"></script>
@@ -54,7 +57,7 @@
     <div class="navbar-brand center-title" center ng-style="centerWithOffset(160)">Sandbox Manager</div>
     <div class="pull-right">
         <div class="navbar-stack-name ng-hide" ng-show="showing.signout">
-            Welcome <a id="welcome" ng-click="manageUserAccount()"><span style="font-weight: bold">{{oauthUser.name}}</span></a></div>
+            Welcome <a id="welcome" ng-class="{disabled: showing.demoOnly}"  ng-click="manageUserAccount()"><span style="font-weight: bold">{{oauthUser.name}}</span></a></div>
         <div  class="navbar-stack-sign-in ng-hide" ng-show="showing.signin" >
             <a id="signin" ng-click="signin()"><i class="fa fa-sign-in"></i> Sign In</a>
         </div>

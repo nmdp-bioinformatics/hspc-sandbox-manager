@@ -48,13 +48,15 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.persona = persona;
                 $rootScope.$digest();
             });
-            if ($scope.oauthUser.ldapId === 'demo') {
-                $scope.showing.demoOnly = true;
-            }
             $scope.showing.signin = false;
             $scope.showing.signout = true;
             $scope.showing.navBar = true;
-            $state.go('launch-scenarios', {});
+            if ($scope.oauthUser.ldapId === 'demo') {
+                $scope.showing.demoOnly = true;
+                $state.go('app-gallery', {});
+            } else {
+                $state.go('launch-scenarios', {});
+            }
         });
 
         $rootScope.$on('hide-nav', function(){
@@ -128,7 +130,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.selected = {
             selectedPatient: {},
             patientSelected: false,
-            patientResources: []
+            patientResources: [],
+            chartConfig: {}
         };
 
     }).controller("PatientDetailController",
@@ -191,12 +194,65 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.createPatient =  true;
         }
 
+        var resourcesNames = [];
+        var resourceCounts = [];
+
+        function emptyArray(array){
+            while (array.length > 0) {
+                array.pop();
+            }
+        }
+
+        $scope.selected.chartConfig = {
+            options: {
+                chart: {
+                    type: 'bar'
+                },
+                legend: {
+                    enabled: false
+                }
+            },
+            xAxis: {
+                categories: resourcesNames,
+                title: {
+                    text: null
+                }
+            },
+            yAxis: {
+                min: 0,
+                labels: {
+                    overflow: 'justify'
+                },
+                title: {
+                    text: null
+                }
+            },series: [{
+                type: 'bar',
+                name: "Resource Count",
+                data: resourceCounts,
+                dataLabels: {
+                    enabled: true
+                },
+                color: '#00AEEF'
+            }],
+            subtitle: {
+                text: null
+            },
+            title: {
+                text: null
+            },
+            credits: {
+                enabled: false
+            }
+        };
+
         $scope.onSelected = $scope.onSelected || function(p){
+            if ($scope.selected.selectedPatient !== p) {
                 $scope.selected.selectedPatient = p;
                 $scope.selected.patientSelected = true;
                 $scope.showing.patientDetail = true;
 
-                patientResources.getSupportedResources.success(function(resources){
+                patientResources.getSupportedResources().done(function(resources){
                     $scope.selected.patientResources = [];
                     for (var i = 0; i < resources.length; i++) {
                         var query = {};
@@ -205,10 +261,19 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                             .then(function(resource, queryResult){
                                 $scope.selected.patientResources.push({resourceType: queryResult.config.type, count: queryResult.data.total});
                                 $scope.selected.patientResources = $filter('orderBy')($scope.selected.patientResources, "resourceType");
+
+                                emptyArray(resourcesNames);
+                                emptyArray(resourceCounts);
+                                angular.forEach($scope.selected.patientResources, function (resource) {
+                                    resourcesNames.push(resource.resourceType);
+                                    resourceCounts.push(parseInt(resource.count));
+                                });
+
                                 $rootScope.$digest();
                             });
                     }
                 });
+            }
         };
 
         $scope.skipPatient = function(){
@@ -617,20 +682,20 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         if (source === 'patient') {
             $scope.title = "Apps a Patient Can Launch";
             $scope.name = launchScenarios.getBuilder().persona.name;
-            apps.getPatientApps.success(function(apps){
+            apps.getPatientApps().done(function(apps){
                 $scope.all_user_apps = apps;
             });
         } else if (source === 'practitioner') {
             $scope.title = "Apps a Practitioner Can Launch Without a Patient Context";
             $scope.name = launchScenarios.getBuilder().persona.name;
-            apps.getPractitionerApps.success(function(apps){
+            apps.getPractitionerApps().done(function(apps){
                 $scope.all_user_apps = apps;
             });
         } else {
             $scope.title = "Apps a Practitioner Can Launch With a Patient Context";
             $scope.name = " Practitioner: " + launchScenarios.getBuilder().persona.name +
                 " with Patient: " + launchScenarios.getBuilder().patient.name;
-            apps.getPractitionerPatientApps.success(function(apps){
+            apps.getPractitionerPatientApps().done(function(apps){
                 $scope.all_user_apps = apps;
             });
         }
@@ -686,7 +751,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
     }).controller("AppsGalleryController", function($scope, apps, userServices, launchApp) {
         $scope.all_user_apps = [];
-        apps.getGalleryApps.success(function(apps){
+        apps.getGalleryApps().done(function(apps){
             $scope.all_user_apps = apps;
             if ($scope.showing.demoOnly) {
                 $scope.all_user_apps = $scope.all_user_apps.filter(function( app ) {
