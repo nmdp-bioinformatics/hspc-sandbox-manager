@@ -1,6 +1,6 @@
 [
     {
-        "client_name" : "HSPC Appointments",
+        "client_name" : "Appointments",
         "client_id" : "hspc_appointments",
         "launch_uri" : "http://localhost:8080/hspc-appointments/static/appointments/launch.html",
         "redirect_uri" : "http://localhost:8080/hspc-appointments/static/appointments/index.html",

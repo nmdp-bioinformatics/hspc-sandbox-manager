@@ -1,6 +1,6 @@
 [
     {
-        "client_name" : "HSPC Appointment Viewer",
+        "client_name" : "Appointments",
         "client_id" : "hspc_appointment_viewer",
         "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/launch",
         "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-appointment-viewer/redirect",

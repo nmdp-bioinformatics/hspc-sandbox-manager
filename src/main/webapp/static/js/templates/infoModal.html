@@ -1,0 +1,25 @@
+<div class="modal-header">
+    <h3 class="modal-title">{{app.client_name}}</h3>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-lg-8">
+            <textarea readonly>{{app.info}}</textarea>
+        </div>
+    <div class="col-lg-4">
+        <div class="row">
+            <div class="thumbnail">
+                <div class="thumb-holder">
+                    <img ng-src="{{app.logo_uri}}" width="100%">
+                </div>
+            </div>
+                <div>Company Link: <a>{{app.company_url}}</a></div>
+        </div>
+    </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button class="form-btn btn btn-basic" type="button" ng-click="launch(app)">Launch App</button>
+    <button class="form-btn btn btn-basic" type="button" ng-click="close()">Close</button>
+</div>

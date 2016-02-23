@@ -99,7 +99,7 @@
         "persona" : ""
     },
     {
-        "client_name" : "HSPC Appointments",
+        "client_name" : "Appointments",
         "client_id" : "hspc_appointments",
         "launch_uri" : "https://sandbox.hspconsortium.org/hspc-appointments/static/appointments/launch.html",
         "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-appointments/static/appointments/index.html",
@@ -108,7 +108,7 @@
         "persona" : {"fullUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-api/data/Practitioner/COREPRACTITIONER1"}
     },
     {
-        "client_name" : "HSPC Appointments Patient",
+        "client_name" : "Appointments Patient",
         "client_id" : "hspc_appointments",
         "launch_uri" : "https://sandbox.hspconsortium.org/hspc-appointments/static/appointments/launch.html",
         "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-appointments/static/appointments/index.html",
@@ -117,7 +117,7 @@
         "persona" : {"fullUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-api/data/Patient/COREPATIENT1"}
     },
     {
-        "client_name" : "HSPC Appointments no Patient",
+        "client_name" : "Appointments no Patient",
         "client_id" : "hspc_appointments",
         "launch_uri" : "https://sandbox.hspconsortium.org/hspc-appointments/static/appointments/launch.html",
         "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-appointments/static/appointments/index.html",

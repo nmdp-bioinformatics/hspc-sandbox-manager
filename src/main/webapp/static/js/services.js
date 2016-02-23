@@ -619,6 +619,7 @@ angular.module('sandManApp.services', [])
     var practitionerPatientApps;
     var practitionerApps;
     var galleryApps;
+    var galleryAppDetails;
 
     return {
         getPatientApps : function() {
@@ -660,6 +661,13 @@ angular.module('sandManApp.services', [])
                 deferred.resolve(galleryApps);
             } else {
                 this.loadSettings().then(function(){
+                    angular.forEach(galleryApps, function (app) {
+                        angular.forEach(galleryAppDetails, function (appDetails) {
+                            if (app.client_id === appDetails.client_id) {
+                                app.info = appDetails.info;
+                            }
+                        });
+                    });
                     deferred.resolve(galleryApps);
                 });
             }
@@ -673,9 +681,12 @@ angular.module('sandManApp.services', [])
                     practitionerPatientApps = result;
                     $http.get('static/js/config/practitioner-apps.json').success(function(result){
                         practitionerApps = result;
-                        $http.get('static/js/config/gallery-apps.json').success(function(result){
-                            galleryApps = result;
-                            deferred.resolve();
+                        $http.get('static/js/config/gallery-app-details.json').success(function(result){
+                            galleryAppDetails = result;
+                            $http.get('static/js/config/gallery-apps.json').success(function(result){
+                                galleryApps = result;
+                                deferred.resolve();
+                            });
                         });
                     });
                 });

@@ -417,6 +417,27 @@ fieldset[disabled] .btn-basic.active {
     transition: all .2s ease-in-out;
 }
 
+.modal-body .thumbnail {
+    height: 160px;
+    width: 220px;
+    display: block;
+    padding: 4px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.info {
+    float: right;
+    margin-top: -3px;
+    margin-right: -5px;
+}
+
+.thumbnail .btn-block {
+    float: left;
+    width: 82%
+}
+
 .thumb-holder {
     height: 150px;
     width: 210px;
@@ -561,6 +582,16 @@ fieldset[disabled] .btn-basic.active {
 .modal-body-style {
     font-size: 12px;
     font-weight: 300;
+}
+
+.modal-body textarea {
+    resize: none;
+    border: 1px solid #e6e6e6;
+    border-radius: 4px;
+    padding: 10px;
+    width: 550px;
+    height: 450px;
+    outline: none;
 }
 
 .editor-label {

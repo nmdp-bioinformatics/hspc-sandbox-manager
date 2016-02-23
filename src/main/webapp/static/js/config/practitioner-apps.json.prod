@@ -1,6 +1,6 @@
 [
     {
-        "client_name" : "HSPC Appointment Viewer",
+        "client_name" : "Appointments",
         "client_id" : "hspc_appointment_viewer",
         "launch_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/launch",
         "redirect_uri" : "https://sandbox.hspconsortium.org/hspc-appointment-viewer/redirect",

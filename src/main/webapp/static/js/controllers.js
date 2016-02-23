@@ -214,6 +214,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             },
             xAxis: {
                 categories: resourcesNames,
+//                lineWidth: 0,
+//                minorGridLineWidth: 0,
+//                lineColor: 'transparent',
+//                minorTickLength: 0,
+//                tickLength: 0,
                 title: {
                     text: null
                 }
@@ -223,6 +228,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 labels: {
                     overflow: 'justify'
                 },
+//                lineWidth: 0,
+//                minorGridLineWidth: 0,
+//                lineColor: 'transparent',
+//                minorTickLength: 0,
+//                tickLength: 0,
                 title: {
                     text: null
                 }
@@ -749,7 +759,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             });
         };
 
-    }).controller("AppsGalleryController", function($scope, apps, userServices, launchApp) {
+    }).controller("AppsGalleryController", function($scope, apps, userServices, launchApp, $uibModal) {
         $scope.all_user_apps = [];
         apps.getGalleryApps().done(function(apps){
             $scope.all_user_apps = apps;
@@ -759,6 +769,29 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 });
             }
         });
+
+        $scope.info = function (app){
+            $scope.modalOpen = true;
+            var modalInstance = $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/infoModal.html',
+                controller: 'InfoModalInstanceCtrl',
+                size:'lg',
+                resolve: {
+                    getApp: function () {
+                        return {
+                            app:app
+                        }
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (app) {
+                $scope.launch(app)
+            }, function () {
+            });
+
+        };
 
         $scope.launch = function(app){
             launchApp.launch(app, app.patient, undefined, app.persona);
@@ -965,5 +998,17 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     return window.location = to;
                 });
         };
-    });
+    }).controller('InfoModalInstanceCtrl',['$scope', '$uibModalInstance', 'getApp',
+    function ($scope, $uibModalInstance, getApp) {
+
+        $scope.app = getApp.app;
+
+        $scope.launch = function (app) {
+            $uibModalInstance.close(app);
+        };
+
+        $scope.close = function () {
+            $uibModalInstance.dismiss();
+        };
+    }]);
 

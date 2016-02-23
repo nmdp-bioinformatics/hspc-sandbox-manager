@@ -99,7 +99,7 @@
         "persona" : ""
     },
     {
-        "client_name" : "HSPC Appointment Viewer",
+        "client_name" : "Appointments",
         "client_id" : "hspc_appointments",
         "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/launch.html",
         "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/index.html",
@@ -108,7 +108,7 @@
         "persona" : {"fullUrl": "http://54.213.219.198:9080/uat/hspc-reference-api/data/Practitioner/COREPRACTITIONER1"}
     },
     {
-        "client_name" : "HSPC Appointments Patient",
+        "client_name" : "Appointments Patient",
         "client_id" : "hspc_appointments",
         "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/launch.html",
         "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/index.html",
@@ -117,7 +117,7 @@
         "persona" : {"fullUrl": "http://54.213.219.198:9080/uat/hspc-reference-api/data/Patient/COREPATIENT1"}
     },
     {
-        "client_name" : "HSPC Appointments no Patient",
+        "client_name" : "Appointments no Patient",
         "client_id" : "hspc_appointments",
         "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/launch.html",
         "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/index.html",
