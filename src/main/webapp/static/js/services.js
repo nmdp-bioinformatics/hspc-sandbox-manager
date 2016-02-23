@@ -661,14 +661,6 @@ angular.module('sandManApp.services', [])
                 deferred.resolve(galleryApps);
             } else {
                 this.loadSettings().then(function(){
-                    angular.forEach(galleryApps, function (app) {
-                        angular.forEach(galleryAppDetails, function (appDetails) {
-                            if (app.client_id === appDetails.client_id) {
-                                app.info = appDetails.info;
-                                app.company_url = app.company_url;
-                            }
-                        });
-                    });
                     deferred.resolve(galleryApps);
                 });
             }
@@ -686,6 +678,15 @@ angular.module('sandManApp.services', [])
                             galleryAppDetails = result;
                             $http.get('static/js/config/gallery-apps.json').success(function(result){
                                 galleryApps = result;
+                                angular.forEach(galleryApps, function (app) {
+                                    angular.forEach(galleryAppDetails, function (appDetails) {
+                                        if (app.client_id === appDetails.client_id) {
+                                            app.info = appDetails.info;
+                                            app.company_url = appDetails.company_url;
+                                            app.author = appDetails.author;
+                                        }
+                                    });
+                                });
                                 deferred.resolve();
                             });
                         });

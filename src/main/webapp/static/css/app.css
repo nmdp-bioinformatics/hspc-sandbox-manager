@@ -433,6 +433,32 @@ fieldset[disabled] .btn-basic.active {
     margin-right: -5px;
 }
 
+.app-detail-label {
+    /*float: left;*/
+    width: 60px;
+    /*padding-right: 10px;*/
+    /*margin-bottom: 10px;*/
+}
+
+.app-detail-value {
+    /*float: left;*/
+    width: 215px;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.app-detail-value>a {
+    color: #00AEEF;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.app-detail-value>a:hover {
+    color: #0095cc;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 .thumbnail .btn-block {
     float: left;
     width: 82%
