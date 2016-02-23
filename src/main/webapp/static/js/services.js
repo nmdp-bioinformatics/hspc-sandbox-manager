@@ -665,6 +665,7 @@ angular.module('sandManApp.services', [])
                         angular.forEach(galleryAppDetails, function (appDetails) {
                             if (app.client_id === appDetails.client_id) {
                                 app.info = appDetails.info;
+                                app.company_url = app.company_url;
                             }
                         });
                     });
