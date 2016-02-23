@@ -9,48 +9,56 @@
     {
         "client_name" : "Growth Chart",
         "client_id" : "growth_chart",
+        "author": "Boston Children's Hospital",
         "company_url": "https://gallery.smarthealthit.org/boston-childrens-hospital",
-        "info": ""
+        "info": "The Growth Chart app was developed from a unique collaboration among SMART, Fjord service design consultancy, MedAppTech software development group, and clinicians. This App demonstrates a high-performance, concise, minimal-click presentation of a child’s growth over time."
     },
     {
         "client_name" : "BP Centiles",
         "client_id" : "bp_centiles",
+        "author": "Boston Children's Hospital",
         "company_url": "https://gallery.smarthealthit.org/boston-childrens-hospital",
-        "info": ""
+        "info": "Interpreting blood pressure measurements for children is complicated by the need to account for a constantly changing body size. It is time-consuming to calculate and/or do data entry, yet assessment of blood pressure percentiles is medically recommended from the age of 3 onward because 75% of cases of pediatric hypertension and 90% of cases of prehypertension in children from 3 to 18 years of age go undetected.\n\rThe BP Centiles app reads a child’s relevant vitals and calculates systolic and diastolic blood pressure percentiles normalized by age, sex, and height The app also includes a pop-up calculator and a graphical history of the child's blood pressure percentile, enabling full screening at each visit.\n\rColor coding reveals at a glance whether individual readings are normal (green), prehypertensive (yellow), hypertensive (red) or hypotensive (blue). Users can zoom in on a group of readings for more information and apply various filters to help them interpret the measurements—such as looking only at BPs measured in the legs, sitting down or by machine."
     },
     {
         "client_name" : "Cardiac Risk",
         "client_id" : "cardiac_risk",
+        "author": "Boston Children's Hospital",
         "company_url": "https://gallery.smarthealthit.org/boston-childrens-hospital",
-        "info": ""
+        "info": "The widely-used Reynolds Risk Score is used to estimate the 10-year cardiovascular risk of an individual. For patients and clinicians alike, this calculation is often reported in an esoteric, hard-to-read lab report.\n\rFor our model of an improved Reynolds Risk Score reporting SMART App, we took an inspired Creative Commons design, the work of designer David McCandless, whose “Blood Work Cardiology Result” appeared in the Wired Magazine article “The Blood Test Gets a Makeover” (Wired 18.12, December 2010) and was published under a Creative Commons license. The resulting SMART Cardiac Risk app presents relevant patient vitals and lab measurements and the calculated Reynolds Risk Score, along with a succinct, patient-friendly explanation for each result. The app’s presentation produces a highly attractive document to hand to a patient. Furthermore, the SMART Cardiac Risk app also offers simulation: the clinician (or patient) can make changes to one or more of the patient’s vitals or lab results to see how the patient’s current Reynolds Risk Score could be improved."
     },
     {
         "client_name" : "Duke Pillbox",
         "client_id" : "f0ea39ca-9ad0-4676-baae-d28878baf75e",
+        "author": "Duke Medicine",
         "company_url": "http://www.dukemedicine.org",
-        "info": ""
+        "info": "Duke PillBox is a patient-centered, skill-based interactive learning tool designed to improve skills for medication management and patient-provider communication for med reconciliation. Used across hospital, clinic and home settings, the Duke Pillbox offers new opportunities for data capture of patient-provider interactions related to medication use.\n\rThe app is used to teach patients the skills required to identify and organize pills in a daily and weekly medication-dosing schedule. The innovative design features pedagogically appropriate strategies to overcome health literacy barriers and optimize patient opportunities to communicate questions, concerns and misunderstandings regarding medication management with providers. Developed by Duke Medicine in collaboration with MedAppTech, Duke Pillbox has demonstrated improved self-management through patient learning, communication and user-satisfaction outcomes in hospital, clinic and home settings."
     },
     {
         "client_name" : "ClinDat",
         "client_id" : "26bc47e9-c182-4136-855b-6e7b1bb67e9f",
+        "author": "Health Report Services",
         "company_url": "https://clindat.com",
         "info": "ClinDat provides simplified electronic entry for patients to complete MDHAQ/RAPID3 (multidimensional health assessment questionnaire/routine assessment of patient index data), for quantitative,medical history data, useful to monitor patients with all rheuamtic diseases, including treat-to-target in rheumatoid arthritis (RA). ClinDat also provides a physician RheuMetric checklist, with electronic scoring of a 28 joint count, using a table or homunculus, and computes a disease activity score (DAS28), simplified disease ativitiy score (SDAI), clinical disease activity score (CDAI), and/or RAPID3, indicating high, moderate, low, activity, or remission. Rheumetric also allows physicians to score overall global status, and 3 subscales for reversible inflammatory activity, irreversible organ damage, and distress unexplained by findings on examination, laboratory tests, or x-rays and scans, to support and document the basis for therapeutic decisions in clinical care."
     },
     {
         "client_name" : "Meducation RS",
         "client_id" : "meducation",
+        "author": "Polyglot Systems",
         "company_url": "http://www.pgsi.com",
         "info": "Meducation® is a cloud-based solution, accessed from within your EHR workflow, that converts patients’ complex medication instructions into plain language for Low Health Literate and Limited English Proficient patients. The need is severe – 1 in 3 Americans are 'low health literate' and confront substantial communication barriers when they interact with the healthcare system. Low health literate individuals are more likely to take their medicines incorrectly, be hospitalized, mismanage chronic conditions and visit the emergency room.\n\r\n\rMeducation® uses a patient’s drug and SIG information to create engaging and intuitive patient-specific instructions and regimen summaries that."
     },
     {
         "client_name" : "Meducation Timeview",
         "client_id" : "timeview",
+        "author": "Polyglot Systems",
         "company_url": "http://www.pgsi.com",
         "info": "For providers, Meducation® TimeView™ displays a patient’s adherence history, across all prescribers, in an intuitive, longitudinal format, permitting interventions to be tailored quickly and appropriately.\n\r\n\rMeducation® TimeView™ displays information from any source -- your EHR, Pharmacy Management System, PBM or from a Surescripts call that is part of the hospital or clinic admission process. TimeView was created by a physician, to present patient’s medication history in an intuitive format that enables interventions to be tailored quickly and appropriately."
     },
     {
         "client_name" : "Premier AKI Staging",
         "client_id" : "1396ff99-8012-4043-8d33-7a1139f08ccc",
+        "author": "Premier, Inc.",
         "company_url": "https://www.premierinc.com/",
         "info": "The Premier AKI Staging app assists clinicians aiming to follow the clinical practice guidelines established by Kidney Disease Improving Global Outcomes (KDIGO). The app is targeted at practitioners caring for adults and children at risk for or with Acute Kidney Injury, including contrast induced acute kidney injury.\n\r\n\rEffective care of acute complex conditions such as acute kidney injury (AKI) rests in the early detection, early intervention, and coordination of care. Patients continue to go undetected for periods of time leading to poor outcomes, longer length of stays, higher treatment costs, and inevitably increased risk of mortality. Early identification and management of patients at risk to develop specific conditions are critical to successful delivery of high-value care.\n\r\n\rThe Premier AKI staging app illustrated here is a scaled down version of some new applications and modules being developed by Premier Inc. for monitoring and managing acute kidney injury. This app is for demonstration purposes only, and is not approved for clinical use. It was created as a mechanism to help advance the definition and testing of the SMART on FHIR protocol.\n\r\n\rThe result? Technology that has proven to increase medication adherence and patient satisfaction. A recent VA study showed that Meducation drove a 77% improvement in cardiac patients remembering to take their heart medications. The University of Connecticut’s HCAHPS survey results, on medication communications, improved from the 1st, 1st & 4th percentile to 52nd, 85th & 96th percentile in just 90 days after implementing Meducation.\n\r\n\rMeducation helps providers deliver care that is more effective, efficient and patient-centered for vastly improved performance under ACA funding programs, such as Value Based Purchasing, Hospital Readmissions Reduction, Patient Centered Medical Home, ACO and Star Ratings."
     },
