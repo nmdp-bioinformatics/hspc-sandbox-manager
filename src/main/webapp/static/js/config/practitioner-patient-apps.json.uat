@@ -7,6 +7,13 @@
         "logo_uri" : "http://54.213.219.198:9080/uat/hspc-bilirubin-app/static/bilirubin-chart/images/bilirubin.png"
     },
     {
+        "client_name" : "Growth Chart",
+        "client_id" : "growth_chart",
+        "launch_uri" : "http://54.213.219.198:9080/uat/hspc-reference-apps/static/apps/growth-chart/launch.html",
+        "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-reference-apps/static/apps/growth-chart/",
+        "logo_uri" : "http://54.213.219.198:9080/uat/hspc-reference-apps/static/images/apps/growth-chart.png"
+    },
+    {
         "client_name" : "BP Centiles",
         "client_id" : "bp_centiles",
         "launch_uri" : "http://54.213.219.198:9080/uat/hspc-reference-apps/static/apps/bp-centiles/launch.html",

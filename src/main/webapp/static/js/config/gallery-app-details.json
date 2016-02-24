@@ -5,6 +5,13 @@
         "author": "Intermountain Healthcare",
         "company_url": "https://IntermountainHealthcare.org",
         "info": "The Intermountain Healthcare Bilirubin Risk Chart App is based on Intermountain’s HELP2 application of the same name. This app is for demonstration purposes only and is not approved for clinical use. It was created to highlight the concept of the HSPC model, which creates a method of sharing clinical applications currently locked up in a single organization or EHR vendor and make it available to all healthcare providers.\n\rJaundice occurs in most newborn infants. Most jaundice is benign, but because of the potential toxicity of bilirubin, newborn infants must be monitored to identify those who might develop severe hyperbilirubinemia and, in rare cases, acute bilirubin encephalopathy or kernicterus. Although kernicterus should almost always be preventable, cases continue to occur. The focus of this app is to reduce the incidence of severe hyperbilirubinemia and bilirubin encephalopathy while minimizing the risks of unintended harm such as maternal anxiety, decreased breastfeeding, and unnecessary costs or treatment.\n\rBy overlaying bilirubin [Mass/volume] results over a time-based risk chart, clinicians are presented with a visual representation of the results and associated criticality zones. By viewing the results in this way, the clinician can determine the best course of action based on the recommended intervention for the criticality of the result."
+   },
+    {
+        "client_name" : "Growth Chart",
+        "client_id" : "growth_chart",
+        "author": "Boston Children's Hospital",
+        "company_url": "https://gallery.smarthealthit.org/boston-childrens-hospital",
+        "info": "The Growth Chart app was developed from a unique collaboration among SMART, Fjord service design consultancy, MedAppTech software development group, and clinicians. This App demonstrates a high-performance, concise, minimal-click presentation of a child’s growth over time."
     },
     {
         "client_name" : "BP Centiles",
