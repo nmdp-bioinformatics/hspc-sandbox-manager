@@ -765,7 +765,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.all_user_apps = apps;
             if ($scope.showing.demoOnly) {
                 $scope.all_user_apps = $scope.all_user_apps.filter(function( app ) {
-                    return app.client_id !== "hspc_appointment_viewer";
+                    return app.client_id !== "hspc_appointments";
                 });
             }
         });
