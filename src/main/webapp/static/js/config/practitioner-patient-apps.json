@@ -35,11 +35,11 @@
         "logo_uri" : "https://gallery.smarthealthit.org/img/apps/14.png"
     },
     {
-        "client_name" : "ClinDat",
-        "client_id" : "26bc47e9-c182-4136-855b-6e7b1bb67e9f",
-        "launch_uri" : "https://apps.medapptech.com:9004/fhir-app/launch.html",
-        "redirect_uri" : "https://apps.medapptech.com:9004/fhir-app/authorize.html",
-        "logo_uri" : "https://gallery.smarthealthit.org/img/apps/16.png"
+        "client_name" : "Patient Data Manager",
+        "client_id" : "patient_data_manager",
+        "launch_uri" : "http://localhost:8080/hspc-patient-data-manager/static/patient-data-manager/launch.html",
+        "redirect_uri" : "http://localhost:8080/hspc-patient-data-manager/static/patient-data-manager/",
+        "logo_uri" : "http://localhost:8080/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png"
     },
     {
         "client_name" : "Meducation RS",
@@ -77,11 +77,11 @@
         "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/ccm_homepage_icon.png"
     },
     {
-        "client_name" : "Patient Data Manager",
-        "client_id" : "patient_data_manager",
-        "launch_uri" : "http://localhost:8080/hspc-patient-data-manager/static/patient-data-manager/launch.html",
-        "redirect_uri" : "http://localhost:8080/hspc-patient-data-manager/static/patient-data-manager/",
-        "logo_uri" : "http://localhost:8080/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png"
+        "client_name" : "ClinDat",
+        "client_id" : "26bc47e9-c182-4136-855b-6e7b1bb67e9f",
+        "launch_uri" : "https://apps.medapptech.com:9004/fhir-app/launch.html",
+        "redirect_uri" : "https://apps.medapptech.com:9004/fhir-app/authorize.html",
+        "logo_uri" : "https://gallery.smarthealthit.org/img/apps/16.png"
     },
     {
         "client_name" : "Appointments",

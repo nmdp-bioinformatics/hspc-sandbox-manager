@@ -35,11 +35,11 @@
         "info": "Duke PillBox is a patient-centered, skill-based interactive learning tool designed to improve skills for medication management and patient-provider communication for med reconciliation. Used across hospital, clinic and home settings, the Duke Pillbox offers new opportunities for data capture of patient-provider interactions related to medication use.\n\rThe app is used to teach patients the skills required to identify and organize pills in a daily and weekly medication-dosing schedule. The innovative design features pedagogically appropriate strategies to overcome health literacy barriers and optimize patient opportunities to communicate questions, concerns and misunderstandings regarding medication management with providers. Developed by Duke Medicine in collaboration with MedAppTech, Duke Pillbox has demonstrated improved self-management through patient learning, communication and user-satisfaction outcomes in hospital, clinic and home settings."
     },
     {
-        "client_name" : "ClinDat",
-        "client_id" : "26bc47e9-c182-4136-855b-6e7b1bb67e9f",
-        "author": "Health Report Services",
-        "company_url": "https://clindat.com",
-        "info": "ClinDat provides simplified electronic entry for patients to complete MDHAQ/RAPID3 (multidimensional health assessment questionnaire/routine assessment of patient index data), for quantitative,medical history data, useful to monitor patients with all rheuamtic diseases, including treat-to-target in rheumatoid arthritis (RA). ClinDat also provides a physician RheuMetric checklist, with electronic scoring of a 28 joint count, using a table or homunculus, and computes a disease activity score (DAS28), simplified disease ativitiy score (SDAI), clinical disease activity score (CDAI), and/or RAPID3, indicating high, moderate, low, activity, or remission. Rheumetric also allows physicians to score overall global status, and 3 subscales for reversible inflammatory activity, irreversible organ damage, and distress unexplained by findings on examination, laboratory tests, or x-rays and scans, to support and document the basis for therapeutic decisions in clinical care."
+        "client_name" : "Patient Data Manager",
+        "client_id" : "patient_data_manager",
+        "author": "Healthcare Services Platform Consortium",
+        "company_url": "http://HSPConsortium.org",
+        "info": ""
     },
     {
         "client_name" : "Meducation RS",
@@ -63,11 +63,11 @@
         "info": "The Premier AKI Staging app assists clinicians aiming to follow the clinical practice guidelines established by Kidney Disease Improving Global Outcomes (KDIGO). The app is targeted at practitioners caring for adults and children at risk for or with Acute Kidney Injury, including contrast induced acute kidney injury. \n\rEffective care of acute complex conditions such as acute kidney injury (AKI) rests in the early detection, early intervention, and coordination of care. Patients continue to go undetected for periods of time leading to poor outcomes, longer length of stays, higher treatment costs, and inevitably increased risk of mortality. Early identification and management of patients at risk to develop specific conditions are critical to successful delivery of high-value care.\n\r The Premier AKI staging app illustrated here is a scaled down version of some new applications and modules being developed by Premier Inc. for monitoring and managing acute kidney injury. This app is for demonstration purposes only, and is not approved for clinical use. It was created as a mechanism to help advance the definition and testing of the SMART on FHIR protocol."
     },
     {
-        "client_name" : "Patient Data Manager",
-        "client_id" : "patient_data_manager",
-        "author": "Healthcare Services Platform Consortium",
-        "company_url": "http://HSPConsortium.org",
-        "info": ""
+        "client_name" : "ClinDat",
+        "client_id" : "26bc47e9-c182-4136-855b-6e7b1bb67e9f",
+        "author": "Health Report Services",
+        "company_url": "https://clindat.com",
+        "info": "ClinDat provides simplified electronic entry for patients to complete MDHAQ/RAPID3 (multidimensional health assessment questionnaire/routine assessment of patient index data), for quantitative,medical history data, useful to monitor patients with all rheuamtic diseases, including treat-to-target in rheumatoid arthritis (RA). ClinDat also provides a physician RheuMetric checklist, with electronic scoring of a 28 joint count, using a table or homunculus, and computes a disease activity score (DAS28), simplified disease ativitiy score (SDAI), clinical disease activity score (CDAI), and/or RAPID3, indicating high, moderate, low, activity, or remission. Rheumetric also allows physicians to score overall global status, and 3 subscales for reversible inflammatory activity, irreversible organ damage, and distress unexplained by findings on examination, laboratory tests, or x-rays and scans, to support and document the basis for therapeutic decisions in clinical care."
     },
     {
         "client_name": "Visual DX",
