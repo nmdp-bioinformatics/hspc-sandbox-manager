@@ -12,11 +12,8 @@
                                     <img ng-src="{{app.logo_uri}}" width="100%">
                                 </div>
                                 <div class="caption">
+                                    <input type="image" src="static/images/circle_info-128.png" ng-click="info(app)" class="image-btn"/>
                                     <button ng-click="launch(app)" class="btn btn-basic btn-block">{{app.client_name}}</button>
-                                    <a ng-click="info(app)" class="info"><span class="fa-stack fa-lg">
-                                      <i class="fa fa-info fa-stack-1x"></i>
-                                      <i class="fa fa-circle-o fa-stack-2x"></i>
-                                    </span></i></a>
                                 </div>
                             </div>
                         </li>

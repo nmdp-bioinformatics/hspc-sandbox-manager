@@ -337,12 +337,6 @@ fieldset[disabled] .btn-basic.active {
     margin: 4px 8px;
 }
 
-.image-btn {
-    display: block;
-    height: 24px;
-    padding: 2px 6px;
-}
-
 .form-group {
     /*margin-bottom: 15px;*/
     margin-bottom: 2px;
@@ -427,11 +421,11 @@ fieldset[disabled] .btn-basic.active {
     border-radius: 4px;
 }
 
-.info {
-    float: right;
-    margin-top: -3px;
-    margin-right: -5px;
-}
+/*.info {*/
+    /*float: right;*/
+    /*margin-top: -3px;*/
+    /*margin-right: -5px;*/
+/*}*/
 
 .app-detail-label {
     /*float: left;*/
@@ -442,7 +436,7 @@ fieldset[disabled] .btn-basic.active {
 
 .app-detail-value {
     /*float: left;*/
-    width: 215px;
+    width: 290px;
     margin-bottom: 10px;
     font-weight: 600;
 }
@@ -451,6 +445,7 @@ fieldset[disabled] .btn-basic.active {
     color: #00AEEF;
     font-size: 14px;
     font-weight: 600;
+    word-wrap: break-word;
 }
 
 .app-detail-value>a:hover {
@@ -853,8 +848,9 @@ td {
 .image-btn {
     display: block;
     height: 24px;
-    padding: 2px 6px;
+    padding: 0 10px 0 0;
     outline: none;
+    float: left;
 }
 
 .message_area {
