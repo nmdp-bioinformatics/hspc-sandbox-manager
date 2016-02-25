@@ -70,6 +70,13 @@
         "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/visualdx_logo.png"
     },
     {
+        "client_name": "Crimson Care Management",
+        "client_id": "d827bd57-1be6-49a6-8f23-577c7edb51df",
+        "launch_uri" : "https://fhirdemo.advisory.com/launcherHspc/launch.html",
+        "redirect_uri" : "https://fhirdemo.advisory.com/launcherHspc",
+        "logo_uri" : ""
+    },
+    {
         "client_name" : "Patient Data Manager",
         "client_id" : "patient_data_manager",
         "launch_uri" : "https://sandbox.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/launch.html",
