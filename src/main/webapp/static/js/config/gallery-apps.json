@@ -94,7 +94,7 @@
         "client_id": "d827bd57-1be6-49a6-8f23-577c7edb51df",
         "launch_uri" : "https://fhirdemo.advisory.com/launcherHspc/launch.html",
         "redirect_uri" : "https://fhirdemo.advisory.com/launcherHspc",
-        "logo_uri" : "",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/ccm_homepage_icon.png",
         "patient" : {"fhirId": "8718"},
         "persona" : ""
     },
