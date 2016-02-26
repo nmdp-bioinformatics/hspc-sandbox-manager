@@ -23,7 +23,7 @@
         "launch_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/bp-centiles/launch.html",
         "redirect_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/apps/bp-centiles/",
         "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/bpc.png",
-        "patient" : {"fhirId": "13663"},
+        "patient" : {"fhirId": "1002503"},
         "persona" : ""
     },
     {
