@@ -465,6 +465,11 @@ fieldset[disabled] .btn-basic.active {
     width: 80%
 }
 
+.thumbnail .app-picker .btn-block {
+    float: left;
+    width: 100%
+}
+
 .thumb-holder {
     height: 150px;
     width: 210px;
