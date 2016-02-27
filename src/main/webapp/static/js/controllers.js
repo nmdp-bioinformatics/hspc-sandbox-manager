@@ -739,9 +739,18 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 }
             });
 
-            modalInstance.result.then(function (scenario) {
-                scenario.lastLaunchSeconds = new Date().getTime();
-                launchScenarios.addFullLaunchScenarioList(scenario);
+            modalInstance.result.then(function (result) {
+                var scenario = result.scenario;
+                if (result.launch) {
+                    if (scenario.patient.name === 'None'){
+                        launchApp.launch(scenario.app, undefined, scenario.contextParams, scenario.persona);
+                    } else {
+                        launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.persona);
+                    }
+                } else {
+                    scenario.lastLaunchSeconds = new Date().getTime();
+                    launchScenarios.addFullLaunchScenarioList(scenario);
+                }
                 $state.go('launch-scenarios', {});
             }, function () {
             });
@@ -802,8 +811,12 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.scenario = getScenario;
 
-        $scope.saveLaunchScenario = function (scenario) {
-            $uibModalInstance.close(scenario);
+        $scope.saveLaunchScenario = function (scenario, launch) {
+            var result = {
+                scenario: scenario,
+                launch: launch
+            };
+            $uibModalInstance.close(result);
         };
 
         $scope.cancel = function () {
