@@ -7,6 +7,13 @@
         "logo_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/images/appointments.png"
     },
     {
+        "client_name" : "Health Ally Connect",
+        "client_id" : "a2a37344-62d1-498f-8787-75b1341b6f46",
+        "launch_uri" : "https://hspc-portal-conditionplatform-osiamedical.azurewebsites.net/launch.html",
+        "redirect_uri" : "https://hspc-portal-conditionplatform-osiamedical.azurewebsites.net/",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/health-ally-210x150.png"
+    },
+    {
         "client_name" : "My Web App",
         "client_id" : "my_web_app",
         "launch_uri" : "http://localhost:8000/fhir-app/launch.html",
