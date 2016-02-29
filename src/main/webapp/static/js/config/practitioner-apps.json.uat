@@ -1,5 +1,12 @@
 [
     {
+        "client_name" : "VigiLanz",
+        "client_id" : "7d41d48b-eb40-4722-9092-551ac40f668a",
+        "launch_uri" : "https://hspc-portal-conditionplatform-osiamedical.azurewebsites.net/launch.html",
+        "redirect_uri" : "https://hspc-portal-conditionplatform-osiamedical.azurewebsites.net/",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/health-ally-210x150.png"
+    },
+    {
         "client_name" : "Appointments",
         "client_id" : "hspc_appointments",
         "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/launch.html",
