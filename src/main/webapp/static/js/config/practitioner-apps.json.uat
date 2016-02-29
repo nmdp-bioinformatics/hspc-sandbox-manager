@@ -9,9 +9,9 @@
     {
         "client_name" : "Appointments",
         "client_id" : "hspc_appointments",
-        "launch_uri" : "http://localhost:8080/hspc-appointments/static/appointments/launch.html",
-        "redirect_uri" : "http://localhost:8080/hspc-appointments/static/appointments/index.html",
-        "logo_uri" : "http://localhost:8080/hspc-appointments/static/appointments/images/appointments.png"
+        "launch_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/launch.html",
+        "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/index.html",
+        "logo_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/images/appointments.png"
     },
     {
         "client_name" : "My Web App",
