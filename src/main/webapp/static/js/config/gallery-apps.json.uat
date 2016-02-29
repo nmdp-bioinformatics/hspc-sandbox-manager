@@ -110,18 +110,18 @@
     {
         "client_name" : "Health Ally Connect",
         "client_id" : "a2a37344-62d1-498f-8787-75b1341b6f46",
-        "launch_uri" : "https://www.vigilanzportal.com/FHIRClient/Launch/SMARTLaunch",
-        "redirect_uri" : "https://www.vigilanzportal.com/FHIRClient/Launch/SMARTRedirect",
-        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/vigiLanz-logo-210x150.png",
+        "launch_uri" : "https://hspc-portal-conditionplatform-osiamedical.azurewebsites.net/launch.html",
+        "redirect_uri" : "https://hspc-portal-conditionplatform-osiamedical.azurewebsites.net/",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/health-ally-210x150.png",
         "patient" : {"fhirId": "29326"},
         "persona" : ""
     },
     {
-        "client_name" : "VigiLanz",
+        "client_name" : "VigiLanz SMARTDemo",
         "client_id" : "7d41d48b-eb40-4722-9092-551ac40f668a",
-        "launch_uri" : "https://hspc-portal-conditionplatform-osiamedical.azurewebsites.net/launch.html",
-        "redirect_uri" : "https://hspc-portal-conditionplatform-osiamedical.azurewebsites.net/",
-        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/health-ally-210x150.png",
+        "launch_uri" : "https://www.vigilanzportal.com/FHIRClient/Launch/SMARTLaunch",
+        "redirect_uri" : "https://www.vigilanzportal.com/FHIRClient/Launch/SMARTRedirect",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/vigiLanz-logo-210x150.png",
         "patient" : {"fhirId": "29326"},
         "persona" : ""
     },
