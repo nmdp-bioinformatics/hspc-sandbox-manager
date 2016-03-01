@@ -113,7 +113,7 @@
         "launch_uri" : "https://hspc-portal-conditionplatform-osiamedical.azurewebsites.net/launch.html",
         "redirect_uri" : "https://hspc-portal-conditionplatform-osiamedical.azurewebsites.net/",
         "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/health-ally-210x150.png",
-        "patient" : {"fhirId": "29326"},
+        "patient" : {"fhirId": "88218"},
         "persona" : ""
     },
     {
