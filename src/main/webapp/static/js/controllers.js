@@ -846,7 +846,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             name:[
                 {given:[], family:[], text:""}
             ],
-            birthDate: now
+            birthDateTime: now
         };
 
         $scope.open = function () {
@@ -866,6 +866,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             });
 
             modalInstance.result.then(function (modalPatient) {
+                // capture the date only for the birthDate value
+                modalPatient.birthDate = modalPatient.birthDateTime.toISOString().substring(0, 10);
+                // todo support storing the birthDateTime in the extention when HSPC supports it
                 fhirApiServices.create(modalPatient);
                 $rootScope.$emit('patient-created');
             }, function () {
@@ -889,7 +892,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.isBirthDateValid = function() {
-            return $scope.modalPatient.birthDate != null;
+            return $scope.modalPatient.birthDateTime != null;
         };
 
         $scope.isPatientValid = function() {

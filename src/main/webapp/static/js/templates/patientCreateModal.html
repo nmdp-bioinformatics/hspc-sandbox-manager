@@ -42,10 +42,10 @@
             <label class="control-label col-sm-3" >Birth Date:</label>
 
             <div class="col-sm-9">
-                <input type="datetime-local" class="form-control" id="birthDate"
+                <input type="date" class="form-control" id="birthDate"
                        required ng-model="modalPatient.birthDate"
                        aria-describedby="birthDateErrorStatus"
-                       placeholder="yyyy-MM-ddTHH:mm:ss" >
+                       placeholder="yyyy-MM-dd" >
                 <span id="birthDateIcon" ng-class="isBirthDateValid() ? 'glyphicon glyphicon-ok form-control-feedback' : 'glyphicon glyphicon-remove form-control-feedback'" aria-hidden="true"></span>
             </div>
         </div>
