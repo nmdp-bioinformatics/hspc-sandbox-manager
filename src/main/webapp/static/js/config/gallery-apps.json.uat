@@ -142,5 +142,14 @@
         "logo_uri" : "http://54.213.219.198:9080/uat/hspc-appointments/static/appointments/images/appointments.png",
         "patient" : "",
         "persona" : {"fullUrl": "http://54.213.219.198:9080/uat/hspc-reference-api/data/Practitioner/COREPRACTITIONER1"}
+    },
+    {
+        "client_name" : "RxCheck",
+        "client_id" : "f136196f-1267-450d-99e0-826f0a11eaeb",
+        "launch_uri" : "https://www.rxcheck.com/fhir/launch",
+        "redirect_uri" : "https://www.rxcheck.com/fhir",
+        "logo_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-apps/static/images/apps/rxcheck-logo.png",
+        "patient" : {"fhirId": "71876"},
+        "persona" : ""
     }
 ]
