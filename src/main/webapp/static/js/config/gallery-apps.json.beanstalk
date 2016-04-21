@@ -1,0 +1,11 @@
+[
+    {
+        "client_name" : "Bilirubin Chart",
+        "client_id" : "bilirubin_chart",
+        "launch_uri" : "http://ec2-54-201-94-228.us-west-2.compute.amazonaws.com:8080/hspc-bilirubin-app-0.10/static/bilirubin-chart/launch.html",
+        "redirect_uri" : "http://ec2-54-201-94-228.us-west-2.compute.amazonaws.com:8080/hspc-bilirubin-app-0.10/static/bilirubin-chart/",
+        "logo_uri" : "http://ec2-54-201-94-228.us-west-2.compute.amazonaws.com:8080/hspc-bilirubin-app-0.10/static/bilirubin-chart/images/bilirubin.png",
+        "patient" : {"fhirId": "ID549614829"},
+        "persona" : ""
+    }
+]
