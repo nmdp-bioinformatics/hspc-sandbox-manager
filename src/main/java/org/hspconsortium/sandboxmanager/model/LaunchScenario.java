@@ -9,7 +9,9 @@ import java.util.List;
 @Entity
 @NamedQueries({
         @NamedQuery(name="LaunchScenario.findByOwnerId",
-                query="SELECT c FROM LaunchScenario c WHERE c.owner.ldapId = :id")
+                query="SELECT c FROM LaunchScenario c WHERE c.owner.ldapId = :id and c.sandbox is NULL"),
+        @NamedQuery(name="LaunchScenario.findByOwnerIdAndSandboxId",
+                query="SELECT c FROM LaunchScenario c WHERE c.owner.ldapId = :id and c.sandbox.sandboxId = :sandboxId")
 })
 public class LaunchScenario {
 
@@ -19,6 +21,7 @@ public class LaunchScenario {
     private Patient patient;
     private Persona persona;
     private App app;
+    private Sandbox sandbox;
     private List<ContextParams> contextParams;
     private Timestamp lastLaunch;
     private Long lastLaunchSeconds;
@@ -45,6 +48,16 @@ public class LaunchScenario {
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name="sandbox_id")
+    public Sandbox getSandbox() {
+        return sandbox;
+    }
+
+    public void setSandbox(Sandbox sandbox) {
+        this.sandbox = sandbox;
     }
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})

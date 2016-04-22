@@ -13,7 +13,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             largeSidebar: true,
             demoOnly: false
         };
+        $scope.sandboxName = "HSPC";
         $scope.messages = [];
+
+        launchScenarios.getSandboxIdFromUrl();
 
         $rootScope.$on('message-notify', function(event, messages){
             $scope.messages = messages;
@@ -37,17 +40,45 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         });
 
         $scope.signin = function() {
-            appsSettings.getSettings().then(function(settings){
-                oauth2.authorize(settings);
-            });
+            $state.go('login', {});
         };
 
-        $rootScope.$on('signed-in', function(){
+        $rootScope.$on('signed-in', function(event, arg){
+            var canceledSandboxCreate = (arg !== undefined && arg === 'cancel-sandbox-create');
             $scope.oauthUser = userServices.getOAuthUser();
-            userServices.getFhirProfileUser().then(function(persona){
-                $scope.persona = persona;
-                $rootScope.$digest();
-            });
+
+            if (canceledSandboxCreate) {
+                $scope.sandboxName = "HSPC";
+                completeSignIn();
+            } else {
+                appsSettings.getSettings().then(function(settings){
+
+                    //Initial sign in with no sandbox specified
+                    if (fhirApiServices.fhirClient().server.serviceUrl === settings.defaultServiceUrl) {
+                        launchScenarios.getUserSandbox().then(function(sandboxExists){
+                            if (sandboxExists) {
+                                oauth2.login(launchScenarios.getSandbox().sandboxId);
+                            } else if (sandboxExists === 'invalid') {
+                                $state.go('404');
+                            } else {
+                                $scope.showing.navBar = false;
+                                $state.go('create-sandbox', {});
+                            }
+                        });
+
+                    } else {
+                        launchScenarios.getUserSandbox().then(function(sandboxExists){
+                            if (sandboxExists) {
+                                $scope.sandboxName = launchScenarios.getSandbox().name;
+                            }
+                            completeSignIn();
+                        });
+                    }
+                });
+            }
+        });
+
+        function completeSignIn() {
             $scope.showing.signin = false;
             $scope.showing.signout = true;
             $scope.showing.navBar = true;
@@ -57,7 +88,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             } else {
                 $state.go('launch-scenarios', {});
             }
-        });
+        }
 
         $rootScope.$on('hide-nav', function(){
             $scope.showing.navBar = false;
@@ -75,19 +106,114 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             userServices.userSettings();
         };
 
-    }]).controller("StartController",
+    }]).controller("StartController", // After auth
         function(fhirApiServices){
             fhirApiServices.initClient();
-    }).controller("LoginController",
-    function($rootScope, $scope, oauth2, appsSettings, fhirApiServices){
+    }).controller("SandboxController",
+    function($state, launchScenarios){
+        launchScenarios.sandboxIdFromUrl();
 
-        if (sessionStorage.tokenResponse && !fhirApiServices.clientInitialized()) {
-            // access token is available, so sign-in now
-            appsSettings.getSettings().then(function(settings){
-                oauth2.authorize(settings);
+        $state.go('login', {});
+    }).controller("404Controller",
+        function(){
+
+    }).controller("CreateSandboxController",
+    function($rootScope, $scope, $state, launchScenarios, appsSettings){
+
+        $scope.showing.navBar = false;
+        $scope.isIdValid = false;
+        $scope.isNameValid = true;
+        $scope.tempSandboxId = "<sandbox id>";
+        $scope.sandboxName = "";
+        $scope.sandboxId = "";
+        $scope.sandboxDesc = "";
+        $scope.createEnabled = true;
+
+        appsSettings.getSettings().then(function(settings){
+            $scope.baseUrl = settings.baseUrl;
+        });
+
+        $scope.$watchGroup(['sandboxId', 'sandboxName'], function() {
+            $scope.validateId($scope.sandboxId).then(function(valid){
+                var idChanged = $scope.isIdValid !== valid
+                $scope.isIdValid = valid;
+                $scope.isNameValid = $scope.validateName($scope.sandboxName);
+                $scope.createEnabled = ($scope.isIdValid && $scope.isNameValid);
+                if ($scope.createEnabled || idChanged) {
+                    $rootScope.$digest();
+                }
             });
-        } else if (fhirApiServices.clientInitialized()) {
+        });
+
+        $scope.validateId = function(id) {
+            var deferred = $.Deferred();
+
+            $scope.tempSandboxId = id;
+            if (id !== undefined && id !== "" && id.length <= 20 && /^[a-zA-Z0-9]*$/.test(id)) {
+                launchScenarios.getSandboxById(id).then(function(sandbox){
+                    deferred.resolve(sandbox === undefined || sandbox === "");
+                });
+            } else {
+                $scope.tempSandboxId = "<sandbox id>";
+                deferred.resolve(false);
+            }
+            return deferred;
+        };
+
+        $scope.validateName = function(name) {
+            if (name !== undefined && name !== "") {
+                if (name.length > 50) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        $scope.cancel = function() {
+            $rootScope.$emit('signed-in', 'cancel-sandbox-create');
+        };
+
+        $scope.createSandbox = function() {
+            launchScenarios.createSandbox({sandboxId: $scope.sandboxId, sandboxName: $scope.sandboxName, description: $scope.sandboxDesc}).then(function(sandbox){
+//                launchScenarios.createDefaultLaunchScenarios().then(function(){
+                    $rootScope.$emit('sandbox-created');
+//                });
+            });
+
+            $state.go('progress', {});
+        };
+
+    }).controller("LoginController",
+    function($rootScope, $scope, $state, oauth2, appsSettings, fhirApiServices, launchScenarios){
+
+//        if (sessionStorage.tokenResponse && !fhirApiServices.clientInitialized()) {
+//            // access token is available, so sign-in now
+//            appsSettings.getSettings().then(function(settings){
+//                oauth2.authorize(settings);
+//            });
+//        } else if (fhirApiServices.clientInitialized()) {
+        if (fhirApiServices.clientInitialized()) {
+
             $rootScope.$emit('signed-in');
+
+//            appsSettings.getSettings().then(function(settings){
+//                if (fhirApiServices.fhirClient().server.serviceUrl === settings.defaultServiceUrl) {
+//
+//                    launchScenarios.getUserSandbox().then(function(sandboxExists){
+//
+//                        if (sandboxExists) {
+//                            oauth2.login(launchScenarios.getSandbox().sandboxId);
+//                        } else {
+//                            $scope.showing.navBar = false;
+//                            $state.go('create-sandbox', {});
+//                        }
+//                    });
+//
+//                } else {
+//                    $rootScope.$emit('signed-in');
+//                }
+//            });
+
         } else {
             oauth2.login();
         }
@@ -534,7 +660,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     function($rootScope, $scope, $state, launchScenarios, launchApp, userServices, descriptionBuilder){
         $scope.showing = {detail: false, addingContext: false};
         $scope.selectedScenario = {};
-        launchScenarios.getLaunchScenarios();
+        launchScenarios.getSandboxLaunchScenarios();
         launchScenarios.clearBuilder();
         launchScenarios.getBuilder().owner = userServices.oauthUser();
 
@@ -1026,5 +1152,52 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.close = function () {
             $uibModalInstance.dismiss();
         };
+    }]).controller('ProgressCtrl',['$rootScope', '$scope', '$state', '$timeout', 'launchScenarios',
+    function ($rootScope, $scope, $state, $timeout, launchScenarios) {
+
+        $scope.createProgress = 0;
+        $scope.showing.navBar = false;
+
+        var messageNum = 0;
+        var messages = [
+            "Create apps for practitioners that launch within an EHR, smart phone, tablet, or web browser",
+            "Create apps for patients and their related persons that launch from a smart phone, tablet, web browser, or personal computer",
+            "Create backend services that interact directly with HSPC Platforms",
+            "Verify your app follows the SMART security and launch context standard",
+            "Run your app against your very own FHIR server",
+            "Test your apps by creating various launch scenarios",
+            "Create practitioners, patients, and clinical data",
+            "Verify that your app is HSPC compliant"
+        ];
+        updateProgress();
+        fadeMessage();
+
+        $rootScope.$on('sandbox-created', function(){
+            $scope.createProgress = 100;
+            $timeout(function() {
+                $rootScope.$emit('signed-in');
+            },500);
+        });
+
+        function fadeMessage(){
+            $timeout(function() {
+                $scope.message = messages[messageNum];
+                $scope.showMessage = true;
+                // Loading done here - Show message for 3 more seconds.
+                $timeout(function() {
+                    $scope.showMessage = false;
+                    messageNum++;
+                    fadeMessage();
+                },3000);
+            }, 500);
+        }
+
+        function updateProgress(){
+            $scope.createProgress += 1;
+            if ($scope.createProgress < 95) {
+                $timeout(updateProgress, 100);
+            }
+        }
+
     }]);
 

@@ -36,16 +36,19 @@ public class LaunchScenarioController {
     private final PatientService patientService;
     private final PersonaService personaService;
     private final AppService appService;
+    private final SandboxService sandboxService;
 
     @Inject
     public LaunchScenarioController(final LaunchScenarioService launchScenarioService,
                                     final PatientService patientService, final PersonaService personaService,
-                                    final AppService appService, final UserService userService) {
+                                    final AppService appService, final UserService userService,
+                                    final SandboxService sandboxService) {
         this.launchScenarioService = launchScenarioService;
         this.userService = userService;
         this.patientService = patientService;
         this.personaService = personaService;
         this.appService = appService;
+        this.sandboxService = sandboxService;
     }
 
     @RequestMapping(value = "/launchScenario", method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
@@ -56,23 +59,51 @@ public class LaunchScenarioController {
         }
         launchScenario.setOwner(user);
 
-        Persona persona = personaService.findByFhirId(launchScenario.getPersona().getFhirId());
+        // A null sandbox is the HSPC sandbox
+        Sandbox sandbox = null;
+        if (launchScenario.getSandbox() != null) {
+            sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
+            launchScenario.setSandbox(sandbox);
+        }
+
+        Persona persona = null;
+        if (sandbox == null) {
+            persona = personaService.findByFhirId(launchScenario.getPersona().getFhirId());
+        } else {
+            persona = personaService.findByFhirIdAndSandboxId(launchScenario.getPersona().getFhirId(), sandbox.getSandboxId());
+        }
         if (persona == null) {
+            persona = launchScenario.getPersona();
+            persona.setSandbox(sandbox);
             persona = personaService.save(launchScenario.getPersona());
         }
         launchScenario.setPersona(persona);
 
         if (launchScenario.getPatient() != null) {
-            Patient patient = patientService.findByFhirId(launchScenario.getPatient().getFhirId());
+            Patient patient = null;
+            if (sandbox == null) {
+                patient = patientService.findByFhirId(launchScenario.getPatient().getFhirId());
+            } else {
+                patient = patientService.findByFhirIdAndSandboxId(launchScenario.getPatient().getFhirId(), sandbox.getSandboxId());
+            }
             if (patient == null) {
-                patient = patientService.save(launchScenario.getPatient());
+                patient = launchScenario.getPatient();
+                patient.setSandbox(sandbox);
+                patient = patientService.save(patient);
             }
             launchScenario.setPatient(patient);
         }
 
-        App app = appService.findByClientId(launchScenario.getApp().getClient_id());
+        App app = null;
+        if (sandbox == null) {
+            app = appService.findByClientId(launchScenario.getApp().getClient_id());
+        } else {
+            app = appService.findByClientIdAndSandboxId(launchScenario.getApp().getClient_id(), sandbox.getSandboxId());
+        }
         if (app == null) {
-            app = appService.save(launchScenario.getApp());
+            app = launchScenario.getApp();
+            app.setSandbox(sandbox);
+            app = appService.save(app);
         }
         launchScenario.setApp(app);
 
@@ -81,7 +112,9 @@ public class LaunchScenarioController {
 
     @RequestMapping(value = "/launchScenario", method = RequestMethod.PUT, produces ="application/json")
     public @ResponseBody LaunchScenario updateLaunchScenario(@RequestBody @Valid final LaunchScenario launchScenario) {
-        return launchScenarioService.save(launchScenario);
+        LaunchScenario updateLaunchScenario = launchScenarioService.getById(launchScenario.getId());
+        updateLaunchScenario.setLastLaunchSeconds(launchScenario.getLastLaunchSeconds());
+        return launchScenarioService.save(updateLaunchScenario);
     }
 
     @RequestMapping(value = "/launchScenario", method = RequestMethod.DELETE, produces ="application/json")
@@ -97,7 +130,26 @@ public class LaunchScenarioController {
             ownerId = java.net.URLDecoder.decode(id, "UTF-8");
             return launchScenarioService.findByOwnerId(ownerId);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/launchScenarios", method = RequestMethod.GET, produces ="application/json",
+            params = {"id", "sandboxId"})
+    public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios(@RequestParam(value = "id") String id, @RequestParam(value = "sandboxId") String sandboxId) {
+        String ownerId = null;
+
+        try {
+            ownerId = java.net.URLDecoder.decode(id, "UTF-8");
+            // A null sandbox is the HSPC sandbox
+            if (sandboxId == null || sandboxId.isEmpty()) {
+                return launchScenarioService.findByOwnerId(ownerId);
+            } else {
+                return launchScenarioService.findByOwnerIdAndSandboxId(ownerId, sandboxId);
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
         return null;
     }

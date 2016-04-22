@@ -1,11 +1,32 @@
 'use strict';
 
 angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootstrap', 'highcharts-ng', 'sandManApp.filters', 'sandManApp.services',
-    'sandManApp.controllers', 'sandManApp.directives'], function($stateProvider, $urlRouterProvider){
+    'sandManApp.controllers', 'sandManApp.directives'], function($stateProvider, $urlRouterProvider, $locationProvider ){
+
+
+//    $locationProvider.html5Mode(true);
 
     $urlRouterProvider.otherwise('/login');
 
     $stateProvider
+
+        .state('sandbox', {
+            url: '/sandbox/:sandbox',
+            templateUrl: 'static/js/templates/sandbox.html',
+            authenticate: true
+        })
+
+        .state('create-sandbox', {
+            url: '/create-sandbox',
+            templateUrl: 'static/js/templates/createSandbox.html',
+            authenticate: true
+        })
+
+        .state('progress', {
+            url: '/progress',
+            templateUrl: 'static/js/templates/createProgress.html',
+            authenticate: true
+        })
 
         .state('login', {
             url: '/login',
@@ -68,10 +89,15 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
             templateUrl:'static/js/templates/start.html'
         })
 
+        .state('404', {
+            url: '/404',
+            demoOnly: true,
+            templateUrl:'static/js/templates/404.html'
+        })
+
         .state('resolve', {
             url: '/resolve/:context/against/:iss/for/:clientName/then/:endpoint',
             demoOnly: true,
             templateUrl:'static/js/templates/resolve.html'
         });
-
-});
+    });

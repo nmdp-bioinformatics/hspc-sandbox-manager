@@ -7,4 +7,6 @@ public interface PatientService {
     Patient save(Patient patient);
 
     Patient findByFhirId(String fhirId);
+
+    Patient findByFhirIdAndSandboxId(String fhirId, String sandboxId);
 }

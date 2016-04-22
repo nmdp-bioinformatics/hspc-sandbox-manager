@@ -1,6 +1,10 @@
 package org.hspconsortium.sandboxmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NamedQueries({
@@ -11,6 +15,8 @@ public class User {
     private Integer id;
     private String ldapId;
     private String name;
+    private List<Sandbox> sandboxes = new ArrayList<>();
+    private List<String> sandboxIds = new ArrayList<>();
 
     public void setId(Integer id) {
         this.id = id;
@@ -37,4 +43,24 @@ public class User {
     public String getName() {
         return name;
     }
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users")
+    @JsonIgnore
+    public List<Sandbox> getSandboxes() {
+        for (Sandbox sandbox : sandboxes) {
+            sandboxIds.add(sandbox.getSandboxId());
+        }
+
+        return sandboxes;
+    }
+
+    public void setSandboxes(List<Sandbox> sandboxes) {
+        this.sandboxes = sandboxes;
+    }
+
+    @Transient
+    public List<String> getSandboxIds() {
+        return this.sandboxIds;
+    }
+
 }

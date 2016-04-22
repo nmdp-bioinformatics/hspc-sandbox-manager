@@ -12,6 +12,10 @@ public interface LaunchScenarioService {
 
     Iterable<LaunchScenario> findAll();
 
+    LaunchScenario getById(int id);
+
     List<LaunchScenario> findByOwnerId(String id);
+
+    List<LaunchScenario> findByOwnerIdAndSandboxId(String id, String sandboxId);
 
 }

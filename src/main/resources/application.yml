@@ -16,3 +16,8 @@ spring:
       ddl-auto: update
       dialect: org.hibernate.dialect.MySQL5InnoDBDialect
       naming_strategy: org.hibernate.cfg.ImprovedNamingStrategy
+hspc:
+  platform:
+    api:
+      sandboxManagementEndpointURL: http://localhost:8080/hspc-reference-api/management/sandbox
+

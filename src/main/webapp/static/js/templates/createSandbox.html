@@ -1,0 +1,58 @@
+<div ng-controller="CreateSandboxController" class="container-fluid full-screen login-form">
+    <div class="row login-box">
+        <div class="login-title">Create Sandbox</div>
+        <div class="col-lg-12 login-section ">
+
+            <div class="columns-group">
+                <div class="single-column">
+                    <div class="login-form-group">
+                        <label class="login-form-label">Sandbox ID</label>
+                        <input ng-model="sandboxId" class="login-form-input-box" required/>
+                        <i ng-show="!isIdValid" class='login-form-input-icon fa fa-close fa-lg'></i>
+                        <label class="login-form-description">Your sandbox will be available at {{baseUrl}}/{{tempSandboxId}}</label>
+                    </div>
+                    <div class="login-form-group">
+                        <label class="login-form-label">Sandbox Name</label>
+                        <input ng-model="sandboxName" class="login-form-input-box"/>
+                        <i ng-show="!isNameValid" class='login-form-input-icon fa fa-close fa-lg'></i>
+                        <label class="login-form-description">e.g., NewCo Sandbox</label>
+                    </div>
+                    <div class="login-form-group">
+                        <label class="login-form-label">Description</label>
+                        <textarea class="login-form-description-box" ng-model="sandboxDesc"></textarea>
+                        <!--<input ng-model="sandboxDesc" class="login-form-input-box"/>-->
+                        <label class="login-form-description">e.g., This sandbox is the QA environment for NewCo.</label>
+                    </div>
+                </div>
+                <div class="single-column">
+                    <div class="login-form-info-box">
+                        <h1>What is a sandbox?</h1>
+                        <p>A sandbox is your very own instance of an HSPC Platform* combined with tools and utilities to help you build and test your medical apps.</p>
+
+                        <ul class="feature-checkmark-list">
+                            <li class="feature-checkmark-list--item">Create apps for practitioners that launch within an EHR, smart phone, tablet, or web browser</li>
+                            <li class="feature-checkmark-list--item">Create apps for patients and their related persons that launch from a smart phone, tablet, web browser, or personal computer</li>
+                            <li class="feature-checkmark-list--item">Create backend services that interact directly with HSPC Platforms*</li>
+                            <li class="feature-checkmark-list--item">Verify your app follows the SMART security and launch context standards</li>
+                            <li class="feature-checkmark-list--item">Run your app against your very own FHIR server</li>
+                            <li class="feature-checkmark-list--item">Test your apps by creating various launch scenarios</li>
+                            <li class="feature-checkmark-list--item">Create practitioners, patients, and clinical data</li>
+                            <li class="feature-checkmark-list--item">Verify that your app is HSPC compliant</li>
+                        </ul>
+
+                        <p>*An HSPC Platform is a standardized way to interact with a medical system such as an EHR, Hospital, Clinic, HIE, PHR, Lab, Insurer, etc.</p>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="col-lg-12 login-section ">-->
+                <!--<div class="login-form-info-box">-->
+                    <!--<h1>Invite users</h1>-->
+                <!--</div>-->
+            <!--</div>    -->
+            <div class="col-lg-12 login-section ">
+                <button class="form-btn btn btn-basic" type="button" ng-disabled="!createEnabled" ng-click="createSandbox()">Create Sandbox</button>
+                <button class="form-btn btn btn-default" type="button" ng-click="cancel()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

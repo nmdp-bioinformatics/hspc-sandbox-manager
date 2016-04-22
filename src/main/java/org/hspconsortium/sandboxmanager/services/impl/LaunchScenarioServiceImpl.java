@@ -31,13 +31,23 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
         repository.delete(launchScenario);
     }
 
+    @Override
     public Iterable<LaunchScenario> findAll(){
         return repository.findAll();
-
     }
 
+    @Override
+    public LaunchScenario getById(int id) {
+        return  repository.findOne(id);
+    }
+
+    @Override
     public List<LaunchScenario> findByOwnerId(String id) {
         return  repository.findByOwnerId(id);
     }
 
+    @Override
+    public List<LaunchScenario> findByOwnerIdAndSandboxId(String id, String sandboxId) {
+        return  repository.findByOwnerIdAndSandboxId(id, sandboxId);
+    }
 }

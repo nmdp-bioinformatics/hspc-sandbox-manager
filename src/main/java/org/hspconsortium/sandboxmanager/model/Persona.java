@@ -6,7 +6,10 @@ import java.math.BigInteger;
 @Entity
 @NamedQueries({
         @NamedQuery(name="Persona.findByFhirId",
-                query="SELECT c FROM Persona c WHERE c.fhirId = :id")
+                query="SELECT c FROM Persona c WHERE c.fhirId = :id and c.sandbox is NULL"),
+        @NamedQuery(name="Persona.findByFhirIdAndSandboxId",
+                query="SELECT c FROM Persona c WHERE c.fhirId = :id and c.sandbox.sandboxId = :sandboxId")
+
 })
 public class Persona {
     private Integer id;
@@ -14,6 +17,7 @@ public class Persona {
     private String fhirId;
     private String resource;
     private String fullUrl;
+    private Sandbox sandbox;
 
     public void setId(Integer id) {
         this.id = id;
@@ -56,4 +60,15 @@ public class Persona {
     public String getFullUrl() {
         return fullUrl;
     }
+
+    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name="sandbox_id")
+    public Sandbox getSandbox() {
+        return sandbox;
+    }
+
+    public void setSandbox(Sandbox sandbox) {
+        this.sandbox = sandbox;
+    }
+
 }

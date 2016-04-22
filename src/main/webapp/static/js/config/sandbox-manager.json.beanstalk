@@ -1,7 +1,0 @@
-{
-    "profile_update_uri" : "http://hspcreferencemessag-env.us-west-2.elasticbeanstalk.com/sandboxuser/profileupdate",
-    "serviceUrl": "http://hspcreferenceapi-sandbox-env.us-west-2.elasticbeanstalk.com/data",
-    "baseUrl": "http://hspcsandboxmanager-env.us-west-2.elasticbeanstalk.com",
-    "oauthLogoutUrl": "http://hspcreferenceauth-sandbox-env.us-west-2.elasticbeanstalk.com/logout",
-    "userManagementUrl": "http://ec2-54-200-104-189.us-west-2.compute.amazonaws.com:8080/pwm/private/"
-}
