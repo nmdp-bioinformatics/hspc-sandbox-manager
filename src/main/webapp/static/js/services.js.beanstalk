@@ -288,7 +288,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 appsSettings.getSettings().then(function(settings){
                     $.ajax({
-                        url: settings.baseUrl + "/launchScenario",
+                    url: window.location.href.split("#")[0].substring(0, window.location.href.split("#")[0].length-1) + "/launchScenario",
                         type: 'POST',
                         data: JSON.stringify(launchScenario),
                         contentType: "application/json"
@@ -304,7 +304,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 appsSettings.getSettings().then(function(settings){
                     $.ajax({
-                        url: settings.baseUrl + "/launchScenario",
+                    url: window.location.href.split("#")[0].substring(0, window.location.href.split("#")[0].length-1) + "/launchScenario",
                         type: 'PUT',
                         data: JSON.stringify(launchScenario),
                         contentType: "application/json"
@@ -318,7 +318,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 appsSettings.getSettings().then(function(settings){
                     $.ajax({
-                        url: settings.baseUrl + "/launchScenario",
+                    url: window.location.href.split("#")[0].substring(0, window.location.href.split("#")[0].length-1) + "/launchScenario",
                         type: 'DELETE',
                         data: JSON.stringify(launchScenario),
                         contentType: "application/json"
@@ -333,7 +333,7 @@ angular.module('sandManApp.services', [])
                 var deferred = $.Deferred();
                 appsSettings.getSettings().then(function(settings){
                     $.ajax({
-                        url: settings.baseUrl + "/launchScenarios?id=" + encodeURIComponent(userServices.oauthUser().ldapId),
+                    url: window.location.href.split("#")[0].substring(0, window.location.href.split("#")[0].length-1) + "/launchScenarios?id=" + encodeURIComponent(userServices.oauthUser().ldapId),
                         type: 'GET',
                         contentType: "application/json"
                     }).done(function(launchScenarioList){
