@@ -597,7 +597,7 @@ angular.module('sandManApp.services', [])
 
                 appsSettings.getSettings().then(function(settings){
                     $.ajax({
-                        url: "https://sandbox.hspconsortium.org/pwm",
+                        url: "http://test.hspconsortium.org/apps/pwm",
                         type: 'GET',
                         beforeSend : function( xhr ) {
                             xhr.setRequestHeader( 'c8381465-a7f8-4ecc-958d-ec296d6e8671', oauthUser.ldapId);
@@ -605,7 +605,7 @@ angular.module('sandManApp.services', [])
                         }
 
                     }).done(function(data){
-                            window.location.href = "https://sandbox.hspconsortium.org/pwm/private/"
+                            window.location.href = "http://test.hspconsortium.org/apps/pwm/private/"
                         }).fail(function(){
                         });
                 });

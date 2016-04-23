@@ -1,6 +1,8 @@
 {
-    "profile_update_uri" : "http://hspcreferencemessag-env.us-west-2.elasticbeanstalk.com/sandboxuser/profileupdate",
-    "serviceUrl": "http://hspcreferenceapi-sandbox-env.us-west-2.elasticbeanstalk.com/data",
+    "profile_update_uri" : "http://test.hspconsortium.org/messaging/sandboxuser/profileupdate",
+    "defaultServiceUrl": "http://test.hspconsortium.org/api/data",
+    "baseServiceUrl": "http://test.hspconsortium.org/api/",
     "oauthLogoutUrl": "http://hspcreferenceauth-sandbox-env.us-west-2.elasticbeanstalk.com/logout",
-    "userManagementUrl": "http://ec2-54-200-104-189.us-west-2.compute.amazonaws.com:8080/pwm/private/"
+    "userManagementUrl": "http://test.hspconsortium.org/apps/pwm/private/",
+    "defaultLaunchScenarios": ["bilirubin_chart", "Growth Chart", "BP Centiles", "Cardiac Risk"]
 }
