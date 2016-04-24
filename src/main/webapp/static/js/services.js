@@ -179,6 +179,22 @@ angular.module('sandManApp.services', [])
                             });
                         }
                         deferred.resolve(resourceResults, resourceSearchResult);
+                    }).fail(function(error){
+                    var test = error;
+                    });
+                return deferred;
+            },
+            readResourceInstance: function(resource, id) {
+                var deferred = $.Deferred();
+
+                $.when(fhirClient.api.read({type: resource, id: id}))
+                    .done(function(resourceResult){
+                        var resource;
+                        resource = esourceResult.data.entry;
+                        resource = entry.fullUrl;
+                        deferred.resolve(resource);
+                    }).fail(function(error){
+                        var test = error;
                     });
                 return deferred;
             },
@@ -222,7 +238,7 @@ angular.module('sandManApp.services', [])
                 return deferred;
             }
         }
-    }).factory('launchScenarios', function($rootScope, $location, $filter, appsSettings, apps, userServices, notification) {
+    }).factory('launchScenarios', function($rootScope, $location, $filter, fhirApiServices, errorService, appsSettings, apps, userServices, notification) {
 
         var scenarioBuilder = {
             owner: '',
@@ -253,6 +269,19 @@ angular.module('sandManApp.services', [])
                     recentLaunchScenarioList.push(fullLaunchScenarioList[i]);
                 }
             }
+        }
+
+        function prepLaunchScenario(launchScenario) {
+            var newLaunchScenario = {
+                owner: launchScenario.owner,
+                description: launchScenario.description,
+                patient: launchScenario.patient,
+                app: launchScenario.app
+            };
+            if (launchScenario.persona !== undefined && launchScenario.persona !== '') {
+                newLaunchScenario.persona = launchScenario.persona;
+            }
+            return newLaunchScenario;
         }
 
         return {
@@ -324,9 +353,10 @@ angular.module('sandManApp.services', [])
             getRecentLaunchScenarioList: function() {
                 return recentLaunchScenarioList;
             },
-            addLaunchScenario: function(launchScenario){
+            addLaunchScenario: function(launchScenario, showNotification){
                 var that = this;
                 appsSettings.getSettings().then(function(settings){
+                    launchScenario = prepLaunchScenario(launchScenario);
                     if (sandbox.sandboxId !== '') {
                         launchScenario.sandbox = sandbox;
                     }
@@ -337,9 +367,13 @@ angular.module('sandManApp.services', [])
                         contentType: "application/json"
                     }).done(function(result){
                             that.getSandboxLaunchScenarios();
-                            notification.message("Launch Scenario Created");
+                            if (showNotification) {
+                                notification.message("Launch Scenario Created");
+                            }
                         }).fail(function(){
-                        notification.message({ type:"error", text: "Failed to Create Launch Scenario" });
+                            if (showNotification) {
+                                notification.message({ type:"error", text: "Failed to Create Launch Scenario" });
+                            }
                     });
                 });
             },
@@ -372,28 +406,6 @@ angular.module('sandManApp.services', [])
                         });
                 });
             },
-//            getLaunchScenarios: function() {
-//                var deferred = $.Deferred();
-//                appsSettings.getSettings().then(function(settings){
-//                    $.ajax({
-//                        url: settings.baseUrl + "/launchScenarios?id=" + encodeURIComponent(userServices.oauthUser().ldapId),
-//                        type: 'GET',
-//                        contentType: "application/json"
-//                    }).done(function(launchScenarioList){
-//                            fullLaunchScenarioList = [];
-//                            if (launchScenarioList) {
-//                                launchScenarioList.forEach(function(launchScenario){
-//                                    fullLaunchScenarioList.push(launchScenario);
-//                                });
-//                                orderByLastLaunch();
-//                                $rootScope.$emit('launch-scenario-list-update');
-//                            }
-//                            deferred.resolve();
-//                        }).fail(function(){
-//                        });
-//                });
-//                return deferred;
-//            },
             getSandboxLaunchScenarios: function() {
                 var deferred = $.Deferred();
                 appsSettings.getSettings().then(function(settings){
@@ -436,7 +448,6 @@ angular.module('sandManApp.services', [])
                         data: JSON.stringify(createSandbox),
                         contentType: "application/json"
                     }).done(function(sandboxResult){
-//                            notification.message("Sandbox Created");
                             sandbox = {
                                 id: sandboxResult.id,
                                 createdBy: sandboxResult.createdBy,
@@ -444,11 +455,12 @@ angular.module('sandManApp.services', [])
                                 sandboxId: sandboxResult.sandboxId,
                                 description: sandboxResult.description
                             };
-//                            that.createDefaultLaunchScenarios();
                             deferred.resolve(sandbox);
-                        }).fail(function(){
+                        }).fail(function(error){
+                            var errorMessage = error.responseJSON.message;
+                            errorService.setErrorMessage(errorMessage);
                             that.clearSandbox();
-//                            notification.message({ type:"error", text: "Failed to Create Sandbox" });
+                            deferred.reject();
                         });
                 });
                 return deferred;
@@ -463,7 +475,9 @@ angular.module('sandManApp.services', [])
                         contentType: "application/json"
                     }).done(function(sandboxResult){
                             if (sandboxResult.length > 0) {
-                                if (sandboxIdFromURL !== undefined && sandboxIdFromURL !== sandboxResult[0].sandboxId) {
+                                if (settings.reservedEndpoints.indexOf(sandboxIdFromURL) > -1) {
+                                    deferred.resolve("reserved");
+                                } else if (sandboxIdFromURL !== undefined && sandboxIdFromURL !== sandboxResult[0].sandboxId) {
                                     deferred.resolve('invalid');
                                 } else {
                                     sandbox = {
@@ -490,35 +504,54 @@ angular.module('sandManApp.services', [])
             getSandboxById: function(sandboxId) {
                 var deferred = $.Deferred();
                 appsSettings.getSettings().then(function(settings){
-                    $.ajax({
-                        url: settings.baseUrl + "/sandbox?id=" + sandboxId,
-                        type: 'GET',
-                        contentType: "application/json"
-                    }).done(function(sandbox){
-                            deferred.resolve(sandbox);
-                        }).fail(function(){
-                            deferred.resolve();
-                        });
+                        if (settings.reservedEndpoints.indexOf(sandboxId) > -1) {
+                            deferred.resolve("reserved");
+                        } else {
+                            $.ajax({
+                            url: settings.baseUrl + "/sandbox?id=" + sandboxId,
+                            type: 'GET',
+                            contentType: "application/json"
+                            }).done(function(sandbox){
+                                deferred.resolve(sandbox);
+                                $rootScope.$digest();
+
+                                }).fail(function(){
+                                    deferred.resolve();
+                                    $rootScope.$digest();
+                                });
+                        }
                 });
                 return deferred;
             },
             createDefaultLaunchScenarios: function() {
                 var that = this;
-                var deferred = $.Deferred();
                 apps.getGalleryApps().then(function(galleryApps){
                     appsSettings.getSettings().then(function(settings){
-                        settings.defaultLaunchScenarios.forEach(function(client_id) {
-                            galleryApps.forEach(function(launchScenario) {
-                                if (launchScenario.client_id === client_id) {
-                                    launchScenario.owner = userServices.getOAuthUser();
-                                    that.addLaunchScenario(launchScenario);
-                                }
+                        var defaultPersona;
+                        fhirApiServices.readResourceInstance('Practitioner', settings.defaultPersonaId)
+                            .then(function(resource){
+                                defaultPersona = {
+                                    fhirId: "",
+                                    fullUrl: "",
+                                    name: "",
+                                    resource: "Practitioner"
+                                };
+                                settings.defaultLaunchScenarios.forEach(function(client_id) {
+                                    galleryApps.forEach(function(app) {
+                                        var newLaunchScenario = {};
+                                        if (app.client_id === client_id) {
+                                            newLaunchScenario.owner = userServices.getOAuthUser();
+                                            newLaunchScenario.description = app.client_name;
+                                            newLaunchScenario.app = app;
+                                            newLaunchScenario.patient = {"fhirId": app.patient};
+                                            newLaunchScenario.persona = defaultPersona;
+                                            that.addLaunchScenario(newLaunchScenario, false);
+                                        }
+                                    });
+                                });
                             });
-                        });
                     });
                 });
-
-                return deferred;
             }
 
         }
@@ -597,7 +630,7 @@ angular.module('sandManApp.services', [])
 
                 appsSettings.getSettings().then(function(settings){
                     $.ajax({
-                        url: "http://test.hspconsortium.org/apps/pwm",
+                        url: settings.userManagementUrl,
                         type: 'GET',
                         beforeSend : function( xhr ) {
                             xhr.setRequestHeader( 'c8381465-a7f8-4ecc-958d-ec296d6e8671', oauthUser.ldapId);
@@ -605,7 +638,7 @@ angular.module('sandManApp.services', [])
                         }
 
                     }).done(function(data){
-                            window.location.href = "http://test.hspconsortium.org/apps/pwm/private/"
+                            window.location.href = settings.userManagementUrl + "/private/"
                         }).fail(function(){
                         });
                 });
@@ -727,6 +760,16 @@ angular.module('sandManApp.services', [])
             }
             return result;
         }
+    }).factory('errorService', function() {
+        var errorMessage;
+        return {
+            getErrorMessage: function () {
+                return errorMessage;
+            },
+            setErrorMessage: function (error) {
+                errorMessage = error;
+            }
+    };
     }).factory('tools', function() {
 
         return {

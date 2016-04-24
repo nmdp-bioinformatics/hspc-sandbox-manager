@@ -95,6 +95,18 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
             templateUrl:'static/js/templates/404.html'
         })
 
+        .state('error', {
+            url: '/error',
+            demoOnly: true,
+            templateUrl:'static/js/templates/error.html'
+        })
+
+        .state('future', {
+            url: '/future',
+            demoOnly: true,
+            templateUrl:'static/js/templates/future.html'
+        })
+
         .state('resolve', {
             url: '/resolve/:context/against/:iss/for/:clientName/then/:endpoint',
             demoOnly: true,

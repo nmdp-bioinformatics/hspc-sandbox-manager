@@ -31,11 +31,11 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 public class StartController {
 
-    @RequestMapping(value = "/sandbox/{sandboxId}", method = RequestMethod.GET)
-    public void getSandboxById(HttpServletRequest request, HttpServletResponse response, @PathVariable(value = "sandboxId") String sandboxId) {
-
-        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-        response.setHeader("Location", "http://localhost:8080/hspc-sandbox-manager/#/sandbox/"+ sandboxId + "/");
-    }
+//    @RequestMapping(value = "/sandbox/{sandboxId}", method = RequestMethod.GET)
+//    public void getSandboxById(HttpServletRequest request, HttpServletResponse response, @PathVariable(value = "sandboxId") String sandboxId) {
+//
+//        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+//        response.setHeader("Location", "http://localhost:8080/hspc-sandbox-manager/#/sandbox/"+ sandboxId + "/");
+//    }
 
 }

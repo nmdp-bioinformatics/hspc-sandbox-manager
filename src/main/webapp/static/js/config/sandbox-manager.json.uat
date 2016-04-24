@@ -3,6 +3,7 @@
     "defaultServiceUrl": "http://54.213.219.198:9080/uat/hspc-reference-api/data",
     "baseServiceUrl": "http://54.213.219.198:9080/uat/hspc-reference-api/",
     "oauthLogoutUrl": "http://54.213.219.198:9080/uat/hspc-reference-authorization/logout",
-    "userManagementUrl": "https://sandbox.hspconsortium.org/pwm/private/",
+    "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
+    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin"],
     "defaultLaunchScenarios": ["bilirubin_chart", "Growth Chart", "BP Centiles", "Cardiac Risk"]
 }

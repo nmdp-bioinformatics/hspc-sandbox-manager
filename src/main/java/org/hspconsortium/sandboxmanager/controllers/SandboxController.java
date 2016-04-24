@@ -93,19 +93,18 @@ public class SandboxController {
                         , responseString));
             }
 
-        userService.save(user);
-        return sandboxService.save(sandbox);
+           userService.save(user);
+            return sandboxService.save(sandbox);
         } catch (IOException io_ex) {
             throw new RuntimeException(io_ex);
         }
-
     }
 
-    @RequestMapping(value = "/sandbox", method = RequestMethod.DELETE, produces ="application/json",
-            params = {"id"})
-    public void deleteSandbox(@RequestParam(value = "id") String id) {
-        sandboxService.delete(Integer.parseInt(id));
-    }
+//    @RequestMapping(value = "/sandbox", method = RequestMethod.DELETE, produces ="application/json",
+//            params = {"id"})
+//    public void deleteSandbox(@RequestParam(value = "id") String id) {
+//        sandboxService.delete(Integer.parseInt(id));
+//    }
 
     @RequestMapping(value = "/sandbox", method = RequestMethod.GET, produces ="application/json",
             params = {"id"})

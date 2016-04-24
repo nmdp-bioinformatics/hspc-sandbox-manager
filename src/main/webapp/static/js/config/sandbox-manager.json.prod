@@ -3,6 +3,7 @@
     "defaultServiceUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-api/data",
     "baseServiceUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-api/",
     "oauthLogoutUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-authorization/logout",
-    "userManagementUrl": "https://sandbox.hspconsortium.org/pwm/private/",
+    "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
+    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin"],
     "defaultLaunchScenarios": ["bilirubin_chart", "Growth Chart", "BP Centiles", "Cardiac Risk"]
 }

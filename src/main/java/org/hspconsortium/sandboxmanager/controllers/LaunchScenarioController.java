@@ -67,12 +67,14 @@ public class LaunchScenarioController {
         }
 
         Persona persona = null;
-        if (sandbox == null) {
-            persona = personaService.findByFhirId(launchScenario.getPersona().getFhirId());
-        } else {
-            persona = personaService.findByFhirIdAndSandboxId(launchScenario.getPersona().getFhirId(), sandbox.getSandboxId());
+        if (launchScenario.getPersona() != null) {
+            if (sandbox == null) {
+                persona = personaService.findByFhirId(launchScenario.getPersona().getFhirId());
+            } else {
+                persona = personaService.findByFhirIdAndSandboxId(launchScenario.getPersona().getFhirId(), sandbox.getSandboxId());
+            }
         }
-        if (persona == null) {
+        if (persona == null && launchScenario.getPersona() != null) {
             persona = launchScenario.getPersona();
             persona.setSandbox(sandbox);
             persona = personaService.save(launchScenario.getPersona());
@@ -120,19 +122,6 @@ public class LaunchScenarioController {
     @RequestMapping(value = "/launchScenario", method = RequestMethod.DELETE, produces ="application/json")
     public @ResponseBody void deleteLaunchScenario(@RequestBody @Valid final LaunchScenario launchScenario) {
         launchScenarioService.delete(launchScenario);
-    }
-
-    @RequestMapping(value = "/launchScenarios", method = RequestMethod.GET, produces ="application/json",
-            params = {"id"})
-    public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios(@RequestParam(value = "id") String id) {
-        String ownerId = null;
-        try {
-            ownerId = java.net.URLDecoder.decode(id, "UTF-8");
-            return launchScenarioService.findByOwnerId(ownerId);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @RequestMapping(value = "/launchScenarios", method = RequestMethod.GET, produces ="application/json",

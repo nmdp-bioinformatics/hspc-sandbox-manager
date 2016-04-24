@@ -3,6 +3,7 @@
     "defaultServiceUrl": "http://test.hspconsortium.org/api/data",
     "baseServiceUrl": "http://test.hspconsortium.org/api/",
     "oauthLogoutUrl": "http://hspcreferenceauth-sandbox-env.us-west-2.elasticbeanstalk.com/logout",
-    "userManagementUrl": "http://test.hspconsortium.org/apps/pwm/private/",
+    "userManagementUrl": "http://test.hspconsortium.org/apps/pwm",
+    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin"],
     "defaultLaunchScenarios": ["bilirubin_chart", "Growth Chart", "BP Centiles", "Cardiac Risk"]
 }

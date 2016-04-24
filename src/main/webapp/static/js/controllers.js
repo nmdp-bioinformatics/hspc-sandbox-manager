@@ -29,6 +29,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.signin();
                 event.preventDefault();
             }
+            if (toState.name == "launch-scenarios" && fromState.name == "after-auth"){
+                $scope.signin();
+                event.preventDefault();
+            }
             if (toState.scenarioBuilderStep && launchScenarios.getBuilder().persona === "") {
                 $state.go('launch-scenarios', {});
                 event.preventDefault();
@@ -60,6 +64,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                                 oauth2.login(launchScenarios.getSandbox().sandboxId);
                             } else if (sandboxExists === 'invalid') {
                                 $state.go('404');
+                            } else if (sandboxExists === 'reserved') {
+                                $state.go('future');
                             } else {
                                 $scope.showing.navBar = false;
                                 $state.go('create-sandbox', {});
@@ -111,11 +117,18 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             fhirApiServices.initClient();
     }).controller("SandboxController",
     function($state, launchScenarios){
-        launchScenarios.sandboxIdFromUrl();
+        launchScenarios.getSandboxIdFromUrl();
 
         $state.go('login', {});
     }).controller("404Controller",
         function(){
+
+    }).controller("ErrorController",
+    function($scope, errorService){
+        $scope.errorMessage = errorService.getErrorMessage();
+
+    }).controller("FutureController",
+    function(){
 
     }).controller("CreateSandboxController",
     function($rootScope, $scope, $state, launchScenarios, appsSettings){
@@ -135,29 +148,30 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.$watchGroup(['sandboxId', 'sandboxName'], function() {
             $scope.validateId($scope.sandboxId).then(function(valid){
-                var idChanged = $scope.isIdValid !== valid
                 $scope.isIdValid = valid;
                 $scope.isNameValid = $scope.validateName($scope.sandboxName);
                 $scope.createEnabled = ($scope.isIdValid && $scope.isNameValid);
-                if ($scope.createEnabled || idChanged) {
-                    $rootScope.$digest();
-                }
             });
         });
 
         $scope.validateId = function(id) {
             var deferred = $.Deferred();
 
-            $scope.tempSandboxId = id;
-            if (id !== undefined && id !== "" && id.length <= 20 && /^[a-zA-Z0-9]*$/.test(id)) {
-                launchScenarios.getSandboxById(id).then(function(sandbox){
-                    deferred.resolve(sandbox === undefined || sandbox === "");
-                });
+            if ($scope.tempSandboxId !== id ) {
+                $scope.tempSandboxId = id;
+                if (id !== undefined && id !== "" && id.length <= 20 && /^[a-zA-Z0-9]*$/.test(id)) {
+                    launchScenarios.getSandboxById(id).then(function(sandbox){
+                        deferred.resolve(sandbox === undefined || sandbox === "");
+                    });
+                } else {
+                    $scope.tempSandboxId = "<sandbox id>";
+                    deferred.resolve(false);
+                }
             } else {
-                $scope.tempSandboxId = "<sandbox id>";
-                deferred.resolve(false);
+                deferred.resolve($scope.isIdValid);
             }
             return deferred;
+
         };
 
         $scope.validateName = function(name) {
@@ -175,45 +189,19 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.createSandbox = function() {
             launchScenarios.createSandbox({sandboxId: $scope.sandboxId, sandboxName: $scope.sandboxName, description: $scope.sandboxDesc}).then(function(sandbox){
-//                launchScenarios.createDefaultLaunchScenarios().then(function(){
-                    $rootScope.$emit('sandbox-created');
-//                });
+                $rootScope.$emit('sandbox-created');
+            }).fail(function() {
+                $state.go('error', {});
             });
 
             $state.go('progress', {});
         };
 
     }).controller("LoginController",
-    function($rootScope, $scope, $state, oauth2, appsSettings, fhirApiServices, launchScenarios){
+    function($rootScope, oauth2, fhirApiServices){
 
-//        if (sessionStorage.tokenResponse && !fhirApiServices.clientInitialized()) {
-//            // access token is available, so sign-in now
-//            appsSettings.getSettings().then(function(settings){
-//                oauth2.authorize(settings);
-//            });
-//        } else if (fhirApiServices.clientInitialized()) {
         if (fhirApiServices.clientInitialized()) {
-
             $rootScope.$emit('signed-in');
-
-//            appsSettings.getSettings().then(function(settings){
-//                if (fhirApiServices.fhirClient().server.serviceUrl === settings.defaultServiceUrl) {
-//
-//                    launchScenarios.getUserSandbox().then(function(sandboxExists){
-//
-//                        if (sandboxExists) {
-//                            oauth2.login(launchScenarios.getSandbox().sandboxId);
-//                        } else {
-//                            $scope.showing.navBar = false;
-//                            $state.go('create-sandbox', {});
-//                        }
-//                    });
-//
-//                } else {
-//                    $rootScope.$emit('signed-in');
-//                }
-//            });
-
         } else {
             oauth2.login();
         }
@@ -1195,7 +1183,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         function updateProgress(){
             $scope.createProgress += 1;
             if ($scope.createProgress < 95) {
-                $timeout(updateProgress, 100);
+                $timeout(updateProgress, 50);
             }
         }
 
