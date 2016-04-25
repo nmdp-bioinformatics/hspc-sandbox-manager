@@ -1183,7 +1183,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         function updateProgress(){
             $scope.createProgress += 1;
             if ($scope.createProgress < 95) {
-                $timeout(updateProgress, 50);
+                $timeout(updateProgress, 100);
             }
         }
 
