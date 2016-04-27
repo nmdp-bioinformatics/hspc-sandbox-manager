@@ -7,6 +7,13 @@
         "logo_uri" : "http://test.hspconsortium.org/apps/hspc-bilirubin-app-0.10/static/bilirubin-chart/images/bilirubin.png"
     },
     {
+        "client_name" : "Growth Chart",
+        "client_id" : "growth_chart",
+        "launch_uri" : "http://test.hspconsortium.org/apps/hspc-reference-apps/static/apps/growth-chart/launch.html",
+        "redirect_uri" : "http://test.hspconsortium.org/apps/hspc-reference-apps/static/apps/growth-chart/",
+        "logo_uri" : "http://test.hspconsortium.org/apps/hspc-reference-apps/static/images/apps/growth-chart.png"
+    },
+    {
         "client_name" : "My Web App",
         "client_id" : "my_web_app",
         "launch_uri" : "http://localhost:8000/fhir-app/launch.html",
