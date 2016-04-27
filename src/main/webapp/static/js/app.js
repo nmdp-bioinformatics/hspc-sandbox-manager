@@ -3,8 +3,7 @@
 angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootstrap', 'highcharts-ng', 'sandManApp.filters', 'sandManApp.services',
     'sandManApp.controllers', 'sandManApp.directives'], function($stateProvider, $urlRouterProvider, $locationProvider ){
 
-
-//    $locationProvider.html5Mode(true);
+   $locationProvider.html5Mode(true);
 
     $urlRouterProvider.otherwise('/login');
 
@@ -36,18 +35,21 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
         .state('patient-view', {
             url: '/patient-view/:source',
             templateUrl: 'static/js/templates/patientView.html',
+            needsSandbox: true,
             authenticate: true
         })
 
         .state('practitioner-view', {
             url: '/practitioner-view',
             templateUrl: 'static/js/templates/practitionerView.html',
+            needsSandbox: true,
             authenticate: true
         })
 
         .state('launch-scenarios', {
             url: '/launch-scenarios',
             templateUrl: 'static/js/templates/launchScenarioView.html',
+            needsSandbox: true,
             authenticate: true
         })
 
@@ -55,24 +57,28 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
             url: '/apps/:source/:action',
             templateUrl: 'static/js/templates/appsLauncher.html',
             scenarioBuilderStep: true,
+            needsSandbox: true,
             authenticate: true
         })
 
         .state('patients', {
             url: '/patients',
             templateUrl: 'static/js/templates/patients.html',
+            needsSandbox: true,
             authenticate: true
         })
 
         .state('practitioners', {
             url: '/practitioners',
             templateUrl: 'static/js/templates/practitioners.html',
+            needsSandbox: true,
             authenticate: true
         })
 
         .state('users', {
             url: '/users',
             templateUrl: 'static/js/templates/users.html',
+            needsSandbox: true,
             authenticate: true
         })
 
@@ -86,7 +92,7 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
         .state('after-auth', {
             url: '/after-auth',
             demoOnly: true,
-            templateUrl:'static/js/templates/start.html'
+            templateUrl:'static/js/templates/after-auth.html'
         })
 
         .state('404', {
@@ -105,6 +111,12 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
             url: '/future',
             demoOnly: true,
             templateUrl:'static/js/templates/future.html'
+        })
+
+        .state('start', {
+            url: '/start',
+            demoOnly: true,
+            templateUrl:'static/js/templates/start.html'
         })
 
         .state('resolve', {

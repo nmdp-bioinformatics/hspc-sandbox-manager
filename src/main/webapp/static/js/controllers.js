@@ -29,8 +29,18 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.signin();
                 event.preventDefault();
             }
+            if (toState.needsSandbox && !launchScenarios.hasSandbox()){
+                // User can't go to a page which requires a sandbox without a sandbox
+                $scope.showing.navBar = false;
+                $state.go('create-sandbox', {});
+                event.preventDefault();
+            }
             if (toState.name == "launch-scenarios" && fromState.name == "after-auth"){
                 $scope.signin();
+                event.preventDefault();
+            }
+            if (toState.name == "progress" && !launchScenarios.creatingSandbox()){
+//                $scope.signin();
                 event.preventDefault();
             }
             if (toState.scenarioBuilderStep && launchScenarios.getBuilder().persona === "") {
@@ -52,8 +62,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.oauthUser = userServices.getOAuthUser();
 
             if (canceledSandboxCreate) {
-                $scope.sandboxName = "HSPC";
-                completeSignIn();
+                $state.go('start');
             } else {
                 appsSettings.getSettings().then(function(settings){
 
@@ -76,6 +85,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                         launchScenarios.getUserSandbox().then(function(sandboxExists){
                             if (sandboxExists) {
                                 $scope.sandboxName = launchScenarios.getSandbox().name;
+                                launchScenarios.setHasSandbox(true);
                             }
                             completeSignIn();
                         });
@@ -112,7 +122,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             userServices.userSettings();
         };
 
-    }]).controller("StartController", // After auth
+    }]).controller("AfterAuthController", // After auth
         function(fhirApiServices){
             fhirApiServices.initClient();
     }).controller("SandboxController",
@@ -127,6 +137,12 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     function($scope, errorService){
         $scope.errorMessage = errorService.getErrorMessage();
 
+    }).controller("StartController",
+    function($scope, $state){
+        $scope.newSandbox = function() {
+            $scope.showing.navBar = false;
+            $state.go('create-sandbox', {});
+        };
     }).controller("FutureController",
     function(){
 
@@ -135,6 +151,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.showing.navBar = false;
         $scope.isIdValid = false;
+        $scope.showError = false;
         $scope.isNameValid = true;
         $scope.tempSandboxId = "<sandbox id>";
         $scope.sandboxName = "";
@@ -149,6 +166,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.$watchGroup(['sandboxId', 'sandboxName'], function() {
             $scope.validateId($scope.sandboxId).then(function(valid){
                 $scope.isIdValid = valid;
+                $scope.showError = !$scope.isIdValid && ($scope.sandboxId !== "" && $scope.sandboxId !== undefined);
                 $scope.isNameValid = $scope.validateName($scope.sandboxName);
                 $scope.createEnabled = ($scope.isIdValid && $scope.isNameValid);
             });
@@ -157,6 +175,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.validateId = function(id) {
             var deferred = $.Deferred();
 
+            $scope.invalidMessage = "ID Not Available";
             if ($scope.tempSandboxId !== id ) {
                 $scope.tempSandboxId = id;
                 if (id !== undefined && id !== "" && id.length <= 20 && /^[a-zA-Z0-9]*$/.test(id)) {
@@ -165,6 +184,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     });
                 } else {
                     $scope.tempSandboxId = "<sandbox id>";
+                    $scope.invalidMessage = "ID Is Invalid";
                     deferred.resolve(false);
                 }
             } else {
@@ -188,10 +208,16 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.createSandbox = function() {
+            launchScenarios.setCreatingSandbox(true);
+            if ($scope.sandboxName === undefined || $scope.sandboxName === "") {
+                $scope.sandboxName = $scope.sandboxId;
+            }
             launchScenarios.createSandbox({sandboxId: $scope.sandboxId, sandboxName: $scope.sandboxName, description: $scope.sandboxDesc}).then(function(sandbox){
+                launchScenarios.setCreatingSandbox(false);
                 $rootScope.$emit('sandbox-created');
             }).fail(function() {
-                $state.go('error', {});
+                    launchScenarios.setCreatingSandbox(false);
+                    $state.go('error', {});
             });
 
             $state.go('progress', {});

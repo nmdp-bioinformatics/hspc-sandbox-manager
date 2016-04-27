@@ -260,6 +260,8 @@ angular.module('sandManApp.services', [])
         var recentLaunchScenarioList = [];
         var fullLaunchScenarioList = [];
         var sandboxIdFromURL;
+        var hasSandbox = false;
+        var creatingSandbox = false;
 
         function orderByLastLaunch() {
             if(fullLaunchScenarioList){
@@ -302,6 +304,18 @@ angular.module('sandManApp.services', [])
             },
             getSandbox: function() {
                 return sandbox;
+            },
+            hasSandbox: function() {
+                return hasSandbox;
+            },
+            setHasSandbox: function(exists) {
+                hasSandbox = exists;
+            },
+            creatingSandbox: function() {
+                return creatingSandbox;
+            },
+            setCreatingSandbox: function(creating) {
+                creatingSandbox = creating;
             },
             clearSandbox: function() {
                 sandbox = {
