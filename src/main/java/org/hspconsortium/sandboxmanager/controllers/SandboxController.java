@@ -27,13 +27,16 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.hspconsortium.sandboxmanager.model.*;
-import org.hspconsortium.sandboxmanager.services.*;
+import org.hspconsortium.sandboxmanager.model.Sandbox;
+import org.hspconsortium.sandboxmanager.model.User;
+import org.hspconsortium.sandboxmanager.services.SandboxService;
+import org.hspconsortium.sandboxmanager.services.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-
 import javax.inject.Inject;
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -55,7 +58,11 @@ public class SandboxController {
     }
 
     @RequestMapping(value = "/sandbox", method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
-    public @ResponseBody Sandbox createSandbox(@RequestBody @Valid final Sandbox sandbox) {
+    public @ResponseBody Sandbox createSandbox(ServletRequest request, @RequestBody @Valid final Sandbox sandbox) {
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String authHeader = httpRequest.getHeader("Authorization");
+        authHeader = authHeader.substring(7);
+
         User user = userService.findByLdapId(sandbox.getCreatedBy().getLdapId());
         if (user == null) {
             user = userService.save(sandbox.getCreatedBy());
@@ -76,6 +83,7 @@ public class SandboxController {
             String jsonString = "{\"teamId\": \"" + sandbox.getSandboxId() + "\"}";
             entity = new StringEntity(jsonString);
             putRequest.setEntity(entity);
+            putRequest.setHeader("Authorization", "BEARER " + authHeader);
 
         } catch (UnsupportedEncodingException uee_ex) {
             throw new RuntimeException(uee_ex);

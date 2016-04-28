@@ -460,7 +460,10 @@ angular.module('sandManApp.services', [])
                         url: settings.baseUrl + "/sandbox",
                         type: 'POST',
                         data: JSON.stringify(createSandbox),
-                        contentType: "application/json"
+                        contentType: "application/json",
+                        beforeSend : function( xhr ) {
+                            xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                        }
                     }).done(function(sandboxResult){
                             sandbox = {
                                 id: sandboxResult.id,
