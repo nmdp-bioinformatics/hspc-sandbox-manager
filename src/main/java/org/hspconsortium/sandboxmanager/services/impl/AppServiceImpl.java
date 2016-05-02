@@ -26,21 +26,6 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
-    public App findByLaunchUri(String uri) {
-        return  repository.findByLaunchUri(uri);
-    }
-
-    @Override
-    public App findByClientId(String clientId) {
-        return  repository.findByLaunchUri(clientId);
-    }
-
-    @Override
-    public App findByLaunchUriAndSandboxId(String uri, String sandboxId) {
-        return  repository.findByLaunchUriAndSandboxId(uri, sandboxId);
-    }
-
-    @Override
     public App findByClientIdAndSandboxId(String clientId, String sandboxId) {
         return  repository.findByClientIdAndSandboxId(clientId, sandboxId);
     }

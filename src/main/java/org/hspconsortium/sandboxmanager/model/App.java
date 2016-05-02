@@ -5,12 +5,6 @@ import java.math.BigInteger;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name="App.findByLaunchUri",
-        query="SELECT c FROM App c WHERE c.launch_uri = :uri and c.sandbox is null"),
-        @NamedQuery(name="App.findByClientId",
-        query="SELECT c FROM App c WHERE c.client_id = :client_id and c.sandbox is null"),
-        @NamedQuery(name="App.findByLaunchUriAndSandboxId",
-        query="SELECT c FROM App c WHERE c.launch_uri = :uri and c.sandbox.sandboxId = :sandboxId"),
         @NamedQuery(name="App.findByClientIdAndSandboxId",
         query="SELECT c FROM App c WHERE c.client_id = :client_id and c.sandbox.sandboxId = :sandboxId")
 
@@ -40,7 +34,6 @@ public class App {
     public String getClient_name() {
         return client_name;
     }
-
 
     public String getClient_id() {
         return client_id;

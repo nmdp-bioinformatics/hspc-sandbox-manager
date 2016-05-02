@@ -6,6 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface PatientRepository extends CrudRepository<Patient, Integer> {
-    public Patient findByFhirId(@Param("id") String id);
-    public Patient findByFhirIdAndSandboxId(@Param("id") String id, @Param("sandboxId") String sandboxId);
+    public Patient findByFhirIdAndSandboxId(@Param("fhirId") String fhirId, @Param("sandboxId") String sandboxId);
 }

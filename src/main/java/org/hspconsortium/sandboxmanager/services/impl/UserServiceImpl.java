@@ -28,6 +28,7 @@ public class UserServiceImpl implements UserService {
         return repository.findByLdapId(ldapId);
     }
 
+
 }
 
 

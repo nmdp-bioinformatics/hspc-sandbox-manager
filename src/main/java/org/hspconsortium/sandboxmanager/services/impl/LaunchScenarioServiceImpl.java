@@ -42,12 +42,7 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
     }
 
     @Override
-    public List<LaunchScenario> findByOwnerId(String id) {
-        return  repository.findByOwnerId(id);
-    }
-
-    @Override
-    public List<LaunchScenario> findByOwnerIdAndSandboxId(String id, String sandboxId) {
-        return  repository.findByOwnerIdAndSandboxId(id, sandboxId);
+    public List<LaunchScenario> findByUserIdAndSandboxId(String userId, String sandboxId) {
+        return  repository.findByUserIdAndSandboxId(userId, sandboxId);
     }
 }

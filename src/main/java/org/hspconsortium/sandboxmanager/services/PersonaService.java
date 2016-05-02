@@ -6,7 +6,5 @@ public interface PersonaService {
 
     Persona save(Persona persona);
 
-    Persona findByFhirId(String fhirId);
-
     Persona findByFhirIdAndSandboxId(String fhirId, String sandboxId);
 }

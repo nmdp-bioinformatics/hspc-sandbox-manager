@@ -20,4 +20,5 @@ hspc:
   platform:
     api:
       sandboxManagementEndpointURL: http://localhost:8080/hspc-reference-api/management/sandbox
+      oauthUserInfoEndpointURL: http://localhost:8080/hspc-reference-authorization/userinfo
 

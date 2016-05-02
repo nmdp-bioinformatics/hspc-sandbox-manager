@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 @NamedQueries({
         @NamedQuery(name="Sandbox.findBySandboxId",
-                query="SELECT c FROM Sandbox c WHERE c.sandboxId = :sandboxId"),
+                query="SELECT c FROM Sandbox c WHERE c.sandboxId = :sandboxId")
 })
 public class Sandbox {
     private Integer id;
@@ -48,7 +48,7 @@ public class Sandbox {
     }
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name="owner_id")
+    @JoinColumn(name="created_by_id")
     public User getCreatedBy() {
         return createdBy;
     }

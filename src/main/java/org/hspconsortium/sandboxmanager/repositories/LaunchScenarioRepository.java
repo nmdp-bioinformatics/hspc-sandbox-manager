@@ -9,6 +9,5 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface LaunchScenarioRepository extends CrudRepository<LaunchScenario, Integer> {
-    public List<LaunchScenario> findByOwnerId(@Param("id") String id);
-    public List<LaunchScenario> findByOwnerIdAndSandboxId(@Param("id") String id, @Param("sandboxId") String sandboxId);
+    public List<LaunchScenario> findByUserIdAndSandboxId(@Param("userId") String userId, @Param("sandboxId") String sandboxId);
 }

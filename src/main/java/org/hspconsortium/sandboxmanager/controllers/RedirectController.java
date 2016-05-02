@@ -20,22 +20,33 @@
 
 package org.hspconsortium.sandboxmanager.controllers;
 
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-public class StartController {
+public class RedirectController {
 
-//    @RequestMapping(value = "/sandbox/{sandboxId}", method = RequestMethod.GET)
-//    public void getSandboxById(HttpServletRequest request, HttpServletResponse response, @PathVariable(value = "sandboxId") String sandboxId) {
-//
-//        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-//        response.setHeader("Location", "http://localhost:8080/hspc-sandbox-manager/#/sandbox/"+ sandboxId + "/");
-//    }
+    @RequestMapping({
+            "/launch-scenarios",
+            "/login",
+            "/after-auth",
+            "/create-sandbox",
+            "/tracks/{id:\\w+}",
+            "/apps",
+            "/patients",
+            "/practitioners",
+            "/users",
+            "/app-gallery",
+            "/start",
+            "/resolve"
+    })
 
+//    @RequestMapping({"/test/**"})
+    public void index(HttpServletRequest request, HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+        response.setHeader("Location", "http://localhost:8080/hspc-sandbox-manager/");
+    }
 }

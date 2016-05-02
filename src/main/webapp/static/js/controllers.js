@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('sandManApp.controllers', []).controller('navController',[
-    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "launchScenarios", "$location", "$state",
-    function($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, launchScenarios, $location, $state) {
+    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "$location", "$state",
+    function($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, $location, $state) {
 
         $scope.showing = {
             signout: false,
@@ -16,7 +16,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.sandboxName = "HSPC";
         $scope.messages = [];
 
-        launchScenarios.getSandboxIdFromUrl();
+        sandboxManagement.getSandboxIdFromUrl();
 
         $rootScope.$on('message-notify', function(event, messages){
             $scope.messages = messages;
@@ -29,7 +29,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.signin();
                 event.preventDefault();
             }
-            if (toState.needsSandbox && !launchScenarios.hasSandbox()){
+            if (toState.needsSandbox && !sandboxManagement.hasSandbox()){
                 // User can't go to a page which requires a sandbox without a sandbox
                 $scope.showing.navBar = false;
                 $state.go('create-sandbox', {});
@@ -39,11 +39,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.signin();
                 event.preventDefault();
             }
-            if (toState.name == "progress" && !launchScenarios.creatingSandbox()){
+            if (toState.name == "progress" && !sandboxManagement.creatingSandbox()){
 //                $scope.signin();
                 event.preventDefault();
             }
-            if (toState.scenarioBuilderStep && launchScenarios.getBuilder().persona === "") {
+            if (toState.scenarioBuilderStep && sandboxManagement.getScenarioBuilder().persona === "") {
                 $state.go('launch-scenarios', {});
                 event.preventDefault();
             }
@@ -59,39 +59,44 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $rootScope.$on('signed-in', function(event, arg){
             var canceledSandboxCreate = (arg !== undefined && arg === 'cancel-sandbox-create');
-            $scope.oauthUser = userServices.getOAuthUser();
 
-            if (canceledSandboxCreate) {
-                $state.go('start');
-            } else {
-                appsSettings.getSettings().then(function(settings){
+            userServices.getOAuthUserFromServer().then(function(){
+                $scope.oauthUser = userServices.getOAuthUser();
 
-                    //Initial sign in with no sandbox specified
-                    if (fhirApiServices.fhirClient().server.serviceUrl === settings.defaultServiceUrl) {
-                        launchScenarios.getUserSandbox().then(function(sandboxExists){
-                            if (sandboxExists) {
-                                oauth2.login(launchScenarios.getSandbox().sandboxId);
-                            } else if (sandboxExists === 'invalid') {
-                                $state.go('404');
-                            } else if (sandboxExists === 'reserved') {
-                                $state.go('future');
-                            } else {
-                                $scope.showing.navBar = false;
-                                $state.go('create-sandbox', {});
-                            }
-                        });
+                if (canceledSandboxCreate) {
+                    $state.go('start');
+                } else {
+                    appsSettings.getSettings().then(function(settings){
 
-                    } else {
-                        launchScenarios.getUserSandbox().then(function(sandboxExists){
-                            if (sandboxExists) {
-                                $scope.sandboxName = launchScenarios.getSandbox().name;
-                                launchScenarios.setHasSandbox(true);
-                            }
-                            completeSignIn();
-                        });
-                    }
-                });
-            }
+                        //Initial sign in with no sandbox specified
+                        if (fhirApiServices.fhirClient().server.serviceUrl === settings.defaultServiceUrl) {
+                            sandboxManagement.getUserSandbox().then(function(sandboxExists){
+                                if (sandboxExists) {
+                                    oauth2.login(sandboxManagement.getSandbox().sandboxId);
+                                } else if (sandboxExists === 'invalid') {
+                                    $state.go('404');
+                                } else if (sandboxExists === 'reserved') {
+                                    $state.go('future');
+                                } else {
+                                    $scope.showing.navBar = false;
+                                    $state.go('create-sandbox', {});
+                                }
+                            });
+
+                        } else {
+                            sandboxManagement.getUserSandbox().then(function(sandboxExists){
+                                if (sandboxExists) {
+                                    $scope.sandboxName = sandboxManagement.getSandbox().name;
+                                    sandboxManagement.setHasSandbox(true);
+                                }
+                                completeSignIn();
+                            });
+                        }
+                    });
+                }
+
+            });
+
         });
 
         function completeSignIn() {
@@ -126,8 +131,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         function(fhirApiServices){
             fhirApiServices.initClient();
     }).controller("SandboxController",
-    function($state, launchScenarios){
-        launchScenarios.getSandboxIdFromUrl();
+    function($state, sandboxManagement){
+        sandboxManagement.getSandboxIdFromUrl();
 
         $state.go('login', {});
     }).controller("404Controller",
@@ -147,7 +152,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     function(){
 
     }).controller("CreateSandboxController",
-    function($rootScope, $scope, $state, launchScenarios, appsSettings){
+    function($rootScope, $scope, $state, sandboxManagement, appsSettings){
 
         $scope.showing.navBar = false;
         $scope.isIdValid = false;
@@ -179,7 +184,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             if ($scope.tempSandboxId !== id ) {
                 $scope.tempSandboxId = id;
                 if (id !== undefined && id !== "" && id.length <= 20 && /^[a-zA-Z0-9]*$/.test(id)) {
-                    launchScenarios.getSandboxById(id).then(function(sandbox){
+                    sandboxManagement.getSandboxById(id).then(function(sandbox){
                         deferred.resolve(sandbox === undefined || sandbox === "");
                     });
                 } else {
@@ -208,15 +213,15 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.createSandbox = function() {
-            launchScenarios.setCreatingSandbox(true);
+            sandboxManagement.setCreatingSandbox(true);
             if ($scope.sandboxName === undefined || $scope.sandboxName === "") {
                 $scope.sandboxName = $scope.sandboxId;
             }
-            launchScenarios.createSandbox({sandboxId: $scope.sandboxId, sandboxName: $scope.sandboxName, description: $scope.sandboxDesc}).then(function(sandbox){
-                launchScenarios.setCreatingSandbox(false);
+            sandboxManagement.createSandbox({sandboxId: $scope.sandboxId, sandboxName: $scope.sandboxName, description: $scope.sandboxDesc}).then(function(sandbox){
+                sandboxManagement.setCreatingSandbox(false);
                 $rootScope.$emit('sandbox-created');
             }).fail(function() {
-                    launchScenarios.setCreatingSandbox(false);
+                    sandboxManagement.setCreatingSandbox(false);
                     $state.go('error', {});
             });
 
@@ -275,7 +280,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
     }).controller("PatientDetailController",
-    function($scope, $rootScope, $state, launchScenarios, $filter, launchApp){
+    function($scope, $rootScope, $state, sandboxManagement, $filter, launchApp){
 
         if ($state.current.name === 'patients') {
             $scope.showing.patientDataManager = true;
@@ -286,23 +291,30 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
         $scope.setPatient = function(p){
-            if (launchScenarios.getBuilder().persona === '') {
-                launchScenarios.setPersona(
-                    {fhirId: p.id,
+            if (sandboxManagement.getScenarioBuilder().persona === '') {
+                sandboxManagement.getScenarioBuilder().persona =
+                    {
+                        fhirId: p.id,
                         resource: p.resourceType,
                         fullUrl: p.fullUrl,
-                        name: $filter('nameGivenFamily')(p)});
-                launchScenarios.setPatient(
-                    {fhirId: p.id,
+                        name: $filter('nameGivenFamily')(p)
+                    };
+
+                sandboxManagement.getScenarioBuilder().patient =
+                    {
+                        fhirId: p.id,
                         resource: p.resourceType,
-                        name: $filter('nameGivenFamily')(p)});
+                        name: $filter('nameGivenFamily')(p)
+                    };
                 $state.go('apps', {source: 'patient', action: 'choose'});
 //                $state.go($state.current, {source: 'patient'}, {reload: true});
             } else {
-                launchScenarios.setPatient(
-                    {fhirId: p.id,
+                sandboxManagement.getScenarioBuilder().patient =
+                    {
+                        fhirId: p.id,
                         resource: p.resourceType,
-                        name: $filter('nameGivenFamily')(p)});
+                        name: $filter('nameGivenFamily')(p)
+                    };
                 $state.go('apps', {source: 'practitioner-patient', action: 'choose'});
             }
         };
@@ -312,7 +324,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
     }).controller("PatientSearchController",
-    function($scope, $rootScope, $state, $filter, $stateParams, fhirApiServices, launchScenarios, patientResources) {
+    function($scope, $rootScope, $state, $filter, $stateParams, fhirApiServices, sandboxManagement, patientResources) {
 
         var source = $stateParams.source;
 
@@ -427,10 +439,12 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.skipPatient = function(){
-            launchScenarios.setPatient(
-                {fhirId: 0,
+            sandboxManagement.getScenarioBuilder().patient =
+                {
+                    fhirId: 0,
                     resource: "None",
-                    name: "None"});
+                    name: "None"
+                };
             $state.go('apps', {source: 'practitioner', action: 'choose'});
         };
 
@@ -537,7 +551,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
     }).controller("PractitionerDetailController",
-    function($scope, $rootScope, $state, $filter, launchScenarios){
+    function($scope, $rootScope, $state, $filter, sandboxManagement){
 
         if ($state.current.name === 'practitioner-view') {
             $scope.showing.selectForScenario = true;
@@ -562,11 +576,13 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.setPractitioner = function(p){
-            launchScenarios.setPersona(
-                {fhirId: p.id,
+            sandboxManagement.getScenarioBuilder().persona =
+                {
+                    fhirId: p.id,
                     resource: p.resourceType,
                     fullUrl: p.fullUrl,
-                    name: $filter('nameGivenFamily')(p)});
+                    name: $filter('nameGivenFamily')(p)
+                };
             $state.go('patient-view', {source: 'patient'});
         };
     }).controller("PractitionerSearchController",
@@ -671,16 +687,16 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         });
 
     }).controller("LaunchScenariosController",
-    function($rootScope, $scope, $state, launchScenarios, launchApp, userServices, descriptionBuilder){
+    function($rootScope, $scope, $state, sandboxManagement, launchApp, userServices, descriptionBuilder){
         $scope.showing = {detail: false, addingContext: false};
         $scope.selectedScenario = {};
-        launchScenarios.getSandboxLaunchScenarios();
-        launchScenarios.clearBuilder();
-        launchScenarios.getBuilder().owner = userServices.oauthUser();
+        sandboxManagement.getSandboxLaunchScenarios();
+        sandboxManagement.clearScenarioBuilder();
+        sandboxManagement.getScenarioBuilder().owner = userServices.getOAuthUser();
 
         $scope.launch = function(scenario){
             scenario.lastLaunchSeconds = new Date().getTime();
-            launchScenarios.updateLaunchScenario(scenario);
+            sandboxManagement.updateLaunchScenario(scenario);
 
 //            if (scenario.app.launch_uri === undefined){
 //                if (scenario.persona.resource === "Patient") {
@@ -705,7 +721,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.delete = function(scenario){
-            launchScenarios.deleteLaunchScenario(scenario);
+            sandboxManagement.deleteLaunchScenario(scenario);
             $scope.selectedScenario = {};
             $scope.showing.detail = false;
         };
@@ -714,18 +730,18 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
-            launchScenarios.setSelectedScenario(arg);
+            sandboxManagement.setSelectedScenario(arg);
         });
 
         $rootScope.$on('full-selected', function(event, arg){
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
-            launchScenarios.setSelectedScenario(arg);
+            sandboxManagement.setSelectedScenario(arg);
         });
 
     }).controller("ContextParamController",
-    function($scope, launchScenarios){
+    function($scope, sandboxManagement){
 
         $scope.selectedContext = {};
         $scope.contextSelected = false;
@@ -750,7 +766,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.saveContextParam = function() {
             if ($scope.contextNameIsValid && $scope.contextValueIsValid){
                 $scope.selectedScenario.contextParams.push({name: $scope.contextName, value: $scope.contextValue});
-                launchScenarios.updateLaunchScenario($scope.selectedScenario);
+                sandboxManagement.updateLaunchScenario($scope.selectedScenario);
                 $scope.contextName = "";
                 $scope.contextValue = "";
                 $scope.showing.addingContext = false;
@@ -761,7 +777,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.selectedScenario.contextParams = $scope.selectedScenario.contextParams.filter(function( obj ) {
                 return (obj !== $scope.selectedContext );
             });
-            launchScenarios.updateLaunchScenario($scope.selectedScenario);
+            sandboxManagement.updateLaunchScenario($scope.selectedScenario);
             $scope.selectedContext = {};
             $scope.contextSelected = false;
         };
@@ -784,7 +800,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
     }).controller("RecentTableCtrl",
-    function($rootScope, $scope, launchScenarios){
+    function($rootScope, $scope, sandboxManagement){
         $scope.selectedScenario = '';
         $scope.launchScenarioList = [];
         $scope.fullTable = false;
@@ -795,7 +811,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $rootScope.$on('launch-scenario-list-update', function(){
-            $scope.launchScenarioList = launchScenarios.getRecentLaunchScenarioList();
+            $scope.launchScenarioList = sandboxManagement.getRecentLaunchScenarioList();
             $rootScope.$digest();
         });
 
@@ -804,7 +820,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         });
 
     }).controller("FullTableCtrl",
-    function($rootScope, $scope, launchScenarios){
+    function($rootScope, $scope, sandboxManagement){
         $scope.selectedScenario = '';
         $scope.launchScenarioList = [];
         $scope.fullTable = true;
@@ -816,7 +832,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $rootScope.$on('launch-scenario-list-update', function(){
-            $scope.launchScenarioList = launchScenarios.getFullLaunchScenarioList();
+            $scope.launchScenarioList = sandboxManagement.getFullLaunchScenarioList();
             $rootScope.$digest();
         });
 
@@ -824,27 +840,27 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.selectedScenario = '';
         });
 
-    }).controller("AppsViewController", function($rootScope, $scope, $state, $stateParams, apps, customFhirApp, launchApp, launchScenarios, $uibModal) {
+    }).controller("AppsViewController", function($rootScope, $scope, $state, $stateParams, apps, customFhirApp, launchApp, sandboxManagement, $uibModal) {
         $scope.all_user_apps = [];
         var source = $stateParams.source;
         var action = $stateParams.action;
 
         if (source === 'patient') {
             $scope.title = "Apps a Patient Can Launch";
-            $scope.name = launchScenarios.getBuilder().persona.name;
+            $scope.name = sandboxManagement.getScenarioBuilder().persona.name;
             apps.getPatientApps().done(function(apps){
                 $scope.all_user_apps = apps;
             });
         } else if (source === 'practitioner') {
             $scope.title = "Apps a Practitioner Can Launch Without a Patient Context";
-            $scope.name = launchScenarios.getBuilder().persona.name;
+            $scope.name = sandboxManagement.getScenarioBuilder().persona.name;
             apps.getPractitionerApps().done(function(apps){
                 $scope.all_user_apps = apps;
             });
         } else {
             $scope.title = "Apps a Practitioner Can Launch With a Patient Context";
-            $scope.name = " Practitioner: " + launchScenarios.getBuilder().persona.name +
-                " with Patient: " + launchScenarios.getBuilder().patient.name;
+            $scope.name = " Practitioner: " + sandboxManagement.getScenarioBuilder().persona.name +
+                " with Patient: " + sandboxManagement.getScenarioBuilder().patient.name;
             apps.getPractitionerPatientApps().done(function(apps){
                 $scope.all_user_apps = apps;
             });
@@ -854,11 +870,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
             // choose for the launch scenario
             if (action === 'choose') {
-                launchScenarios.setApp(app);
-                openModalDialog(launchScenarios.getBuilder());
+                sandboxManagement.getScenarioBuilder().app = app;
+                openModalDialog(sandboxManagement.getScenarioBuilder());
             } else {  // Launch
                 if (source === 'patient' || source === 'practitioner-patient') {
-                    launchApp.launch(app, launchScenarios.getSelectedScenario().patient);
+                    launchApp.launch(app, sandboxManagement.getSelectedScenario().patient);
                 } else {
                     launchApp.launch(app);
                 }
@@ -889,7 +905,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     }
                 } else {
                     scenario.lastLaunchSeconds = new Date().getTime();
-                    launchScenarios.addFullLaunchScenarioList(scenario);
+                    sandboxManagement.addFullLaunchScenarioList(scenario);
                 }
                 $state.go('launch-scenarios', {});
             }, function () {
@@ -1009,7 +1025,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 // capture the date only for the birthDate value
                 modalPatient.birthDate = modalPatient.birthDateTime.toISOString().substring(0, 10);
                 // todo support storing the birthDateTime in the extention when HSPC supports it
-                fhirApiServices.create(modalPatient);
+                fhirApiServices.createResourceInstance(modalPatient);
                 $rootScope.$emit('patient-created');
             }, function () {
             });
@@ -1083,7 +1099,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             });
 
             modalInstance.result.then(function (modalPractitioner) {
-                fhirApiServices.create(modalPractitioner);
+                fhirApiServices.createResourceInstance(modalPractitioner);
                 $rootScope.$emit('practitioner-created');
             }, function () {
             });
@@ -1166,8 +1182,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.close = function () {
             $uibModalInstance.dismiss();
         };
-    }]).controller('ProgressCtrl',['$rootScope', '$scope', '$state', '$timeout', 'launchScenarios',
-    function ($rootScope, $scope, $state, $timeout, launchScenarios) {
+    }]).controller('ProgressCtrl',['$rootScope', '$scope', '$state', '$timeout', 'sandboxManagement',
+    function ($rootScope, $scope, $state, $timeout, sandboxManagement) {
 
         $scope.createProgress = 0;
         $scope.showing.navBar = false;

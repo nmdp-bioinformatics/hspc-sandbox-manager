@@ -3,7 +3,7 @@
 angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootstrap', 'highcharts-ng', 'sandManApp.filters', 'sandManApp.services',
     'sandManApp.controllers', 'sandManApp.directives'], function($stateProvider, $urlRouterProvider, $locationProvider ){
 
-   $locationProvider.html5Mode(true);
+//   $locationProvider.html5Mode(true);
 
     $urlRouterProvider.otherwise('/login');
 

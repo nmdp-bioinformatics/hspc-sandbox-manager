@@ -4,20 +4,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name="LaunchScenario.findByOwnerId",
-                query="SELECT c FROM LaunchScenario c WHERE c.owner.ldapId = :id and c.sandbox is NULL"),
-        @NamedQuery(name="LaunchScenario.findByOwnerIdAndSandboxId",
-                query="SELECT c FROM LaunchScenario c WHERE c.owner.ldapId = :id and c.sandbox.sandboxId = :sandboxId")
+        @NamedQuery(name="LaunchScenario.findByUserIdAndSandboxId",
+                query="SELECT c FROM LaunchScenario c WHERE c.createdBy.ldapId = :userId and c.sandbox.sandboxId = :sandboxId")
 })
 public class LaunchScenario {
 
     private Integer id;
     private String description;
-    private User owner;
+    private User createdBy;
+    private List<User> users = new ArrayList<>();
+    private List<String> userIds = new ArrayList<>();
     private Patient patient;
     private Persona persona;
     private App app;
@@ -41,13 +42,35 @@ public class LaunchScenario {
     }
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name="owner_id")
-    public User getOwner() {
-        return owner;
+    @JoinColumn(name="created_by_id")
+    public User getCreatedBy() {
+        return createdBy;
     }
 
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_launch_scenario", joinColumns = {
+            @JoinColumn(name = "launch_scenario_id", nullable = false, updatable = false) },
+            inverseJoinColumns = { @JoinColumn(name = "user_id",
+                    nullable = false, updatable = false) })
+    @JsonIgnore
+    public List<User> getUsers() {
+        for (User user : users) {
+            userIds.add(user.getLdapId());
+        }
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    @Transient
+    public List<String> getUserIds() {
+        return this.userIds;
     }
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
