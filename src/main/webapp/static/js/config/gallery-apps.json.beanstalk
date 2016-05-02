@@ -2,18 +2,18 @@
     {
         "client_name" : "Bilirubin Chart",
         "client_id" : "bilirubin_chart",
-        "launch_uri" : "https://ec2-52-35-49-1.us-west-2.compute.amazonaws.com/hspc-bilirubin-app-0.10/static/bilirubin-chart/launch.html",
-        "redirect_uri" : "https://ec2-52-35-49-1.us-west-2.compute.amazonaws.com/hspc-bilirubin-app-0.10/static/bilirubin-chart/",
-        "logo_uri" : "https://ec2-52-35-49-1.us-west-2.compute.amazonaws.com/hspc-bilirubin-app-0.10/static/bilirubin-chart/images/bilirubin.png",
+        "launch_uri" : "https://apps.test.hspconsortium.org/hspc-bilirubin-app-0.10/static/bilirubin-chart/launch.html",
+        "redirect_uri" : "https://apps.test.hspconsortium.org/hspc-bilirubin-app-0.10/static/bilirubin-chart/",
+        "logo_uri" : "https://apps.test.hspconsortium.org/hspc-bilirubin-app-0.10/static/bilirubin-chart/images/bilirubin.png",
         "patient" : {"fhirId": "ID549614829"},
         "persona" : ""
     },
     {
         "client_name" : "Growth Chart",
         "client_id" : "growth_chart",
-        "launch_uri" : "https://ec2-52-35-49-1.us-west-2.compute.amazonaws.com/hspc-reference-apps/static/apps/growth-chart/launch.html",
-        "redirect_uri" : "https://ec2-52-35-49-1.us-west-2.compute.amazonaws.com/hspc-reference-apps/static/apps/growth-chart/",
-        "logo_uri" : "https://ec2-52-35-49-1.us-west-2.compute.amazonaws.com/hspc-reference-apps/static/images/apps/growth-chart.png",
+        "launch_uri" : "https://apps.test.hspconsortium.org/hspc-reference-apps/static/apps/growth-chart/launch.html",
+        "redirect_uri" : "https://apps.test.hspconsortium.org/hspc-reference-apps/static/apps/growth-chart/",
+        "logo_uri" : "https://apps.test.hspconsortium.org/hspc-reference-apps/static/images/apps/growth-chart.png",
         "patient" : {"fhirId": "13663"},
         "persona" : ""
     }
