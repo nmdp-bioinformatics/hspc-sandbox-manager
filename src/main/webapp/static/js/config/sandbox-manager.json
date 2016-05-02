@@ -1,9 +1,9 @@
 {
-    "profile_update_uri" : "https://messaging.test.hspconsortium.org/sandboxuser/profileupdate",
-    "defaultServiceUrl": "https://api.test.hspconsortium.org/data",
-    "baseServiceUrl": "https://api.test.hspconsortium.org/",
-    "oauthLogoutUrl": "https://auth.test.hspconsortium.org/logout",
-    "userManagementUrl": "https://apps.test.hspconsortium.org/pwm",
+    "profile_update_uri" : "http://localhost:8080/hspc-reference-messaging/sandboxuser/profileupdate",
+    "defaultServiceUrl": "http://localhost:8080/hspc-reference-api/data",
+    "baseServiceUrl": "http://localhost:8080/hspc-reference-api/",
+    "oauthLogoutUrl": "http://localhost:8080/hspc-reference-authorization/logout",
+    "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
     "defaultPersonaId": "COREPRACTITIONER1",
     "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin"],
     "defaultLaunchScenarios": ["bilirubin_chart", "Growth Chart", "BP Centiles", "Cardiac Risk"]
