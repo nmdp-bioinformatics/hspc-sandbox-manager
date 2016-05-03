@@ -35,7 +35,6 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.hspconsortium.sandboxmanager.model.Sandbox;
@@ -43,6 +42,8 @@ import org.hspconsortium.sandboxmanager.model.User;
 import org.hspconsortium.sandboxmanager.services.OAuthService;
 import org.hspconsortium.sandboxmanager.services.SandboxService;
 import org.hspconsortium.sandboxmanager.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,6 +64,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/sandbox")
 public class SandboxController {
+    private static Logger LOGGER = LoggerFactory.getLogger(SandboxController.class.getName());
+
     @Value("${hspc.platform.api.sandboxManagementEndpointURL}")
     private String sandboxManagementEndpointURL;
 
@@ -84,6 +87,7 @@ public class SandboxController {
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
     public @ResponseBody Sandbox createSandbox(HttpServletRequest request, @RequestBody @Valid final Sandbox sandbox) throws UnsupportedEncodingException{
 
+        LOGGER.info("Creating sandbox: " + sandbox.getName());
         checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
         User user = userService.findByLdapId(sandbox.getCreatedBy().getLdapId());
         if (user == null) {
@@ -98,7 +102,9 @@ public class SandboxController {
         sandboxes.add(sandbox);
         user.setSandboxes(sandboxes);
 
-        HttpPut putRequest = new HttpPut(this.sandboxManagementEndpointURL + "/" + sandbox.getSandboxId());
+        String url = this.sandboxManagementEndpointURL + "/" + sandbox.getSandboxId();
+
+        HttpPut putRequest = new HttpPut(url);
         putRequest.addHeader("Content-Type", "application/json");
         StringEntity entity;
 
@@ -111,6 +117,7 @@ public class SandboxController {
         try {
             sslContext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).useSSL().build();
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
+            LOGGER.error("Error loading ssl context", e);
             throw new RuntimeException(e);
         }
         HttpClientBuilder builder = HttpClientBuilder.create();
@@ -129,16 +136,20 @@ public class SandboxController {
             if (closeableHttpResponse.getStatusLine().getStatusCode() != 200) {
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
                 String responseString = EntityUtils.toString(rEntity, "UTF-8");
-                throw new RuntimeException(String.format("There was a problem creating the sandbox.\n" +
-                        "Response Status : %s .\nResponse Detail :%s."
-                        , closeableHttpResponse.getStatusLine()
-                        , responseString));
+                String errorMsg = String.format("There was a problem creating the sandbox.\n" +
+                                "Response Status : %s .\nResponse Detail :%s. \nUrl: :%s",
+                        closeableHttpResponse.getStatusLine(),
+                        responseString,
+                        url);
+                LOGGER.error(errorMsg);
+                throw new RuntimeException(errorMsg);
             }
 
            userService.save(user);
             return sandboxService.save(sandbox);
-        } catch (IOException io_ex) {
-            throw new RuntimeException(io_ex);
+        } catch (IOException e) {
+            LOGGER.error("Error posting to " + url, e);
+            throw new RuntimeException(e);
         }
     }
 

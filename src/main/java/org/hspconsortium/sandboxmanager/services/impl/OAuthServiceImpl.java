@@ -21,6 +21,8 @@ import org.apache.http.util.EntityUtils;
 import org.hspconsortium.sandboxmanager.services.OAuthService;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,7 @@ import java.security.NoSuchAlgorithmException;
 
 @Service
 public class OAuthServiceImpl implements OAuthService {
+    private static Logger LOGGER = LoggerFactory.getLogger(OAuthServiceImpl.class.getName());
 
     @Value("${hspc.platform.api.oauthUserInfoEndpointURL}")
     private String oauthUserInfoEndpointURL;
@@ -90,9 +93,11 @@ public class OAuthServiceImpl implements OAuthService {
                 jsonObject = new JSONObject(entity);
                 return (String)jsonObject.get("sub");
             } catch (JSONException e) {
+                LOGGER.error("JSON Error reading entity: " + entity, e);
                 throw new RuntimeException(e);
             }
         } catch (IOException io_ex) {
+            LOGGER.error("Error on HTTP GET", io_ex);
             throw new RuntimeException(io_ex);
         }
     }
