@@ -494,7 +494,7 @@ angular.module('sandManApp.services', [])
                             if (sandboxResult.length > 0) {
                                 if (settings.reservedEndpoints.indexOf(sandboxIdFromURL) > -1) {
                                     deferred.resolve("reserved");
-                                } else if (sandboxIdFromURL !== undefined && sandboxIdFromURL !== sandboxResult[0].sandboxId) {
+                                } else if (sandboxIdFromURL !== undefined && sandboxIdFromURL !== "" && sandboxIdFromURL !== sandboxResult[0].sandboxId) {
                                     deferred.resolve('invalid');
                                 } else {
                                     sandbox = {
