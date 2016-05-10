@@ -2,16 +2,16 @@
     {
         "client_name" : "Bilirubin Chart",
         "client_id" : "bilirubin_chart",
-        "launch_uri" : "https://apps.test.hspconsortium.org/hspc-bilirubin-app-0.10/static/bilirubin-chart/launch.html",
-        "redirect_uri" : "https://apps.test.hspconsortium.org/hspc-bilirubin-app-0.10/static/bilirubin-chart/",
-        "logo_uri" : "https://apps.test.hspconsortium.org/hspc-bilirubin-app-0.10/static/bilirubin-chart/images/bilirubin.png"
+        "launch_uri" : "https://test-apps.hspconsortium.org/hspc-bilirubin-app-0.10/static/bilirubin-chart/launch.html",
+        "redirect_uri" : "https://test-apps.hspconsortium.org/hspc-bilirubin-app-0.10/static/bilirubin-chart/",
+        "logo_uri" : "https://test-apps.hspconsortium.org/hspc-bilirubin-app-0.10/static/bilirubin-chart/images/bilirubin.png"
     },
     {
         "client_name" : "Growth Chart",
         "client_id" : "growth_chart",
-        "launch_uri" : "https://apps.test.hspconsortium.org/hspc-reference-apps/static/apps/growth-chart/launch.html",
-        "redirect_uri" : "https://apps.test.hspconsortium.org/hspc-reference-apps/static/apps/growth-chart/",
-        "logo_uri" : "https://apps.test.hspconsortium.org/hspc-reference-apps/static/images/apps/growth-chart.png"
+        "launch_uri" : "https://test-apps.hspconsortium.org/hspc-reference-apps/static/apps/growth-chart/launch.html",
+        "redirect_uri" : "https://test-apps.hspconsortium.org/hspc-reference-apps/static/apps/growth-chart/",
+        "logo_uri" : "https://test-apps.hspconsortium.org/hspc-reference-apps/static/images/apps/growth-chart.png"
     },
     {
         "client_name" : "My Web App",
