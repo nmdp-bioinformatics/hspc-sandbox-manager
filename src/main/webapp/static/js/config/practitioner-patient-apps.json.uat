@@ -2,9 +2,9 @@
     {
         "client_name" : "Bilirubin Chart",
         "client_id" : "bilirubin_chart",
-        "launch_uri" : "http://54.213.219.198:9080/uat/hspc-bilirubin-app/static/bilirubin-chart/launch.html",
-        "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-bilirubin-app/static/bilirubin-chart/",
-        "logo_uri" : "http://54.213.219.198:9080/uat/hspc-bilirubin-app/static/bilirubin-chart/images/bilirubin.png"
+        "launch_uri" : "http://54.213.219.198:9080/uat/hspc-bilirubin-risk-chart/static/bilirubin-chart/launch.html",
+        "redirect_uri" : "http://54.213.219.198:9080/uat/hspc-bilirubin-risk-chart/static/bilirubin-chart/",
+        "logo_uri" : "http://54.213.219.198:9080/uat/hspc-bilirubin-risk-chart/static/bilirubin-chart/images/bilirubin.png"
     },
     {
         "client_name" : "Growth Chart",
