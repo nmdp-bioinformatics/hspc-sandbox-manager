@@ -4,11 +4,13 @@ endpoints:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/sandman?autoReconnect=true
+    url: jdbc:mysql://localhost:3306/sandman
     username: root
     password: password
 #    persistenceUnitName: sandman
     driverClassName: com.mysql.jdbc.Driver
+    validation-query: SELECT 1
+    test-on-borrow: true
   jpa:
     database: MYSQL
     show-sql: true
