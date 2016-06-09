@@ -67,7 +67,7 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('fhirApiServices', function (oauth2, appsSettings, notification, $rootScope, $location) {
+    }).factory('fhirApiServices', function (oauth2, appsSettings, notification, $rootScope, $location, errorService) {
 
         /**
          *
@@ -190,8 +190,8 @@ angular.module('sandManApp.services', [])
                 $.when(fhirClient.api.read({type: resource, id: id}))
                     .done(function(resourceResult){
                         var resource;
-                        resource = esourceResult.data.entry;
-                        resource = entry.fullUrl;
+                        resource = resourceResult.data.entry;
+                        resource = resourceResult.data.entry.fullUrl;
                         deferred.resolve(resource);
                     }).fail(function(error){
                         var test = error;
@@ -218,7 +218,21 @@ angular.module('sandManApp.services', [])
 
                 return true;
             },
-            registerContext: function(app, params){
+            createBundle: function(bundle) {
+                var deferred = $.Deferred();
+
+                $.when(fhirClient.api.transaction({data: angular.copy(bundle)}))
+                    .done(function(results){
+                        notification.message("Bundle Uploaded");
+                        deferred.resolve(results.data);
+                        // deferred.resolve(JSON.stringify(results.data));
+                    }).fail(function(error){
+                        // errorService.setErrorMessage(error.data.responseText, true);
+                        deferred.reject(error.data.responseText);
+                    });
+                return deferred;
+        },
+        registerContext: function(app, params){
                 var deferred = $.Deferred();
 
                 var req = fhirClient.authenticated({

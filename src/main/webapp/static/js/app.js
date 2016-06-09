@@ -89,6 +89,12 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
             authenticate: true
         })
 
+        .state('data-manager', {
+            url: '/data-manager',
+            templateUrl: 'static/js/templates/dataManager.html',
+            authenticate: true
+        })
+
         .state('after-auth', {
             url: '/after-auth',
             demoOnly: true,
