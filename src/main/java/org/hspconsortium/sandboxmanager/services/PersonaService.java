@@ -4,7 +4,7 @@ import org.hspconsortium.sandboxmanager.model.Persona;
 
 public interface PersonaService {
 
-    Persona save(Persona persona);
+    Persona save(final Persona persona);
 
-    Persona findByFhirIdAndSandboxId(String fhirId, String sandboxId);
+    Persona findByFhirIdAndSandboxId(final String fhirId, final String sandboxId);
 }

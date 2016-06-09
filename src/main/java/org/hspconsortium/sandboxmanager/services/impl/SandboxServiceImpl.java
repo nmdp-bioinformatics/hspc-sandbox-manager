@@ -20,7 +20,7 @@ public class SandboxServiceImpl implements SandboxService {
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(final int id) {
         repository.delete(id);
     }
 

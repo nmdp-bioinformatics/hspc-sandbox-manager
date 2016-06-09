@@ -1,11 +1,12 @@
 <div  ng-controller="StartController" class="start-form">
-    <img src="static/images/SandboxLogo.png"/>
+    <!--<img src="static/images/SandboxLogo.png"/>-->
     <!--<div class="start-title">Create Your Sandbox</div>-->
     <div class="row start-box">
         <div class="col-lg-12 start-section ">
 
             <div class="columns-group">
                 <div class="single-column">
+                    <div class="start-note">Note: This <b>test</b> version of the sandbox is for testing purposes only. Any changes you make will be <b>lost</b>. We'd love any help testing this. Please log defects <a href="https://healthservices.atlassian.net/secure/RapidBoard.jspa?rapidView=3&projectKey=SNDBX&view=planning.nodetail&versions=visible" target="_self">here</a>.</div>
                     <div class="start-form-info-box">
                         <h1>What is a sandbox?</h1>
                         <p>A sandbox is your very own instance of an HSPC Platform* combined with tools and utilities to help you build and test your medical apps.</p>
@@ -27,7 +28,8 @@
             </div>
         </div>
         <div class="col-lg-12 create-section ">
-            <button class="pull-right form-btn btn btn-basic" type="button" ng-click="newSandbox()">Create Sandbox</button>
+            <button class="form-btn btn btn-basic" type="button" ng-click="signin()">Sign In</button>
+            <button class="form-btn btn btn-basic" type="button" ng-click="signup()">Sign Up</button>
         </div>
     </div>
 </div>

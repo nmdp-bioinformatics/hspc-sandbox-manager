@@ -1,5 +1,5 @@
 {
-    "profile_update_uri" : "https://messaging.test.hspconsortium.org/sandboxuser/profileupdate",
+    "profileUpdateUri" : "https://messaging.test.hspconsortium.org/sandboxuser/profileupdate",
     "defaultServiceUrl": "https://api.test.hspconsortium.org/data",
     "baseServiceUrl": "https://api.test.hspconsortium.org/",
     "oauthLogoutUrl": "https://auth.test.hspconsortium.org/logout",

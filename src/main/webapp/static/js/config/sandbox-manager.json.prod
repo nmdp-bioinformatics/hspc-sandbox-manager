@@ -1,5 +1,5 @@
 {
-    "profile_update_uri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-messaging/sandboxuser/profileupdate",
+    "profileUpdateUri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-messaging/sandboxuser/profileupdate",
     "defaultServiceUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-api/data",
     "baseServiceUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-api/",
     "oauthLogoutUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-authorization/logout",

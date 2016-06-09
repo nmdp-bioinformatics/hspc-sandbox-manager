@@ -20,6 +20,7 @@
 
 package org.hspconsortium.sandboxmanager.controllers;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,24 +30,32 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 public class RedirectController {
 
-    @RequestMapping({
-            "/launch-scenarios",
-            "/login",
-            "/after-auth",
-            "/create-sandbox",
-            "/tracks/{id:\\w+}",
-            "/apps",
-            "/patients",
-            "/practitioners",
-            "/users",
-            "/app-gallery",
-            "/start",
-            "/resolve"
-    })
+//    @RequestMapping({
+//            "/launch-scenarios",
+//            "/login",
+//            "/after-auth",
+//            "/create-sandbox",
+//            "/tracks/{id:\\w+}",
+//            "/apps",
+//            "/patients",
+//            "/practitioners",
+//            "/users",
+//            "/app-gallery",
+//            "/start",
+//            "/resolve"
+//    })
 
 //    @RequestMapping({"/test/**"})
-    public void index(HttpServletRequest request, HttpServletResponse response) {
-        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-        response.setHeader("Location", "http://localhost:8080/hspc-sandbox-manager/");
-    }
+//public void router(HttpServletRequest request, HttpServletResponse response, @PathVariable String sandboxId) {
+//    response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+//    response.setHeader("Location", "http://localhost:8080/hspc-sandbox-manager/");
+//}
+
+//    @RequestMapping({"/{sandboxId}/{route}/**"})
+//    public void router(HttpServletRequest request, HttpServletResponse response, @PathVariable String sandboxId
+//            , @PathVariable String route) {
+//        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+////        response.setHeader("Location", "http://localhost:8080/hspc-sandbox-manager/" + sandboxId + "/" + route);
+//        response.setHeader("Location", "http://localhost:8080/hspc-sandbox-manager/");
+//    }
 }

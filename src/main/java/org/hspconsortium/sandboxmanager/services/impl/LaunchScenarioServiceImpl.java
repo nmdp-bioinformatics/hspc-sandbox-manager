@@ -27,8 +27,8 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
 
     @Override
     @Transactional
-    public void delete(final LaunchScenario launchScenario) {
-        repository.delete(launchScenario);
+    public void delete(final int id) {
+        repository.delete(id);
     }
 
     @Override
@@ -37,12 +37,12 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
     }
 
     @Override
-    public LaunchScenario getById(int id) {
+    public LaunchScenario getById(final int id) {
         return  repository.findOne(id);
     }
 
     @Override
-    public List<LaunchScenario> findByUserIdAndSandboxId(String userId, String sandboxId) {
+    public List<LaunchScenario> findByUserIdAndSandboxId(final String userId, final String sandboxId) {
         return  repository.findByUserIdAndSandboxId(userId, sandboxId);
     }
 }

@@ -25,7 +25,7 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public Patient findByFhirIdAndSandboxId(String fhirId, String sandboxId) {
+    public Patient findByFhirIdAndSandboxId(final String fhirId, final String sandboxId) {
         return  repository.findByFhirIdAndSandboxId(fhirId, sandboxId);
     }
 

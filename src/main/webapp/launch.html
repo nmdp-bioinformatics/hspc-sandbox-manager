@@ -24,7 +24,7 @@
         // the FHIR Starter's token credentials to the app
         delete sessionStorage.tokenResponse;
         
-        window.location = details.app.launch_uri + 
+        window.location = details.app.launchUri +
         '?iss=' + encodeURIComponent(details.iss) + 
         '&launch=' + encodeURIComponent(details.context.launch_id);
       }

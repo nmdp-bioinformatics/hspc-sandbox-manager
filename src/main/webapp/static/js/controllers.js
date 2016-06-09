@@ -9,9 +9,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             signin: true,
             loading: false,
             searchloading: false,
-            navBar: false,
-            largeSidebar: true,
-            demoOnly: false
+            navBar: true,
+            sideNavBar: false,
+            largeSidebar: true
         };
         $scope.sandboxName = "HSPC";
         $scope.messages = [];
@@ -24,7 +24,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         });
 
         $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
-            if (toState.authenticate && typeof window.fhirClient === "undefined"){
+            if (toState.authenticate && typeof fhirApiServices.fhirClient() === "undefined"){
                 // User isn’t authenticated
                 $scope.signin();
                 event.preventDefault();
@@ -32,6 +32,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             if (toState.needsSandbox && !sandboxManagement.hasSandbox()){
                 // User can't go to a page which requires a sandbox without a sandbox
                 $scope.showing.navBar = false;
+                $scope.showing.sideNavBar = false;
                 $state.go('create-sandbox', {});
                 event.preventDefault();
             }
@@ -45,10 +46,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             }
             if (toState.scenarioBuilderStep && sandboxManagement.getScenarioBuilder().persona === "") {
                 $state.go('launch-scenarios', {});
-                event.preventDefault();
-            }
-            if ($scope.showing.demoOnly && !toState.demoOnly) {
-                $state.go('app-gallery', {});
                 event.preventDefault();
             }
         });
@@ -79,6 +76,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                                     $state.go('future');
                                 } else {
                                     $scope.showing.navBar = false;
+                                    $scope.showing.sideNavBar = false;
                                     $state.go('create-sandbox', {});
                                 }
                             });
@@ -103,23 +101,25 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.signin = false;
             $scope.showing.signout = true;
             $scope.showing.navBar = true;
-            if ($scope.oauthUser.ldapId === 'demo') {
-                $scope.showing.demoOnly = true;
-                $state.go('app-gallery', {});
-            } else {
-                $state.go('launch-scenarios', {});
-            }
+            $scope.showing.sideNavBar = true;
+            $state.go('launch-scenarios', {});
         }
 
         $rootScope.$on('hide-nav', function(){
             $scope.showing.navBar = false;
+            $scope.showing.sideNavBar = false;
         });
 
         $scope.signout = function() {
-            delete $rootScope.user;
             fhirApiServices.clearClient();
+            userServices.clearOAuthUser();
+            $scope.showing.signin = true;
+            $scope.showing.signout = false;
+            $scope.showing.navBar = true;
+            $scope.showing.sideNavBar = false;
             oauth2.logout().then(function(){
-                oauth2.login();
+                $state.go('start', {});
+                //oauth2.login();
             });
         };
 
@@ -143,11 +143,17 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.errorMessage = errorService.getErrorMessage();
 
     }).controller("StartController",
-    function($scope, $state){
-        $scope.newSandbox = function() {
-            $scope.showing.navBar = false;
-            $state.go('create-sandbox', {});
+    function($scope, $state, userServices){
+        $scope.showing.navBar = true;
+        $scope.showing.sideNavBar = false;
+
+        $scope.signin = function() {
+            $state.go('login', {});
         };
+        $scope.signup = function() {
+            userServices.createUser();
+        };
+        
     }).controller("FutureController",
     function(){
 
@@ -155,6 +161,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     function($rootScope, $scope, $state, sandboxManagement, appsSettings){
 
         $scope.showing.navBar = false;
+        $scope.showing.sideNavBar = false;
         $scope.isIdValid = false;
         $scope.showError = false;
         $scope.isNameValid = true;
@@ -240,7 +247,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     }).controller("SideBarController",
     function($rootScope, $scope){
 
-        var sideBarStates = ['launch-scenarios','users', 'patients', 'practitioners', 'app-gallery'];
+        var sideBarStates = ['launch-scenarios','users', 'patients', 'practitioners', 'manage-apps'];
 
         $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
             if ( sideBarStates.indexOf(toState.name) > -1) {
@@ -340,6 +347,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.noPatientContext =  false;
             $scope.showing.createPatient =  false;
             $scope.showing.navBar = false;
+            $scope.showing.sideNavBar = false;
             $rootScope.$emit('hide-nav');
         } else { // Patient View
             $scope.showing.noPatientContext =  false;
@@ -698,17 +706,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             scenario.lastLaunchSeconds = new Date().getTime();
             sandboxManagement.updateLaunchScenario(scenario);
 
-//            if (scenario.app.launch_uri === undefined){
-//                if (scenario.persona.resource === "Patient") {
-//                    $state.go('apps', {source: 'patient'});
-//                } else if (scenario.persona.resource === "Practitioner"){
-//                    if (scenario.patient.name === "None") {
-//                        $state.go('apps', {source: 'practitioner'});
-//                    } else {
-//                        $state.go('apps', {source: 'practitioner-patient'});
-//                    }
-//                }
-//            } else
             if (scenario.patient.name === 'None'){
                 launchApp.launch(scenario.app, undefined, scenario.contextParams, scenario.persona);
             } else {
@@ -840,33 +837,18 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.selectedScenario = '';
         });
 
-    }).controller("AppsViewController", function($rootScope, $scope, $state, $stateParams, apps, customFhirApp, launchApp, sandboxManagement, $uibModal) {
+    }).controller("AppPickerController", function($rootScope, $scope, $state, $stateParams, appRegistrationServices, customFhirApp, launchApp, sandboxManagement, $uibModal) {
         $scope.all_user_apps = [];
         var source = $stateParams.source;
         var action = $stateParams.action;
+    
+        $scope.title = "Registered Apps";
+        // appRegistrationServices.getSandboxApps().done(function(apps){
+        //     $scope.all_user_apps = apps;
+        // });
+        $scope.all_user_apps = appRegistrationServices.getAppList();
 
-        if (source === 'patient') {
-            $scope.title = "Apps a Patient Can Launch";
-            $scope.name = sandboxManagement.getScenarioBuilder().persona.name;
-            apps.getPatientApps().done(function(apps){
-                $scope.all_user_apps = apps;
-            });
-        } else if (source === 'practitioner') {
-            $scope.title = "Apps a Practitioner Can Launch Without a Patient Context";
-            $scope.name = sandboxManagement.getScenarioBuilder().persona.name;
-            apps.getPractitionerApps().done(function(apps){
-                $scope.all_user_apps = apps;
-            });
-        } else {
-            $scope.title = "Apps a Practitioner Can Launch With a Patient Context";
-            $scope.name = " Practitioner: " + sandboxManagement.getScenarioBuilder().persona.name +
-                " with Patient: " + sandboxManagement.getScenarioBuilder().patient.name;
-            apps.getPractitionerPatientApps().done(function(apps){
-                $scope.all_user_apps = apps;
-            });
-        }
-
-        $scope.launch = function launch(app){
+        $scope.select = function launch(app){
 
             // choose for the launch scenario
             if (action === 'choose') {
@@ -917,49 +899,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.launchCustom = function launchCustom(){
             customFhirApp.set($scope.customapp);
             $scope.launch({
-                client_id: $scope.customapp.id,
-                launch_uri: $scope.customapp.url,
-                client_name: "Custom App",
-                logo_uri: "static/images/fhir-logo-www.png"
+                clientId: $scope.customapp.id,
+                launchUri: $scope.customapp.url,
+                clientName: "Custom App",
+                logoUri: "static/images/fhir-logo-www.png"
             });
-        };
-
-    }).controller("AppsGalleryController", function($scope, apps, userServices, launchApp, $uibModal) {
-        $scope.all_user_apps = [];
-        apps.getGalleryApps().done(function(apps){
-            $scope.all_user_apps = apps;
-            if ($scope.showing.demoOnly) {
-                $scope.all_user_apps = $scope.all_user_apps.filter(function( app ) {
-                    return app.client_id !== "hspc_appointments";
-                });
-            }
-        });
-
-        $scope.info = function (app){
-            $scope.modalOpen = true;
-            var modalInstance = $uibModal.open({
-                animation: true,
-                templateUrl: 'static/js/templates/infoModal.html',
-                controller: 'InfoModalInstanceCtrl',
-                size:'lg',
-                resolve: {
-                    getApp: function () {
-                        return {
-                            app:app
-                        }
-                    }
-                }
-            });
-
-            modalInstance.result.then(function (app) {
-                $scope.launch(app)
-            }, function () {
-            });
-
-        };
-
-        $scope.launch = function(app){
-            launchApp.launch(app, app.patient, undefined, app.persona);
         };
 
     }).controller('ModalInstanceCtrl',['$scope', '$uibModalInstance', "getScenario",
@@ -1170,23 +1114,192 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     return window.location = to;
                 });
         };
-    }).controller('InfoModalInstanceCtrl',['$scope', '$uibModalInstance', 'getApp',
-    function ($scope, $uibModalInstance, getApp) {
+    }).controller("AppsDetailController",
+    function($scope){
 
-        $scope.app = getApp.app;
+    }).controller("AppsController", function($scope, $rootScope, $state, appRegistrationServices, $uibModal) {
 
-        $scope.launch = function (app) {
-            $uibModalInstance.close(app);
+    $scope.all_user_apps = [];
+    $scope.galleryOffset = 246;
+
+    $scope.showing = {appDetail: false};
+
+    $scope.selected = {
+        selectedApp: {}
+    };
+    $scope.clientJSON = {};
+
+    appRegistrationServices.getSandboxApps();
+    // appRegistrationServices.getSandboxApps().done(function (apps) {
+    //     $scope.all_user_apps = apps;
+    // });
+
+    $rootScope.$on('app-list-update', function () {
+        $scope.all_user_apps = appRegistrationServices.getAppList();
+        $rootScope.$digest();
+    });
+
+    $scope.registration = function () {
+        var modalInstance = $uibModal.open({
+            animation: true,
+            templateUrl: 'static/js/templates/registerAppModal.html',
+            controller: 'AppRegistrationModalCtrl',
+            size: 'lg'
+
+        });
+
+        modalInstance.result.then(function (app) {
+            var modalProgress = openModalProgressDialog();
+            appRegistrationServices.createSandboxApp(app).then(function (result) {
+                modalProgress.dismiss();
+            }, function(err) {
+                modalProgress.dismiss();
+                $state.go('error', {});
+            });
+        });
+    };
+
+    function openModalProgressDialog() {
+        return $uibModal.open({
+            animation: true,
+            templateUrl: 'static/js/templates/progressModal.html',
+            size: 'sm'
+        });
+    }
+    
+    $scope.select = function (app) {
+        $scope.selected.selectedApp = app;
+        $scope.showing.appDetail = true;
+        delete $scope.clientJSON.logo;
+        if (app.clientJSON) {
+            $scope.clientJSON = app.clientJSON;
+        } else {
+            delete $scope.clientJSON.logoUri;
+        }
+        appRegistrationServices.getSandboxApp(app.id).then(function (resultApp) {
+            $scope.galleryOffset = 80;
+            $scope.selected.selectedApp.clientJSON = JSON.parse(resultApp.clientJSON);
+            $scope.clientJSON = $scope.selected.selectedApp.clientJSON;
+            $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
+
+            $rootScope.$digest();
+        });
+    };
+
+    $scope.updateFile = function(files) {
+
+        $scope.myFile = files[0];
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $scope.clientJSON.logo = e.target.result;
+            $rootScope.$digest();
+        };
+        var url = reader.readAsDataURL(files[0]);
+    };
+
+    $scope.save = function (){
+        $scope.selected.selectedApp.logo = $scope.myFile;
+        var updateClientJSON = angular.copy($scope.clientJSON);
+        delete updateClientJSON.logo;
+        if( Object.prototype.toString.call( updateClientJSON.redirectUris ) !== '[object Array]' &&
+                typeof updateClientJSON.redirectUris !== 'undefined') {
+            updateClientJSON.redirectUris = updateClientJSON.redirectUris.split(',');
+        }
+        if( Object.prototype.toString.call( updateClientJSON.scope ) !== '[object Array]' &&
+            typeof updateClientJSON.scope !== 'undefined') {
+            updateClientJSON.scope = updateClientJSON.scope.split(',');
+        }
+
+        $scope.selected.selectedApp.clientJSON = updateClientJSON;
+        $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
+        appRegistrationServices.updateSandboxApp(angular.copy($scope.selected.selectedApp)).then(function (result) {
+        }, function(err) {
+            $state.go('error', {});
+        });
+    };
+
+    $scope.delete = function (app){
+        $scope.showing.appDetail = false;
+        appRegistrationServices.deleteSandboxApp($scope.selected.selectedApp.id).then(function () {
+            $scope.selected.selectedApp = {};
+        });
+    };
+
+}).controller('AppRegistrationModalCtrl',function ($scope, $rootScope, sandboxManagement, $uibModalInstance) {
+
+    $scope.clientType = "Public Client";
+    // $scope.clientTypes = ["Confidential Client", "Public Client", "Backend Service"];
+    $scope.clientTypes = ["Public Client", "Confidential Client"];
+
+    $scope.clientJSON = {};
+
+    $scope.sandboxName = sandboxManagement.getSandbox().name;
+
+    $scope.uploadFile = function(files) {
+
+        $scope.myFile = files[0];
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $scope.clientJSON.logo = e.target.result;
+            $rootScope.$digest();
+        };
+        var url = reader.readAsDataURL(files[0]);
+    };
+
+    $scope.$watchGroup(['clientJSON.clientName', 'clientJSON.launchUri', 'clientJSON.redirectUris'], function() {
+            $scope.createEnabled = valueSet($scope.clientJSON.launchUri) && valueSet($scope.clientJSON.clientName);
+    });
+
+    function valueSet(value) {
+        return (typeof value !== 'undefined' && value !== '');
+    }
+
+    $scope.registerApp = function (clientJSON) {
+
+        if( Object.prototype.toString.call( clientJSON.redirectUris ) !== '[object Array]' &&
+            typeof clientJSON.redirectUris !== 'undefined' ) {
+            clientJSON.redirectUris = clientJSON.redirectUris.split(',');
+        }
+        if ($scope.clientType !== "Backend Service") {
+            clientJSON.grantTypes = [ "authorization_code" ];
+        } else {
+            clientJSON.grantTypes = [ "client_credentials" ];
+        }
+
+        if ($scope.clientType !== "Public Client") {
+            clientJSON.tokenEndpointAuthMethod = "SECRET_BASIC";
+        } else {
+            clientJSON.tokenEndpointAuthMethod = "NONE";
+        }
+
+        // Just adding some default scopes to start with
+        clientJSON.scope = ["launch","patient/*.*","profile","openid"];
+
+        var authClient = {
+            clientName: clientJSON.clientName
         };
 
-        $scope.close = function () {
+        var newApp = {
+            launchUri: clientJSON.launchUri,
+            logo: $scope.myFile,
+            authClient: authClient
+        };
+        delete clientJSON.logo;
+        newApp.clientJSON = clientJSON;
+        $uibModalInstance.close(newApp);
+    };
+
+        $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-    }]).controller('ProgressCtrl',['$rootScope', '$scope', '$state', '$timeout', 'sandboxManagement',
-    function ($rootScope, $scope, $state, $timeout, sandboxManagement) {
+    }).controller('ProgressCtrl',['$rootScope', '$scope', '$state', '$timeout',
+    function ($rootScope, $scope, $state, $timeout) {
 
         $scope.createProgress = 0;
         $scope.showing.navBar = false;
+        $scope.showing.sideNavBar = false;
 
         var messageNum = 0;
         var messages = [
@@ -1223,9 +1336,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
         function updateProgress(){
-            $scope.createProgress += 1;
-            if ($scope.createProgress < 95) {
-                $timeout(updateProgress, 100);
+            $scope.createProgress += 0.333;   // Progress .333% at a time
+            if ($scope.createProgress < 95) {  // If it hits 95%, hold there
+                $timeout(updateProgress, 100);  // Wake up every tenth of a second and progress
             }
         }
 

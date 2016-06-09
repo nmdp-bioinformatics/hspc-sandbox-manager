@@ -1,0 +1,23 @@
+[
+    {
+        "clientName" : "Bilirubin Chart",
+        "authClient": {"clientId": "bilirubin_chart"},
+        "launchUri" : "http://localhost:8080/hspc-bilirubin-app/static/bilirubin-chart/launch.html",
+        "redirectUri" : "http://localhost:8080/hspc-bilirubin-app/static/bilirubin-chart/",
+        "logoUri" : "http://localhost:8080/hspc-bilirubin-app/static/bilirubin-chart/images/bilirubin.png"
+    },
+    {
+        "clientName": "Patient Data Manager",
+        "authClient": {"clientId": "patient_data_manager"},
+        "launchUri": "http://localhost:8080/hspc-patient-data-manager/static/patient-data-manager/launch.html",
+        "redirectUri": "http://localhost:8080/hspc-patient-data-manager/static/patient-data-manager/",
+        "logoUri": "http://localhost:8080/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png"
+    },
+    {
+        "clientName" : "My Web App",
+        "authClient": {"clientId": "my_web_app"},
+        "launchUri" : "http://localhost:8000/fhir-app/launch.html",
+        "redirectUri" : "http://localhost:8000/fhir-app/",
+        "logoUri" : "https://fhir.smarthealthit.org/images/apps/my.png"
+    }
+]

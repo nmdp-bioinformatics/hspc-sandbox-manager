@@ -1,5 +1,5 @@
 {
-    "profile_update_uri" : "http://54.213.219.198:9080/uat/hspc-reference-messaging/sandboxuser/profileupdate",
+    "profileUpdateUri" : "http://54.213.219.198:9080/uat/hspc-reference-messaging/sandboxuser/profileupdate",
     "defaultServiceUrl": "http://54.213.219.198:9080/uat/hspc-reference-api/data",
     "baseServiceUrl": "http://54.213.219.198:9080/uat/hspc-reference-api/",
     "oauthLogoutUrl": "http://54.213.219.198:9080/uat/hspc-reference-authorization/logout",

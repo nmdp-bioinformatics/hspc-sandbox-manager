@@ -25,7 +25,7 @@ public class PersonaServiceImpl implements PersonaService {
     }
 
     @Override
-    public Persona findByFhirIdAndSandboxId(String fhirId, String sandboxId) {
+    public Persona findByFhirIdAndSandboxId(final String fhirId, final String sandboxId) {
         return  repository.findByFhirIdAndSandboxId(fhirId, sandboxId);
     }
 }

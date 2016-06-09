@@ -1,7 +1,5 @@
 package org.hspconsortium.sandboxmanager.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +15,7 @@ public class Sandbox {
     private String name;
     private String description;
     private User createdBy;
-    private List<User> users = new ArrayList<>();
-    private List<String> userIds = new ArrayList<>();
-
+    private List<UserRole> userRoles = new ArrayList<>();
 
     public void setId(Integer id) {
         this.id = id;
@@ -57,22 +53,13 @@ public class Sandbox {
         this.createdBy = createdBy;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "user_sandbox", joinColumns = {
-            @JoinColumn(name = "sandbox_id", nullable = false, updatable = false) },
-            inverseJoinColumns = { @JoinColumn(name = "user_id",
-                    nullable = false, updatable = false) })
-    @JsonIgnore
-    public List<User> getUsers() {
-        for (User user : users) {
-            userIds.add(user.getLdapId());
-        }
-
-        return users;
+    @OneToMany(cascade={CascadeType.ALL})
+    public List<UserRole> getUserRoles() {
+        return userRoles;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
+    public void setUserRoles(List<UserRole> userRoles) {
+        this.userRoles = userRoles;
     }
 
     public String getDescription() {
@@ -81,11 +68,6 @@ public class Sandbox {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    @Transient
-    public List<String> getUserIds() {
-        return this.userIds;
     }
 
 }

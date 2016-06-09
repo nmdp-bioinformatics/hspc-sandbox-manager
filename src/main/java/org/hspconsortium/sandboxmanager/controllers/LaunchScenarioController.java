@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -61,7 +60,8 @@ public class LaunchScenarioController {
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
-    public @ResponseBody LaunchScenario createLaunchScenario(HttpServletRequest request, @RequestBody @Valid final LaunchScenario launchScenario) {
+    public @ResponseBody LaunchScenario createLaunchScenario(HttpServletRequest request, @RequestBody final LaunchScenario launchScenario) {
+
         // A null sandbox is the HSPC sandbox
         Sandbox sandbox = null;
         if (launchScenario.getSandbox() != null) {
@@ -112,9 +112,9 @@ public class LaunchScenarioController {
 
         App app = null;
         if (sandbox == null) {
-            app = appService.findByClientIdAndSandboxId(launchScenario.getApp().getClient_id(), null);
+            app = appService.findByLaunchUriAndClientIdAndSandboxId(launchScenario.getApp().getLaunchUri(), launchScenario.getApp().getAuthClient().getClientId(), null);
         } else {
-            app = appService.findByClientIdAndSandboxId(launchScenario.getApp().getClient_id(), sandbox.getSandboxId());
+            app = appService.findByLaunchUriAndClientIdAndSandboxId(launchScenario.getApp().getLaunchUri(), launchScenario.getApp().getAuthClient().getClientId(), sandbox.getSandboxId());
         }
         if (app == null) {
             app = launchScenario.getApp();
@@ -126,8 +126,13 @@ public class LaunchScenarioController {
         return launchScenarioService.save(launchScenario);
     }
 
-    @RequestMapping(method = RequestMethod.PUT, produces ="application/json")
-    public @ResponseBody LaunchScenario updateLaunchScenario(HttpServletRequest request, @RequestBody @Valid final LaunchScenario launchScenario) {
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces ="application/json")
+    public @ResponseBody LaunchScenario updateLaunchScenario(HttpServletRequest request, @PathVariable Integer id, @RequestBody final LaunchScenario launchScenario) {
+        if (id.intValue() != launchScenario.getId().intValue()) {
+            throw new RuntimeException(String.format("Response Status : %s.\n" +
+                            "Response Detail : Launch Scenario Id doesn't match Id in JSON body."
+                    , HttpStatus.SC_BAD_REQUEST));
+        }
         checkUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
         LaunchScenario updateLaunchScenario = launchScenarioService.getById(launchScenario.getId());
         if (updateLaunchScenario != null) {
@@ -137,13 +142,14 @@ public class LaunchScenarioController {
         return null;
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, produces ="application/json")
-    public @ResponseBody void deleteLaunchScenario(HttpServletRequest request, @RequestBody @Valid final LaunchScenario launchScenario) {
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces ="application/json")
+    public @ResponseBody void deleteLaunchScenario(HttpServletRequest request, @PathVariable Integer id) {
+        LaunchScenario launchScenario = launchScenarioService.getById(id);
         checkUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
-        launchScenarioService.delete(launchScenario);
+        launchScenarioService.delete(launchScenario.getId());
     }
 
-    @RequestMapping(method = RequestMethod.GET, produces ="application/json",
+    @RequestMapping(method = RequestMethod.GET, produces = "application/json",
             params = {"userId", "sandboxId"})
     public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios(HttpServletRequest request,
         @RequestParam(value = "userId") String userIdEncoded, @RequestParam(value = "sandboxId") String sandboxId) throws UnsupportedEncodingException{
@@ -167,7 +173,7 @@ public class LaunchScenarioController {
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    @ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
+   @ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
     public void handleException(HttpServletResponse response, Exception e) throws IOException {
         response.getWriter().write(e.getMessage());
     }

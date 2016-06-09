@@ -5,9 +5,9 @@ import org.hspconsortium.sandboxmanager.model.User;
 
 public interface SandboxService {
 
-    Sandbox save(Sandbox sandbox);
+    Sandbox save(final Sandbox sandbox);
 
-    void delete(int id);
+    void delete(final int id);
 
-    Sandbox findBySandboxId(String sandboxId);
+    Sandbox findBySandboxId(final String sandboxId);
 }

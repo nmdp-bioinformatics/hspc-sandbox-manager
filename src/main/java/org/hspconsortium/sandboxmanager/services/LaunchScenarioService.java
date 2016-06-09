@@ -6,14 +6,14 @@ import java.util.List;
 
 public interface LaunchScenarioService {
 
-    LaunchScenario save(LaunchScenario launchScenario);
+    LaunchScenario save(final LaunchScenario launchScenario);
 
-    void delete(LaunchScenario id);
+    void delete(final int id);
 
     Iterable<LaunchScenario> findAll();
 
-    LaunchScenario getById(int id);
+    LaunchScenario getById(final int id);
 
-    List<LaunchScenario> findByUserIdAndSandboxId(String userId, String sandboxId);
+    List<LaunchScenario> findByUserIdAndSandboxId(final String userId, final String sandboxId);
 
 }

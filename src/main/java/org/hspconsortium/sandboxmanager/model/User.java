@@ -16,7 +16,7 @@ public class User {
     private String ldapId;
     private String name;
     private List<Sandbox> sandboxes = new ArrayList<>();
-    private List<String> sandboxIds = new ArrayList<>();
+//    private List<String> sandboxIds = new ArrayList<>();
 
     public void setId(Integer id) {
         this.id = id;
@@ -37,6 +37,7 @@ public class User {
     }
 
     public void setName(String name) {
+
         this.name = name;
     }
 
@@ -44,12 +45,12 @@ public class User {
         return name;
     }
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "users")
+    @OneToMany(cascade={CascadeType.ALL})
     @JsonIgnore
     public List<Sandbox> getSandboxes() {
-        for (Sandbox sandbox : sandboxes) {
-            sandboxIds.add(sandbox.getSandboxId());
-        }
+//        for (Sandbox sandbox : sandboxes) {
+//            sandboxIds.add(sandbox.getSandboxId());
+//        }
 
         return sandboxes;
     }
@@ -58,9 +59,9 @@ public class User {
         this.sandboxes = sandboxes;
     }
 
-    @Transient
-    public List<String> getSandboxIds() {
-        return this.sandboxIds;
-    }
+//    @Transient
+//    public List<String> getSandboxIds() {
+//        return this.sandboxIds;
+//    }
 
 }

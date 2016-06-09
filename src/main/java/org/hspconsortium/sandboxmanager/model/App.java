@@ -1,20 +1,24 @@
 package org.hspconsortium.sandboxmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
-import java.math.BigInteger;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name="App.findByClientIdAndSandboxId",
-        query="SELECT c FROM App c WHERE c.client_id = :client_id and c.sandbox.sandboxId = :sandboxId")
-
+        @NamedQuery(name="App.findByLaunchUriAndClientIdAndSandboxId",
+        query="SELECT c FROM App c WHERE c.launchUri = :launchUri and " +
+                "c.authClient.clientId = :clientId and c.sandbox.sandboxId = :sandboxId"),
+        @NamedQuery(name="App.findBySandboxId",
+        query="SELECT c FROM App c WHERE c.sandbox.sandboxId = :sandboxId")
 })
 public class App {
     private Integer id;
-    private String client_name;
-    private String client_id;
-    private String launch_uri;
-    private String logo_uri;
+    private String launchUri;
+    private Image logo;
+    private String logoUri;
+    private AuthClient authClient;
+    private String clientJSON;
     private Sandbox sandbox;
 
     public void setId(Integer id) {
@@ -27,36 +31,31 @@ public class App {
         return id;
     }
 
-    public void setClient_name(String client_name) {
-        this.client_name = client_name;
+    public void setLaunchUri(String launchUri) {
+        this.launchUri = launchUri;
     }
 
-    public String getClient_name() {
-        return client_name;
+    public String getLaunchUri() {
+        return launchUri;
     }
 
-    public String getClient_id() {
-        return client_id;
+    public String getLogoUri() {
+        return logoUri;
     }
 
-    public void setClient_id(String client_id) {
-        this.client_id = client_id;
+    public void setLogoUri(String logoUri) {
+        this.logoUri = logoUri;
     }
 
-    public void setLaunch_uri(String launch_uri) {
-        this.launch_uri = launch_uri;
+    @OneToOne(cascade={CascadeType.ALL})
+    @JoinColumn(name="logo_id")
+    @JsonIgnore
+    public Image getLogo() {
+        return logo;
     }
 
-    public String getLaunch_uri() {
-        return launch_uri;
-    }
-
-    public String getLogo_uri() {
-        return logo_uri;
-    }
-
-    public void setLogo_uri(String logo_uri) {
-        this.logo_uri = logo_uri;
+    public void setLogo(Image logo) {
+        this.logo = logo;
     }
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
@@ -67,6 +66,25 @@ public class App {
 
     public void setSandbox(Sandbox sandbox) {
         this.sandbox = sandbox;
+    }
+
+    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name="auth_client_id")
+    public AuthClient getAuthClient() {
+        return authClient;
+    }
+
+    public void setAuthClient(AuthClient authClient) {
+        this.authClient = authClient;
+    }
+
+    @Transient
+    public String getClientJSON() {
+        return clientJSON;
+    }
+
+    public void setClientJSON(String clientJSON) {
+        this.clientJSON = clientJSON;
     }
 
 }

@@ -37,8 +37,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
+import org.hspconsortium.sandboxmanager.model.Role;
 import org.hspconsortium.sandboxmanager.model.Sandbox;
 import org.hspconsortium.sandboxmanager.model.User;
+import org.hspconsortium.sandboxmanager.model.UserRole;
 import org.hspconsortium.sandboxmanager.services.OAuthService;
 import org.hspconsortium.sandboxmanager.services.SandboxService;
 import org.hspconsortium.sandboxmanager.services.UserService;
@@ -51,7 +53,6 @@ import javax.inject.Inject;
 import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.KeyManagementException;
@@ -85,7 +86,7 @@ public class SandboxController {
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
-    public @ResponseBody Sandbox createSandbox(HttpServletRequest request, @RequestBody @Valid final Sandbox sandbox) throws UnsupportedEncodingException{
+    public @ResponseBody Sandbox createSandbox(HttpServletRequest request, @RequestBody final Sandbox sandbox) throws UnsupportedEncodingException{
 
         LOGGER.info("Creating sandbox: " + sandbox.getName());
         checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
@@ -94,13 +95,9 @@ public class SandboxController {
             user = userService.save(sandbox.getCreatedBy());
         }
         sandbox.setCreatedBy(user);
-        List<User> users = new ArrayList<>();
-        users.add(user);
-        sandbox.setUsers(users);
-
-        List<Sandbox> sandboxes = user.getSandboxes();
-        sandboxes.add(sandbox);
-        user.setSandboxes(sandboxes);
+        List<UserRole> userRoles = new ArrayList<>();
+        userRoles.add(new UserRole(user, Role.ADMIN));
+        sandbox.setUserRoles(userRoles);
 
         String url = this.sandboxManagementEndpointURL + "/" + sandbox.getSandboxId();
 
@@ -145,25 +142,34 @@ public class SandboxController {
                 throw new RuntimeException(errorMsg);
             }
 
-           userService.save(user);
-            return sandboxService.save(sandbox);
+            Sandbox savedSandbox = sandboxService.save(sandbox);
+            List<Sandbox> sandboxes = user.getSandboxes();
+            sandboxes.add(savedSandbox);
+            user.setSandboxes(sandboxes);
+            userService.save(user);
+            return savedSandbox;
         } catch (IOException e) {
             LOGGER.error("Error posting to " + url, e);
             throw new RuntimeException(e);
+        } finally {
+            try {
+                httpClient.close();
+            }catch (IOException e) {
+                LOGGER.error("Error closing HttpClient");
+            }
         }
     }
 
-    @RequestMapping(method = RequestMethod.GET, produces ="application/json",
-            params = {"id"})
-    public @ResponseBody Sandbox getSandboxById(HttpServletRequest request, @RequestParam(value = "id") String id) {
-        return sandboxService.findBySandboxId(id);
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces ="application/json")
+    public @ResponseBody String getSandboxById(@PathVariable String id) {
+        Sandbox sandbox = sandboxService.findBySandboxId(id);
+        return (sandbox == null) ? null : sandbox.getSandboxId() ;
     }
 
-    @RequestMapping(method = RequestMethod.GET, produces ="application/json",
-            params = {"userId"})
+    @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"userId"})
     public @ResponseBody
     @SuppressWarnings("unchecked")
-    List<Sandbox> getSandboxByOwner(HttpServletRequest request, @RequestParam(value = "userId") String userIdEncoded) throws UnsupportedEncodingException {
+    List<Sandbox> getSandboxesByOwner(HttpServletRequest request, @RequestParam(value = "userId") String userIdEncoded) throws UnsupportedEncodingException {
         String userId = java.net.URLDecoder.decode(userIdEncoded, "UTF-8");
         checkUserAuthorization(request, userId);
         User user = userService.findByLdapId(userId);
@@ -183,7 +189,7 @@ public class SandboxController {
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    @ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
+    @ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
     public void handleException(HttpServletResponse response, Exception e) throws IOException {
         response.getWriter().write(e.getMessage());
     }

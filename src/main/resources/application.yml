@@ -2,9 +2,14 @@ endpoints:
   jmx:
     enabled: false
 
+multipart:
+  enabled: true
+
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/sandman?autoReconnect=true
+    url: jdbc:mysql://localhost:3306/sandman
+    testOnBorrow: true
+    validationQuery: SELECT 1
     username: root
     password: password
 #    persistenceUnitName: sandman
@@ -21,4 +26,5 @@ hspc:
     api:
       sandboxManagementEndpointURL: http://localhost:8080/hspc-reference-api/management/sandbox
       oauthUserInfoEndpointURL: http://localhost:8080/hspc-reference-authorization/userinfo
+      oauthClientEndpointURL: http://localhost:8080/hspc-reference-authorization/api/clients
 

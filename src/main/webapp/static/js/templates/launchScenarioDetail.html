@@ -46,10 +46,12 @@
                 <div class="title">App</div>
                 <div class="content">
                     <div class="detail-form">
-                        <label class="detail-form-label full-line">{{selectedScenario.app.client_name}}</label>
+                        <label class="detail-form-label full-line center-text">{{selectedScenario.app.authClient.clientName}}</label>
                     </div>
-                    <div class="thumb-holder">
-                        <img ng-src="{{selectedScenario.app.logo_uri}}">
+                    <div class="thumbnail">
+                        <img ng-show="selectedScenario.app.logoUri" ng-src="{{selectedScenario.app.logoUri}}">
+                        <label ng-hide="selectedScenario.app.logoUri" style="margin-top: 5px">No Image</label>
+
                     </div>
                 </div>
             </div>
@@ -57,20 +59,10 @@
 
         </div>
     </div>
-    <!--<div class="row">-->
-        <!--<div class="col-md-12 content-column">-->
-            <!--<div style="text-align: center">App {{selectedScenario.app.client_name}}</div>-->
-            <!--<div class="thumbnail">-->
-                <!--<div class="thumb-holder">-->
-                    <!--<img ng-src="{{selectedScenario.app.logo_uri}}">-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
     <div class="row">
         <div class="col-md-12 content-column">
             <div class="btn btn-basic btn-md" ng-click="launch(selectedScenario)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
-            <div class="btn btn-basic btn-md" ng-click="delete(selectedScenario)"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
+            <div class="btn btn-delete btn-md" ng-click="delete(selectedScenario)"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
         </div>
     </div>
 </div>
