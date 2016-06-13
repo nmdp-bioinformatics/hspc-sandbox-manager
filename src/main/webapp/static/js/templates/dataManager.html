@@ -1,17 +1,19 @@
 <div class="container-fluid" ng-controller="DataManagerController">
+
     <div class="row">
-        <div class="content-column" resize ng-style="resizeWithOffset(120)" ng-class="'col-lg-12'">
-            <div class="slim-page-header">{{title}}</div>
+        <div ng-class="showing.results ? 'col-lg-6' : 'col-lg-12'">
+            <div class="slim-page-header">Import JSON Bundle</div>
+            <div class="pull-left basic-text">Paste JSON FHIR Bundle in the Text Area</div>
 
-            <div ng-show="uploadScreen" class="pull-left basic-text">Paste JSON FHIR Bundle in the Text Area</div>
-
-            <textarea ng-show="uploadScreen" resize ng-style="resizeWithOffset(200)" ng-model="bundle" style="resize: none; background-color: #fff; cursor: text; height:400px; margin-top: 30px" class="form-control"></textarea>
-            <textarea ng-show="!uploadScreen" resize ng-style="resizeWithOffset(190)" style="resize: none; background-color: #fff; cursor: text; height:400px" class="form-control"  readonly>{{bundleResults | json}}</textarea>
+            <textarea resize ng-style="resizeWithOffset(200)" ng-model="bundle" style="resize: none; background-color: #fff; cursor: text; height:400px; margin-top: 30px" class="form-control"></textarea>
+            <div class="col-md-12 content-column">
+                <div ng-disabled="!bundle" class="btn btn-basic btn-md" ng-click="upload(bundle)"><i class="fa fa-upload fa-lg"></i> Import</div>
+            </div>
+        </div>
+        <div class="col-lg-6" ng-show="showing.results">
+            <div class="slim-page-header" style="padding-bottom:20px">Import Results</div>
+            <textarea resize ng-style="resizeWithOffset(200)" style="resize: none; background-color: #fff; cursor: text; height:400px" class="form-control"  readonly>{{bundleResults}}</textarea>
         </div>
     </div>
-    <div class="row" ng-show="uploadScreen">
-        <div class="col-md-12 content-column">
-            <div ng-disabled="!bundle" class="btn btn-basic btn-md" ng-click="upload(bundle)"><i class="fa fa-upload fa-lg"></i> Import</div>
-        </div>
-    </div>
+
 </div>

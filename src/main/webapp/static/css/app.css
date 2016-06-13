@@ -207,6 +207,12 @@
 
 .progress-spinner {
     margin: 20px 0 20px 120px;
+    color: #fff;
+    background: transparent;
+    border: none;
+    position: absolute;
+    top: 200px;
+    box-shadow: none;
 }
 
 .red-popover + .popover > .popover-inner {background-color: #f82219;}
@@ -848,14 +854,6 @@ fieldset[disabled] .btn-cancel.active {
     min-width: 220px;
     min-height: 160px;
     margin: 5px 0 0;
-}
-
-.progress {
-    height: 5px;
-}
-
-.progress-spinner {
-    margin: 20px 0 20px 120px;
 }
 
 .detail-form-label-input,

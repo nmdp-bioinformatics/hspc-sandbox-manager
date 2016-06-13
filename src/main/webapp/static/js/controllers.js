@@ -158,24 +158,21 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     function(){
 
     }).controller("DataManagerController",
-    function($scope, fhirApiServices, $uibModal){
+    function($scope, fhirApiServices, $uibModal, $filter){
 
-        $scope.uploadScreen = true;
+        $scope.showing = {results: false};
         $scope.bundleResults = "";
-        $scope.title = "Import JSON Bundle";
 
         $scope.upload = function (bundle){
 
             var modalProgress = openModalProgressDialog();
             fhirApiServices.createBundle(bundle).then(function (results) {
-                $scope.bundleResults = results;
-                $scope.uploadScreen = false;
-                $scope.title = "Import Results";
+                $scope.bundleResults = $filter('json')(results);
+                $scope.showing.results = true;
                 modalProgress.dismiss();
             }, function(results) {
                 $scope.bundleResults = results;
-                $scope.uploadScreen = false;
-                $scope.title = "Import Results";
+                $scope.showing.results = true;
                 modalProgress.dismiss();
             });
         };
@@ -930,11 +927,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.launchCustom = function launchCustom(){
             customFhirApp.set($scope.customapp);
-            $scope.launch({
-                clientId: $scope.customapp.id,
+            $scope.select({
                 launchUri: $scope.customapp.url,
-                clientName: "Custom App",
-                logoUri: "static/images/fhir-logo-www.png"
+                authClient: {clientName: "Custom App",
+                             clientId:$scope.customapp.id }
             });
         };
 

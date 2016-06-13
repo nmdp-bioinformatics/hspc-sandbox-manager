@@ -3,10 +3,6 @@
         <div class="col-md-12 content-column">
             <div class="detail-description">{{desc.title}}</div>
 
-            <div class="detail-form">
-                <label class="detail-form-label">Description:</label>
-                <label class="detail-form-value">{{selectedScenario.description}}</label>
-            </div>
             <!--<div class="detail-form-line-inline">-->
                 <!--<label class="detail-form-label-inline">Description:</label>-->
                 <!--<label ng-hide="editDescription" class="detail-form-value-inline">{{selectedScenario.description}}</label>-->
@@ -59,13 +55,14 @@
                 <div class="title">App</div>
                 <div class="content">
                     <div class="detail-form">
-                        <label class="detail-form-label">App Name:</label>
-                        <label class="detail-form-label-value">{{selectedScenario.app.client_name}}</label>
+                        <label class="detail-form-label full-line">{{selectedScenario.app.authClient.clientName}}</label>
+                        <!--<label class="detail-form-label">App Name:</label>-->
+                        <!--<label class="detail-form-label-value">{{selectedScenario.authClient.clientName}}</label>-->
                     </div>
-                    <div class="detail-form">
-                        <label class="detail-form-label">Launch Uri:</label>
-                        <label class="detail-form-label-value">{{selectedScenario.app.launch_uri}}</label>
-                    </div>
+                    <!--<div class="detail-form">-->
+                        <!--<label class="detail-form-label">Launch Uri:</label>-->
+                        <!--<label class="detail-form-label-value">{{selectedScenario.app.launchUri}}</label>-->
+                    <!--</div>-->
                     <div class="thumbnail">
                         <img ng-show="selectedScenario.app.logoUri" ng-src="{{selectedScenario.app.logoUri}}">
                         <label ng-hide="selectedScenario.app.logoUri" style="margin-top: 5px">No Image</label>
