@@ -157,6 +157,37 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     }).controller("FutureController",
     function(){
 
+    }).controller("DataManagerController",
+    function($scope, fhirApiServices, $uibModal){
+
+        $scope.uploadScreen = true;
+        $scope.bundleResults = "";
+        $scope.title = "Import JSON Bundle";
+
+        $scope.upload = function (bundle){
+
+            var modalProgress = openModalProgressDialog();
+            fhirApiServices.createBundle(bundle).then(function (results) {
+                $scope.bundleResults = results;
+                $scope.uploadScreen = false;
+                $scope.title = "Import Results";
+                modalProgress.dismiss();
+            }, function(results) {
+                $scope.bundleResults = results;
+                $scope.uploadScreen = false;
+                $scope.title = "Import Results";
+                modalProgress.dismiss();
+            });
+        };
+
+        function openModalProgressDialog() {
+            return $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/progressModal.html',
+                size: 'sm'
+            });
+        }
+
     }).controller("CreateSandboxController",
     function($rootScope, $scope, $state, sandboxManagement, appsSettings){
 
@@ -697,6 +728,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     }).controller("LaunchScenariosController",
     function($rootScope, $scope, $state, sandboxManagement, launchApp, userServices, descriptionBuilder){
         $scope.showing = {detail: false, addingContext: false};
+        $scope.editDescription = false;
         $scope.selectedScenario = {};
         sandboxManagement.getSandboxLaunchScenarios();
         sandboxManagement.clearScenarioBuilder();

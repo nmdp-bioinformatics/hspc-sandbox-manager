@@ -14,7 +14,7 @@
 
 .full-screen {
     /*font-family: Open Sans,sans-serif;*/
-    color: #666666;
+    color: #58585A;
     overflow: hidden;
 }
 
@@ -850,6 +850,14 @@ fieldset[disabled] .btn-cancel.active {
     margin: 5px 0 0;
 }
 
+.progress {
+    height: 5px;
+}
+
+.progress-spinner {
+    margin: 20px 0 20px 120px;
+}
+
 .detail-form-label-input,
 .detail-form-value {
     border-radius: 4px;
@@ -873,6 +881,29 @@ fieldset[disabled] .btn-cancel.active {
     padding: 6px 6px 0px 0;
     outline: none;
     float: left;
+}
+
+
+.detail-form-line-inline {
+    min-height: 35px
+}
+
+.detail-form-line-inline .detail-form-label-inline {
+    padding: 10px 0 0 0;
+}
+
+.detail-form-value-inline {
+    border: 1px solid #e6e6e6;
+    border-radius: 4px;
+    color: #58585A;
+    /*padding-right: 4px;*/
+    min-height: 30px;
+    width: 60%;
+    float: left;
+    position: relative;
+    display: inline-block;
+    padding: 5px 5px 5px;
+    min-height: 30px;
 }
 
 .detail-form-label-inline {
