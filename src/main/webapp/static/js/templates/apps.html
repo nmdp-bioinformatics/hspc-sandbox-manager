@@ -2,7 +2,7 @@
     <div class="row">
         <div class="content-column" resize ng-style="resizeWithOffset(80)" ng-class="showing.appDetail ? 'col-lg-8 right-border' : 'col-lg-12'">
             <div style="margin-bottom: 10px">
-                <div class="slim-page-header">Apps Manager</div>
+                <div class="slim-page-header">Registered Sandbox Apps</div>
                 <button ng-click="registration()" class="btn btn-basic"><i class="fa fa-plus fa-lg"></i> Register New App</button>
             </div>
             <div class="row">
@@ -17,7 +17,10 @@
             </div>
         </div>
         <div class="col-lg-4 content-column" ng-show="showing.appDetail">
-            <div class="slim-page-header">Details</div>
+            <div class="details-header">
+                <div class="slim-page-header">Registered App Details</div>
+            </div>
+
             <div ng-include="'static/js/templates/appsDetail.html'"></div>
         </div>
     </div>

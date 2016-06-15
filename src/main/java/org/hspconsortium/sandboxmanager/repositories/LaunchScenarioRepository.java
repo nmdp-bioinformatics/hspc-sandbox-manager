@@ -10,4 +10,5 @@ import java.util.List;
 
 public interface LaunchScenarioRepository extends CrudRepository<LaunchScenario, Integer> {
     public List<LaunchScenario> findByUserIdAndSandboxId(@Param("userId") String userId, @Param("sandboxId") String sandboxId);
+    public List<LaunchScenario> findByAppIdAndSandboxId(@Param("appId") int appId, @Param("sandboxId") String sandboxId);
 }

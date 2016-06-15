@@ -53,6 +53,7 @@ import javax.inject.Inject;
 import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.KeyManagementException;
@@ -86,6 +87,7 @@ public class SandboxController {
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
+    @Transactional
     public @ResponseBody Sandbox createSandbox(HttpServletRequest request, @RequestBody final Sandbox sandbox) throws UnsupportedEncodingException{
 
         LOGGER.info("Creating sandbox: " + sandbox.getName());

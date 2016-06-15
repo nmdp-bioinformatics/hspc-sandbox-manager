@@ -10,6 +10,8 @@ public interface AppService {
 
     void delete(final int id);
 
+    void delete(App app);
+
     App getById(final int id);
 
     App findByLaunchUriAndClientIdAndSandboxId(final String launchUri, final String clientId, final String sandboxId);

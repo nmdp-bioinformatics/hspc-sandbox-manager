@@ -21,10 +21,7 @@
 package org.hspconsortium.sandboxmanager.controllers;
 
 import org.apache.http.HttpStatus;
-import org.hspconsortium.sandboxmanager.model.App;
-import org.hspconsortium.sandboxmanager.model.AuthClient;
-import org.hspconsortium.sandboxmanager.model.Image;
-import org.hspconsortium.sandboxmanager.model.Sandbox;
+import org.hspconsortium.sandboxmanager.model.*;
 import org.hspconsortium.sandboxmanager.services.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 
@@ -63,6 +61,7 @@ public class AppRegistrationController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
+    @Transactional
     public @ResponseBody App createApp(HttpServletRequest request, @RequestBody App app) throws IOException {
 
         Sandbox sandbox = sandboxService.findBySandboxId(app.getSandbox().getSandboxId());
@@ -98,26 +97,28 @@ public class AppRegistrationController {
         App app = appService.getById(id);
         checkUserAuthorization(request, app.getSandbox().getCreatedBy().getLdapId());
 
-        String clientJSON = oAuthService.getOAuthClient(app.getAuthClient().getAuthDatabaseId());
-        app.setClientJSON(clientJSON);
+        if (app.getAuthClient().getAuthDatabaseId() != null) {
+            String clientJSON = oAuthService.getOAuthClient(app.getAuthClient().getAuthDatabaseId());
+            app.setClientJSON(clientJSON);
+        }
         return app;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces ="application/json")
+    @Transactional
     public @ResponseBody void deleteApp(HttpServletRequest request, @PathVariable Integer id) {
 
         App app = appService.getById(id);
         checkUserAuthorization(request, app.getSandbox().getCreatedBy().getLdapId());
-
-        if (app.getLogo() != null) {
-            imageService.delete(app.getLogo().getId());
+        Integer authDatabaseId = app.getAuthClient().getAuthDatabaseId();
+        appService.delete(app);
+        if (authDatabaseId != null) {
+            oAuthService.deleteOAuthClient(authDatabaseId);
         }
-        appService.delete(app.getId());
-        authClientService.delete(app.getAuthClient().getId());
-        oAuthService.deleteOAuthClient(app.getAuthClient().getAuthDatabaseId());
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces ="application/json")
+    @Transactional
     public @ResponseBody App updateApp(HttpServletRequest request, @PathVariable Integer id, @RequestBody App app) {
 
         App existingApp = appService.getById(id);
@@ -160,6 +161,7 @@ public class AppRegistrationController {
     }
 
     @RequestMapping(value = "/{id}/image", method = RequestMethod.POST, consumes = {"multipart/form-data"} )
+    @Transactional
     public @ResponseBody void putFullImage(HttpServletRequest request, @PathVariable Integer id, @RequestParam("file") MultipartFile file) {
 
         App app = appService.getById(id);

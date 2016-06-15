@@ -10,7 +10,7 @@ import javax.persistence.*;
         query="SELECT c FROM App c WHERE c.launchUri = :launchUri and " +
                 "c.authClient.clientId = :clientId and c.sandbox.sandboxId = :sandboxId"),
         @NamedQuery(name="App.findBySandboxId",
-        query="SELECT c FROM App c WHERE c.sandbox.sandboxId = :sandboxId")
+        query="SELECT c FROM App c WHERE c.sandbox.sandboxId = :sandboxId and c.authClient.authDatabaseId IS NOT NULL")
 })
 public class App {
     private Integer id;

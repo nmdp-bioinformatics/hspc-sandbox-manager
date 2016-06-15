@@ -224,9 +224,7 @@ angular.module('sandManApp.services', [])
                     .done(function(results){
                         notification.message("Bundle Uploaded");
                         deferred.resolve(results.data);
-                        // deferred.resolve(JSON.stringify(results.data));
                     }).fail(function(error){
-                        // errorService.setErrorMessage(error.data.responseText, true);
                         deferred.reject(error.data.responseText);
                     });
                 return deferred;
@@ -292,8 +290,9 @@ angular.module('sandManApp.services', [])
                 createdBy: launchScenario.owner,
                 description: launchScenario.description,
                 patient: launchScenario.patient,
-                app: launchScenario.app
+                app: angular.copy(launchScenario.app)
             };
+            delete newLaunchScenario.app.clientJSON;
             if (launchScenario.persona !== undefined && launchScenario.persona !== '') {
                 newLaunchScenario.persona = launchScenario.persona;
             }
@@ -398,11 +397,14 @@ angular.module('sandManApp.services', [])
             },
             updateLaunchScenario: function(launchScenario){
                 var that = this;
+                var updatedLaunchScenario = angular.copy(launchScenario);
+                updatedLaunchScenario.app = angular.copy(updatedLaunchScenario.app);
+                delete updatedLaunchScenario.app.clientJSON;
                 appsSettings.getSettings().then(function(settings){
                     $.ajax({
-                        url: settings.baseUrl + "/launchScenario/" + launchScenario.id,
+                        url: settings.baseUrl + "/launchScenario/" + updatedLaunchScenario.id,
                         type: 'PUT',
-                        data: JSON.stringify(launchScenario),
+                        data: JSON.stringify(updatedLaunchScenario),
                         contentType: "application/json",
                         beforeSend : function( xhr ) {
                             xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
@@ -429,6 +431,23 @@ angular.module('sandManApp.services', [])
                             notification.message("Failed to Delete Launch Scenario");
                         });
                 });
+            },
+            getLaunchScenarioByApp: function(appId){
+                var deferred = $.Deferred();
+                appsSettings.getSettings().then(function(settings){
+                    $.ajax({
+                        url: settings.baseUrl + "/launchScenario?appId=" + appId,
+                        type: 'GET',
+                        beforeSend : function( xhr ) {
+                            xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                        }
+                    }).done(function(results){
+                        deferred.resolve(results);
+                    }).fail(function(){
+                        deferred.reject();
+                    });
+                });
+                return deferred;
             },
             getSandboxLaunchScenarios: function() {
                 var deferred = $.Deferred();
@@ -678,7 +697,7 @@ angular.module('sandManApp.services', [])
         getSelectedApp: function() {
             return selectedApp;
         },
-        getAppList: function() {
+         getAppList: function() {
             return fullAppList;
         },
         createSandboxApp: function(app){
@@ -728,12 +747,13 @@ angular.module('sandManApp.services', [])
 
                 var logo = app.logo;
                 delete app.logo;
-                app.clientJSON = JSON.stringify(app.clientJSON);
+                var newApp = angular.copy(app);
+                newApp.clientJSON = JSON.stringify(newApp.clientJSON);
 
                 $.ajax({
-                    url: settings.baseUrl + "/app/" + app.id,
+                    url: settings.baseUrl + "/app/" + newApp.id,
                     type: 'PUT',
-                    data: JSON.stringify(app),
+                    data: JSON.stringify(newApp),
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
                         xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
@@ -874,12 +894,14 @@ angular.module('sandManApp.services', [])
         getPatientDataManagerApp();
 
         function registerContext(app, params, key) {
+            var launchApp = angular.copy(app);
+            delete launchApp.clientJSON;
             fhirApiServices
-                .registerContext(app, params)
+                .registerContext(launchApp, params)
                 .done(function(c){
                     console.log(fhirApiServices.fhirClient());
                     window.localStorage[key] = JSON.stringify({
-                        app: app,
+                        app: launchApp,
                         iss: fhirApiServices.fhirClient().server.serviceUrl,
                         context: c
                     });

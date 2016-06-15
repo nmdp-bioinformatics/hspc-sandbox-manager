@@ -1,4 +1,4 @@
-<div id="patient-details" class="col-md-12" ng-controller="AppsDetailController">
+<div id="patient-details" class="col-md-12">
     <div class="row">
         <div class="col-md-12 content-column">
             <div class="detail-form">
@@ -66,7 +66,7 @@
     <div class="row">
         <div class="col-md-12 content-column">
             <div class="btn btn-basic btn-md" ng-click="save()"><i class="fa fa-save fa-lg"></i> Save</div>
-            <div class="btn btn-delete btn-md" ng-click="delete()"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
+            <div class="btn btn-delete btn-md" ng-disabled="!canDelete" ng-click="delete()"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
         </div>
     </div>
 

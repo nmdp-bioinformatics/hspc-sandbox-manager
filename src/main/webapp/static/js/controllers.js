@@ -870,11 +870,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.all_user_apps = [];
         var source = $stateParams.source;
         var action = $stateParams.action;
-    
-        $scope.title = "Registered Apps";
-        // appRegistrationServices.getSandboxApps().done(function(apps){
-        //     $scope.all_user_apps = apps;
-        // });
+
+        $scope.title =  "Registered Apps";
+        $scope.showCustomApp = true;
+
         $scope.all_user_apps = appRegistrationServices.getAppList();
 
         $scope.select = function launch(app){
@@ -923,14 +922,18 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             });
         }
 
+        // get from localStorage
         $scope.customapp = customFhirApp.get();
 
         $scope.launchCustom = function launchCustom(){
+            //set localStorage
             customFhirApp.set($scope.customapp);
             $scope.select({
                 launchUri: $scope.customapp.url,
                 authClient: {clientName: "Custom App",
-                             clientId:$scope.customapp.id }
+                             clientId:$scope.customapp.id,
+                             isCustom: true
+                            }
             });
         };
 
@@ -1142,13 +1145,12 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     return window.location = to;
                 });
         };
-    }).controller("AppsDetailController",
-    function($scope){
-
-    }).controller("AppsController", function($scope, $rootScope, $state, appRegistrationServices, $uibModal) {
+    }).controller("AppsController", function($scope, $rootScope, $state, appRegistrationServices, sandboxManagement, $uibModal) {
 
     $scope.all_user_apps = [];
     $scope.galleryOffset = 246;
+    $scope.canDelete = false;
+    $scope.showCustomApp = false;
 
     $scope.showing = {appDetail: false};
 
@@ -1158,9 +1160,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     $scope.clientJSON = {};
 
     appRegistrationServices.getSandboxApps();
-    // appRegistrationServices.getSandboxApps().done(function (apps) {
-    //     $scope.all_user_apps = apps;
-    // });
 
     $rootScope.$on('app-list-update', function () {
         $scope.all_user_apps = appRegistrationServices.getAppList();
@@ -1196,6 +1195,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     }
     
     $scope.select = function (app) {
+        canDeleteApp(app.id);
         $scope.selected.selectedApp = app;
         $scope.showing.appDetail = true;
         delete $scope.clientJSON.logo;
@@ -1213,6 +1213,13 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $rootScope.$digest();
         });
     };
+
+    function canDeleteApp(appId){
+        sandboxManagement.getLaunchScenarioByApp(appId).then(function (launchScenarios) {
+            $scope.canDelete = !(launchScenarios.length > 0);
+            $rootScope.$digest();
+        });
+    }
 
     $scope.updateFile = function(files) {
 
@@ -1241,7 +1248,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.selected.selectedApp.clientJSON = updateClientJSON;
         $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
-        appRegistrationServices.updateSandboxApp(angular.copy($scope.selected.selectedApp)).then(function (result) {
+        appRegistrationServices.updateSandboxApp($scope.selected.selectedApp).then(function (result) {
         }, function(err) {
             $state.go('error', {});
         });

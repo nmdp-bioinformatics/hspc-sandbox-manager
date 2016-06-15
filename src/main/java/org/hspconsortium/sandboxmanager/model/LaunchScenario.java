@@ -11,7 +11,9 @@ import java.util.List;
 @Entity
 @NamedQueries({
         @NamedQuery(name="LaunchScenario.findByUserIdAndSandboxId",
-                query="SELECT c FROM LaunchScenario c WHERE c.createdBy.ldapId = :userId and c.sandbox.sandboxId = :sandboxId")
+                query="SELECT c FROM LaunchScenario c WHERE c.createdBy.ldapId = :userId and c.sandbox.sandboxId = :sandboxId"),
+        @NamedQuery(name="LaunchScenario.findByAppIdAndSandboxId",
+        query="SELECT c FROM LaunchScenario c WHERE c.app.id = :appId and c.sandbox.sandboxId = :sandboxId")
 })
 public class LaunchScenario {
 

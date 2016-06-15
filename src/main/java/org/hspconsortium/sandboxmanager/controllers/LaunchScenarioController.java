@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -60,6 +61,7 @@ public class LaunchScenarioController {
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
+    @Transactional
     public @ResponseBody LaunchScenario createLaunchScenario(HttpServletRequest request, @RequestBody final LaunchScenario launchScenario) {
 
         // A null sandbox is the HSPC sandbox
@@ -117,6 +119,7 @@ public class LaunchScenarioController {
             app = appService.findByLaunchUriAndClientIdAndSandboxId(launchScenario.getApp().getLaunchUri(), launchScenario.getApp().getAuthClient().getClientId(), sandbox.getSandboxId());
         }
         if (app == null) {
+            // Create an anonymous App for a custom launch
             app = launchScenario.getApp();
             app.setSandbox(sandbox);
             app = appService.save(app);
@@ -127,6 +130,7 @@ public class LaunchScenarioController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces ="application/json")
+    @Transactional
     public @ResponseBody LaunchScenario updateLaunchScenario(HttpServletRequest request, @PathVariable Integer id, @RequestBody final LaunchScenario launchScenario) {
         if (id.intValue() != launchScenario.getId().intValue()) {
             throw new RuntimeException(String.format("Response Status : %s.\n" +
@@ -137,15 +141,32 @@ public class LaunchScenarioController {
         LaunchScenario updateLaunchScenario = launchScenarioService.getById(launchScenario.getId());
         if (updateLaunchScenario != null) {
             updateLaunchScenario.setLastLaunchSeconds(launchScenario.getLastLaunchSeconds());
+            updateLaunchScenario.setContextParams(launchScenario.getContextParams());
+            updateLaunchScenario.setDescription(launchScenario.getDescription());
             return launchScenarioService.save(updateLaunchScenario);
         }
         return null;
     }
 
+    @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"appId"})
+    public @ResponseBody Iterable<LaunchScenario> getLaunchScenariosForApp(HttpServletRequest request,
+                   @RequestParam(value = "appId") int appId) {
+
+        App app = appService.getById(appId);
+        checkUserAuthorization(request, app.getSandbox().getCreatedBy().getLdapId());
+
+        return launchScenarioService.findByAppIdAndSandboxId(app.getId(), app.getSandbox().getSandboxId());
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces ="application/json")
+    @Transactional
     public @ResponseBody void deleteLaunchScenario(HttpServletRequest request, @PathVariable Integer id) {
         LaunchScenario launchScenario = launchScenarioService.getById(id);
         checkUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
+        if (launchScenario.getApp().getAuthClient().getAuthDatabaseId() == null) {
+            // This is an anonymous App created for a custom launch
+            appService.delete(launchScenario.getApp());
+        }
         launchScenarioService.delete(launchScenario.getId());
     }
 

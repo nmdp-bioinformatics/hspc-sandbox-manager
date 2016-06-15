@@ -206,12 +206,14 @@
 }
 
 .progress-spinner {
-    margin: 20px 0 20px 120px;
+    margin: 0 80px;
+    font-size: 25px;
+    text-align: center;
     color: #fff;
     background: transparent;
     border: none;
     position: absolute;
-    top: 200px;
+    top: 175px;
     box-shadow: none;
 }
 
@@ -465,17 +467,23 @@ a.disabled {
     color: #66d5ff;
 }
 
-.details-header .float-right-dark-btn {
-    padding-right: 8px;
+.details-header .slim-page-header {
+    font-size: 16px;
+    font-weight: 300;
+    margin-top: -3px;
+    padding: 5px;
+    font-family: inherit;
+    line-height: 1.1;
+    color: #fff;
 }
 
 .details-header {
     height: 28px;
-    width: 100%;
     background: #10759D;
     padding-top: 4px;
-    margin-bottom: 4px;
+    margin: -5px -20px 0 -5px;
 }
+
 .details-header .float-right-dark-btn {
     padding-right: 8px;
 }
@@ -800,10 +808,34 @@ fieldset[disabled] .btn-cancel.active {
     /*width: 210px;    !* 10px are used for border and padding leaving 200px for the thumbnail *!*/
     height: 190px;   /* 30px to contain the button below the image */
     width: 220px;    /* 10px are used for border and padding leaving 200px for the thumbnail */
-    border: 1px solid #ddd;
+    /*border: 1px solid #ddd;*/
+    background-color: #f2f2f2;
     border-radius: 4px;
     padding: 4px;
     text-align: center;
+    cursor: pointer;
+}
+
+.thumb-holder.selected {
+    background-color: #cccccc;
+}
+
+
+.thumb-holder .thumbnail {
+    background-color: #f2f2f2;
+}
+.thumb-holder.selected .thumbnail {
+    background-color: #cccccc;
+}
+
+.thumb-holder a {
+    font-weight: 300;
+    font-size: 20px;
+    position: absolute;
+    bottom: 15px;
+    left: 20px;
+    text-align: center;
+    width: 210px;
 }
 
 .thumb-holder .thumbnail {
@@ -812,6 +844,8 @@ fieldset[disabled] .btn-cancel.active {
     padding: 0;
     margin-left: auto;
     margin-right: auto;
+    -webkit-transition: none;
+    transition: none;
 }
 
 .thumb-holder .thumbnail img {

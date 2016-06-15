@@ -2,7 +2,7 @@ package org.hspconsortium.sandboxmanager.services.impl;
 
 import org.hspconsortium.sandboxmanager.model.App;
 import org.hspconsortium.sandboxmanager.repositories.AppRepository;
-import org.hspconsortium.sandboxmanager.services.AppService;
+import org.hspconsortium.sandboxmanager.services.*;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -13,10 +13,17 @@ import java.util.List;
 public class AppServiceImpl implements AppService {
 
     private final AppRepository repository;
+    private final AuthClientService authClientService;
+    private final ImageService imageService;
 
     @Inject
-    public AppServiceImpl(final AppRepository repository) {
+    public AppServiceImpl(final AppRepository repository,
+                          final AuthClientService authClientService,
+                          final SandboxService sandboxService,
+                          final ImageService imageService) {
         this.repository = repository;
+        this.authClientService = authClientService;
+        this.imageService = imageService;
     }
 
     @Override
@@ -29,6 +36,22 @@ public class AppServiceImpl implements AppService {
     @Transactional
     public void delete(final int id) {
         repository.delete(id);
+    }
+
+    @Override
+    @Transactional
+    public void delete(final App app) {
+
+        if (app.getLogo() != null) {
+            int logoId = app.getLogo().getId();
+            app.setLogo(null);
+            imageService.delete(logoId);
+        }
+
+        int authClientId = app.getAuthClient().getId();
+        app.setAuthClient(null);
+        authClientService.delete(authClientId);
+        delete(app.getId());
     }
 
     @Override
