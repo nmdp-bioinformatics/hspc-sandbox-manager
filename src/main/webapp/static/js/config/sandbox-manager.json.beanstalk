@@ -1,7 +1,7 @@
 {
     "profileUpdateUri" : "https://test-messaging.hspconsortium.org/sandboxuser/profileupdate",
     "defaultServiceUrl": "https://test-api.hspconsortium.org/data",
-    "baseServiceUrl": "https://test-auth.hspconsortium.org/",
+    "baseServiceUrl": "https://test-api.hspconsortium.org/",
     "oauthLogoutUrl": "https://test-auth.hspconsortium.org/logout",
     "userManagementUrl": "https://test-pwm.hspconsortium.org",
     "defaultPersonaId": "COREPRACTITIONER1",
