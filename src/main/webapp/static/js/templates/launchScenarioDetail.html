@@ -1,16 +1,7 @@
-<div id="patient-details" class="col-md-12 horizontal-scroll" ng-style="resizeWithOffset(150)" resize >
+<div id="patient-details" class="col-md-12 horizontal-scroll" ng-style="resizeWithOffset(190)" resize >
     <div class="row">
         <div class="col-md-12 content-column">
             <div class="detail-description">{{desc.title}}</div>
-
-            <!--<div class="detail-form-line-inline">-->
-                <!--<label class="detail-form-label-inline">Description:</label>-->
-                <!--<label ng-hide="editDescription" class="detail-form-value-inline">{{selectedScenario.description}}</label>-->
-                <!--<a ng-hide="editDescription" ng-click="editDescription = true" class='float-right-dark-btn'>-->
-                    <!--<i class='fa fa-pencil fa-lg'></i>-->
-                <!--</a>-->
-                <!--<input content-editable ng-show="editDescription" class="detail-form-label-input-inline" ng-model="selectedScenario.description"/>-->
-            <!--</div>-->
 
             <div class="title-box">
                 <div class="title">Persona</div>
@@ -52,21 +43,23 @@
             </div>
 
             <div class="title-box">
-                <div class="title">App</div>
-                <div class="content">
+                <div ng-show="!isCustom" class="title">App</div>
+                <div ng-show="isCustom" class="title">Custom App</div>
+                <div ng-show="!isCustom" class="content">
                     <div class="detail-form">
                         <label class="detail-form-label full-line">{{selectedScenario.app.authClient.clientName}}</label>
-                        <!--<label class="detail-form-label">App Name:</label>-->
-                        <!--<label class="detail-form-label-value">{{selectedScenario.authClient.clientName}}</label>-->
                     </div>
-                    <!--<div class="detail-form">-->
-                        <!--<label class="detail-form-label">Launch Uri:</label>-->
-                        <!--<label class="detail-form-label-value">{{selectedScenario.app.launchUri}}</label>-->
-                    <!--</div>-->
                     <div class="thumbnail">
                         <img ng-show="selectedScenario.app.logoUri" ng-src="{{selectedScenario.app.logoUri}}">
                         <label ng-hide="selectedScenario.app.logoUri" style="margin-top: 5px">No Image</label>
-
+                    </div>
+                </div>
+                <div ng-show="isCustom" class="content">
+                    <div class="detail-form">
+                        <label class="detail-form-label full-line">Client ID:  <b>{{selectedScenario.app.authClient.clientId}}</b></label>
+                    </div>
+                    <div class="detail-form" style="padding-bottom: 40px">
+                        <label class="detail-form-label full-line">Launch URI: <b>{{selectedScenario.app.launchUri}}</b></label>
                     </div>
                 </div>
             </div>
@@ -74,21 +67,10 @@
 
         </div>
     </div>
-    <!--<div class="row">-->
-        <!--<div class="col-md-12 content-column">-->
-            <!--<div style="text-align: center">App {{selectedScenario.app.client_name}}</div>-->
-            <!--<div class="thumbnail">-->
-                <!--<div class="thumb-holder">-->
-                    <!--<img ng-src="{{selectedScenario.app.logo_uri}}">-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
     <div class="row">
         <div class="col-md-12 content-column">
             <div class="btn btn-basic btn-md" ng-click="launch(selectedScenario)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
             <div class="btn btn-delete btn-md" ng-click="delete(selectedScenario)"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
-            <!--<div class="btn btn-basic btn-md" ng-click="update(selectedScenario)"><i class="fa fa-save fa-lg"></i> Save</div>-->
         </div>
     </div>
 </div>

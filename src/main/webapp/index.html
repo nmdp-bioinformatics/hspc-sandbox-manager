@@ -94,7 +94,7 @@
 
 <div>
     <div class="row container-fluid">
-        <div ng-class="showing.largeSidebar ? 'col-xs-2' : 'col-xs-1'" class="col-xs-2 sidebar" ng-show="showing.sideNavBar" resize ng-style="resizeWithOffset(80)">
+        <div ng-class="showing.largeSidebar ? 'col-xs-2' : 'col-xs-1'" class="col-xs-2 sidebar" ng-show="showing.sideNavBar" resize ng-style="resizeWithOffset(140)">
             <div ng-include src="'static/js/templates/sideNav.html'"></div>
         </div>
         <div ng-class="showing.sideNavBar ? showing.largeSidebar ? 'col-xs-10' : 'col-xs-11' : 'col-xs-12'">
@@ -107,5 +107,29 @@
     <div notification ng-repeat="message in messages"></div>
 </div>
 
+<footer ng-show="showing.navBar">
+    <div class="container">
+        <div class="copyright">
+            <!--<a class="spm spm-logo-footer" href="https://www.digicert.com/" style="display:inline"><img src="static/images/digi-footer-logo.png" border="0" style="display:inline"></a>-->
+            <!--© 2003-2016 DigiCert® Inc • <i>SSL Certificate Authority</i> • All Rights Reserved | All trademarks displayed on this web site are the exclusive property of the respective holders.-->
+            <!-- Begin DigiCert site seal HTML and JavaScript -->
+            <div class="site-seal">
+                <div id="DigiCertClickID_YT4mvfuq" data-language="en">
+                    <!--<a href="https://www.digicert.com/wildcard-ssl-certificates.htm">Wildcard SSL Certificate</a>-->
+                </div>
+                <script type="text/javascript">
+                    var __dcid = __dcid || [];__dcid.push(["DigiCertClickID_YT4mvfuq", "3", "m", "black", "YT4mvfuq"]);
+                    (function(){var cid=document.createElement("script");
+                        cid.async=true;
+                        cid.src="//seal.digicert.com/seals/cascade/seal.min.js";
+                        var s = document.getElementsByTagName("script");
+                        var ls = s[(s.length - 1)];ls.parentNode.insertBefore(cid, ls.nextSibling);
+                    }());
+                </script>
+                <!-- End DigiCert site seal HTML and JavaScript -->
+            </div>
+        </div>
+    </div>
+</footer>
 </body>
 </html>

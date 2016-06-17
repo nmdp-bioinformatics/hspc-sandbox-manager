@@ -181,6 +181,9 @@ public class AppRegistrationController {
             Image image = new Image();
             image.setBytes(file.getBytes());
             image.setContentType(file.getContentType());
+            if (app.getLogo() != null) {
+                imageService.delete(app.getLogo().getId());
+            }
             app.setLogo(image);
             app.setLogoUri(request.getRequestURL().toString());
             app.getAuthClient().setLogoUri(request.getRequestURL().toString());

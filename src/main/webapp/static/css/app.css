@@ -323,7 +323,7 @@ span.title,
 
 .nav-sidebar a {
     font-weight: 300;
-    font-size: 14px;
+    font-size: 16px;
     color: #666666;
     position: relative;
     display: block;
@@ -336,6 +336,11 @@ span.title,
     text-decoration: none;
     cursor: pointer;
 }
+
+.nav-sidebar i {
+    font-size: 18px;
+}
+
 .sidebar {
     background-color: #fafafa;
     border-right: 2px solid #f4f4f4;
@@ -346,6 +351,16 @@ span.title,
     position: absolute;
     bottom: 20px;
     right: 20px;
+}
+
+.site-seal {
+    position: absolute;
+    left: 20px;
+    bottom: 5px;
+}
+
+.site-seal img {
+    width: 80px !important;
 }
 
 .box {
@@ -809,7 +824,8 @@ fieldset[disabled] .btn-cancel.active {
     height: 190px;   /* 30px to contain the button below the image */
     width: 220px;    /* 10px are used for border and padding leaving 200px for the thumbnail */
     /*border: 1px solid #ddd;*/
-    background-color: #f2f2f2;
+    /*background-color: #fafafa;*/
+    /*background-color: #f2f2f2;*/
     border-radius: 4px;
     padding: 4px;
     text-align: center;
@@ -817,15 +833,23 @@ fieldset[disabled] .btn-cancel.active {
 }
 
 .thumb-holder.selected {
-    background-color: #cccccc;
+    background-color: #fafafa;
+    /*border: 2px solid #f4f4f4;*/
+    border-radius: 6px;
+    /*background-color: #cccccc;*/
+    /*background-color: #e6e6e6;*/
 }
 
 
 .thumb-holder .thumbnail {
-    background-color: #f2f2f2;
+    /*background-color: #fafafa;*/
+    /*background-color: #f2f2f2;*/
 }
+
 .thumb-holder.selected .thumbnail {
-    background-color: #cccccc;
+    background-color: #fafafa;
+    /*background-color: #cccccc;*/
+    /*background-color: #e6e6e6;*/
 }
 
 .thumb-holder a {
@@ -836,6 +860,7 @@ fieldset[disabled] .btn-cancel.active {
     left: 20px;
     text-align: center;
     width: 210px;
+    text-decoration: underline;
 }
 
 .thumb-holder .thumbnail {
@@ -1492,6 +1517,33 @@ td {
 .start-form-text:hover {
     color: #4593B2;
     text-decoration: none;
+}
+
+footer .container {
+    /*margin-top: 3px;*/
+    overflow: hidden;
+    width: 980px;
+    /*height: 40px;*/
+}
+
+footer .copyright {
+    float: left;
+    color: #777777;
+    font-size: 9px;
+    width: 980px;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: #fafafa;
+    border-radius: 0;
+    border-width: 2px 0 0;
+    border-style: solid;
+    border-color: #f4f4f4;
+    height: 60px;
+    padding-top: 5px;
 }
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {

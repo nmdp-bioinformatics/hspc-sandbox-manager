@@ -1,13 +1,13 @@
 <div class="container-fluid" ng-controller="AppsController">
     <div class="row">
-        <div class="content-column" resize ng-style="resizeWithOffset(80)" ng-class="showing.appDetail ? 'col-lg-8 right-border' : 'col-lg-12'">
+        <div class="content-column" resize ng-style="resizeWithOffset(140)" ng-class="showing.appDetail ? 'col-lg-8 right-border' : 'col-lg-12'">
             <div style="margin-bottom: 10px">
                 <div class="slim-page-header">Registered Sandbox Apps</div>
                 <button ng-click="registration()" class="btn btn-basic"><i class="fa fa-plus fa-lg"></i> Register New App</button>
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <div ng-class="showing.appDetail ? 'app-gallery-container-slim' : 'app-gallery-container'" resize ng-style="resizeWithOffset(246)">
+                    <div ng-class="showing.appDetail ? 'app-gallery-container-slim' : 'app-gallery-container'" resize ng-style="resizeWithOffset(250)">
                         <br style="clear: both;" />
                         <div  class="row-fluid">
                             <div ng-include="'static/js/templates/appsView.html'"></div>

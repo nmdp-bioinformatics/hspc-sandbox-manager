@@ -50,6 +50,13 @@ public class OAuthServiceImpl implements OAuthService {
     @Value("${hspc.platform.api.oauthUserInfoEndpointURL}")
     private String oauthUserInfoEndpointURL;
 
+    @Value("${hspc.platform.api.oauthUser}")
+    private String oauthUser;
+
+    @Value("${hspc.platform.api.oauthUserPassword}")
+    private String oauthUserPassword;
+
+
     public String getBearerToken(HttpServletRequest request) {
 
         String authToken = request.getHeader("Authorization");
@@ -252,8 +259,8 @@ public class OAuthServiceImpl implements OAuthService {
 
         try {
             List<NameValuePair> formData = new ArrayList<>();
-            formData.add(new BasicNameValuePair("j_username", "admin"));
-            formData.add(new BasicNameValuePair("j_password", "FH!R4a11"));
+            formData.add(new BasicNameValuePair("j_username", oauthUser));
+            formData.add(new BasicNameValuePair("j_password", oauthUserPassword));
             formData.add(new BasicNameValuePair("submit", "Sign in"));
             UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formData);
             postRequest.setEntity(entity);

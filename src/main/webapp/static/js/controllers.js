@@ -181,7 +181,13 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             return $uibModal.open({
                 animation: true,
                 templateUrl: 'static/js/templates/progressModal.html',
-                size: 'sm'
+                controller: 'ProgressModalCtrl',
+                size: 'sm',
+                resolve: {
+                    getTitle: function () {
+                        return "Importing...";
+                    }
+                }
             });
         }
 
@@ -725,7 +731,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     }).controller("LaunchScenariosController",
     function($rootScope, $scope, $state, sandboxManagement, launchApp, userServices, descriptionBuilder){
         $scope.showing = {detail: false, addingContext: false};
-        $scope.editDescription = false;
+        $scope.isCustom = false;
         $scope.selectedScenario = {};
         sandboxManagement.getSandboxLaunchScenarios();
         sandboxManagement.clearScenarioBuilder();
@@ -755,6 +761,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $rootScope.$on('recent-selected', function(event, arg){
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
+            $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null);
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
         });
@@ -762,6 +769,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $rootScope.$on('full-selected', function(event, arg){
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
+            $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null);
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
         });
@@ -953,6 +961,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
         };
+    }]).controller('ProgressModalCtrl',['$scope', '$uibModalInstance', "getTitle",
+    function ($scope, $uibModalInstance, getTitle) {
+
+        $scope.title = getTitle;
+
     }]).controller('ConfirmModalInstanceCtrl',['$scope', '$uibModalInstance', 'getSettings',
     function ($scope, $uibModalInstance, getSettings) {
 
@@ -1190,7 +1203,13 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         return $uibModal.open({
             animation: true,
             templateUrl: 'static/js/templates/progressModal.html',
-            size: 'sm'
+            controller: 'ProgressModalCtrl',
+            size: 'sm',
+            resolve: {
+                getTitle: function () {
+                    return "Saving...";
+                }
+            }
         });
     }
     
@@ -1248,17 +1267,43 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.selected.selectedApp.clientJSON = updateClientJSON;
         $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
+        var modalProgress = openModalProgressDialog();
         appRegistrationServices.updateSandboxApp($scope.selected.selectedApp).then(function (result) {
+            modalProgress.dismiss();
         }, function(err) {
+            modalProgress.dismiss();
             $state.go('error', {});
         });
     };
 
-    $scope.delete = function (app){
+    $scope.delete = function (){
         $scope.showing.appDetail = false;
-        appRegistrationServices.deleteSandboxApp($scope.selected.selectedApp.id).then(function () {
-            $scope.selected.selectedApp = {};
+        $uibModal.open({
+            animation: true,
+            templateUrl: 'static/js/templates/confirmModal.html',
+            controller: 'ConfirmModalInstanceCtrl',
+            resolve: {
+                getSettings: function () {
+                    return {
+                        title:"Delete " + $scope.selected.selectedApp.authClient.clientName,
+                        ok:"Yes",
+                        cancel:"Cancel",
+                        type:"confirm-error",
+                        text:"Are you sure you want to delete?",
+                        callback:function(result){ //setting callback
+                            if (result == true) {
+                                appRegistrationServices.deleteSandboxApp($scope.selected.selectedApp.id).then(function () {
+                                    $scope.selected.selectedApp = {};
+                                });
+                            }
+                        }
+                    };
+                }
+            }
         });
+        // appRegistrationServices.deleteSandboxApp($scope.selected.selectedApp.id).then(function () {
+        //     $scope.selected.selectedApp = {};
+        // });
     };
 
 }).controller('AppRegistrationModalCtrl',function ($scope, $rootScope, sandboxManagement, $uibModalInstance) {
@@ -1377,5 +1422,18 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             }
         }
 
+    }]).controller('ConfirmModalInstanceCtrl',['$scope', '$uibModalInstance', 'getSettings',
+    function ($scope, $uibModalInstance, getSettings) {
+
+        $scope.title = (getSettings.title !== undefined) ? getSettings.title : "";
+        $scope.ok = (getSettings.ok !== undefined) ? getSettings.ok : "Yes";
+        $scope.cancel = (getSettings.cancel !== undefined) ? getSettings.cancel : "No";
+        $scope.text = (getSettings.text !== undefined) ? getSettings.text : "Continue?";
+        var callback = (getSettings.callback !== undefined) ? getSettings.callback : null;
+
+        $scope.confirm = function (result) {
+            $uibModalInstance.close(result);
+            callback(result);
+        };
     }]);
 
