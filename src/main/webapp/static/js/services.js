@@ -1058,7 +1058,7 @@ angular.module('sandManApp.services', [])
             }
         }
 
-    }).factory('appsService', ['$http',function($http)  {
+    }).factory('appsService', ['$http', 'envInfo',function($http, envInfo)  {
 
     var sampleApps;
 
@@ -1076,10 +1076,17 @@ angular.module('sandManApp.services', [])
         },
         loadSettings: function(){
             var deferred = $.Deferred();
-                $http.get('static/js/config/sample-apps.json').success(function(result){
+            if (envInfo.env !== "null") {
+                $http.get('static/js/config/sample-apps-' + envInfo.env + '.json').success(function (result) {
                     sampleApps = result;
-                    deferred.resolve(result);
+                    deferred.resolve(sampleApps);
                 });
+            } else {
+                $http.get('static/js/config/sample-apps-localhost.json').success(function (result) {
+                    sampleApps = result;
+                    deferred.resolve(sampleApps);
+                });
+            }
             return deferred;
             }
         };
@@ -1109,7 +1116,7 @@ angular.module('sandManApp.services', [])
         }
     };
 
-}]).factory('appsSettings', ['$http',function($http)  {
+}]).factory('appsSettings', ['$http', 'envInfo',function($http, envInfo)  {
 
     var settings;
 
@@ -1119,7 +1126,14 @@ angular.module('sandManApp.services', [])
             $http.get('static/js/config/sandbox-manager.json').success(function(result){
                 settings = result;
                 settings.baseUrl = window.location.href.split("#")[0].substring(0, window.location.href.split("#")[0].length-1);
-                deferred.resolve(result);
+                if (envInfo.profileUpdateUri !== "null") {
+                    settings.profileUpdateUri = envInfo.profileUpdateUri;
+                    settings.defaultServiceUrl = envInfo.defaultServiceUrl;
+                    settings.baseServiceUrl = envInfo.baseServiceUrl;
+                    settings.oauthLogoutUrl = envInfo.oauthLogoutUrl;
+                    settings.userManagementUrl = envInfo.userManagementUrl;
+                }
+                deferred.resolve(settings);
                 });
             return deferred;
         },

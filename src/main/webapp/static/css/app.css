@@ -353,16 +353,6 @@ span.title,
     right: 20px;
 }
 
-.site-seal {
-    position: absolute;
-    left: 20px;
-    bottom: 5px;
-}
-
-.site-seal img {
-    width: 80px !important;
-}
-
 .box {
     display: block;
     padding: 4px;
@@ -1518,6 +1508,18 @@ td {
     color: #4593B2;
     text-decoration: none;
 }
+
+
+.site-seal {
+    position: absolute;
+    left: 20px;
+    bottom: 5px;
+}
+
+.site-seal img {
+    width: 80px !important;
+}
+
 
 footer .container {
     /*margin-top: 3px;*/

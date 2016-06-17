@@ -27,6 +27,7 @@ hspc:
       sandboxManagementEndpointURL: http://localhost:8080/hspc-reference-api/management/sandbox
       oauthUserInfoEndpointURL: http://localhost:8080/hspc-reference-authorization/userinfo
       oauthClientEndpointURL: http://localhost:8080/hspc-reference-authorization/api/clients
+      oauthUserLoginEndpointURL: http://localhost:8080/hspc-reference-authorization/j_spring_security_check
       oauthUser: admin
       oauthUserPassword: password
 

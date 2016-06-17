@@ -50,6 +50,9 @@ public class OAuthServiceImpl implements OAuthService {
     @Value("${hspc.platform.api.oauthUserInfoEndpointURL}")
     private String oauthUserInfoEndpointURL;
 
+    @Value("${hspc.platform.api.oauthUserLoginEndpointURL}")
+    private String oauthUserLoginEndpointURL;
+
     @Value("${hspc.platform.api.oauthUser}")
     private String oauthUser;
 
@@ -253,7 +256,7 @@ public class OAuthServiceImpl implements OAuthService {
 
     private CloseableHttpClient getAuthenticatedHttpClient() {
 
-        HttpPost postRequest = new HttpPost("http://localhost:8080/hspc-reference-authorization/j_spring_security_check");
+        HttpPost postRequest = new HttpPost(oauthUserLoginEndpointURL);
         postRequest.addHeader("Content-Type", "application/x-www-form-urlencoded");
         postRequest.addHeader("Connection", "Keep-Alive");
 
