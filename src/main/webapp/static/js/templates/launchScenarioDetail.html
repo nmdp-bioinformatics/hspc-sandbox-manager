@@ -51,7 +51,8 @@
                     </div>
                     <div class="thumbnail">
                         <img ng-show="selectedScenario.app.logoUri" ng-src="{{selectedScenario.app.logoUri}}">
-                        <label ng-hide="selectedScenario.app.logoUri" style="margin-top: 5px">No Image</label>
+                        <!--<label ng-hide="selectedScenario.app.logoUri" style="margin-top: 5px">No Image</label>-->
+                        <img ng-hide="selectedScenario.app.logoUri" src="static/images/HSPCSandboxNoIconApp-512.png">
                     </div>
                 </div>
                 <div ng-show="isCustom" class="content">

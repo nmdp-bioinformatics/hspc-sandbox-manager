@@ -28,5 +28,5 @@ hspc:
       oauthUserInfoEndpointURL: http://localhost:8080/hspc-reference-authorization/userinfo
       oauthClientEndpointURL: http://localhost:8080/hspc-reference-authorization/api/clients
       oauthUser: admin
-      oauthUserPassword: FH!R4a11
+      oauthUserPassword: password
 

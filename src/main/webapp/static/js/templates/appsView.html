@@ -5,7 +5,8 @@
                 <li ng-class="showing.appDetail ? 'col-md-4' : 'col-md-3'" ng-repeat="app in all_user_apps|filter:{launchUri:'!!'}">
                     <div ng-class="{selected: selected.selectedApp === app}"  class="thumb-holder" ng-click="select(app)" >
                         <div class="thumbnail">
-                            <img ng-src="{{app.logoUri}}">
+                            <img ng-show="app.logoUri" ng-src="{{app.logoUri}}">
+                            <img ng-show="!app.logoUri" src="static/images/HSPCSandboxNoIconApp-512.png">
                         </div>
                         <a>{{app.authClient.clientName}}</a>
                     </div>
