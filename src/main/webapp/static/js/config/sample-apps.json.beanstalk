@@ -3,16 +3,16 @@
         "clientName" : "Bilirubin Chart",
         "authClient": {"clientId": "bilirubin_chart"},
         "clientId" : "bilirubin_chart",
-        "launchUri" : "https://apps.test.hspconsortium.org/hspc-bilirubin-app-0.10/static/bilirubin-chart/launch.html",
-        "redirectUri" : "https://apps.test.hspconsortium.org/hspc-bilirubin-app-0.10/static/bilirubin-chart/",
-        "logoUri" : "https://apps.test.hspconsortium.org/hspc-bilirubin-app-0.10/static/bilirubin-chart/images/bilirubin.png"
+        "launchUri" : "https://test-apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/launch.html",
+        "redirectUri" : "https://test-apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/",
+        "logoUri" : "https://test-apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/images/bilirubin.png"
     },
     {
         "clientName": "Patient Data Manager",
         "authClient": {"clientId": "patient_data_manager"},
-        "launchUri": "https://apps.test.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/launch.html",
-        "redirectUri": "https://apps.test.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/",
-        "logoUri": "https://apps.test.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png"
+        "launchUri": "https://test-apps.hspconsortium.org/hspc-patient-data-manager-0.1/static/patient-data-manager/launch.html",
+        "redirectUri": "https://test-apps.hspconsortium.org/hspc-patient-data-manager-0.1/static/patient-data-manager/",
+        "logoUri": "https://test-apps.hspconsortium.org/hspc-patient-data-manager-0.1/static/patient-data-manager/images/pdm.png"
     },
     {
         "clientName" : "My Web App",
