@@ -289,12 +289,15 @@ angular.module('sandManApp.services', [])
             var newLaunchScenario = {
                 createdBy: launchScenario.owner,
                 description: launchScenario.description,
-                patient: launchScenario.patient,
+                lastLaunchSeconds: new Date().getTime(),
                 app: angular.copy(launchScenario.app)
             };
             delete newLaunchScenario.app.clientJSON;
             if (launchScenario.persona !== undefined && launchScenario.persona !== '') {
                 newLaunchScenario.persona = launchScenario.persona;
+            }
+            if (launchScenario.patient !== undefined && launchScenario.patient !== '') {
+                newLaunchScenario.patient = launchScenario.patient;
             }
             return newLaunchScenario;
         }
@@ -971,7 +974,7 @@ angular.module('sandManApp.services', [])
 
                 if (scenario.persona.resource === 'Practitioner') {
                     desc.title = "Launch App as a Practitioner";
-                    if (scenario.patient !== "") {
+                    if (scenario.patient.resource !== "None") {
                         desc.title = desc.title + " with Patient Context";
                     } else {
                         desc.title = desc.title + " with NO Patient Context";

@@ -118,7 +118,7 @@ public class LaunchScenarioController {
         } else {
             app = appService.findByLaunchUriAndClientIdAndSandboxId(launchScenario.getApp().getLaunchUri(), launchScenario.getApp().getAuthClient().getClientId(), sandbox.getSandboxId());
         }
-        if (app == null) {
+        if (app == null || app.getAuthClient().getAuthDatabaseId() == null) {
             // Create an anonymous App for a custom launch
             app = launchScenario.getApp();
             app.setSandbox(sandbox);

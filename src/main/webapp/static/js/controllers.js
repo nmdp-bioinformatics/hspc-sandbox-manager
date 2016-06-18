@@ -922,7 +922,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                         launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.persona);
                     }
                 } else {
-                    scenario.lastLaunchSeconds = new Date().getTime();
                     sandboxManagement.addFullLaunchScenarioList(scenario);
                 }
                 $state.go('launch-scenarios', {});

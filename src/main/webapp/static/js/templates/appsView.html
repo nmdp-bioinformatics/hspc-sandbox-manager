@@ -12,12 +12,13 @@
                     </div>
                 </li>
                 <li ng-show="showCustomApp" ng-class="showing.appDetail ? 'col-md-4' : 'col-md-3'">
-                    <div class="thumb-holder" ng-disabled="!customapp.id || !customapp.url" ng-click="launchCustom()">
+                    <div class="thumb-holder">
                     <div class="thumbnail">
                             <input type="text" ng-model="customapp.id" placeholder="App ID" required /><br/>
                             <input type="text" ng-model="customapp.url" placeholder="Launch URL" required />
                     </div>
-                        <a ng-disabled="!customapp.id || !customapp.url">Custom App</a>
+                        <button ng-click="launchCustom()" ng-disabled="!customapp.id || !customapp.url" class="btn btn-basic btn-block">Custom App</button>
+                        <!--<a ng-disabled="!customapp.id || !customapp.url" ng-click="launchCustom()">Custom App</a>-->
                     </div>
                 </li>
             </ul>

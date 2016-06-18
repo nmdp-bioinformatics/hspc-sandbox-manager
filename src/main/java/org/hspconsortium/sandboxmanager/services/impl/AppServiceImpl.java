@@ -50,6 +50,7 @@ public class AppServiceImpl implements AppService {
 
         int authClientId = app.getAuthClient().getId();
         app.setAuthClient(null);
+        save(app);
         authClientService.delete(authClientId);
         delete(app.getId());
     }
