@@ -3,6 +3,7 @@
     "defaultServiceUrl": "https://test-api.hspconsortium.org/data",
     "baseServiceUrl": "https://test-api.hspconsortium.org/",
     "oauthLogoutUrl": "https://test-auth.hspconsortium.org/logout",
+    "oauthLogoutSuccessUrl": "https://test-sandbox.hspconsortium.org",
     "userManagementUrl": "https://test-pwm.hspconsortium.org",
     "defaultPersonaId": "COREPRACTITIONER1",
     "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin"],

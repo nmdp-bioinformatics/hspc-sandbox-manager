@@ -48,17 +48,9 @@ angular.module('sandManApp.services', [])
                 });
             },
             logout: function(){
-                var deferred = $.Deferred();
-                appsSettings.getSettings().then(function(settings){
-                    $.ajax({
-                        url: settings.oauthLogoutUrl
-                }).done(function(){
-                        delete sessionStorage.hspcAuthorized;
-                        deferred.resolve();
-                        }).fail(function(){
-                        });
-                });
-                return deferred;
+                window.location.href=appsSettings.getSettings().oauthLogoutUrl
+                    + "?hspcRedirectUrl="
+                    + encodeURI(appsSettings.getSettings().oauthLogoutSuccessUrl);
             },
             login: function(sandboxId){
                 
