@@ -405,6 +405,17 @@ span.title,
     text-decoration: none;
 }
 
+.navbar-stack-sandboxes select{
+    color: #666666;
+    position: absolute;
+    top: 0;
+    right: -185px;
+    width: 180px;
+    font-weight: normal;
+    font-size: 14px;
+    height: 20px;
+}
+
 .navbar-stack-sign-in  a:hover,
 .navbar-stack-name a:hover {
     color: #10759D;
@@ -430,6 +441,12 @@ span.title,
     top: 30px;
 }
 
+.navbar-stack-sandboxes {
+    position: absolute;
+    right: 200px;
+    top: 30px;
+}
+
 .slim-page-header {
     font-size: 16px;
     font-weight: 300;
@@ -438,6 +455,11 @@ span.title,
     font-family: inherit;
     line-height: 1.1;
     color: inherit;
+}
+
+.slim-page-header i {
+    font-size: 20px;
+    padding-left: 5px;
 }
 
 .sub-header {
@@ -1529,10 +1551,10 @@ footer .container {
 }
 
 footer .copyright {
-    float: left;
-    color: #777777;
-    font-size: 9px;
-    width: 980px;
+    text-align: center;
+    color: #666666;
+    font-size: 14px;
+    padding-top: 15px;
 }
 
 footer {

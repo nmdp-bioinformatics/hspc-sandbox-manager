@@ -9,12 +9,12 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
 
     $stateProvider
 
-        .state('sandbox', {
-            url: '/sandbox/:sandbox',
-            templateUrl: 'static/js/templates/sandbox.html',
+        .state('dashboard-view', {
+            url: '/dashboard-view',
+            templateUrl: 'static/js/templates/dashboardView.html',
             authenticate: true
         })
-
+        
         .state('create-sandbox', {
             url: '/create-sandbox',
             templateUrl: 'static/js/templates/createSandbox.html',

@@ -64,7 +64,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/sandbox")
+@RequestMapping("/REST/sandbox")
 public class SandboxController {
     private static Logger LOGGER = LoggerFactory.getLogger(SandboxController.class.getName());
 
@@ -162,10 +162,17 @@ public class SandboxController {
         }
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces ="application/json")
-    public @ResponseBody String getSandboxById(@PathVariable String id) {
+    @RequestMapping(method = RequestMethod.GET, params = {"lookUpId"})
+    public @ResponseBody String checkForSandboxById(HttpServletResponse response, @RequestParam(value = "lookUpId")  String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
-        return (sandbox == null) ? null : sandbox.getSandboxId() ;
+        return (sandbox == null) ? null : sandbox.getSandboxId();
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces ="application/json")
+    public @ResponseBody Sandbox getSandboxById(HttpServletRequest request, @PathVariable String id) {
+        Sandbox sandbox = sandboxService.findBySandboxId(id);
+        checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
+        return sandbox;
     }
 
     @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"userId"})

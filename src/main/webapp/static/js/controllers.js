@@ -1,12 +1,13 @@
 'use strict';
 
 angular.module('sandManApp.controllers', []).controller('navController',[
-    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "$location", "$state",
-    function($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, $location, $state) {
+    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "$location", "$state", "tools",
+    function($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, $location, $state, tools) {
 
         $scope.showing = {
             signout: false,
             signin: true,
+            sandboxSelected: false,
             loading: false,
             searchloading: false,
             navBar: true,
@@ -15,8 +16,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
         $scope.sandboxName = "HSPC";
         $scope.messages = [];
-
-        sandboxManagement.getSandboxIdFromUrl();
+        $scope.dashboard = {
+            sandboxes: [],
+            sandbox: {}
+        };
 
         $rootScope.$on('message-notify', function(event, messages){
             $scope.messages = messages;
@@ -40,6 +43,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.signin();
                 event.preventDefault();
             }
+            if (toState.name == "create-sandbox" && sandboxManagement.hasSandbox()){
+                $state.go('launch-scenarios', {});
+                event.preventDefault();
+            }
             if (toState.name == "progress" && !sandboxManagement.creatingSandbox()){
 //                $scope.signin();
                 event.preventDefault();
@@ -61,33 +68,37 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.oauthUser = userServices.getOAuthUser();
 
                 if (canceledSandboxCreate) {
-                    $state.go('start');
+                    $state.go('start', {});
+                    // $scope.dashboard();;
                 } else {
                     appsSettings.getSettings().then(function(settings){
-
+                        
                         //Initial sign in with no sandbox specified
                         if (fhirApiServices.fhirClient().server.serviceUrl === settings.defaultServiceUrl) {
-                            sandboxManagement.getUserSandbox().then(function(sandboxExists){
-                                if (sandboxExists) {
-                                    oauth2.login(sandboxManagement.getSandbox().sandboxId);
-                                } else if (sandboxExists === 'invalid') {
-                                    $state.go('404');
-                                } else if (sandboxExists === 'reserved') {
-                                    $state.go('future');
+                            // TODO bypassing the dashboard redirect
+                            // $scope.dashboard();
+                            sandboxManagement.getUserSandboxesByUserId().then(function (sandboxesExists) {
+                                if (sandboxesExists) {
+                                    window.location.href = appsSettings.getSandboxUrlSettings().dashboardUrl + "/" + sandboxManagement.getSandboxes()[0].sandboxId
                                 } else {
                                     $scope.showing.navBar = false;
                                     $scope.showing.sideNavBar = false;
                                     $state.go('create-sandbox', {});
                                 }
+                            }, function () {
+                                $scope.showing.navBar = false;
+                                $scope.showing.sideNavBar = false;
+                                $state.go('create-sandbox', {});
                             });
-
                         } else {
-                            sandboxManagement.getUserSandbox().then(function(sandboxExists){
+                            sandboxManagement.getSandboxById().then(function(sandboxExists){
                                 if (sandboxExists) {
                                     $scope.sandboxName = sandboxManagement.getSandbox().name;
-                                    sandboxManagement.setHasSandbox(true);
+                                    sandboxSignIn();
+                                } else {
+                                    $state.go('404', {});
+                                    // $scope.dashboard();
                                 }
-                                completeSignIn();
                             });
                         }
                     });
@@ -97,11 +108,12 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         });
 
-        function completeSignIn() {
+        function sandboxSignIn() {
             $scope.showing.signin = false;
             $scope.showing.signout = true;
             $scope.showing.navBar = true;
             $scope.showing.sideNavBar = true;
+            $scope.showing.sandboxSelected = true;
             $state.go('launch-scenarios', {});
         }
 
@@ -123,18 +135,29 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             });
         };
 
+        $scope.dashboard = function() {
+            window.location.href = appsSettings.getSandboxUrlSettings().dashboardUrl;
+        };
+
         $scope.manageUserAccount = function() {
             userServices.userSettings();
         };
 
+        $scope.$on('$viewContentLoaded', function(){
+            if (fhirApiServices.clientInitialized()) {
+                delete sessionStorage.reauthorizing;
+                // $rootScope.$emit('signed-in');
+            } else if (sessionStorage.tokenResponse) {
+                fhirApiServices.initClient();
+            } else if (sessionStorage.hspcAuthorized && !sessionStorage.reauthorizing) {
+                sessionStorage.setItem("reauthorizing", true);
+                oauth2.login();
+            }
+        });
+
     }]).controller("AfterAuthController", // After auth
         function(fhirApiServices){
             fhirApiServices.initClient();
-    }).controller("SandboxController",
-    function($state, sandboxManagement){
-        sandboxManagement.getSandboxIdFromUrl();
-
-        $state.go('login', {});
     }).controller("404Controller",
         function(){
 
@@ -154,6 +177,39 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             userServices.createUser();
         };
         
+    }).controller("DashboardViewController",
+    function($scope, $rootScope, $state, userServices, sandboxManagement, appsSettings){
+        $scope.showing.navBar = true;
+        $scope.showing.sideNavBar = false;
+        $scope.showing.sandboxSelected = false;
+        $scope.dashboard.sandboxes = [];
+        $scope.dashboard.sandbox = {};
+
+        sandboxManagement.getUserSandboxesByUserId().then(function (sandboxesExists) {
+            if (sandboxesExists) {
+                $scope.dashboard.sandboxes = sandboxManagement.getSandboxes();
+                $rootScope.$digest();
+            } else {
+                $scope.showing.navBar = false;
+                $scope.showing.sideNavBar = false;
+                $state.go('create-sandbox', {});
+            }
+        }, function () {
+            $scope.showing.navBar = false;
+            $scope.showing.sideNavBar = false;
+            $state.go('create-sandbox', {});
+        });
+
+        $scope.$watch('dashboard.sandbox', function() {
+            if ($scope.dashboard.sandbox.sandboxId !== undefined) {
+                selectSandbox($scope.dashboard.sandbox.sandboxId);
+            }
+        });
+
+        function selectSandbox(sandboxId) {
+            window.location.href = appsSettings.getSandboxUrlSettings().dashboardUrl + "/" + sandboxId
+        }
+
     }).controller("FutureController",
     function(){
 
@@ -192,7 +248,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
     }).controller("CreateSandboxController",
-    function($rootScope, $scope, $state, sandboxManagement, appsSettings){
+    function($rootScope, $scope, $state, sandboxManagement, tools, appsSettings){
 
         $scope.showing.navBar = false;
         $scope.showing.sideNavBar = false;
@@ -205,9 +261,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.sandboxDesc = "";
         $scope.createEnabled = true;
 
-        appsSettings.getSettings().then(function(settings){
-            $scope.baseUrl = settings.baseUrl;
-        });
+        $scope.baseUrl = appsSettings.getSandboxUrlSettings().dashboardUrl;
 
         $scope.$watchGroup(['sandboxId', 'sandboxName'], function() {
             $scope.validateId($scope.sandboxId).then(function(valid){
@@ -225,7 +279,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             if ($scope.tempSandboxId !== id ) {
                 $scope.tempSandboxId = id;
                 if (id !== undefined && id !== "" && id.length <= 20 && /^[a-zA-Z0-9]*$/.test(id)) {
-                    sandboxManagement.getSandboxById(id).then(function(sandbox){
+                    tools.checkForSandboxById(id).then(function(sandbox){
                         deferred.resolve(sandbox === undefined || sandbox === "");
                     });
                 } else {
@@ -270,7 +324,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
     }).controller("LoginController",
-    function($rootScope, oauth2, fhirApiServices){
+    function($rootScope, $scope, $state, oauth2, fhirApiServices, sandboxManagement){
 
         if (fhirApiServices.clientInitialized()) {
             $rootScope.$emit('signed-in');

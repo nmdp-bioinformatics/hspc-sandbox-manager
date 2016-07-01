@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/launchScenario")
+@RequestMapping("/REST/launchScenario")
 public class LaunchScenarioController {
 
     private final LaunchScenarioService launchScenarioService;
@@ -112,19 +112,20 @@ public class LaunchScenarioController {
             launchScenario.setPatient(patient);
         }
 
-        App app = null;
-        if (sandbox == null) {
-            app = appService.findByLaunchUriAndClientIdAndSandboxId(launchScenario.getApp().getLaunchUri(), launchScenario.getApp().getAuthClient().getClientId(), null);
-        } else {
-            app = appService.findByLaunchUriAndClientIdAndSandboxId(launchScenario.getApp().getLaunchUri(), launchScenario.getApp().getAuthClient().getClientId(), sandbox.getSandboxId());
-        }
-        if (app == null || app.getAuthClient().getAuthDatabaseId() == null) {
+        if (launchScenario.getApp().getAuthClient().getAuthDatabaseId() == null) {
             // Create an anonymous App for a custom launch
-            app = launchScenario.getApp();
-            app.setSandbox(sandbox);
-            app = appService.save(app);
+            launchScenario.getApp().setSandbox(sandbox);
+            App app = appService.save(launchScenario.getApp());
+            launchScenario.setApp(app);
+        } else {
+            App app = null;
+            if (sandbox == null) {
+                app = appService.findByLaunchUriAndClientIdAndSandboxId(launchScenario.getApp().getLaunchUri(), launchScenario.getApp().getAuthClient().getClientId(), null);
+            } else {
+                app = appService.findByLaunchUriAndClientIdAndSandboxId(launchScenario.getApp().getLaunchUri(), launchScenario.getApp().getAuthClient().getClientId(), sandbox.getSandboxId());
+            }
+            launchScenario.setApp(app);
         }
-        launchScenario.setApp(app);
 
         return launchScenarioService.save(launchScenario);
     }

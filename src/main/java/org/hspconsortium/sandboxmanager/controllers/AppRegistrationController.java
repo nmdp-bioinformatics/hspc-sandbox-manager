@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping({"/app"})
+@RequestMapping({"/REST/app"})
 public class AppRegistrationController {
     private static Logger LOGGER = LoggerFactory.getLogger(AppRegistrationController.class.getName());
 

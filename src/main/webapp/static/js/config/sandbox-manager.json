@@ -5,6 +5,6 @@
     "oauthLogoutUrl": "http://localhost:8080/hspc-reference-authorization/logout",
     "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
     "defaultPersonaId": "COREPRACTITIONER1",
-    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin"],
+    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static"],
     "defaultLaunchScenarios": ["bilirubin_chart", "Growth Chart", "BP Centiles", "Cardiac Risk"]
 }

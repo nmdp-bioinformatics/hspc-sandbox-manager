@@ -53,7 +53,7 @@
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-sanitize.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.8/angular-ui-router.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.min.js"></script>
     <script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.14.3.js"></script>
     <script src="static/css/bootstrap/bootstrap-filestyle.min.js"></script>
 
@@ -75,23 +75,29 @@
 
 <!-- NAVIGATION -->
 <nav class="navbar" role="navigation" ng-show="showing.navBar">
+    <!--<div><img ng-click="dashboard()" src="static/images/hspc-sndbx-logo.png" srcset="static/images/hspc-sndbx-logo@2x.png 2x"/></div>-->
     <div><img src="static/images/hspc-sndbx-logo.png" srcset="static/images/hspc-sndbx-logo@2x.png 2x"/></div>
     <div class="navbar-brand center-title" center ng-style="centerWithOffset(160)">Sandbox Manager</div>
     <div class="pull-right">
-        <div class="navbar-stack-name ng-hide" ng-show="showing.signout">
-            Welcome <a id="welcome" ng-click="manageUserAccount()"><span style="font-weight: bold">{{oauthUser.name}}</span></a></div>
-        <div  class="navbar-stack-sign-in ng-hide" ng-show="showing.signin" >
+        <div class="navbar-stack-name" ng-show="showing.signout">
+            Welcome <span style="font-weight: bold">{{oauthUser.name}}</span></div>
+        <!--Welcome <a id="welcome" ng-click="manageUserAccount()"><span style="font-weight: bold">{{oauthUser.name}}</span></a></div>-->
+        <div  class="navbar-stack-sign-in" ng-show="showing.signin" >
             <a id="signin" ng-click="signin()"><i class="fa fa-sign-in"></i> Sign In</a>
         </div>
-        <div class="navbar-stack-sandbox ng-hide" ng-show="showing.signout" >
+        <div class="navbar-stack-sandbox" ng-show="showing.sandboxSelected && showing.signout" >
             Sandbox: <b>{{sandboxName}}</b>
         </div>
-        <div class="navbar-stack-sign-in ng-hide" ng-show="showing.signout" >
+        <div class="navbar-stack-sandboxes" ng-show="!showing.sandboxSelected && showing.signout" >
+            Sandbox: <select ng-model="dashboard.sandbox" ng-options="option as option.name for option in dashboard.sandboxes" class="form-control">
+            <option value="">- Choose A Sandbox -</option>
+        </select>
+        </div>
+        <div class="navbar-stack-sign-in" ng-show="showing.signout" >
             <a id="signout" ng-click="signout()"><i class="fa fa-sign-out"></i> Sign Out</a>
         </div>
     </div>
 </nav>
-
 
 <div>
     <div class="row container-fluid">
@@ -111,8 +117,7 @@
 <footer ng-show="showing.navBar">
     <div class="container">
         <div class="copyright">
-            <!--<a class="spm spm-logo-footer" href="https://www.digicert.com/" style="display:inline"><img src="static/images/digi-footer-logo.png" border="0" style="display:inline"></a>-->
-            <!--© 2003-2016 DigiCert® Inc • <i>SSL Certificate Authority</i> • All Rights Reserved | All trademarks displayed on this web site are the exclusive property of the respective holders.-->
+            © 2016 by Healthcare Services Platform Consortium
             <!-- Begin DigiCert site seal HTML and JavaScript -->
             <div class="site-seal">
                 <div id="DigiCertClickID_YT4mvfuq" data-language="en">
