@@ -79,7 +79,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                             // $scope.dashboard();
                             sandboxManagement.getUserSandboxesByUserId().then(function (sandboxesExists) {
                                 if (sandboxesExists) {
-                                    window.location.href = appsSettings.getSandboxUrlSettings().dashboardUrl + "/" + sandboxManagement.getSandboxes()[0].sandboxId
+                                    window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + sandboxManagement.getSandboxes()[0].sandboxId
                                 } else {
                                     $scope.showing.navBar = false;
                                     $scope.showing.sideNavBar = false;
@@ -129,14 +129,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.signout = false;
             $scope.showing.navBar = true;
             $scope.showing.sideNavBar = false;
-            oauth2.logout().then(function(){
-                $state.go('start', {});
-                //oauth2.login();
-            });
+            oauth2.logout();
         };
 
         $scope.dashboard = function() {
-            window.location.href = appsSettings.getSandboxUrlSettings().dashboardUrl;
+            window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl;
         };
 
         $scope.manageUserAccount = function() {
@@ -207,7 +204,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         });
 
         function selectSandbox(sandboxId) {
-            window.location.href = appsSettings.getSandboxUrlSettings().dashboardUrl + "/" + sandboxId
+            window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + sandboxId
         }
 
     }).controller("FutureController",
@@ -261,7 +258,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.sandboxDesc = "";
         $scope.createEnabled = true;
 
-        $scope.baseUrl = appsSettings.getSandboxUrlSettings().dashboardUrl;
+        $scope.baseUrl = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl;
 
         $scope.$watchGroup(['sandboxId', 'sandboxName'], function() {
             $scope.validateId($scope.sandboxId).then(function(valid){

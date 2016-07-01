@@ -3,7 +3,6 @@
     "defaultServiceUrl": "http://localhost:8080/hspc-reference-api/data",
     "baseServiceUrl": "http://localhost:8080/hspc-reference-api/",
     "oauthLogoutUrl": "http://localhost:8080/hspc-reference-authorization/logout",
-    "oauthLogoutSuccessUrl": "http://localhost:8080/hspc-sandbox-manager",
     "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
     "defaultPersonaId": "COREPRACTITIONER1",
     "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static"],

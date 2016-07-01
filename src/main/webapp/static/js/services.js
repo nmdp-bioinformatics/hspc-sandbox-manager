@@ -48,9 +48,11 @@ angular.module('sandManApp.services', [])
                 });
             },
             logout: function(){
-                window.location.href=appsSettings.getSettings().oauthLogoutUrl
-                    + "?hspcRedirectUrl="
-                    + encodeURI(appsSettings.getSettings().oauthLogoutSuccessUrl);
+                appsSettings.getSettings().then(function(settings) {
+                    window.location.href = settings.oauthLogoutUrl
+                        + "?hspcRedirectUrl="
+                        + encodeURI(appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl);
+                });
             },
             login: function(sandboxId){
                 
@@ -983,7 +985,7 @@ angular.module('sandManApp.services', [])
                         }
                     });
                 } else {
-                    deferred.resolve(undefined);
+                    deferred.reject();
                 }
                 return deferred;
             },
@@ -1172,8 +1174,8 @@ angular.module('sandManApp.services', [])
                 if (sandboxBaseUrlWithoutHash.endsWith("/")) {
                     sandboxBaseUrlWithoutHash = sandboxBaseUrlWithoutHash.substring(0, sandboxBaseUrlWithoutHash.length-1);
                 }
-                sandboxUrlSettings.dashboardUrl = getDashboardUrl(envInfo.env === "null", sandboxBaseUrlWithoutHash);
-                sandboxUrlSettings.sandboxId = sandboxBaseUrlWithoutHash.substring(sandboxUrlSettings.dashboardUrl.length + 1);
+                sandboxUrlSettings.sandboxManagerRootUrl = getDashboardUrl(envInfo.env === "null", sandboxBaseUrlWithoutHash);
+                sandboxUrlSettings.sandboxId = sandboxBaseUrlWithoutHash.substring(sandboxUrlSettings.sandboxManagerRootUrl.length + 1);
                 var trailingSlash = sandboxUrlSettings.sandboxId.lastIndexOf("/");
                 if (trailingSlash > -1 && trailingSlash === sandboxUrlSettings.sandboxId.length - 1) {
                     sandboxUrlSettings.sandboxId = sandboxUrlSettings.sandboxId.substring(0, sandboxUrlSettings.sandboxId.length - 1);
@@ -1181,7 +1183,7 @@ angular.module('sandManApp.services', [])
                 if (sandboxUrlSettings.sandboxId === "") {
                     sandboxUrlSettings.sandboxId = undefined;
                 }
-                sandboxUrlSettings.baseRestUrl = sandboxUrlSettings.dashboardUrl + "/REST";
+                sandboxUrlSettings.baseRestUrl = sandboxUrlSettings.sandboxManagerRootUrl + "/REST";
                 
             }
             return sandboxUrlSettings;    

@@ -6,6 +6,5 @@
                     "defaultServiceUrl": "<%= System.getProperty("defaultServiceUrl") %>",
                     "baseServiceUrl": "<%= System.getProperty("baseServiceUrl") %>",
                     "oauthLogoutUrl": "<%= System.getProperty("oauthLogoutUrl") %>",
-                    "oauthLogoutSuccessUrl": "<%= System.getProperty("oauthLogoutSuccessUrl") %>",
                     "userManagementUrl": "<%= System.getProperty("userManagementUrl") %>"
                 });
