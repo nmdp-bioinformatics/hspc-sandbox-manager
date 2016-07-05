@@ -925,7 +925,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.selectedScenario = '';
         });
 
-    }).controller("AppPickerController", function($rootScope, $scope, $state, $stateParams, appRegistrationServices, customFhirApp, launchApp, sandboxManagement, $uibModal) {
+    }).controller("AppPickerController", function($rootScope, $scope, $state, $stateParams, appRegistrationServices, appsService, customFhirApp, launchApp, sandboxManagement, $uibModal) {
         $scope.all_user_apps = [];
         var source = $stateParams.source;
         var action = $stateParams.action;
@@ -933,7 +933,14 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.title =  "Registered Apps";
         $scope.showCustomApp = true;
 
-        $scope.all_user_apps = appRegistrationServices.getAppList();
+        appsService.getSampleApps().done(function(patientApps){
+            $scope.all_user_apps = angular.copy(appRegistrationServices.getAppList());
+            for (var i=0; i < patientApps.length; i++) {
+                if (patientApps[i]["isDefault"] !== undefined) {
+                    $scope.all_user_apps.push(angular.copy(patientApps[i]));
+                }
+            }
+        });
 
         $scope.select = function launch(app){
 

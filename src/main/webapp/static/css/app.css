@@ -327,6 +327,7 @@ span.title,
     color: #666666;
     position: relative;
     display: block;
+    text-decoration: none;
     padding: 10px 15px;
 }
 

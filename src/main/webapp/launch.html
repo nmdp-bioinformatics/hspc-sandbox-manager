@@ -21,7 +21,7 @@
         
         // Session storage is inherited from opening window, so
         // we need to purge the tokenResponse here to avoid passing
-        // the FHIR Starter's token credentials to the app
+        // the Sandbox Manager's token credentials to the app
         delete sessionStorage.tokenResponse;
         
         window.location = details.app.launchUri +
