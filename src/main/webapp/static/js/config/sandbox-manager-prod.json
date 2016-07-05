@@ -1,9 +1,10 @@
 {
-    "profileUpdateUri" : "https://sandbox.hspconsortium.org/dstu2/hspc-reference-messaging/sandboxuser/profileupdate",
-    "defaultServiceUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-api/data",
-    "baseServiceUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-api/",
-    "oauthLogoutUrl": "https://sandbox.hspconsortium.org/dstu2/hspc-reference-authorization/logout",
-    "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
+    "profileUpdateUri" : "https://stage-messaging.hspconsortium.org/sandboxuser/profileupdate",
+    "defaultServiceUrl": "https://stage-api.hspconsortium.org/data",
+    "baseServiceUrl": "https://stage-api.hspconsortium.org/",
+    "oauthLogoutUrl": "https://stage-auth.hspconsortium.org/logout",
+    "userManagementUrl": "https://stage-pwm.hspconsortium.org",
+    "defaultPersonaId": "COREPRACTITIONER1",
     "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin"],
     "defaultLaunchScenarios": ["bilirubin_chart", "Growth Chart", "BP Centiles", "Cardiac Risk"]
 }
