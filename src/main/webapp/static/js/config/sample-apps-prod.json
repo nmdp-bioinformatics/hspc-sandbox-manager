@@ -4,10 +4,10 @@
         "authClient": {
             "clientName" : "Bilirubin Chart",
             "clientId": "bilirubin_chart",
-            "redirectUri" : "https://stage-apps.hspconsortium.org/hspc-bilirubin-app/static/bilirubin-chart/"
+            "redirectUri" : "https://stage-apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/"
         },
-        "launchUri" : "https://stage-apps.hspconsortium.org/hspc-bilirubin-app/static/bilirubin-chart/launch.html",
-        "logoUri" : "https://stage-apps.hspconsortium.org/hspc-bilirubin-app/static/bilirubin-chart/images/bilirubin.png"
+        "launchUri" : "https://stage-apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/launch.html",
+        "logoUri" : "https://stage-apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/images/bilirubin.png"
     },
     {
         "authClient": {
