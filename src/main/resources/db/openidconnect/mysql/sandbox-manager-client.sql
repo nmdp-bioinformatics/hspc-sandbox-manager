@@ -11,7 +11,8 @@ INSERT INTO client_redirect_uri (owner_id, redirect_uri) VALUES
   ((SELECT id from client_details where client_id = 'sand_man'), 'http://localhost:8080/hspc-sandbox-manager'),
   ((SELECT id from client_details where client_id = 'sand_man'), 'http://54.213.219.198:9080/uat/hspc-sandbox-manager'),
   ((SELECT id from client_details where client_id = 'sand_man'), 'http://ec2-54-191-52-193.us-west-2.compute.amazonaws.com/proxy'),
-  ((SELECT id from client_details where client_id = 'sand_man'), 'https://sandbox.hspconsortium.org/hspc-sandbox-manager');
+  ((SELECT id from client_details where client_id = 'sand_man'), 'https://sandbox.hspconsortium.org/hspc-sandbox-manager'),
+  ((SELECT id from client_details where client_id = 'sand_man'), 'https://stage-sandbox.hspconsortium.org');
 
 INSERT INTO client_scope (owner_id, scope) VALUES
   ((SELECT id from client_details where client_id = 'sand_man'), 'user/*.*'),
