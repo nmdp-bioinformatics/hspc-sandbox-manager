@@ -1,9 +1,9 @@
 {
-    "profileUpdateUri" : "https://stage-messaging.hspconsortium.org/sandboxuser/profileupdate",
-    "defaultServiceUrl": "https://stage-api.hspconsortium.org/data",
-    "baseServiceUrl": "https://stage-api.hspconsortium.org/",
-    "oauthLogoutUrl": "https://stage-auth.hspconsortium.org/logout",
-    "userManagementUrl": "https://stage-pwm.hspconsortium.org",
+    "profileUpdateUri" : "https://hspcreferencemessag-env.us-west-2.elasticbeanstalk.com/sandboxuser/profileupdate",
+    "defaultServiceUrl": "https://stage-secure-api.hspconsortium.org/data",
+    "baseServiceUrl": "https://stage-secure-api.hspconsortium.org/",
+    "oauthLogoutUrl": "https://stage-secure-auth.hspconsortium.org/logout",
+    "userManagementUrl": "https://stage-secure-pwm.hspconsortium.org",
     "defaultPersonaId": "COREPRACTITIONER1",
     "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin"],
     "defaultLaunchScenarios": ["bilirubin_chart", "Growth Chart", "BP Centiles", "Cardiac Risk"]
