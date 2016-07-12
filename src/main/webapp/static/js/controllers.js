@@ -12,7 +12,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             searchloading: false,
             navBar: true,
             sideNavBar: false,
-            largeSidebar: true
+            largeSidebar: true,
+            start: false
         };
         $scope.sandboxName = "HSPC";
         $scope.messages = [];
@@ -29,29 +30,23 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
             if (toState.authenticate && typeof fhirApiServices.fhirClient() === "undefined"){
                 // User isn’t authenticated
-                $scope.signin();
+                if (!window.location.hash.startsWith("#/after-auth")) {
+                    $scope.signin();
+                }
                 event.preventDefault();
-            }
-            if (toState.needsSandbox && !sandboxManagement.hasSandbox()){
+            } else if (toState.needsSandbox && !sandboxManagement.hasSandbox()){
                 // User can't go to a page which requires a sandbox without a sandbox
                 $scope.showing.navBar = false;
                 $scope.showing.sideNavBar = false;
                 $state.go('create-sandbox', {});
                 event.preventDefault();
-            }
-            if (toState.name == "launch-scenarios" && fromState.name == "after-auth"){
-                $scope.signin();
-                event.preventDefault();
-            }
-            if (toState.name == "create-sandbox" && sandboxManagement.hasSandbox()){
+            } else if (toState.name == "create-sandbox" && sandboxManagement.hasSandbox()){
                 $state.go('launch-scenarios', {});
                 event.preventDefault();
-            }
-            if (toState.name == "progress" && !sandboxManagement.creatingSandbox()){
+            } else if (toState.name == "progress" && !sandboxManagement.creatingSandbox()){
 //                $scope.signin();
                 event.preventDefault();
-            }
-            if (toState.scenarioBuilderStep && sandboxManagement.getScenarioBuilder().persona === "") {
+            } else if (toState.scenarioBuilderStep && sandboxManagement.getScenarioBuilder().persona === "") {
                 $state.go('launch-scenarios', {});
                 event.preventDefault();
             }
@@ -140,17 +135,15 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             userServices.userSettings();
         };
 
-        $scope.$on('$viewContentLoaded', function(){
-            if (fhirApiServices.clientInitialized()) {
-                delete sessionStorage.reauthorizing;
-                // $rootScope.$emit('signed-in');
-            } else if (sessionStorage.tokenResponse) {
-                fhirApiServices.initClient();
-            } else if (sessionStorage.hspcAuthorized && !sessionStorage.reauthorizing) {
-                sessionStorage.setItem("reauthorizing", true);
-                oauth2.login();
-            }
-        });
+        // $scope.$on('$viewContentLoaded', function(){
+        if (fhirApiServices.clientInitialized()) {
+            // $rootScope.$emit('signed-in');
+        } else if (sessionStorage.tokenResponse) {
+            fhirApiServices.initClient();
+        } else if (sessionStorage.hspcAuthorized && !window.location.hash.startsWith("#/after-auth")) {
+            oauth2.login();
+        }
+        // });
 
     }]).controller("AfterAuthController", // After auth
         function(fhirApiServices){
@@ -163,9 +156,12 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.errorMessage = errorService.getErrorMessage();
 
     }).controller("StartController",
-    function($scope, $state, userServices){
+    function($scope, $state, $timeout, userServices){
         $scope.showing.navBar = true;
         $scope.showing.sideNavBar = false;
+        $scope.showing.start = !sessionStorage.hspcAuthorized;
+
+        $timeout($scope.showing.start = true, 5000);
 
         $scope.signin = function() {
             $state.go('login', {});

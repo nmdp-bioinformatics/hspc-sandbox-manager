@@ -111,14 +111,13 @@ angular.module('sandManApp.services', [])
                 if (params.code){
                     delete sessionStorage.tokenResponse;
                     FHIR.oauth2.ready(params, function(newSmart){
-                        if (newSmart && newSmart.state && newSmart.state.from !== undefined){
-                            sessionStorage.setItem("hspcAuthorized", true);
-                            delete sessionStorage.reauthorizing;
-                            $location.url(newSmart.state.from);
-                            fhirClient = newSmart;
-                            $rootScope.$emit('signed-in');
-                            $rootScope.$digest();
-                        }
+                        // if (newSmart.state && newSmart.state.from !== undefined){
+                        //     $location.url(newSmart.state.from);
+                        // }
+                        sessionStorage.setItem("hspcAuthorized", true);
+                        fhirClient = newSmart;
+                        $rootScope.$emit('signed-in');
+                        $rootScope.$digest();
                     });
                 } else {
                     oauth2.login();
