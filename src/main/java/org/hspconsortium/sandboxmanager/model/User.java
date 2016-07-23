@@ -45,7 +45,11 @@ public class User {
         return name;
     }
 
-    @OneToMany(cascade={CascadeType.ALL})
+    @ManyToMany(cascade={CascadeType.ALL})
+    @JoinTable(name = "user_sandbox", joinColumns = {
+            @JoinColumn(name = "user_id", nullable = false, updatable = false) },
+            inverseJoinColumns = { @JoinColumn(name = "sandbox_id",
+                    nullable = false, updatable = false) })
     @JsonIgnore
     public List<Sandbox> getSandboxes() {
 //        for (Sandbox sandbox : sandboxes) {

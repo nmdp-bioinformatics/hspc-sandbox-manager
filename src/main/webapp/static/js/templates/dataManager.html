@@ -5,14 +5,14 @@
             <div class="slim-page-header">Import JSON Bundle</div>
             <div class="pull-left basic-text">Paste JSON FHIR Bundle in the Text Area</div>
 
-            <textarea resize ng-style="resizeWithOffset(260)" ng-model="bundle" style="resize: none; background-color: #fff; cursor: text; height:400px; margin-top: 30px" class="form-control"></textarea>
+            <textarea resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+140)" ng-model="bundle" style="resize: none; background-color: #fff; cursor: text; height:400px; margin-top: 30px" class="form-control"></textarea>
             <div class="col-md-12 content-column">
                 <div ng-disabled="!bundle" class="btn btn-basic btn-md" ng-click="upload(bundle)"><i class="fa fa-upload fa-lg"></i> Import</div>
             </div>
         </div>
         <div class="col-lg-6" ng-show="showing.results">
             <div class="slim-page-header" style="padding-bottom:20px">Import Results</div>
-            <textarea resize ng-style="resizeWithOffset(260)" style="resize: none; background-color: #fff; cursor: text; height:400px" class="form-control"  readonly>{{bundleResults}}</textarea>
+            <textarea resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+140)" style="resize: none; background-color: #fff; cursor: text; height:400px" class="form-control"  readonly>{{bundleResults}}</textarea>
         </div>
     </div>
 

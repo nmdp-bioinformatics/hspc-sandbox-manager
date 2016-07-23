@@ -4,6 +4,7 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
     return function (scope, element, attr) {
 
         var w = angular.element($window);
+        var toggle = 0;
         scope.$parent.$watch(function () {
             return {
                 'h': w.height(),
@@ -37,6 +38,18 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
                 }
 
                 return height + 'px'
+            };
+            // Hack to force the table to redraw so that the headers will redraw
+            scope.$parent.redrawTable = function (height, width) {
+
+                scope.$parent.$eval(attr.notifier);
+
+                toggle = (toggle === 1) ? -1 : 1;
+
+                return {
+                    'height': height + 'px',
+                    'width' : (width + toggle) + 'px'
+                };
             };
 
         }, true);
@@ -232,40 +245,15 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
             });
         }
     };
-}]);
-// .directive('contentEditable', function() {
-//     return {
-//         require: 'ngModel',
-//         link: function(scope, elm, attrs, ctrl) {
-//             // view -> model
-//             elm.bind('blur', function() {
-//                 scope.$apply(function() {
-//                     ctrl.$setViewValue(elm.html());
-//                 });
-//             });
-//
-//             // model -> view
-//             ctrl.render = function(value) {
-//                 elm.html(value);
-//             };
-//
-//             // load init value from DOM
-//             ctrl.$setViewValue(elm.html());
-//
-//             elm.bind('keydown', function(event) {
-//                 // console.log("keydown " + event.which);
-//                 var esc = event.which == 27,
-//                     el = event.target;
-//
-//                 if (esc) {
-//                     // console.log("esc");
-//                     ctrl.$setViewValue(elm.html());
-//                     el.blur();
-//                     event.preventDefault();
-//                 }
-//
-//             });
-//
-//         }
-//     };
-// });
+}]).directive('a', function() {
+    return {
+        restrict: 'E',
+        link: function(scope, elem, attrs) {
+            if(!attrs.uiSref && (attrs.ngClick || attrs.href === '' || attrs.href === '#')){
+                elem.on('click', function(e){
+                    e.preventDefault();
+                });
+            }
+        }
+    };
+});

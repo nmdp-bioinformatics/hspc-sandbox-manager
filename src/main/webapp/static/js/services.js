@@ -223,7 +223,7 @@ angular.module('sandManApp.services', [])
 
                 $.when(fhirClient.api.transaction({data: angular.copy(bundle)}))
                     .done(function(results){
-                        notification.message("Bundle Uploaded");
+                        // notification.message("Bundle Uploaded");
                         deferred.resolve(results.data);
                     }).fail(function(error){
                         deferred.reject(error.data.responseText);
@@ -521,6 +521,22 @@ angular.module('sandManApp.services', [])
                 });
                 return deferred;
             },
+            removeUserFromSandboxByUserId: function(ldapId) {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "?userId=" + encodeURIComponent(ldapId),
+                    type: 'PUT',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(sandboxResult){
+                    deferred.resolve(true);
+                }).fail(function(){
+                });
+                return deferred;
+            },
             getSandboxById: function() {
                 var that = this;
                 var deferred = $.Deferred();
@@ -634,7 +650,7 @@ angular.module('sandManApp.services', [])
                         }
                     }).done(function(result){
                             oauthUser = {
-                                ldapId: result.sub,
+                                ldapId: result.sub.toLowerCase(),
                                 name: result.name
                             };
                             deferred.resolve(oauthUser);
@@ -836,6 +852,95 @@ angular.module('sandManApp.services', [])
                 errorService.setErrorMessage(error.message);
                 deferred.reject();
                 // notification.message({ type:"error", text: "Failed to Upload Image" });
+            });
+            return deferred;
+        }
+
+    };
+}).factory('sandboxInviteServices', function($rootScope, $http, fhirApiServices, userServices,
+                                             appsSettings, sandboxManagement, notification, errorService) {
+
+    return {
+        createSandboxInvite: function(ldapId){
+            var deferred = $.Deferred();
+            
+            var sandboxInvite = {
+                invitedBy: {
+                    ldapId: userServices.getOAuthUser().ldapId
+                },
+                invitee: {
+                    ldapId: ldapId
+                },
+                sandbox: sandboxManagement.getSandbox()
+            };
+
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite",
+                type: 'PUT',
+                data: JSON.stringify(sandboxInvite),
+                contentType: "application/json",
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(){
+                // notification.message("Invite Sent");
+                deferred.resolve();
+            }).fail(function(error){
+                // notification.message({ type:"error", text: "Failed to Send Invite" });
+                deferred.reject();
+            });
+            return deferred;
+        },
+        getSandboxInvitesByLdapId: function(status){
+            var deferred = $.Deferred();
+            var that = this;
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite?ldapId=" + encodeURIComponent(userServices.getOAuthUser().ldapId) +
+                    "&status=" + status,
+                type: 'GET',
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(results){
+                deferred.resolve(results);
+                $rootScope.$digest();
+            }).fail(function(){
+                deferred.reject();
+            });
+            return deferred;
+        },
+        getSandboxInvitesBySandboxId: function(status){
+            var deferred = $.Deferred();
+            var that = this;
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite?sandboxId=" + sandboxManagement.getSandbox().sandboxId +
+                "&status=" + status,
+                type: 'GET',
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(results){
+                deferred.resolve(results);
+                $rootScope.$digest();
+            }).fail(function(){
+                deferred.reject();
+            });
+            return deferred;
+        },
+        updateSandboxInvite: function(sandboxInvite, status){
+            var deferred = $.Deferred();
+            var that = this;
+            $.ajax({                                                                                                 
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite/" + sandboxInvite.id + "?status=" + status,
+                type: 'PUT',
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(results){
+                deferred.resolve(results);
+                $rootScope.$digest();
+            }).fail(function(){
+                deferred.reject();
             });
             return deferred;
         }

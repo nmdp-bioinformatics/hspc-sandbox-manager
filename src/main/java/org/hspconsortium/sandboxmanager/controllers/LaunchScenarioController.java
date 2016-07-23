@@ -68,7 +68,8 @@ public class LaunchScenarioController {
         Sandbox sandbox = null;
         if (launchScenario.getSandbox() != null) {
             sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
-            checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
+//            checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
+            checkUserAuthorization(request, sandbox.getUserRoles());
             launchScenario.setSandbox(sandbox);
         }
 
@@ -138,7 +139,9 @@ public class LaunchScenarioController {
                             "Response Detail : Launch Scenario Id doesn't match Id in JSON body."
                     , HttpStatus.SC_BAD_REQUEST));
         }
-        checkUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
+//        checkUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
+        Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
+        checkUserAuthorization(request, sandbox.getUserRoles());
         LaunchScenario updateLaunchScenario = launchScenarioService.getById(launchScenario.getId());
         if (updateLaunchScenario != null) {
             updateLaunchScenario.setLastLaunchSeconds(launchScenario.getLastLaunchSeconds());
@@ -154,7 +157,8 @@ public class LaunchScenarioController {
                    @RequestParam(value = "appId") int appId) {
 
         App app = appService.getById(appId);
-        checkUserAuthorization(request, app.getSandbox().getCreatedBy().getLdapId());
+//        checkUserAuthorization(request, app.getSandbox().getCreatedBy().getLdapId());
+        checkUserAuthorization(request, app.getSandbox().getUserRoles());
 
         return launchScenarioService.findByAppIdAndSandboxId(app.getId(), app.getSandbox().getSandboxId());
     }
@@ -163,7 +167,9 @@ public class LaunchScenarioController {
     @Transactional
     public @ResponseBody void deleteLaunchScenario(HttpServletRequest request, @PathVariable Integer id) {
         LaunchScenario launchScenario = launchScenarioService.getById(id);
-        checkUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
+//        checkUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
+        Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
+        checkUserAuthorization(request, sandbox.getUserRoles());
         if (launchScenario.getApp().getAuthClient().getAuthDatabaseId() == null) {
             // This is an anonymous App created for a custom launch
             appService.delete(launchScenario.getApp());
@@ -206,6 +212,23 @@ public class LaunchScenarioController {
         if (!userId.equalsIgnoreCase(oauthUserId)) {
             throw new UnauthorizedException(String.format("Response Status : %s.\n" +
                     "Response Detail : User not authorized to perform this action."
+                    , HttpStatus.SC_UNAUTHORIZED));
+        }
+    }
+
+    private void checkUserAuthorization(HttpServletRequest request, List<UserRole> users) {
+        String oauthUserId = oAuthUserService.getOAuthUserId(request);
+        boolean userIsAuthorized = false;
+
+        for(UserRole user : users) {
+            if (user.getUser().getLdapId().equalsIgnoreCase(oauthUserId) && user.getRole() != Role.READONLY) {
+                userIsAuthorized = true;
+            }
+        }
+
+        if (!userIsAuthorized) {
+            throw new UnauthorizedException(String.format("Response Status : %s.\n" +
+                            "Response Detail : User not authorized to perform this action."
                     , HttpStatus.SC_UNAUTHORIZED));
         }
     }

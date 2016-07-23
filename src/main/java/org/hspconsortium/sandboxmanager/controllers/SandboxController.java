@@ -43,6 +43,7 @@ import org.hspconsortium.sandboxmanager.model.User;
 import org.hspconsortium.sandboxmanager.model.UserRole;
 import org.hspconsortium.sandboxmanager.services.OAuthService;
 import org.hspconsortium.sandboxmanager.services.SandboxService;
+import org.hspconsortium.sandboxmanager.services.UserRoleService;
 import org.hspconsortium.sandboxmanager.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +62,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 @RestController
@@ -76,13 +78,15 @@ public class SandboxController {
 
     private final SandboxService sandboxService;
     private final UserService userService;
+    private final UserRoleService userRoleService;
     private final OAuthService oAuthUserService;
 
     @Inject
     public SandboxController(final SandboxService sandboxService, final UserService userService,
-                             final OAuthService oAuthUserService) {
+                             final OAuthService oAuthUserService, final UserRoleService userRoleService) {
         this.sandboxService = sandboxService;
         this.userService = userService;
+        this.userRoleService = userRoleService;
         this.oAuthUserService = oAuthUserService;
     }
 
@@ -90,12 +94,21 @@ public class SandboxController {
     @Transactional
     public @ResponseBody Sandbox createSandbox(HttpServletRequest request, @RequestBody final Sandbox sandbox) throws UnsupportedEncodingException{
 
+        Sandbox existingSandbox = sandboxService.findBySandboxId(sandbox.getSandboxId());
+        if (existingSandbox != null) {
+            return existingSandbox;
+        }
+
         LOGGER.info("Creating sandbox: " + sandbox.getName());
         checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
         User user = userService.findByLdapId(sandbox.getCreatedBy().getLdapId());
         if (user == null) {
             user = userService.save(sandbox.getCreatedBy());
+        } else if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(oAuthUserService.getOAuthUserName(request));
+            userService.save(user);
         }
+
         sandbox.setCreatedBy(user);
         List<UserRole> userRoles = new ArrayList<>();
         userRoles.add(new UserRole(user, Role.ADMIN));
@@ -171,7 +184,8 @@ public class SandboxController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces ="application/json")
     public @ResponseBody Sandbox getSandboxById(HttpServletRequest request, @PathVariable String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
-        checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
+//        checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
+        checkUserAuthorization(request, sandbox.getUserRoles());
         return sandbox;
     }
 
@@ -187,6 +201,34 @@ public class SandboxController {
         }
 
         return Collections.EMPTY_LIST;
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = "application/json", params = {"userId"})
+    @Transactional
+    public void removeSandboxUser(HttpServletRequest request, @PathVariable String id, @RequestParam(value = "userId") String userIdEncoded) throws UnsupportedEncodingException {
+        Sandbox sandbox = sandboxService.findBySandboxId(id);
+        //Only the Sandbox creater can remove a user right now
+        checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
+        String removeUserId = java.net.URLDecoder.decode(userIdEncoded, "UTF-8");
+
+        User user = userService.findByLdapId(removeUserId);
+        if (user != null) {
+            List<Sandbox> sandboxes = user.getSandboxes();
+            sandboxes.remove(sandbox);
+            user.setSandboxes(sandboxes);
+            userService.save(user);
+            List<UserRole> userRoles = sandbox.getUserRoles();
+            Iterator<UserRole> iterator = userRoles.iterator();
+            while (iterator.hasNext()) {
+                UserRole userRole = iterator.next();
+                if (userRole.getUser().getId().equals(user.getId())) {
+                    userRoleService.delete(userRole.getId());
+                    iterator.remove();
+                }
+            }
+            sandbox.setUserRoles(userRoles);
+            sandboxService.save(sandbox);
+        }
     }
 
     @ExceptionHandler(UnauthorizedException.class)
@@ -212,4 +254,22 @@ public class SandboxController {
                     , HttpStatus.SC_UNAUTHORIZED));
         }
     }
+
+    private void checkUserAuthorization(HttpServletRequest request, List<UserRole> users) {
+        String oauthUserId = oAuthUserService.getOAuthUserId(request);
+        boolean userIsAuthorized = false;
+
+        for(UserRole user : users) {
+            if (user.getUser().getLdapId().equalsIgnoreCase(oauthUserId) && user.getRole() != Role.READONLY) {
+                userIsAuthorized = true;
+            }
+        }
+
+        if (!userIsAuthorized) {
+            throw new UnauthorizedException(String.format("Response Status : %s.\n" +
+                            "Response Detail : User not authorized to perform this action."
+                    , HttpStatus.SC_UNAUTHORIZED));
+        }
+    }
+
 }

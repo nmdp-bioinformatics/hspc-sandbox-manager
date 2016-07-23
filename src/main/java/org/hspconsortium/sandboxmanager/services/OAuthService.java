@@ -10,6 +10,8 @@ public interface OAuthService {
 
     String getOAuthUserId(HttpServletRequest request);
 
+    String getOAuthUserName(HttpServletRequest request);
+
     String postOAuthClient(String clientJSON);
 
     String putOAuthClient(Integer id, String clientJSON);

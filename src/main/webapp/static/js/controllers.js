@@ -4,10 +4,17 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "$location", "$state", "tools",
     function($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, $location, $state, tools) {
 
+        $scope.size = {
+            navBarHeight: 60,
+            footerHeight: 60,
+            sandboxBarHeight: 0
+        };
+
         $scope.showing = {
             signout: false,
             signin: true,
-            sandboxSelected: false,
+            slimBlueBar: false,
+            progress: false,
             loading: false,
             searchloading: false,
             navBar: true,
@@ -15,7 +22,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             largeSidebar: true,
             start: false
         };
-        $scope.sandboxName = "HSPC";
+
+        $scope.title = {blueBarTitle: "The Healthcare Innovation Ecosystem"};
         $scope.messages = [];
         $scope.dashboard = {
             sandboxes: [],
@@ -40,9 +48,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.showing.sideNavBar = false;
                 $state.go('create-sandbox', {});
                 event.preventDefault();
-            } else if (toState.name == "create-sandbox" && sandboxManagement.hasSandbox()){
-                $state.go('launch-scenarios', {});
-                event.preventDefault();
             } else if (toState.name == "progress" && !sandboxManagement.creatingSandbox()){
 //                $scope.signin();
                 event.preventDefault();
@@ -61,38 +66,26 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
             userServices.getOAuthUserFromServer().then(function(){
                 $scope.oauthUser = userServices.getOAuthUser();
+                $scope.showing.signin = false;
+                $scope.showing.signout = true;
+                getSandboxes();
 
                 if (canceledSandboxCreate) {
-                    $state.go('start', {});
-                    // $scope.dashboard();;
+                    $scope.dashboard();
                 } else {
                     appsSettings.getSettings().then(function(settings){
                         
                         //Initial sign in with no sandbox specified
                         if (fhirApiServices.fhirClient().server.serviceUrl === settings.defaultServiceUrl) {
-                            // TODO bypassing the dashboard redirect
-                            // $scope.dashboard();
-                            sandboxManagement.getUserSandboxesByUserId().then(function (sandboxesExists) {
-                                if (sandboxesExists) {
-                                    window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + sandboxManagement.getSandboxes()[0].sandboxId
-                                } else {
-                                    $scope.showing.navBar = false;
-                                    $scope.showing.sideNavBar = false;
-                                    $state.go('create-sandbox', {});
-                                }
-                            }, function () {
-                                $scope.showing.navBar = false;
-                                $scope.showing.sideNavBar = false;
-                                $state.go('create-sandbox', {});
-                            });
+                            $scope.dashboard();
                         } else {
                             sandboxManagement.getSandboxById().then(function(sandboxExists){
                                 if (sandboxExists) {
-                                    $scope.sandboxName = sandboxManagement.getSandbox().name;
+                                    $scope.title.blueBarTitle = sandboxManagement.getSandbox().name;
                                     sandboxSignIn();
                                 } else {
-                                    $state.go('404', {});
-                                    // $scope.dashboard();
+                                    // $state.go('404', {});
+                                    $scope.dashboard();
                                 }
                             });
                         }
@@ -108,7 +101,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.signout = true;
             $scope.showing.navBar = true;
             $scope.showing.sideNavBar = true;
-            $scope.showing.sandboxSelected = true;
+            $scope.showing.slimBlueBar = true;
+            $scope.size.sandboxBarHeight = 30;
             $state.go('launch-scenarios', {});
         }
 
@@ -127,13 +121,39 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             oauth2.logout();
         };
 
+        $scope.selectSandbox = function(sandbox) {
+            if (sandboxManagement.getSandbox().sandboxId !== sandbox.sandboxId) {
+                window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + sandbox.sandboxId
+            }
+        };
+
+        $scope.createSandbox = function () {
+            $state.go('create-sandbox', {});
+        };
+
         $scope.dashboard = function() {
-            window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl;
+            window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/#/dashboard-view";
         };
 
         $scope.manageUserAccount = function() {
             userServices.userSettings();
         };
+
+        $rootScope.$on('refresh-sandboxes', function(){
+            getSandboxes();
+        });
+
+
+        function getSandboxes() {
+            sandboxManagement.getUserSandboxesByUserId().then(function (sandboxesExists) {
+                if (sandboxesExists) {
+                    $scope.showing.signin = false;
+                    $scope.showing.signout = true;
+                    $scope.dashboard.sandboxes = sandboxManagement.getSandboxes();
+                    $rootScope.$digest();
+                }
+            });
+        }
 
         // $scope.$on('$viewContentLoaded', function(){
         if (fhirApiServices.clientInitialized()) {
@@ -161,48 +181,104 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.showing.sideNavBar = false;
         $scope.showing.start = !sessionStorage.hspcAuthorized;
 
-        $timeout($scope.showing.start = true, 5000);
-
         $scope.signin = function() {
             $state.go('login', {});
         };
         $scope.signup = function() {
             userServices.createUser();
         };
-        
+
     }).controller("DashboardViewController",
-    function($scope, $rootScope, $state, userServices, sandboxManagement, appsSettings){
+    function($scope, $rootScope, $state, userServices, sandboxManagement, sandboxInviteServices, appsSettings){
         $scope.showing.navBar = true;
         $scope.showing.sideNavBar = false;
-        $scope.showing.sandboxSelected = false;
-        $scope.dashboard.sandboxes = [];
-        $scope.dashboard.sandbox = {};
+        $scope.showing.slimBlueBar = false;
+        $scope.size.sandboxBarHeight = 0;
+        $scope.sandboxInvites = [];
+        $scope.title.blueBarTitle = "Dashboard";
 
-        sandboxManagement.getUserSandboxesByUserId().then(function (sandboxesExists) {
-            if (sandboxesExists) {
-                $scope.dashboard.sandboxes = sandboxManagement.getSandboxes();
-                $rootScope.$digest();
-            } else {
-                $scope.showing.navBar = false;
-                $scope.showing.sideNavBar = false;
-                $state.go('create-sandbox', {});
-            }
-        }, function () {
-            $scope.showing.navBar = false;
-            $scope.showing.sideNavBar = false;
-            $state.go('create-sandbox', {});
-        });
+        getSandboxInvites();
 
-        $scope.$watch('dashboard.sandbox', function() {
-            if ($scope.dashboard.sandbox.sandboxId !== undefined) {
-                selectSandbox($scope.dashboard.sandbox.sandboxId);
-            }
-        });
+        $scope.selectSandbox = function(sandbox) {
+            window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + sandbox.sandboxId
+        };
 
-        function selectSandbox(sandboxId) {
-            window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + sandboxId
+        $scope.updateSandboxInvite = function (sandboxInvite, status) {
+            sandboxInviteServices.updateSandboxInvite(sandboxInvite, status).then(function () {
+                getSandboxInvites();
+                $rootScope.$emit('refresh-sandboxes');
+
+            });
+        };
+
+        function getSandboxInvites() {
+            sandboxInviteServices.getSandboxInvitesByLdapId("PENDING").then(function (results) {
+                $scope.sandboxInvites = results;
+            });
         }
 
+    }).controller("SandboxUserViewController",
+    function($scope, $rootScope, sandboxManagement, sandboxInviteServices, userServices, $uibModal){
+        $scope.userRoles = sandboxManagement.getSandbox().userRoles;
+        $scope.sandboxInvites = [];
+        $scope.newUserEmail = "";
+        $scope.validEmail = false;
+
+        getSandboxInvites();
+
+        $scope.showDelete = function (ldapId) {
+            if (sandboxManagement.getSandbox().createdBy.ldapId.toLowerCase() === userServices.getOAuthUser().ldapId.toLowerCase()) {
+                return sandboxManagement.getSandbox().createdBy.ldapId.toLowerCase() !== ldapId.toLowerCase();
+            }
+            return false
+        };
+
+        $scope.removeUser = function (ldapId) {
+            sandboxManagement.removeUserFromSandboxByUserId(ldapId).then(function () {
+                sandboxManagement.getSandboxById().then(function(){
+                    $scope.userRoles = sandboxManagement.getSandbox().userRoles;
+                });
+            });
+        };
+
+        $scope.revokeInvite = function (invite) {
+            sandboxInviteServices.updateSandboxInvite(invite, "REVOKED").then(function () {
+                getSandboxInvites();
+            });
+        };
+
+        $scope.resendInvite = function (ldapId) {
+            sandboxInviteServices.createSandboxInvite(ldapId).then(function () {
+                getSandboxInvites();
+            });
+        };
+
+        $scope.sendInvite = function () {
+            sandboxInviteServices.createSandboxInvite($scope.newUserEmail).then(function () {
+                getSandboxInvites();
+            });
+        };
+
+        $scope.$watch('newUserEmail', function() {
+            $scope.validEmail = validateEmail($scope.newUserEmail);
+        });
+
+        function validateEmail(email) {
+            var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        }
+        
+        function getSandboxInvites() {
+            sandboxInviteServices.getSandboxInvitesBySandboxId("PENDING").then(function (results) {
+                $scope.sandboxInvites = results;
+                sandboxInviteServices.getSandboxInvitesBySandboxId("REJECTED").then(function (results) {
+                    angular.forEach(results, function (invite) {
+                        $scope.sandboxInvites.push(invite);
+                    });
+                });
+            });
+        }
+        
     }).controller("FutureController",
     function(){
 
@@ -218,11 +294,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             fhirApiServices.createBundle(bundle).then(function (results) {
                 $scope.bundleResults = $filter('json')(results);
                 $scope.showing.results = true;
-                modalProgress.dismiss();
+                // modalProgress.dismiss();
             }, function(results) {
                 $scope.bundleResults = results;
                 $scope.showing.results = true;
-                modalProgress.dismiss();
+                // modalProgress.dismiss();
             });
         };
 
@@ -243,8 +319,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     }).controller("CreateSandboxController",
     function($rootScope, $scope, $state, sandboxManagement, tools, appsSettings){
 
-        $scope.showing.navBar = false;
+        $scope.showing.navBar = true;
         $scope.showing.sideNavBar = false;
+        $scope.showing.slimBlueBar = false;
         $scope.isIdValid = false;
         $scope.showError = false;
         $scope.isNameValid = true;
@@ -253,6 +330,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.sandboxId = "";
         $scope.sandboxDesc = "";
         $scope.createEnabled = true;
+        $scope.title.blueBarTitle = "Create Sandbox";
 
         $scope.baseUrl = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl;
 
@@ -302,11 +380,13 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.createSandbox = function() {
             sandboxManagement.setCreatingSandbox(true);
+            $scope.showing.progress = true;
             if ($scope.sandboxName === undefined || $scope.sandboxName === "") {
                 $scope.sandboxName = $scope.sandboxId;
             }
             sandboxManagement.createSandbox({sandboxId: $scope.sandboxId, sandboxName: $scope.sandboxName, description: $scope.sandboxDesc}).then(function(sandbox){
                 sandboxManagement.setCreatingSandbox(false);
+                $scope.showing.progress = false;
                 $rootScope.$emit('sandbox-created');
             }).fail(function() {
                     sandboxManagement.setCreatingSandbox(false);
@@ -1463,7 +1543,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $timeout(function() {
                     $scope.showMessage = false;
                     messageNum++;
-                    fadeMessage();
+                    if (messageNum <= 7) {
+                        fadeMessage();
+                    }
                 },3000);
             }, 500);
         }

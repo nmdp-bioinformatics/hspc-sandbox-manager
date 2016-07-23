@@ -128,6 +128,65 @@ public class OAuthServiceImpl implements OAuthService {
         }
     }
 
+    public String getOAuthUserName(HttpServletRequest request) {
+
+        String authToken = getBearerToken(request);
+        if (authToken == null) {
+            return null;
+        }
+
+        HttpGet getRequest = new HttpGet(this.oauthUserInfoEndpointURL);
+        getRequest.setHeader("Authorization", "BEARER " + authToken);
+
+        SSLContext sslContext;
+        try {
+            sslContext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).useSSL().build();
+        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
+            throw new RuntimeException(e);
+        }
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        SSLConnectionSocketFactory sslConnectionFactory = new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        builder.setSSLSocketFactory(sslConnectionFactory);
+        Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
+                .register("https", sslConnectionFactory)
+                .register("http", new PlainConnectionSocketFactory())
+                .build();
+        HttpClientConnectionManager ccm = new BasicHttpClientConnectionManager(registry);
+        builder.setConnectionManager(ccm);
+
+        CloseableHttpClient httpClient = builder.build();
+
+        try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(getRequest)) {
+            if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                HttpEntity rEntity = closeableHttpResponse.getEntity();
+                String responseString = EntityUtils.toString(rEntity, "UTF-8");
+                throw new RuntimeException(String.format("Response Status : %s .\nResponse Detail :%s."
+                        , closeableHttpResponse.getStatusLine()
+                        , responseString));
+            }
+
+            HttpEntity httpEntity = closeableHttpResponse.getEntity();
+            String entity = IOUtils.toString(httpEntity.getContent());
+            JSONObject jsonObject;
+            try {
+                jsonObject = new JSONObject(entity);
+                return (String)jsonObject.get("name");
+            } catch (JSONException e) {
+                LOGGER.error("JSON Error reading entity: " + entity, e);
+                throw new RuntimeException(e);
+            }
+        } catch (IOException io_ex) {
+            LOGGER.error("Error on HTTP GET", io_ex);
+            throw new RuntimeException(io_ex);
+        } finally {
+            try {
+                httpClient.close();
+            }catch (IOException e) {
+                LOGGER.error("Error closing HttpClient");
+            }
+        }
+    }
+
     public String postOAuthClient(String clientJSON) {
 
         CloseableHttpClient httpClient = getAuthenticatedHttpClient();

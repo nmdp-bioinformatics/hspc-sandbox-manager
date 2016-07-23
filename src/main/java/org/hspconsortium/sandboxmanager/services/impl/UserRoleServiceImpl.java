@@ -20,6 +20,12 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     @Transactional
+    public void delete(final int id){
+        repository.delete(id);
+    };
+
+    @Override
+    @Transactional
     public UserRole save(final UserRole userRole) {
         return repository.save(userRole);
     }

@@ -24,7 +24,7 @@
             <a class="pull-left" ng-click="open()">Create new patient</a>
         </div>
     </div>
-    <div class="row table-container" resize ng-style="resizeWithOffset(305)">
+    <div class="row table-container" resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+185)">
         <div class="col-md-12 result">
             <div id="patient-results-list" ng-cloak when-scrolling="loadMoreIfNeeded()">
                 <table class="table table-striped table-hover">
