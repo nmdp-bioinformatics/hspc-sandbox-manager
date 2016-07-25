@@ -184,7 +184,6 @@ public class SandboxController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces ="application/json")
     public @ResponseBody Sandbox getSandboxById(HttpServletRequest request, @PathVariable String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
-//        checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
         checkUserAuthorization(request, sandbox.getUserRoles());
         return sandbox;
     }
@@ -192,7 +191,7 @@ public class SandboxController {
     @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"userId"})
     public @ResponseBody
     @SuppressWarnings("unchecked")
-    List<Sandbox> getSandboxesByOwner(HttpServletRequest request, @RequestParam(value = "userId") String userIdEncoded) throws UnsupportedEncodingException {
+    List<Sandbox> getSandboxesByMember(HttpServletRequest request, @RequestParam(value = "userId") String userIdEncoded) throws UnsupportedEncodingException {
         String userId = java.net.URLDecoder.decode(userIdEncoded, "UTF-8");
         checkUserAuthorization(request, userId);
         User user = userService.findByLdapId(userId);

@@ -71,22 +71,13 @@ public class SandboxInviteController {
         List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesByInviteeIdAndSandboxId(sandboxInvite.getInvitee().getLdapId(), sandboxInvite.getSandbox().getSandboxId());
 
         // Resend
-        if (sandboxInvites.size() > 0 && sandboxInvites.get(0).getStatus() != InviteStatus.ACCEPTED ) {
-            boolean inUserRoles = false;
-            for(UserRole userRole : sandbox.getUserRoles()) {
-                if (userRole.getUser().getLdapId().equalsIgnoreCase(sandboxInvite.getInvitee().getLdapId())) {
-                    inUserRoles = true;
-                }
-            }
+        if (sandboxInvites.size() > 0 && (!isSandboxMember(sandbox, sandboxInvite.getInvitee().getLdapId()) || sandboxInvites.get(0).getStatus() != InviteStatus.ACCEPTED )) {
+            SandboxInvite existingSandboxInvite = sandboxInvites.get(0);
+            existingSandboxInvite.setStatus(sandboxInvite.getStatus());
+            existingSandboxInvite.setStatus(InviteStatus.PENDING);
 
-            if (!inUserRoles) {  // Don't invite a user already in the sandbox
-                SandboxInvite existingSandboxInvite = sandboxInvites.get(0);
-                existingSandboxInvite.setStatus(sandboxInvite.getStatus());
-                existingSandboxInvite.setStatus(InviteStatus.PENDING);
-
-                sandboxInviteService.save(existingSandboxInvite);
-                //TODO Send email
-            }
+            sandboxInviteService.save(existingSandboxInvite);
+            //TODO Send email
         } else if (sandboxInvites.size() == 0) { // Create
 
             boolean inUserRoles = false;
@@ -185,15 +176,8 @@ public class SandboxInviteController {
                 return;
             }
 
-            List<UserRole> userRoles = sandboxInvite.getSandbox().getUserRoles();
-            boolean inUserRoles = false;
-            for(UserRole userRole : userRoles) {
-                if (userRole.getUser().getLdapId().equalsIgnoreCase(sandboxInvite.getInvitee().getLdapId())) {
-                    inUserRoles = true;
-                }
-            }
-
-            if (!inUserRoles) {
+            if (!isSandboxMember(sandboxInvite.getSandbox(), sandboxInvite.getInvitee().getLdapId())) {
+                List<UserRole> userRoles = sandboxInvite.getSandbox().getUserRoles();
                 userRoles.add(new UserRole(sandboxInvite.getInvitee(), Role.ADMIN));
                 sandboxInvite.getSandbox().setUserRoles(userRoles);
                 sandboxService.save(sandboxInvite.getSandbox());
@@ -237,6 +221,15 @@ public class SandboxInviteController {
     @ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
     public void handleException(HttpServletResponse response, Exception e) throws IOException {
         response.getWriter().write(e.getMessage());
+    }
+
+    private boolean isSandboxMember(Sandbox sandbox, String userId) {
+        for(UserRole userRole : sandbox.getUserRoles()) {
+            if (userRole.getUser().getLdapId().equalsIgnoreCase(userId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void checkUserAuthorization(HttpServletRequest request, String userId) {

@@ -42,8 +42,8 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
     }
 
     @Override
-    public List<LaunchScenario> findByUserIdAndSandboxId(final String userId, final String sandboxId) {
-        return  repository.findByUserIdAndSandboxId(userId, sandboxId);
+    public List<LaunchScenario> findBySandboxId(final String sandboxId) {
+        return  repository.findBySandboxId(sandboxId);
     }
 
     @Override

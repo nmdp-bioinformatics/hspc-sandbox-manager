@@ -294,11 +294,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             fhirApiServices.createBundle(bundle).then(function (results) {
                 $scope.bundleResults = $filter('json')(results);
                 $scope.showing.results = true;
-                // modalProgress.dismiss();
+                modalProgress.dismiss();
             }, function(results) {
                 $scope.bundleResults = results;
                 $scope.showing.results = true;
-                // modalProgress.dismiss();
+                modalProgress.dismiss();
             });
         };
 
@@ -888,7 +888,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $rootScope.$on('recent-selected', function(event, arg){
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
-            $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null);
+            $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
+                $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart");
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
         });
@@ -896,7 +897,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $rootScope.$on('full-selected', function(event, arg){
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
-            $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null);
+            $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
+                $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart");
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
         });

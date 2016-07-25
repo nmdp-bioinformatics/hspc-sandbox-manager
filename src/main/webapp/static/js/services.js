@@ -439,8 +439,7 @@ angular.module('sandManApp.services', [])
             getSandboxLaunchScenarios: function() {
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario?userId=" + encodeURIComponent(userServices.getOAuthUser().ldapId) +
-                    "&sandboxId=" + sandbox.sandboxId,
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario?sandboxId=" + sandbox.sandboxId,
                     type: 'GET',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {

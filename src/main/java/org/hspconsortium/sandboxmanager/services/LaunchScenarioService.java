@@ -14,7 +14,7 @@ public interface LaunchScenarioService {
 
     LaunchScenario getById(final int id);
 
-    List<LaunchScenario> findByUserIdAndSandboxId(final String userId, final String sandboxId);
+    List<LaunchScenario> findBySandboxId(final String sandboxId);
 
     List<LaunchScenario> findByAppIdAndSandboxId(final int appId, final String sandboxId);
 }

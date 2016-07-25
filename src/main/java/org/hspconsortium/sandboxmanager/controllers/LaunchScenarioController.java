@@ -32,6 +32,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -68,7 +69,6 @@ public class LaunchScenarioController {
         Sandbox sandbox = null;
         if (launchScenario.getSandbox() != null) {
             sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
-//            checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
             checkUserAuthorization(request, sandbox.getUserRoles());
             launchScenario.setSandbox(sandbox);
         }
@@ -139,7 +139,6 @@ public class LaunchScenarioController {
                             "Response Detail : Launch Scenario Id doesn't match Id in JSON body."
                     , HttpStatus.SC_BAD_REQUEST));
         }
-//        checkUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
         Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
         checkUserAuthorization(request, sandbox.getUserRoles());
         LaunchScenario updateLaunchScenario = launchScenarioService.getById(launchScenario.getId());
@@ -157,7 +156,6 @@ public class LaunchScenarioController {
                    @RequestParam(value = "appId") int appId) {
 
         App app = appService.getById(appId);
-//        checkUserAuthorization(request, app.getSandbox().getCreatedBy().getLdapId());
         checkUserAuthorization(request, app.getSandbox().getUserRoles());
 
         return launchScenarioService.findByAppIdAndSandboxId(app.getId(), app.getSandbox().getSandboxId());
@@ -167,7 +165,6 @@ public class LaunchScenarioController {
     @Transactional
     public @ResponseBody void deleteLaunchScenario(HttpServletRequest request, @PathVariable Integer id) {
         LaunchScenario launchScenario = launchScenarioService.getById(id);
-//        checkUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
         Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
         checkUserAuthorization(request, sandbox.getUserRoles());
         if (launchScenario.getApp().getAuthClient().getAuthDatabaseId() == null) {
@@ -177,19 +174,18 @@ public class LaunchScenarioController {
         launchScenarioService.delete(launchScenario.getId());
     }
 
-    @RequestMapping(method = RequestMethod.GET, produces = "application/json",
-            params = {"userId", "sandboxId"})
+    @RequestMapping(method = RequestMethod.GET, produces = "application/json", params = {"sandboxId"})
     public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios(HttpServletRequest request,
-        @RequestParam(value = "userId") String userIdEncoded, @RequestParam(value = "sandboxId") String sandboxId) throws UnsupportedEncodingException{
+        @RequestParam(value = "sandboxId") String sandboxId) throws UnsupportedEncodingException{
 
-        String userId = java.net.URLDecoder.decode(userIdEncoded, "UTF-8");
-        checkUserAuthorization(request, userId);
-        // A null sandbox is the HSPC sandbox
-        if (sandboxId == null || sandboxId.isEmpty()) {
-            return launchScenarioService.findByUserIdAndSandboxId(userId, null);
-        } else {
-            return launchScenarioService.findByUserIdAndSandboxId(userId, sandboxId);
+        if (sandboxId != null) {
+            if (isSandboxMember(request, sandboxService.findBySandboxId(sandboxId))) {
+                return launchScenarioService.findBySandboxId(sandboxId);
+            }
+        } else { // A null sandbox is the HSPC sandbox
+            return launchScenarioService.findBySandboxId( null);
         }
+        return Collections.EMPTY_LIST;
     }
 
     @ExceptionHandler(UnauthorizedException.class)
@@ -205,6 +201,26 @@ public class LaunchScenarioController {
     public void handleException(HttpServletResponse response, Exception e) throws IOException {
         response.getWriter().write(e.getMessage());
     }
+
+    private boolean isSandboxMember(Sandbox sandbox, String userId) {
+        for(UserRole userRole : sandbox.getUserRoles()) {
+            if (userRole.getUser().getLdapId().equalsIgnoreCase(userId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isSandboxMember(HttpServletRequest request, Sandbox sandbox) {
+        String oauthUserId = oAuthUserService.getOAuthUserId(request);
+        for(UserRole userRole : sandbox.getUserRoles()) {
+            if (userRole.getUser().getLdapId().equalsIgnoreCase(oauthUserId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private void checkUserAuthorization(HttpServletRequest request, String userId) {
         String oauthUserId = oAuthUserService.getOAuthUserId(request);
