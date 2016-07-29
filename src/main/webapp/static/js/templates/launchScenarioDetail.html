@@ -3,6 +3,21 @@
         <div class="col-md-12 content-column">
             <div class="detail-description">{{desc.title}}</div>
 
+            <div class="detail-form-line-inline">
+                <label class="detail-form-label-inline">Description:</label>
+                <label ng-hide="editDesc.showEdit" class="detail-form-value-inline">{{selectedScenario.description}}</label>
+                <a ng-hide="editDesc.showEdit" ng-click="editDesc.showEdit = true" class='float-right-dark-btn'>
+                    <i class='fa fa-pencil fa-lg'></i>
+                </a>
+                <input ng-show="editDesc.showEdit" class="detail-form-label-input-inline" ng-model="editDesc.new"/>
+                <a ng-show="editDesc.showEdit" ng-click="cancelDesc(selectedScenario)" class='float-right-dark-btn'>
+                    <i class='fa fa-remove fa-lg'></i>
+                </a>
+                <a ng-show="editDesc.showEdit" ng-click="updateDesc(selectedScenario)" class='float-right-dark-btn'>
+                    <i class='fa fa-check fa-lg'></i>
+                </a>
+            </div>
+
             <div class="title-box">
                 <div class="title">Persona</div>
                 <div class="content">
@@ -51,7 +66,6 @@
                     </div>
                     <div class="thumbnail">
                         <img ng-show="selectedScenario.app.logoUri" ng-src="{{selectedScenario.app.logoUri}}">
-                        <!--<label ng-hide="selectedScenario.app.logoUri" style="margin-top: 5px">No Image</label>-->
                         <img ng-hide="selectedScenario.app.logoUri" src="static/images/HSPCSandboxNoIconApp-512.png">
                     </div>
                 </div>
@@ -59,8 +73,19 @@
                     <div class="detail-form">
                         <label class="detail-form-label full-line">Client ID:  <b>{{selectedScenario.app.authClient.clientId}}</b></label>
                     </div>
-                    <div class="detail-form" style="padding-bottom: 40px">
-                        <label class="detail-form-label full-line">Launch URI: <b>{{selectedScenario.app.launchUri}}</b></label>
+                    <div class="detail-form-line-inline">
+                        <label class="detail-form-label-inline">Launch URI: </label>
+                        <label ng-hide="editLaunchUri.showEdit" class="detail-form-value-inline">{{selectedScenario.app.launchUri}}</label>
+                        <a ng-hide="editLaunchUri.showEdit" ng-click="editLaunchUri.showEdit = true" class='float-right-dark-btn'>
+                            <i class='fa fa-pencil fa-lg'></i>
+                        </a>
+                        <input ng-show="editLaunchUri.showEdit" class="detail-form-label-input-inline" ng-model="editLaunchUri.new"/>
+                        <a ng-show="editLaunchUri.showEdit" ng-click="cancelUri(selectedScenario)" class='float-right-dark-btn'>
+                            <i class='fa fa-remove fa-lg'></i>
+                        </a>
+                        <a ng-show="editLaunchUri.showEdit" ng-click="updateUri(selectedScenario)" class='float-right-dark-btn'>
+                            <i class='fa fa-check fa-lg'></i>
+                        </a>
                     </div>
                 </div>
             </div>

@@ -860,6 +860,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.showing = {detail: false, addingContext: false};
         $scope.isCustom = false;
         $scope.selectedScenario = {};
+        $scope.editDesc = {new: "", showEdit: false};
+        $scope.editLaunchUri = {new: "", showEdit: false};
         sandboxManagement.getSandboxLaunchScenarios();
         sandboxManagement.clearScenarioBuilder();
         sandboxManagement.getScenarioBuilder().owner = userServices.getOAuthUser();
@@ -885,9 +887,33 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.detail = false;
         };
 
+        $scope.updateDesc = function(scenario){
+            scenario.description = $scope.editDesc.new;
+            sandboxManagement.updateLaunchScenario(scenario);
+            $scope.editDesc.showEdit = false;
+        };
+
+        $scope.cancelDesc = function(scenario){
+            $scope.editDesc.new = angular.copy(scenario.description);
+            $scope.editDesc.showEdit = false;
+        };
+
+        $scope.updateUri = function(scenario){
+            scenario.app.launchUri = $scope.editLaunchUri.new;
+            sandboxManagement.updateLaunchScenario(scenario);
+            $scope.editLaunchUri.showEdit = false;
+        };
+
+        $scope.cancelUri = function(scenario){
+            $scope.editLaunchUri.new = angular.copy(scenario.app.launchUri);
+            $scope.editLaunchUri.showEdit = false;
+        };
+
         $rootScope.$on('recent-selected', function(event, arg){
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
+            $scope.editDesc.new = angular.copy(arg.description);
+            $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
             $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
                 $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart");
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
@@ -897,6 +923,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $rootScope.$on('full-selected', function(event, arg){
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
+            $scope.editDesc.new = angular.copy(arg.description);
+            $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
             $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
                 $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart");
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);

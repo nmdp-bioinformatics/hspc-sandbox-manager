@@ -1309,17 +1309,30 @@ fieldset[disabled] .btn-cancel.active {
 }
 
 .detail-form-value-inline {
-    border: 1px solid #e6e6e6;
-    border-radius: 4px;
+    /*border: 1px solid #e6e6e6;*/
+    /*border-radius: 4px;*/
     color: #58585A;
-    /*padding-right: 4px;*/
+    font-size: 12px;
+    font-weight: 600;
     min-height: 30px;
     width: 60%;
     float: left;
     position: relative;
     display: inline-block;
+    padding: 10px 5px 5px;
+}
+
+.title-box .detail-form-label-inline {
+    padding: 5px 0 5px 5px;
+    width: 25%;
+}
+.title-box .detail-form-value-inline {
+    width: 70%;
     padding: 5px 5px 5px;
-    min-height: 30px;
+}
+
+.title-box .detail-form-label-input-inline {
+    width: 65%;
 }
 
 .detail-form-label-inline {
@@ -1337,7 +1350,7 @@ fieldset[disabled] .btn-cancel.active {
 
 .detail-form-label-input-inline {
     border-radius: 4px;
-    width: 65%;
+    width: 55%;
     float: left;
     position: relative;
     display: inline-block;
@@ -1360,13 +1373,13 @@ fieldset[disabled] .btn-cancel.active {
     font-weight: 600;
 }
 
-.detail-form-label-input-inline a {
-    padding: 5px 5px 0;
+.detail-form-line-inline a {
+    padding: 5px 7px 0;
     float: left;
-    width: 10%;
+    width: 3%;
 }
 
-.detail-form-label-input-inline a>i {
+.detail-form-line-inline a>i {
     width: 100%;
 }
 

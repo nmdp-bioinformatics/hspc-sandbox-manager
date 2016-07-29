@@ -30,4 +30,6 @@ hspc:
       oauthUserLoginEndpointURL: http://localhost:8080/hspc-reference-authorization/j_spring_security_check
       oauthUser: admin
       oauthUserPassword: password
+    messaging:
+      emailSenderEndpointURL: http://localhost:8080/hspc-reference-messaging/mailsender
 
