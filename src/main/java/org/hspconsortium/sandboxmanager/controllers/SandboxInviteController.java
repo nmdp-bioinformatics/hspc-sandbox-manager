@@ -20,21 +20,15 @@
 
 package org.hspconsortium.sandboxmanager.controllers;
 
-import org.apache.http.HttpStatus;
 import org.hspconsortium.sandboxmanager.model.*;
-import org.hspconsortium.sandboxmanager.services.OAuthService;
-import org.hspconsortium.sandboxmanager.services.SandboxInviteService;
-import org.hspconsortium.sandboxmanager.services.SandboxService;
-import org.hspconsortium.sandboxmanager.services.UserService;
+import org.hspconsortium.sandboxmanager.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Collections;
@@ -43,21 +37,23 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/REST/sandboxinvite")
-public class SandboxInviteController {
+public class SandboxInviteController extends AbstractController {
     private static Logger LOGGER = LoggerFactory.getLogger(SandboxInviteController.class.getName());
 
     private final SandboxInviteService sandboxInviteService;
     private final UserService userService;
     private final SandboxService sandboxService;
-    private final OAuthService oAuthUserService;
+    private final EmailService emailService;
 
     @Inject
     public SandboxInviteController(final SandboxInviteService sandboxInviteService, final UserService userService,
-                                   final SandboxService sandboxService, final OAuthService oAuthUserService) {
+                                   final SandboxService sandboxService, final OAuthService oAuthService,
+                                   final EmailService emailService) {
+        super(oAuthService);
         this.sandboxInviteService = sandboxInviteService;
         this.userService = userService;
         this.sandboxService = sandboxService;
-        this.oAuthUserService = oAuthUserService;
+        this.emailService = emailService;
     }
 
     @RequestMapping(method = RequestMethod.PUT, consumes = "application/json")
@@ -77,7 +73,9 @@ public class SandboxInviteController {
             existingSandboxInvite.setStatus(InviteStatus.PENDING);
 
             sandboxInviteService.save(existingSandboxInvite);
-            //TODO Send email
+            User inviter = userService.findByLdapId(sandboxInvite.getInvitedBy().getLdapId());
+            User invitee = userService.findByLdapId(sandboxInvite.getInvitee().getLdapId());
+            emailService.sendEmail(inviter, invitee, sandboxInvite.getSandbox());
         } else if (sandboxInvites.size() == 0) { // Create
 
             boolean inUserRoles = false;
@@ -106,7 +104,8 @@ public class SandboxInviteController {
                 sandboxInvite.setInvitee(invitee);
                 sandboxInviteService.save(sandboxInvite);
 
-                //TODO Send email
+                User inviter = userService.findByLdapId(sandboxInvite.getInvitedBy().getLdapId());
+                emailService.sendEmail(inviter, invitee, sandboxInvite.getSandbox());
             }
         }
 
@@ -185,7 +184,7 @@ public class SandboxInviteController {
 
             List<Sandbox> sandboxes = sandboxInvite.getInvitee().getSandboxes();
             if (sandboxInvite.getInvitee().getName() == null || sandboxInvite.getInvitee().getName().isEmpty()) {
-                sandboxInvite.getInvitee().setName(oAuthUserService.getOAuthUserName(request));
+                sandboxInvite.getInvitee().setName(oAuthService.getOAuthUserName(request));
             }
             boolean hasSandbox = false;
             for(Sandbox sandbox : sandboxes) {
@@ -208,55 +207,4 @@ public class SandboxInviteController {
             sandboxInviteService.save(sandboxInvite);
         }
     }
-
-    @ExceptionHandler(UnauthorizedException.class)
-    @ResponseBody
-    @ResponseStatus(code = org.springframework.http.HttpStatus.UNAUTHORIZED)
-    public void handleAuthorizationException(HttpServletResponse response, Exception e) throws IOException {
-        response.getWriter().write(e.getMessage());
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
-    @ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
-    public void handleException(HttpServletResponse response, Exception e) throws IOException {
-        response.getWriter().write(e.getMessage());
-    }
-
-    private boolean isSandboxMember(Sandbox sandbox, String userId) {
-        for(UserRole userRole : sandbox.getUserRoles()) {
-            if (userRole.getUser().getLdapId().equalsIgnoreCase(userId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void checkUserAuthorization(HttpServletRequest request, String userId) {
-        String oauthUserId = oAuthUserService.getOAuthUserId(request);
-
-        if (!userId.equalsIgnoreCase(oauthUserId)) {
-            throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                    "Response Detail : User not authorized to perform this action."
-                    , HttpStatus.SC_UNAUTHORIZED));
-        }
-    }
-
-    private void checkUserAuthorization(HttpServletRequest request, List<UserRole> users) {
-        String oauthUserId = oAuthUserService.getOAuthUserId(request);
-        boolean userIsAuthorized = false;
-
-        for(UserRole user : users) {
-            if (user.getUser().getLdapId().equalsIgnoreCase(oauthUserId) && user.getRole() != Role.READONLY) {
-                userIsAuthorized = true;
-            }
-        }
-
-        if (!userIsAuthorized) {
-            throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                            "Response Detail : User not authorized to perform this action."
-                    , HttpStatus.SC_UNAUTHORIZED));
-        }
-    }
-
 }

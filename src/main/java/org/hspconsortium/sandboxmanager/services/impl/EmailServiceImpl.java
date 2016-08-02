@@ -44,10 +44,10 @@ import java.util.UUID;
 public class EmailServiceImpl implements EmailService {
     private static Logger LOGGER = LoggerFactory.getLogger(EmailService.class.getName());
 
+    private static final String HSPC_EMAIL = "no-reply@hspconsortium.org";
     private static final String PNG_MIME = "image/png";
-    public static final String TEMPLATE_FILE = "email\\templates\\email-sandbox-invite.html";
+    private static final String TEMPLATE_FILE = "email\\templates\\email-sandbox-invite.html";
     private static final String EMAIL_SUBJECT = "HSPC Sandbox Invitation";
-//    private static final String THYMELEAF_BANNER_IMAGE = "email\\images\\company-logo-main-web-top.png";
     private static final String HSPC_LOGO_IMAGE = "email\\images\\hspc-sndbx-logo.png";
 
     @Value("${hspc.platform.messaging.emailSenderEndpointURL}")
@@ -61,21 +61,26 @@ public class EmailServiceImpl implements EmailService {
         message.setAcceptHtmlMessage(true);
 
         message.setSenderName(inviter.getName());
-        message.setSenderEmail("amy.ballard@gmail.com");
+        message.setSenderEmail(HSPC_EMAIL);
         message.addRecipient(invitee.getName(), invitee.getLdapId());
 
         message.setTemplate(getFile(TEMPLATE_FILE));
         message.setTemplateFormat(Message.TemplateFormat.HTML);
 
-        message.addVariable("inviter", inviter.getName());
-        message.addVariable("invitee", invitee.getName());
+        if (inviter.getName() != null) {
+            message.addVariable("inviter", inviter.getName());
+        } else {
+            message.addVariable("inviter", inviter.getLdapId());
+        }
+        if (invitee.getName() != null) {
+            message.addVariable("invitee", invitee.getName());
+        } else {
+            message.addVariable("invitee", invitee.getLdapId());
+        }
         message.addVariable("sandboxName", sandbox.getName());
-        message.addVariable("inviteDate", new Date());
+        message.addVariable("inviteeEmail", invitee.getLdapId());
 
         // Add the inline images, referenced from the HTML code as "cid:image-name"
-//        message.addResource("background", PNG_MIME, getImageFile(BACKGROUND_IMAGE, "png"));
-//        message.addResource("logo-background", PNG_MIME, getImageFile(LOGO_BACKGROUND_IMAGE, "png"));
-//        message.addResource("hspc-banner", PNG_MIME, getImageFile(THYMELEAF_BANNER_IMAGE, "png"));
         message.addResource("hspc-logo", PNG_MIME, getImageFile(HSPC_LOGO_IMAGE, "png"));
         try {
             sendEmailToMessaging(message);

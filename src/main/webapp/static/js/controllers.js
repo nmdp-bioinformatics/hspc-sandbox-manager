@@ -234,10 +234,30 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.removeUser = function (ldapId) {
-            sandboxManagement.removeUserFromSandboxByUserId(ldapId).then(function () {
-                sandboxManagement.getSandboxById().then(function(){
-                    $scope.userRoles = sandboxManagement.getSandbox().userRoles;
-                });
+            $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/confirmModal.html',
+                controller: 'ConfirmModalInstanceCtrl',
+                resolve: {
+                    getSettings: function () {
+                        return {
+                            title:"Remove User from Sandbox",
+                            ok:"Yes",
+                            cancel:"Cancel",
+                            type:"confirm-error",
+                            text:"Are you sure you want to remove the user " + ldapId + "?",
+                            callback:function(result){ //setting callback
+                                if (result == true) {
+                                    sandboxManagement.removeUserFromSandboxByUserId(ldapId).then(function () {
+                                        sandboxManagement.getSandboxById().then(function(){
+                                            $scope.userRoles = sandboxManagement.getSandbox().userRoles;
+                                        });
+                                    });
+                                }
+                            }
+                        };
+                    }
+                }
             });
         };
 
@@ -387,7 +407,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             sandboxManagement.createSandbox({sandboxId: $scope.sandboxId, sandboxName: $scope.sandboxName, description: $scope.sandboxDesc}).then(function(sandbox){
                 sandboxManagement.setCreatingSandbox(false);
                 $scope.showing.progress = false;
-                $rootScope.$emit('sandbox-created');
+                $rootScope.$emit('sandbox-created', $scope.sandboxId);
             }).fail(function() {
                     sandboxManagement.setCreatingSandbox(false);
                     $state.go('error', {});
@@ -1129,19 +1149,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.title = getTitle;
 
-    }]).controller('ConfirmModalInstanceCtrl',['$scope', '$uibModalInstance', 'getSettings',
-    function ($scope, $uibModalInstance, getSettings) {
-
-        $scope.title = (getSettings.title !== undefined) ? getSettings.title : "";
-        $scope.ok = (getSettings.ok !== undefined) ? getSettings.ok : "Yes";
-        $scope.cancel = (getSettings.cancel !== undefined) ? getSettings.cancel : "No";
-        $scope.text = (getSettings.text !== undefined) ? getSettings.text : "Continue?";
-        var callback = (getSettings.callback !== undefined) ? getSettings.callback : null;
-
-        $scope.confirm = function (result) {
-            $uibModalInstance.close(result);
-            callback(result);
-        };
     }]).controller('CreateNewPatientCtrl', function($scope, $rootScope, $uibModal, fhirApiServices) {
         var now = new Date();
         now.setMilliseconds(0);
@@ -1464,9 +1471,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 }
             }
         });
-        // appRegistrationServices.deleteSandboxApp($scope.selected.selectedApp.id).then(function () {
-        //     $scope.selected.selectedApp = {};
-        // });
     };
 
 }).controller('AppRegistrationModalCtrl',function ($scope, $rootScope, sandboxManagement, $uibModalInstance) {
@@ -1537,8 +1541,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
-    }).controller('ProgressCtrl',['$rootScope', '$scope', '$state', '$timeout',
-    function ($rootScope, $scope, $state, $timeout) {
+    }).controller('ProgressCtrl',['$rootScope', '$scope', '$state', '$timeout', 'appsSettings',
+    function ($rootScope, $scope, $state, $timeout, appsSettings) {
 
         $scope.createProgress = 0;
         $scope.showing.navBar = false;
@@ -1558,10 +1562,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         updateProgress();
         fadeMessage();
 
-        $rootScope.$on('sandbox-created', function(){
+        $rootScope.$on('sandbox-created', function(event, sandboxId){
             $scope.createProgress = 100;
             $timeout(function() {
-                $rootScope.$emit('signed-in');
+                window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + sandboxId
+                // $rootScope.$emit('signed-in', sandboxId);
             },500);
         });
 

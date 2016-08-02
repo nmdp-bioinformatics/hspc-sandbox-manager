@@ -39,12 +39,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping({"/REST/app"})
-public class AppRegistrationController {
+public class AppRegistrationController extends AbstractController {
     private static Logger LOGGER = LoggerFactory.getLogger(AppRegistrationController.class.getName());
 
     private final AppService appService;
     private final AuthClientService authClientService;
-    private final OAuthService oAuthService;
     private final SandboxService sandboxService;
     private final ImageService imageService;
 
@@ -53,8 +52,8 @@ public class AppRegistrationController {
                                      final AuthClientService authClientService,
                                      final SandboxService sandboxService,
                                      final ImageService imageService) {
+        super(oAuthService);
         this.appService = appService;
-        this.oAuthService = oAuthService;
         this.authClientService = authClientService;
         this.sandboxService = sandboxService;
         this.imageService = imageService;
@@ -65,7 +64,6 @@ public class AppRegistrationController {
     public @ResponseBody App createApp(HttpServletRequest request, @RequestBody App app) throws IOException {
 
         Sandbox sandbox = sandboxService.findBySandboxId(app.getSandbox().getSandboxId());
-//        checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
         checkUserAuthorization(request, sandbox.getUserRoles());
         app.setSandbox(sandbox);
         app.setLogo(null);
@@ -88,7 +86,6 @@ public class AppRegistrationController {
     @RequestMapping(method = RequestMethod.GET, params = {"sandboxId"})
     public @ResponseBody List<App> getApps(HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId) {
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-//        checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
         checkUserAuthorization(request, sandbox.getUserRoles());
         return appService.findBySandboxId(sandboxId);
     }
@@ -97,7 +94,6 @@ public class AppRegistrationController {
     public @ResponseBody App getApp(HttpServletRequest request, @PathVariable Integer id) {
 
         App app = appService.getById(id);
-//        checkUserAuthorization(request, app.getSandbox().getCreatedBy().getLdapId());
         checkUserAuthorization(request, app.getSandbox().getUserRoles());
 
         if (app.getAuthClient().getAuthDatabaseId() != null) {
@@ -112,7 +108,6 @@ public class AppRegistrationController {
     public @ResponseBody void deleteApp(HttpServletRequest request, @PathVariable Integer id) {
 
         App app = appService.getById(id);
-//        checkUserAuthorization(request, app.getSandbox().getCreatedBy().getLdapId());
         checkUserAuthorization(request, app.getSandbox().getUserRoles());
         Integer authDatabaseId = app.getAuthClient().getAuthDatabaseId();
         appService.delete(app);
@@ -126,7 +121,6 @@ public class AppRegistrationController {
     public @ResponseBody App updateApp(HttpServletRequest request, @PathVariable Integer id, @RequestBody App app) {
 
         App existingApp = appService.getById(id);
-//        checkUserAuthorization(request, app.getSandbox().getCreatedBy().getLdapId());
         checkUserAuthorization(request, app.getSandbox().getUserRoles());
         if (existingApp == null || existingApp.getId().intValue() != id.intValue()) {
             throw new RuntimeException(String.format("Response Status : %s.\n" +
@@ -170,7 +164,6 @@ public class AppRegistrationController {
     public @ResponseBody void putFullImage(HttpServletRequest request, @PathVariable Integer id, @RequestParam("file") MultipartFile file) {
 
         App app = appService.getById(id);
-//        checkUserAuthorization(request, app.getSandbox().getCreatedBy().getLdapId());
         checkUserAuthorization(request, app.getSandbox().getUserRoles());
 
         String clientJSON = oAuthService.getOAuthClient(app.getAuthClient().getAuthDatabaseId());
@@ -196,47 +189,6 @@ public class AppRegistrationController {
             appService.save(app);
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    @ExceptionHandler(UnauthorizedException.class)
-    @ResponseBody
-    @ResponseStatus(code = org.springframework.http.HttpStatus.UNAUTHORIZED)
-    public void handleAuthorizationException(HttpServletResponse response, Exception e) throws IOException {
-        response.getWriter().write(e.getMessage());
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
-    @ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
-    public void handleException(HttpServletResponse response, Exception e) throws IOException {
-        response.getWriter().write(e.getMessage());
-    }
-
-    private void checkUserAuthorization(HttpServletRequest request, String userId) {
-        String oauthUserId = oAuthService.getOAuthUserId(request);
-
-        if (!userId.equalsIgnoreCase(oauthUserId)) {
-            throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                            "Response Detail : User not authorized to perform this action."
-                    , HttpStatus.SC_UNAUTHORIZED));
-        }
-    }
-
-    private void checkUserAuthorization(HttpServletRequest request, List<UserRole> users) {
-        String oauthUserId = oAuthService.getOAuthUserId(request);
-        boolean userIsAuthorized = false;
-
-        for(UserRole user : users) {
-            if (user.getUser().getLdapId().equalsIgnoreCase(oauthUserId) && user.getRole() != Role.READONLY) {
-                userIsAuthorized = true;
-            }
-        }
-
-        if (!userIsAuthorized) {
-            throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                            "Response Detail : User not authorized to perform this action."
-                    , HttpStatus.SC_UNAUTHORIZED));
         }
     }
 }

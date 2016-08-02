@@ -21,7 +21,6 @@
 package org.hspconsortium.sandboxmanager.controllers;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.config.Registry;
@@ -53,7 +52,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -67,7 +65,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/REST/sandbox")
-public class SandboxController {
+public class SandboxController extends AbstractController {
     private static Logger LOGGER = LoggerFactory.getLogger(SandboxController.class.getName());
 
     @Value("${hspc.platform.api.sandboxManagementEndpointURL}")
@@ -79,15 +77,14 @@ public class SandboxController {
     private final SandboxService sandboxService;
     private final UserService userService;
     private final UserRoleService userRoleService;
-    private final OAuthService oAuthUserService;
 
     @Inject
     public SandboxController(final SandboxService sandboxService, final UserService userService,
-                             final OAuthService oAuthUserService, final UserRoleService userRoleService) {
+                             final OAuthService oAuthService, final UserRoleService userRoleService) {
+        super(oAuthService);
         this.sandboxService = sandboxService;
         this.userService = userService;
         this.userRoleService = userRoleService;
-        this.oAuthUserService = oAuthUserService;
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
@@ -105,7 +102,7 @@ public class SandboxController {
         if (user == null) {
             user = userService.save(sandbox.getCreatedBy());
         } else if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(oAuthUserService.getOAuthUserName(request));
+            user.setName(oAuthService.getOAuthUserName(request));
             userService.save(user);
         }
 
@@ -123,7 +120,7 @@ public class SandboxController {
         String jsonString = "{\"teamId\": \"" + sandbox.getSandboxId() + "\"}";
         entity = new StringEntity(jsonString);
         putRequest.setEntity(entity);
-        putRequest.setHeader("Authorization", "BEARER " + oAuthUserService.getBearerToken(request));
+        putRequest.setHeader("Authorization", "BEARER " + oAuthService.getBearerToken(request));
 
         SSLContext sslContext = null;
         try {
@@ -176,7 +173,7 @@ public class SandboxController {
     }
 
     @RequestMapping(method = RequestMethod.GET, params = {"lookUpId"})
-    public @ResponseBody String checkForSandboxById(HttpServletResponse response, @RequestParam(value = "lookUpId")  String id) {
+    public @ResponseBody String checkForSandboxById(@RequestParam(value = "lookUpId")  String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
         return (sandbox == null) ? null : sandbox.getSandboxId();
     }
@@ -187,6 +184,21 @@ public class SandboxController {
         checkUserAuthorization(request, sandbox.getUserRoles());
         return sandbox;
     }
+
+//    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces ="application/json")
+//    @Transactional
+//    public @ResponseBody Sandbox deleteSandboxById(HttpServletRequest request, @PathVariable String id) {
+//        Sandbox sandbox = sandboxService.findBySandboxId(id);
+//        checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
+//        //delete sandbox invites
+//        //delete all registered app, authClients, images
+//        //delete launch scenarios, context params
+//        //delete patient/personas for sandbox
+//        //remove user memberships
+//        //remove sandbox from user
+//        sandboxService.delete(Integer.parseInt(id));
+//        return sandbox;
+//    }
 
     @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"userId"})
     public @ResponseBody
@@ -229,46 +241,4 @@ public class SandboxController {
             sandboxService.save(sandbox);
         }
     }
-
-    @ExceptionHandler(UnauthorizedException.class)
-    @ResponseBody
-    @ResponseStatus(code = org.springframework.http.HttpStatus.UNAUTHORIZED)
-    public void handleAuthorizationException(HttpServletResponse response, Exception e) throws IOException {
-        response.getWriter().write(e.getMessage());
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
-    @ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
-    public void handleException(HttpServletResponse response, Exception e) throws IOException {
-        response.getWriter().write(e.getMessage());
-    }
-
-    private void checkUserAuthorization(HttpServletRequest request, String userId) {
-        String oauthUserId = oAuthUserService.getOAuthUserId(request);
-
-        if (!userId.equalsIgnoreCase(oauthUserId)) {
-            throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                    "Response Detail : User not authorized to perform this action."
-                    , HttpStatus.SC_UNAUTHORIZED));
-        }
-    }
-
-    private void checkUserAuthorization(HttpServletRequest request, List<UserRole> users) {
-        String oauthUserId = oAuthUserService.getOAuthUserId(request);
-        boolean userIsAuthorized = false;
-
-        for(UserRole user : users) {
-            if (user.getUser().getLdapId().equalsIgnoreCase(oauthUserId) && user.getRole() != Role.READONLY) {
-                userIsAuthorized = true;
-            }
-        }
-
-        if (!userIsAuthorized) {
-            throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                            "Response Detail : User not authorized to perform this action."
-                    , HttpStatus.SC_UNAUTHORIZED));
-        }
-    }
-
 }

@@ -1,3 +1,23 @@
+/*
+ * #%L
+ *
+ * %%
+ * Copyright (C) 2014 - 2015 Healthcare Services Platform Consortium
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 package org.hspconsortium.sandboxmanager.services.impl;
 
 
@@ -21,6 +41,7 @@ import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.hspconsortium.sandboxmanager.controllers.UnauthorizedException;
 import org.hspconsortium.sandboxmanager.services.OAuthService;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -99,6 +120,11 @@ public class OAuthServiceImpl implements OAuthService {
 
         try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(getRequest)) {
             if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+                    throw new UnauthorizedException(String.format("Response Status : %s.\n" +
+                                    "Response Detail : User not authorized to perform this action."
+                            , HttpStatus.SC_UNAUTHORIZED));
+                }
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
                 String responseString = EntityUtils.toString(rEntity, "UTF-8");
                 throw new RuntimeException(String.format("Response Status : %s .\nResponse Detail :%s."
@@ -158,6 +184,11 @@ public class OAuthServiceImpl implements OAuthService {
 
         try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(getRequest)) {
             if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+                if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+                    throw new UnauthorizedException(String.format("Response Status : %s.\n" +
+                                    "Response Detail : User not authorized to perform this action."
+                            , HttpStatus.SC_UNAUTHORIZED));
+                }
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
                 String responseString = EntityUtils.toString(rEntity, "UTF-8");
                 throw new RuntimeException(String.format("Response Status : %s .\nResponse Detail :%s."
@@ -203,6 +234,11 @@ public class OAuthServiceImpl implements OAuthService {
 
         try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(postRequest)) {
             if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK ) {
+                if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+                    throw new UnauthorizedException(String.format("Response Status : %s.\n" +
+                                    "Response Detail : User not authorized to perform this action."
+                            , HttpStatus.SC_UNAUTHORIZED));
+                }
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
                 String responseString = EntityUtils.toString(rEntity, "UTF-8");
                 throw new RuntimeException(String.format("There was a problem registering the oauth client.\n" +
@@ -240,6 +276,11 @@ public class OAuthServiceImpl implements OAuthService {
 
         try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(putRequest)) {
             if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK ) {
+                if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+                    throw new UnauthorizedException(String.format("Response Status : %s.\n" +
+                                    "Response Detail : User not authorized to perform this action."
+                            , HttpStatus.SC_UNAUTHORIZED));
+                }
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
                 String responseString = EntityUtils.toString(rEntity, "UTF-8");
                 throw new RuntimeException(String.format("There was a problem updating the client.\n" +
@@ -267,6 +308,11 @@ public class OAuthServiceImpl implements OAuthService {
 
         try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(getRequest)) {
             if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK ) {
+                if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+                    throw new UnauthorizedException(String.format("Response Status : %s.\n" +
+                                    "Response Detail : User not authorized to perform this action."
+                            , HttpStatus.SC_UNAUTHORIZED));
+                }
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
                 String responseString = EntityUtils.toString(rEntity, "UTF-8");
                 throw new RuntimeException(String.format("There was a problem registering the client.\n" +
@@ -294,6 +340,11 @@ public class OAuthServiceImpl implements OAuthService {
 
         try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(deleteRequest)) {
             if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK ) {
+                if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+                    throw new UnauthorizedException(String.format("Response Status : %s.\n" +
+                                    "Response Detail : User not authorized to perform this action."
+                            , HttpStatus.SC_UNAUTHORIZED));
+                }
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
                 String responseString = EntityUtils.toString(rEntity, "UTF-8");
                 throw new RuntimeException(String.format("There was a problem deleting the client.\n" +
@@ -369,6 +420,11 @@ public class OAuthServiceImpl implements OAuthService {
 
         try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(postRequest)) {
             if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
+                if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
+                    throw new UnauthorizedException(String.format("Response Status : %s.\n" +
+                                    "Response Detail : User not authorized to perform this action."
+                            , HttpStatus.SC_UNAUTHORIZED));
+                }
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
                 String responseString = EntityUtils.toString(rEntity, "UTF-8");
                 throw new RuntimeException(String.format("Invalid Credentials\n" +

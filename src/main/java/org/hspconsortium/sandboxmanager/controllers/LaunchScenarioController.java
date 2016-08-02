@@ -37,7 +37,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/REST/launchScenario")
-public class LaunchScenarioController {
+public class LaunchScenarioController extends AbstractController  {
 
     private final LaunchScenarioService launchScenarioService;
     private final UserService userService;
@@ -45,33 +45,28 @@ public class LaunchScenarioController {
     private final PersonaService personaService;
     private final AppService appService;
     private final SandboxService sandboxService;
-    private final OAuthService oAuthUserService;
 
     @Inject
     public LaunchScenarioController(final LaunchScenarioService launchScenarioService,
                                     final PatientService patientService, final PersonaService personaService,
                                     final AppService appService, final UserService userService,
-                                    final SandboxService sandboxService, final OAuthService oAuthUserService) {
+                                    final SandboxService sandboxService, final OAuthService oAuthService) {
+        super(oAuthService);
         this.launchScenarioService = launchScenarioService;
         this.userService = userService;
         this.patientService = patientService;
         this.personaService = personaService;
         this.appService = appService;
         this.sandboxService = sandboxService;
-        this.oAuthUserService = oAuthUserService;
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
     @Transactional
     public @ResponseBody LaunchScenario createLaunchScenario(HttpServletRequest request, @RequestBody final LaunchScenario launchScenario) {
 
-        // A null sandbox is the HSPC sandbox
-        Sandbox sandbox = null;
-        if (launchScenario.getSandbox() != null) {
-            sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
-            checkUserAuthorization(request, sandbox.getUserRoles());
-            launchScenario.setSandbox(sandbox);
-        }
+        Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
+        checkUserAuthorization(request, sandbox.getUserRoles());
+        launchScenario.setSandbox(sandbox);
 
         checkUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
         User user = userService.findByLdapId(launchScenario.getCreatedBy().getLdapId());
@@ -79,17 +74,10 @@ public class LaunchScenarioController {
             user = userService.save(launchScenario.getCreatedBy());
         }
         launchScenario.setCreatedBy(user);
-        List<User> users = new ArrayList<>(1);
-        users.add(user);
-        launchScenario.setUsers(users);
 
         Persona persona = null;
         if (launchScenario.getPersona() != null) {
-            if (sandbox == null) {
-                persona = personaService.findByFhirIdAndSandboxId(launchScenario.getPersona().getFhirId(), null);
-            } else {
-                persona = personaService.findByFhirIdAndSandboxId(launchScenario.getPersona().getFhirId(), sandbox.getSandboxId());
-            }
+            persona = personaService.findByFhirIdAndSandboxId(launchScenario.getPersona().getFhirId(), sandbox.getSandboxId());
         }
         if (persona == null && launchScenario.getPersona() != null) {
             persona = launchScenario.getPersona();
@@ -99,12 +87,7 @@ public class LaunchScenarioController {
         launchScenario.setPersona(persona);
 
         if (launchScenario.getPatient() != null) {
-            Patient patient = null;
-            if (sandbox == null) {
-                patient = patientService.findByFhirIdAndSandboxId(launchScenario.getPatient().getFhirId(), null);
-            } else {
-                patient = patientService.findByFhirIdAndSandboxId(launchScenario.getPatient().getFhirId(), sandbox.getSandboxId());
-            }
+            Patient patient = patientService.findByFhirIdAndSandboxId(launchScenario.getPatient().getFhirId(), sandbox.getSandboxId());
             if (patient == null) {
                 patient = launchScenario.getPatient();
                 patient.setSandbox(sandbox);
@@ -119,12 +102,7 @@ public class LaunchScenarioController {
             App app = appService.save(launchScenario.getApp());
             launchScenario.setApp(app);
         } else {
-            App app = null;
-            if (sandbox == null) {
-                app = appService.findByLaunchUriAndClientIdAndSandboxId(launchScenario.getApp().getLaunchUri(), launchScenario.getApp().getAuthClient().getClientId(), null);
-            } else {
-                app = appService.findByLaunchUriAndClientIdAndSandboxId(launchScenario.getApp().getLaunchUri(), launchScenario.getApp().getAuthClient().getClientId(), sandbox.getSandboxId());
-            }
+            App app = appService.findByLaunchUriAndClientIdAndSandboxId(launchScenario.getApp().getLaunchUri(), launchScenario.getApp().getAuthClient().getClientId(), sandbox.getSandboxId());
             launchScenario.setApp(app);
         }
 
@@ -178,74 +156,9 @@ public class LaunchScenarioController {
     public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios(HttpServletRequest request,
         @RequestParam(value = "sandboxId") String sandboxId) throws UnsupportedEncodingException{
 
-        if (sandboxId != null) {
-            if (isSandboxMember(request, sandboxService.findBySandboxId(sandboxId))) {
-                return launchScenarioService.findBySandboxId(sandboxId);
-            }
-        } else { // A null sandbox is the HSPC sandbox
-            return launchScenarioService.findBySandboxId( null);
+        if (sandboxId != null && isSandboxMember(request, sandboxService.findBySandboxId(sandboxId))) {
+            return launchScenarioService.findBySandboxId(sandboxId);
         }
         return Collections.EMPTY_LIST;
-    }
-
-    @ExceptionHandler(UnauthorizedException.class)
-    @ResponseBody
-    @ResponseStatus(code = org.springframework.http.HttpStatus.UNAUTHORIZED)
-    public void handleAuthorizationException(HttpServletResponse response, Exception e) throws IOException {
-        response.getWriter().write(e.getMessage());
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
-   @ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
-    public void handleException(HttpServletResponse response, Exception e) throws IOException {
-        response.getWriter().write(e.getMessage());
-    }
-
-    private boolean isSandboxMember(Sandbox sandbox, String userId) {
-        for(UserRole userRole : sandbox.getUserRoles()) {
-            if (userRole.getUser().getLdapId().equalsIgnoreCase(userId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isSandboxMember(HttpServletRequest request, Sandbox sandbox) {
-        String oauthUserId = oAuthUserService.getOAuthUserId(request);
-        for(UserRole userRole : sandbox.getUserRoles()) {
-            if (userRole.getUser().getLdapId().equalsIgnoreCase(oauthUserId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    private void checkUserAuthorization(HttpServletRequest request, String userId) {
-        String oauthUserId = oAuthUserService.getOAuthUserId(request);
-
-        if (!userId.equalsIgnoreCase(oauthUserId)) {
-            throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                    "Response Detail : User not authorized to perform this action."
-                    , HttpStatus.SC_UNAUTHORIZED));
-        }
-    }
-
-    private void checkUserAuthorization(HttpServletRequest request, List<UserRole> users) {
-        String oauthUserId = oAuthUserService.getOAuthUserId(request);
-        boolean userIsAuthorized = false;
-
-        for(UserRole user : users) {
-            if (user.getUser().getLdapId().equalsIgnoreCase(oauthUserId) && user.getRole() != Role.READONLY) {
-                userIsAuthorized = true;
-            }
-        }
-
-        if (!userIsAuthorized) {
-            throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                            "Response Detail : User not authorized to perform this action."
-                    , HttpStatus.SC_UNAUTHORIZED));
-        }
     }
 }
