@@ -1,7 +1,7 @@
 {
     "profileUpdateUri" : "https://hspcreferencemessag-env.us-west-2.elasticbeanstalk.com/sandboxuser/profileupdate",
     "defaultServiceUrl": "https://secure-api.hspconsortium.org/data",
-    "baseServiceUrl": "https://secure-api.hspconsortium.org/",
+    "baseServiceUrl": "https://secure-api.hspconsortium.org/hspc/",
     "oauthLogoutUrl": "https://secure-auth.hspconsortium.org/logout",
     "userManagementUrl": "https://secure-pwm.hspconsortium.org",
     "defaultPersonaId": "COREPRACTITIONER1",
