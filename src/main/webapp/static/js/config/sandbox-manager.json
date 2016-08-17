@@ -1,7 +1,7 @@
 {
     "profileUpdateUri" : "http://localhost:8080/hspc-reference-messaging/sandboxuser/profileupdate",
-    "defaultServiceUrl": "http://localhost:8080/hspc-reference-api/data",
-    "baseServiceUrl": "http://localhost:8080/hspc-reference-api/",
+    "defaultServiceUrl": "http://localhost:8080/hspc-reference-api/hspc/data",
+    "baseServiceUrl": "http://localhost:8080/hspc-reference-api/hspc/",
     "oauthLogoutUrl": "http://localhost:8080/hspc-reference-authorization/logout",
     "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
     "defaultPersonaId": "COREPRACTITIONER1",
