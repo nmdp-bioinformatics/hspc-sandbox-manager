@@ -527,6 +527,12 @@
     cursor: pointer;
 }
 
+.navbar-stack-sign-in  a:focus,
+.navbar-stack-name a:focus {
+    outline: none;
+    text-decoration: none;
+}
+
 .navbar-stack-name {
     position: absolute;
     right: 15px;
@@ -568,7 +574,12 @@
 
 .navbar-bars i {
     font-size: 18px;
-    color: #666666
+    color: #666666;
+}
+
+.navbar-bars a:focus {
+    outline: none;
+    text-decoration: none;
 }
 
 .navbar-bars i:hover {
@@ -710,6 +721,12 @@ span.title,
     right: -11px;
     text-decoration: none;
     color: #666666;
+}
+
+.navbar-sandboxes > a:focus,
+.navbar-sandboxes > a>i:focus {
+    outline: none;
+    text-decoration: none;
 }
 
 .navbar-sandboxes > a:hover,
