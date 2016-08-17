@@ -495,6 +495,40 @@ angular.module('sandManApp.services', [])
                     });
                 return deferred;
             },
+            updateSandbox: function(sandbox) {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId,
+                    type: 'PUT',
+                    data: JSON.stringify(sandbox),
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(){
+                    that.getSandboxById();
+                    deferred.resolve(true);
+                }).fail(function(){
+                });
+                return deferred;
+            },
+            deleteSandbox: function() {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId,
+                    type: 'DELETE',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(){
+                    deferred.resolve(true);
+                }).fail(function(){
+                });
+                return deferred;
+            },
             getUserSandboxesByUserId: function() {
                 var that = this;
                 var deferred = $.Deferred();
@@ -524,7 +558,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "?userId=" + encodeURIComponent(ldapId),
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "?removeUserId=" + encodeURIComponent(ldapId),
                     type: 'PUT',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -558,6 +592,7 @@ angular.module('sandManApp.services', [])
                                 } else {
                                     that.setHasSandbox(true);
                                     sandbox = sandboxResult;
+                                    $rootScope.$emit('refresh-sandboxes');
                                     that.getSandboxLaunchScenarios();
                                     deferred.resolve(true);
                                 }

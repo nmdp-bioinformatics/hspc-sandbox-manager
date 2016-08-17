@@ -6,7 +6,9 @@ import java.math.BigInteger;
 @Entity
 @NamedQueries({
         @NamedQuery(name="Patient.findByFhirIdAndSandboxId",
-                query="SELECT c FROM Patient c WHERE c.fhirId = :fhirId and c.sandbox.sandboxId = :sandboxId")
+                query="SELECT c FROM Patient c WHERE c.fhirId = :fhirId and c.sandbox.sandboxId = :sandboxId"),
+        @NamedQuery(name="Patient.findBySandboxId",
+                query="SELECT c FROM Patient c WHERE c.sandbox.sandboxId = :sandboxId")
 })
 public class Patient {
     private Integer id;

@@ -54,31 +54,11 @@ abstract class AbstractController {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     @ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
-    public void handleException(HttpServletResponse response, Exception e) throws IOException {
+    public void handleException(final HttpServletResponse response, Exception e) throws IOException {
         response.getWriter().write(e.getMessage());
     }
 
-    boolean isSandboxMember(Sandbox sandbox, String userId) {
-        for(UserRole userRole : sandbox.getUserRoles()) {
-            if (userRole.getUser().getLdapId().equalsIgnoreCase(userId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    boolean isSandboxMember(HttpServletRequest request, Sandbox sandbox) {
-        String oauthUserId = oAuthService.getOAuthUserId(request);
-        for(UserRole userRole : sandbox.getUserRoles()) {
-            if (userRole.getUser().getLdapId().equalsIgnoreCase(oauthUserId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    void checkUserAuthorization(HttpServletRequest request, String userId) {
+    void checkUserAuthorization(final HttpServletRequest request, String userId) {
         String oauthUserId = oAuthService.getOAuthUserId(request);
 
         if (!userId.equalsIgnoreCase(oauthUserId)) {
@@ -88,7 +68,7 @@ abstract class AbstractController {
         }
     }
 
-    void checkUserAuthorization(HttpServletRequest request, List<UserRole> users) {
+    void checkUserAuthorization(final HttpServletRequest request, List<UserRole> users) {
         String oauthUserId = oAuthService.getOAuthUserId(request);
         boolean userIsAuthorized = false;
 

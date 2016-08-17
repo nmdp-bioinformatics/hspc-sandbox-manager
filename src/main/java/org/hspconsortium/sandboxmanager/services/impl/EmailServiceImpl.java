@@ -37,7 +37,6 @@ import java.lang.reflect.Type;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -53,39 +52,45 @@ public class EmailServiceImpl implements EmailService {
     @Value("${hspc.platform.messaging.emailSenderEndpointURL}")
     private String emailSenderEndpointURL;
 
+    @Value("${hspc.platform.messaging.sendEmail}")
+    private boolean sendEmail;
+
     @Override
     public void sendEmail(User inviter, User invitee, Sandbox sandbox) {
-        Message message = new Message(true, Message.ENCODING);
+        if (sendEmail) {
 
-        message.setSubject(EMAIL_SUBJECT);
-        message.setAcceptHtmlMessage(true);
+            Message message = new Message(true, Message.ENCODING);
 
-        message.setSenderName(inviter.getName());
-        message.setSenderEmail(HSPC_EMAIL);
-        message.addRecipient(invitee.getName(), invitee.getLdapId());
+            message.setSubject(EMAIL_SUBJECT);
+            message.setAcceptHtmlMessage(true);
 
-        message.setTemplate(getFile(TEMPLATE_FILE));
-        message.setTemplateFormat(Message.TemplateFormat.HTML);
+            message.setSenderName(inviter.getName());
+            message.setSenderEmail(HSPC_EMAIL);
+            message.addRecipient(invitee.getName(), invitee.getLdapId());
 
-        if (inviter.getName() != null) {
-            message.addVariable("inviter", inviter.getName());
-        } else {
-            message.addVariable("inviter", inviter.getLdapId());
-        }
-        if (invitee.getName() != null) {
-            message.addVariable("invitee", invitee.getName());
-        } else {
-            message.addVariable("invitee", invitee.getLdapId());
-        }
-        message.addVariable("sandboxName", sandbox.getName());
-        message.addVariable("inviteeEmail", invitee.getLdapId());
+            message.setTemplate(getFile(TEMPLATE_FILE));
+            message.setTemplateFormat(Message.TemplateFormat.HTML);
 
-        // Add the inline images, referenced from the HTML code as "cid:image-name"
-        message.addResource("hspc-logo", PNG_MIME, getImageFile(HSPC_LOGO_IMAGE, "png"));
-        try {
-            sendEmailToMessaging(message);
-        } catch (IOException e) {
-            e.printStackTrace();
+            if (inviter.getName() != null) {
+                message.addVariable("inviter", inviter.getName());
+            } else {
+                message.addVariable("inviter", inviter.getLdapId());
+            }
+            if (invitee.getName() != null) {
+                message.addVariable("invitee", invitee.getName());
+            } else {
+                message.addVariable("invitee", invitee.getLdapId());
+            }
+            message.addVariable("sandboxName", sandbox.getName());
+            message.addVariable("inviteeEmail", invitee.getLdapId());
+
+            // Add the inline images, referenced from the HTML code as "cid:image-name"
+            message.addResource("hspc-logo", PNG_MIME, getImageFile(HSPC_LOGO_IMAGE, "png"));
+            try {
+                sendEmailToMessaging(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

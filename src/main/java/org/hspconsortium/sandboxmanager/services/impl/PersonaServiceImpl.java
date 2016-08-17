@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class PersonaServiceImpl implements PersonaService {
@@ -23,10 +24,26 @@ public class PersonaServiceImpl implements PersonaService {
     public Persona save(final Persona persona) {
         return repository.save(persona);
     }
+    @Override
+    @Transactional
+    public void delete(final int id) {
+        repository.delete(id);
+    }
+
+    @Override
+    @Transactional
+    public void delete(final Persona persona) {
+        delete(persona.getId());
+    }
 
     @Override
     public Persona findByFhirIdAndSandboxId(final String fhirId, final String sandboxId) {
         return  repository.findByFhirIdAndSandboxId(fhirId, sandboxId);
+    }
+
+    @Override
+    public List<Persona> findBySandboxId(final String sandboxId) {
+        return  repository.findBySandboxId(sandboxId);
     }
 }
 

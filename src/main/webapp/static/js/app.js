@@ -85,12 +85,21 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
         .state('manage-apps', {
             url: '/manage-apps',
             templateUrl: 'static/js/templates/apps.html',
+            needsSandbox: true,
             authenticate: true
         })
 
         .state('data-manager', {
             url: '/data-manager',
             templateUrl: 'static/js/templates/dataManager.html',
+            needsSandbox: true,
+            authenticate: true
+        })
+
+        .state('settings', {
+            url: '/settings',
+            templateUrl: 'static/js/templates/settings.html',
+            needsSandbox: true,
             authenticate: true
         })
 
@@ -101,17 +110,20 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
 
         .state('404', {
             url: '/404',
-            templateUrl:'static/js/templates/404.html'
+            templateUrl:'static/js/templates/404.html',
+            authenticate: true
         })
 
         .state('error', {
             url: '/error',
-            templateUrl:'static/js/templates/error.html'
+            templateUrl:'static/js/templates/error.html',
+            authenticate: true
         })
 
         .state('future', {
             url: '/future',
-            templateUrl:'static/js/templates/future.html'
+            templateUrl:'static/js/templates/future.html',
+            authenticate: true
         })
 
         .state('start', {

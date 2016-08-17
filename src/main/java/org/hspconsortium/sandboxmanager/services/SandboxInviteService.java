@@ -1,13 +1,19 @@
 package org.hspconsortium.sandboxmanager.services;
 
-import org.hspconsortium.sandboxmanager.model.SandboxInvite;
 import org.hspconsortium.sandboxmanager.model.InviteStatus;
+import org.hspconsortium.sandboxmanager.model.SandboxInvite;
 
 import java.util.List;
 
 public interface SandboxInviteService {
 
     SandboxInvite save(final SandboxInvite sandboxInvite);
+
+    void delete(final int id);
+
+    void delete(SandboxInvite sandboxInvite);
+
+    SandboxInvite create(SandboxInvite sandboxInvite);
 
     SandboxInvite getById(final int id);
 

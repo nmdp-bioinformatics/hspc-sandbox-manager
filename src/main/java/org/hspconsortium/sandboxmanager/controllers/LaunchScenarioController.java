@@ -21,19 +21,18 @@
 package org.hspconsortium.sandboxmanager.controllers;
 
 import org.apache.http.HttpStatus;
-import org.hspconsortium.sandboxmanager.model.*;
+import org.hspconsortium.sandboxmanager.model.App;
+import org.hspconsortium.sandboxmanager.model.LaunchScenario;
+import org.hspconsortium.sandboxmanager.model.Sandbox;
+import org.hspconsortium.sandboxmanager.model.User;
 import org.hspconsortium.sandboxmanager.services.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 @RestController
 @RequestMapping("/REST/launchScenario")
@@ -41,21 +40,16 @@ public class LaunchScenarioController extends AbstractController  {
 
     private final LaunchScenarioService launchScenarioService;
     private final UserService userService;
-    private final PatientService patientService;
-    private final PersonaService personaService;
     private final AppService appService;
     private final SandboxService sandboxService;
 
     @Inject
     public LaunchScenarioController(final LaunchScenarioService launchScenarioService,
-                                    final PatientService patientService, final PersonaService personaService,
                                     final AppService appService, final UserService userService,
                                     final SandboxService sandboxService, final OAuthService oAuthService) {
         super(oAuthService);
         this.launchScenarioService = launchScenarioService;
         this.userService = userService;
-        this.patientService = patientService;
-        this.personaService = personaService;
         this.appService = appService;
         this.sandboxService = sandboxService;
     }
@@ -70,43 +64,9 @@ public class LaunchScenarioController extends AbstractController  {
 
         checkUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
         User user = userService.findByLdapId(launchScenario.getCreatedBy().getLdapId());
-        if (user == null) {
-            user = userService.save(launchScenario.getCreatedBy());
-        }
         launchScenario.setCreatedBy(user);
 
-        Persona persona = null;
-        if (launchScenario.getPersona() != null) {
-            persona = personaService.findByFhirIdAndSandboxId(launchScenario.getPersona().getFhirId(), sandbox.getSandboxId());
-        }
-        if (persona == null && launchScenario.getPersona() != null) {
-            persona = launchScenario.getPersona();
-            persona.setSandbox(sandbox);
-            persona = personaService.save(launchScenario.getPersona());
-        }
-        launchScenario.setPersona(persona);
-
-        if (launchScenario.getPatient() != null) {
-            Patient patient = patientService.findByFhirIdAndSandboxId(launchScenario.getPatient().getFhirId(), sandbox.getSandboxId());
-            if (patient == null) {
-                patient = launchScenario.getPatient();
-                patient.setSandbox(sandbox);
-                patient = patientService.save(patient);
-            }
-            launchScenario.setPatient(patient);
-        }
-
-        if (launchScenario.getApp().getAuthClient().getAuthDatabaseId() == null) {
-            // Create an anonymous App for a custom launch
-            launchScenario.getApp().setSandbox(sandbox);
-            App app = appService.save(launchScenario.getApp());
-            launchScenario.setApp(app);
-        } else {
-            App app = appService.findByLaunchUriAndClientIdAndSandboxId(launchScenario.getApp().getLaunchUri(), launchScenario.getApp().getAuthClient().getClientId(), sandbox.getSandboxId());
-            launchScenario.setApp(app);
-        }
-
-        return launchScenarioService.save(launchScenario);
+        return launchScenarioService.create(launchScenario);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces ="application/json")
@@ -119,14 +79,7 @@ public class LaunchScenarioController extends AbstractController  {
         }
         Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
         checkUserAuthorization(request, sandbox.getUserRoles());
-        LaunchScenario updateLaunchScenario = launchScenarioService.getById(launchScenario.getId());
-        if (updateLaunchScenario != null) {
-            updateLaunchScenario.setLastLaunchSeconds(launchScenario.getLastLaunchSeconds());
-            updateLaunchScenario.setContextParams(launchScenario.getContextParams());
-            updateLaunchScenario.setDescription(launchScenario.getDescription());
-            return launchScenarioService.save(updateLaunchScenario);
-        }
-        return null;
+        return launchScenarioService.update(launchScenario);
     }
 
     @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"appId"})
@@ -145,18 +98,17 @@ public class LaunchScenarioController extends AbstractController  {
         LaunchScenario launchScenario = launchScenarioService.getById(id);
         Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
         checkUserAuthorization(request, sandbox.getUserRoles());
-        if (launchScenario.getApp().getAuthClient().getAuthDatabaseId() == null) {
-            // This is an anonymous App created for a custom launch
-            appService.delete(launchScenario.getApp());
-        }
-        launchScenarioService.delete(launchScenario.getId());
+        launchScenarioService.delete(launchScenario);
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = "application/json", params = {"sandboxId"})
+    @SuppressWarnings("unchecked")
     public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios(HttpServletRequest request,
         @RequestParam(value = "sandboxId") String sandboxId) throws UnsupportedEncodingException{
 
-        if (sandboxId != null && isSandboxMember(request, sandboxService.findBySandboxId(sandboxId))) {
+        String oauthUserId = oAuthService.getOAuthUserId(request);
+        if (sandboxId != null && sandboxService.isSandboxMember(sandboxService.findBySandboxId(sandboxId),
+                                                                userService.findByLdapId(oauthUserId))) {
             return launchScenarioService.findBySandboxId(sandboxId);
         }
         return Collections.EMPTY_LIST;

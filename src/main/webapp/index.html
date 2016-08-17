@@ -47,7 +47,6 @@
             window.location.hash = newHash;
         }
     </script>
-
 </head>
 
 <!-- apply our angular app to our site -->
@@ -55,11 +54,11 @@
 
 <!-- NAVIGATION -->
 <nav class="navbar" role="navigation" ng-show="showing.navBar">
-    <div class="navbar-bars"><a href="#" uib-popover-template="'static/js/templates/barsPopover.html'" popover-trigger="focus" popover-placement="bottom"><i class="fa fa-bars fa-lg"></i></a></div>
+    <div class="navbar-bars"><a tabindex="0" uib-popover-template="'static/js/templates/barsPopover.html'" popover-trigger="focus" popover-placement="bottom" class="btn btn-default"><i class="fa fa-bars fa-lg"></i></a></div>
     <div class="navbar-img"><img ng-click="dashboard()" src="static/images/hspc-sndbx-logo.png" srcset="static/images/hspc-sndbx-logo@2x.png 2x" style="cursor: pointer" /></div>
-    <div class="navbar-sandboxes" ng-show="showing.signout"><a href="#" uib-popover-template="'static/js/templates/sandboxPopover.html'" popover-trigger="focus" popover-placement="bottom">Sandboxes <i class="fa fa-sort-desc fa-lg"></i></a></div>
+    <div class="navbar-sandboxes" ng-show="showing.signout"><a href="#" style="cursor: pointer" uib-popover-template="'static/js/templates/sandboxPopover.html'" data-toggle="popover" popover-trigger="focus" popover-placement="bottom">Sandboxes <i class="fa fa-sort-desc fa-lg"></i></a></div>
     <div class="navbar-stack-name" ng-show="showing.signout" ng-cloak>
-    Welcome <a id="welcome" href="#" uib-popover-template="'static/js/templates/settingsPopover.html'" popover-trigger="focus" popover-placement="bottom" ><span style="font-weight: bold">{{oauthUser.name}}</span></a></div>
+    Welcome <a id="welcome" href="#" style="cursor: pointer" uib-popover-template="'static/js/templates/settingsPopover.html'" data-toggle="popover" popover-trigger="focus" popover-placement="bottom" ><span style="font-weight: bold">{{oauthUser.name}}</span></a></div>
     <div class="navbar-stack-sign-in" ng-show="showing.signin" ng-cloak>
         <a id="signin" ng-click="signin()"><i class="fa fa-sign-in"></i> Sign In</a>
     </div>

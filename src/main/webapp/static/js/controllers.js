@@ -124,6 +124,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.selectSandbox = function(sandbox) {
             if (sandboxManagement.getSandbox().sandboxId !== sandbox.sandboxId) {
                 window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + sandbox.sandboxId
+            } else if (sandboxManagement.getSandbox().sandboxId === sandbox.sandboxId && $state.current.name === "create-sandbox") {
+                $scope.showing.sideNavBar = true;
+                $state.go('launch-scenarios', {});
             }
         };
 
@@ -150,6 +153,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     $scope.showing.signin = false;
                     $scope.showing.signout = true;
                     $scope.dashboard.sandboxes = sandboxManagement.getSandboxes();
+                    $scope.title.blueBarTitle = sandboxManagement.getSandbox().name;
                     $rootScope.$digest();
                 }
             });
@@ -298,6 +302,53 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 });
             });
         }
+        
+    }).controller("SettingsViewController",
+    function($scope, $rootScope, sandboxManagement, appsSettings, userServices, $uibModal){
+
+        $scope.confirmDelete = false;
+        $scope.sandbox = angular.copy(sandboxManagement.getSandbox());
+        $scope.sandboxURL = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + $scope.sandbox.sandboxId;
+        $scope.fhirVersion = "DSTU 2";
+
+        $scope.canDelete = function () {
+            return (sandboxManagement.getSandbox().createdBy.ldapId.toLowerCase() === userServices.getOAuthUser().ldapId.toLowerCase());
+        };
+
+        $scope.showDelete = function () {
+            return $scope.confirmDelete && $scope.canDelete();
+        };
+
+        $scope.updateSandbox = function () {
+            sandboxManagement.updateSandbox($scope.sandbox);
+        };
+
+        $scope.deleteSandbox = function () {
+            $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/sandboxDeleteModal.html',
+                controller: 'SandboxDeleteModalInstanceCtrl',
+                resolve: {
+                    getSettings: function () {
+                        return {
+                            title:"Delete Sandbox",
+                            ok:"Yes",
+                            cancel:"Cancel",
+                            type:"confirm-error",
+                            text:"Are you sure you want to delete sandbox " + sandboxManagement.getSandbox().name + "? "+
+                            "This is not reversible and will delete all FHIR data, launch scenarios, registered app, etc.",
+                            callback:function(result){ //setting callback
+                                if (result == true) {
+                                    sandboxManagement.deleteSandbox().then(function () {
+                                        window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/#/dashboard-view";
+                                    });
+                                }
+                            }
+                        };
+                    }
+                }
+            });
+        };
         
     }).controller("FutureController",
     function(){
@@ -1388,6 +1439,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.selected.selectedApp = app;
         $scope.showing.appDetail = true;
         delete $scope.clientJSON.logo;
+        $scope.myFile = undefined;
         if (app.clientJSON) {
             $scope.clientJSON = app.clientJSON;
         } else {
@@ -1423,7 +1475,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     };
 
     $scope.save = function (){
-        $scope.selected.selectedApp.logo = $scope.myFile;
+        if ($scope.myFile !== undefined) {
+            $scope.selected.selectedApp.logo = $scope.myFile;
+        }
         var updateClientJSON = angular.copy($scope.clientJSON);
         delete updateClientJSON.logo;
         if( Object.prototype.toString.call( updateClientJSON.redirectUris ) !== '[object Array]' &&
@@ -1595,6 +1649,25 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     }]).controller('ConfirmModalInstanceCtrl',['$scope', '$uibModalInstance', 'getSettings',
     function ($scope, $uibModalInstance, getSettings) {
 
+        $scope.title = (getSettings.title !== undefined) ? getSettings.title : "";
+        $scope.ok = (getSettings.ok !== undefined) ? getSettings.ok : "Yes";
+        $scope.cancel = (getSettings.cancel !== undefined) ? getSettings.cancel : "No";
+        $scope.text = (getSettings.text !== undefined) ? getSettings.text : "Continue?";
+        var callback = (getSettings.callback !== undefined) ? getSettings.callback : null;
+
+        $scope.confirm = function (result) {
+            $uibModalInstance.close(result);
+            callback(result);
+        };
+    }]).controller('SandboxDeleteModalInstanceCtrl',['$scope', '$uibModalInstance', 'getSettings',
+    function ($scope, $uibModalInstance, getSettings) {
+
+        $scope.canDelete = false;
+
+        $scope.$watch('deleteText', function() {
+            $scope.canDelete = $scope.deleteText === "DELETE";
+        });
+        
         $scope.title = (getSettings.title !== undefined) ? getSettings.title : "";
         $scope.ok = (getSettings.ok !== undefined) ? getSettings.ok : "Yes";
         $scope.cancel = (getSettings.cancel !== undefined) ? getSettings.cancel : "No";

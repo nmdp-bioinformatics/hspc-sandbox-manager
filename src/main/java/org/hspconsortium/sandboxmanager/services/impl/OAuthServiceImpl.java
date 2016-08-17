@@ -65,22 +65,10 @@ import java.util.List;
 public class OAuthServiceImpl implements OAuthService {
     private static Logger LOGGER = LoggerFactory.getLogger(OAuthServiceImpl.class.getName());
 
-    @Value("${hspc.platform.api.oauthClientEndpointURL}")
-    private String oauthClientEndpointURL;
-
     @Value("${hspc.platform.api.oauthUserInfoEndpointURL}")
-    private String oauthUserInfoEndpointURL;
+    String oauthUserInfoEndpointURL;
 
-    @Value("${hspc.platform.api.oauthUserLoginEndpointURL}")
-    private String oauthUserLoginEndpointURL;
-
-    @Value("${hspc.platform.api.oauthUser}")
-    private String oauthUser;
-
-    @Value("${hspc.platform.api.oauthUserPassword}")
-    private String oauthUserPassword;
-
-
+    @Override
     public String getBearerToken(HttpServletRequest request) {
 
         String authToken = request.getHeader("Authorization");
@@ -90,71 +78,33 @@ public class OAuthServiceImpl implements OAuthService {
         return authToken.substring(7);
     }
 
+    @Override
     public String getOAuthUserId(HttpServletRequest request) {
-
-        String authToken = getBearerToken(request);
-        if (authToken == null) {
-            return null;
-        }
-
-        HttpGet getRequest = new HttpGet(this.oauthUserInfoEndpointURL);
-        getRequest.setHeader("Authorization", "BEARER " + authToken);
-
-        SSLContext sslContext;
         try {
-            sslContext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).useSSL().build();
-        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
+            JSONObject jsonObject = getOAuthUser(request);
+            if (jsonObject != null) {
+                return (String) jsonObject.get("sub");
+            }
+        } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        HttpClientBuilder builder = HttpClientBuilder.create();
-        SSLConnectionSocketFactory sslConnectionFactory = new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-        builder.setSSLSocketFactory(sslConnectionFactory);
-        Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
-                .register("https", sslConnectionFactory)
-                .register("http", new PlainConnectionSocketFactory())
-                .build();
-        HttpClientConnectionManager ccm = new BasicHttpClientConnectionManager(registry);
-        builder.setConnectionManager(ccm);
-
-        CloseableHttpClient httpClient = builder.build();
-
-        try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(getRequest)) {
-            if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-                    throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                                    "Response Detail : User not authorized to perform this action."
-                            , HttpStatus.SC_UNAUTHORIZED));
-                }
-                HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
-                throw new RuntimeException(String.format("Response Status : %s .\nResponse Detail :%s."
-                        , closeableHttpResponse.getStatusLine()
-                        , responseString));
-            }
-
-            HttpEntity httpEntity = closeableHttpResponse.getEntity();
-            String entity = IOUtils.toString(httpEntity.getContent());
-            JSONObject jsonObject;
-            try {
-                jsonObject = new JSONObject(entity);
-                return (String)jsonObject.get("sub");
-            } catch (JSONException e) {
-                LOGGER.error("JSON Error reading entity: " + entity, e);
-                throw new RuntimeException(e);
-            }
-        } catch (IOException io_ex) {
-            LOGGER.error("Error on HTTP GET", io_ex);
-            throw new RuntimeException(io_ex);
-        } finally {
-            try {
-                httpClient.close();
-            }catch (IOException e) {
-                LOGGER.error("Error closing HttpClient");
-            }
-        }
+        return null;
     }
 
+    @Override
     public String getOAuthUserName(HttpServletRequest request) {
+        try {
+            JSONObject jsonObject = getOAuthUser(request);
+            if (jsonObject != null) {
+                return (String) jsonObject.get("name");
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    private JSONObject getOAuthUser(HttpServletRequest request) {
 
         String authToken = getBearerToken(request);
         if (authToken == null) {
@@ -198,10 +148,8 @@ public class OAuthServiceImpl implements OAuthService {
 
             HttpEntity httpEntity = closeableHttpResponse.getEntity();
             String entity = IOUtils.toString(httpEntity.getContent());
-            JSONObject jsonObject;
             try {
-                jsonObject = new JSONObject(entity);
-                return (String)jsonObject.get("name");
+                return new JSONObject(entity);
             } catch (JSONException e) {
                 LOGGER.error("JSON Error reading entity: " + entity, e);
                 throw new RuntimeException(e);
@@ -215,226 +163,6 @@ public class OAuthServiceImpl implements OAuthService {
             }catch (IOException e) {
                 LOGGER.error("Error closing HttpClient");
             }
-        }
-    }
-
-    public String postOAuthClient(String clientJSON) {
-
-        CloseableHttpClient httpClient = getAuthenticatedHttpClient();
-        HttpPost postRequest = new HttpPost(oauthClientEndpointURL);
-        postRequest.addHeader("Content-Type", "application/json");
-
-        try {
-            JSONObject jsonObject = new JSONObject(clientJSON);
-            StringEntity entity = new StringEntity(jsonObject.toString());
-            postRequest.setEntity(entity);
-        } catch (JSONException | UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-
-        try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(postRequest)) {
-            if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK ) {
-                if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-                    throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                                    "Response Detail : User not authorized to perform this action."
-                            , HttpStatus.SC_UNAUTHORIZED));
-                }
-                HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
-                throw new RuntimeException(String.format("There was a problem registering the oauth client.\n" +
-                                "Response Status : %s .\nResponse Detail :%s."
-                        , closeableHttpResponse.getStatusLine()
-                        , responseString));
-            }
-
-            HttpEntity httpEntity = closeableHttpResponse.getEntity();
-            return IOUtils.toString(httpEntity.getContent());
-        } catch (IOException io_ex) {
-            throw new RuntimeException(io_ex);
-        } finally {
-            try {
-                httpClient.close();
-            }catch (IOException e) {
-                LOGGER.error("Error closing HttpClient");
-            }
-        }
-    }
-
-    public String putOAuthClient(Integer id, String clientJSON) {
-
-        CloseableHttpClient httpClient = getAuthenticatedHttpClient();
-        HttpPut putRequest = new HttpPut(oauthClientEndpointURL + "/" + id);
-        putRequest.addHeader("Content-Type", "application/json");
-
-        try {
-            JSONObject jsonObject = new JSONObject(clientJSON);
-            StringEntity entity = new StringEntity(jsonObject.toString());
-            putRequest.setEntity(entity);
-        } catch (JSONException | UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-
-        try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(putRequest)) {
-            if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK ) {
-                if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-                    throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                                    "Response Detail : User not authorized to perform this action."
-                            , HttpStatus.SC_UNAUTHORIZED));
-                }
-                HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
-                throw new RuntimeException(String.format("There was a problem updating the client.\n" +
-                                "Response Status : %s .\nResponse Detail :%s."
-                        , closeableHttpResponse.getStatusLine()
-                        , responseString));
-            }
-            HttpEntity httpEntity = closeableHttpResponse.getEntity();
-            return IOUtils.toString(httpEntity.getContent());
-        } catch (IOException io_ex) {
-            throw new RuntimeException(io_ex);
-        } finally {
-            try {
-                httpClient.close();
-            }catch (IOException e) {
-                LOGGER.error("Error closing HttpClient");
-            }
-        }
-    }
-
-    public String getOAuthClient(Integer id) {
-
-        CloseableHttpClient httpClient = getAuthenticatedHttpClient();
-        HttpGet getRequest = new HttpGet(oauthClientEndpointURL + "/" + id);
-
-        try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(getRequest)) {
-            if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK ) {
-                if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-                    throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                                    "Response Detail : User not authorized to perform this action."
-                            , HttpStatus.SC_UNAUTHORIZED));
-                }
-                HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
-                throw new RuntimeException(String.format("There was a problem registering the client.\n" +
-                                "Response Status : %s .\nResponse Detail :%s."
-                        , closeableHttpResponse.getStatusLine()
-                        , responseString));
-            }
-            HttpEntity httpEntity = closeableHttpResponse.getEntity();
-            return EntityUtils.toString(httpEntity);
-        } catch (IOException io_ex) {
-            throw new RuntimeException(io_ex);
-        } finally {
-            try {
-                httpClient.close();
-            }catch (IOException e) {
-                LOGGER.error("Error closing HttpClient");
-            }
-        }
-    }
-
-    public void deleteOAuthClient(Integer id) {
-
-        CloseableHttpClient httpClient = getAuthenticatedHttpClient();
-        HttpDelete deleteRequest = new HttpDelete(oauthClientEndpointURL + "/" + id);
-
-        try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(deleteRequest)) {
-            if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK ) {
-                if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-                    throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                                    "Response Detail : User not authorized to perform this action."
-                            , HttpStatus.SC_UNAUTHORIZED));
-                }
-                HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
-                throw new RuntimeException(String.format("There was a problem deleting the client.\n" +
-                                "Response Status : %s .\nResponse Detail :%s."
-                        , closeableHttpResponse.getStatusLine()
-                        , responseString));
-            }
-        } catch (IOException io_ex) {
-            throw new RuntimeException(io_ex);
-        } finally {
-            try {
-                httpClient.close();
-            }catch (IOException e) {
-                LOGGER.error("Error closing HttpClient");
-            }
-        }
-    }
-
-
-    private CloseableHttpClient getAuthenticatedHttpClient() {
-
-        HttpPost postRequest = new HttpPost(oauthUserLoginEndpointURL);
-        postRequest.addHeader("Content-Type", "application/x-www-form-urlencoded");
-        postRequest.addHeader("Connection", "Keep-Alive");
-
-        try {
-            List<NameValuePair> formData = new ArrayList<>();
-            formData.add(new BasicNameValuePair("j_username", oauthUser));
-            formData.add(new BasicNameValuePair("j_password", oauthUserPassword));
-            formData.add(new BasicNameValuePair("submit", "Sign in"));
-            UrlEncodedFormEntity entity = new UrlEncodedFormEntity(formData);
-            postRequest.setEntity(entity);
-
-        } catch (UnsupportedEncodingException uee_ex) {
-            throw new RuntimeException(uee_ex);
-        }
-
-        SSLContext sslContext;
-        try {
-            sslContext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).useSSL().build();
-        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
-            throw new RuntimeException(e);
-        }
-        HttpClientBuilder builder = HttpClientBuilder.create();
-        SSLConnectionSocketFactory sslConnectionFactory = new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-        builder.setSSLSocketFactory(sslConnectionFactory);
-        Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
-                .register("https", sslConnectionFactory)
-                .register("http", new PlainConnectionSocketFactory())
-                .build();
-        HttpClientConnectionManager ccm = new BasicHttpClientConnectionManager(registry);
-        builder.setConnectionManager(ccm);
-
-        CloseableHttpClient httpClient = builder.setRedirectStrategy(new DefaultRedirectStrategy() {
-
-            public boolean isRedirected(HttpRequest request, HttpResponse response, HttpContext context)  {
-                boolean isRedirect=false;
-                try {
-                    isRedirect = super.isRedirected(request, response, context);
-                } catch (ProtocolException e) {
-                    e.printStackTrace();
-                }
-                if (!isRedirect) {
-                    int responseCode = response.getStatusLine().getStatusCode();
-                    if (responseCode == HttpServletResponse.SC_MOVED_PERMANENTLY ||
-                            responseCode == HttpServletResponse.SC_MOVED_TEMPORARILY) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        }).build();
-
-        try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(postRequest)) {
-            if (closeableHttpResponse.getStatusLine().getStatusCode() != HttpServletResponse.SC_OK) {
-                if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-                    throw new UnauthorizedException(String.format("Response Status : %s.\n" +
-                                    "Response Detail : User not authorized to perform this action."
-                            , HttpStatus.SC_UNAUTHORIZED));
-                }
-                HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
-                throw new RuntimeException(String.format("Invalid Credentials\n" +
-                                "Response Status : %s .\nResponse Detail :%s."
-                        , closeableHttpResponse.getStatusLine()
-                        , responseString));
-            }
-            return httpClient;
-        } catch (IOException io_ex) {
-            throw new RuntimeException(io_ex);
         }
     }
 

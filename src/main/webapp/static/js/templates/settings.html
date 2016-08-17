@@ -1,0 +1,53 @@
+<div class="container-fluid" ng-controller="SettingsViewController">
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="col-md-12 settings-container" resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight)">
+                <div class="sub-header">Sandbox Details</div>
+                <div class="box">
+                    <div class="right-form-group">
+                        <label class="right-form-label">Sandbox ID </label>
+                        <label class="right-form-value-label">{{sandbox.sandboxId}}</label>
+                    </div>
+                    <div class="right-form-group">
+                        <label class="right-form-label">Sandbox URL </label>
+                        <label class="right-form-value-label">{{sandboxURL}}</label>
+                    </div>
+                    <div class="right-form-group">
+                        <label class="right-form-label">Sandbox FHIR Version </label>
+                        <label class="right-form-value-label">{{fhirVersion}}</label>
+                    </div>
+                    <div class="right-form-group">
+                        <label class="right-form-label">Sandbox Name</label>
+                        <input ng-model="sandbox.name" class="right-form-input-box"/>
+                    </div>
+                    <div class="right-form-group">
+                        <label class="right-form-label">Description</label>
+                        <textarea class="right-form-description-box" ng-model="sandbox.description"></textarea>
+                    </div>
+                    <div  class="btn btn-basic btn-md" ng-click="updateSandbox()"><i class="fa fa-save fa-lg"></i> Save</div>
+                </div>
+
+                <div class="sub-header">Delete Sandbox</div>
+                <div class="box">
+                    <label class="right-form-note-label">Deleting the sandbox will delete:
+                        <ul>
+                            <li>all FHIR data</li>
+                            <li>launch scenarios</li>
+                            <li>registered apps</li>
+                            <li>remove access for all sandbox members</li>
+                        </ul>
+                        This is NOT reversible!</label>
+                    <div tooltip-placement="top" uib-tooltip="Only the sanbox creator can delete the sandbox" tooltip-trigger="{{!canDelete() ? 'mouseenter' : 'none'}}">
+                    <div class="right-form-group">
+                        <input ng-disabled="!canDelete()" type="checkbox" ng-model="confirmDelete" class="right-form-input-checkbox"/>
+                        <label class="right-form-checkbox-label">Are you sure you want to delete sandbox <b>{{sandbox.name}}</b>? </label>
+                    </div>
+                    <div ng-disabled="!showDelete()" class="btn btn-basic btn-md" ng-click="deleteSandbox()"><i class="fa fa-remove fa-lg"></i> Delete Sandbox</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -21,10 +21,12 @@
 package org.hspconsortium.sandboxmanager.controllers;
 
 import org.apache.http.HttpStatus;
-import org.hspconsortium.sandboxmanager.model.*;
-import org.hspconsortium.sandboxmanager.services.*;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.hspconsortium.sandboxmanager.model.App;
+import org.hspconsortium.sandboxmanager.model.Image;
+import org.hspconsortium.sandboxmanager.model.Sandbox;
+import org.hspconsortium.sandboxmanager.services.AppService;
+import org.hspconsortium.sandboxmanager.services.OAuthService;
+import org.hspconsortium.sandboxmanager.services.SandboxService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -43,112 +45,68 @@ public class AppRegistrationController extends AbstractController {
     private static Logger LOGGER = LoggerFactory.getLogger(AppRegistrationController.class.getName());
 
     private final AppService appService;
-    private final AuthClientService authClientService;
     private final SandboxService sandboxService;
-    private final ImageService imageService;
 
     @Inject
     public AppRegistrationController(final AppService appService, final OAuthService oAuthService,
-                                     final AuthClientService authClientService,
-                                     final SandboxService sandboxService,
-                                     final ImageService imageService) {
+                                     final SandboxService sandboxService) {
         super(oAuthService);
         this.appService = appService;
-        this.authClientService = authClientService;
         this.sandboxService = sandboxService;
-        this.imageService = imageService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
     @Transactional
-    public @ResponseBody App createApp(HttpServletRequest request, @RequestBody App app) throws IOException {
-
+    public @ResponseBody App createApp(final HttpServletRequest request, @RequestBody App app) {
         Sandbox sandbox = sandboxService.findBySandboxId(app.getSandbox().getSandboxId());
         checkUserAuthorization(request, sandbox.getUserRoles());
         app.setSandbox(sandbox);
-        app.setLogo(null);
-
-        String entity = oAuthService.postOAuthClient(app.getClientJSON());
-        try {
-            JSONObject jsonObject = new JSONObject(entity);
-            app.getAuthClient().setAuthDatabaseId((Integer)jsonObject.get("id"));
-            app.getAuthClient().setClientId((String)jsonObject.get("clientId"));
-            app.getAuthClient().setClientName((String)jsonObject.get("clientName"));
-            AuthClient authClient = authClientService.save(app.getAuthClient());
-            app.setAuthClient(authClient);
-            return appService.save(app);
-        } catch (JSONException e) {
-            LOGGER.error("JSON Error reading entity: " + entity, e);
-            throw new RuntimeException(e);
-        }
+        return appService.create(app);
     }
 
     @RequestMapping(method = RequestMethod.GET, params = {"sandboxId"})
-    public @ResponseBody List<App> getApps(HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId) {
+    public @ResponseBody List<App> getApps(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId) {
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
         checkUserAuthorization(request, sandbox.getUserRoles());
         return appService.findBySandboxId(sandboxId);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces ="application/json")
-    public @ResponseBody App getApp(HttpServletRequest request, @PathVariable Integer id) {
+    public @ResponseBody App getApp(final HttpServletRequest request, @PathVariable Integer id) {
 
         App app = appService.getById(id);
         checkUserAuthorization(request, app.getSandbox().getUserRoles());
-
-        if (app.getAuthClient().getAuthDatabaseId() != null) {
-            String clientJSON = oAuthService.getOAuthClient(app.getAuthClient().getAuthDatabaseId());
-            app.setClientJSON(clientJSON);
-        }
-        return app;
+        return appService.getClientJSON(app);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces ="application/json")
     @Transactional
-    public @ResponseBody void deleteApp(HttpServletRequest request, @PathVariable Integer id) {
+    public @ResponseBody void deleteApp(final HttpServletRequest request, @PathVariable Integer id) {
 
         App app = appService.getById(id);
         checkUserAuthorization(request, app.getSandbox().getUserRoles());
-        Integer authDatabaseId = app.getAuthClient().getAuthDatabaseId();
         appService.delete(app);
-        if (authDatabaseId != null) {
-            oAuthService.deleteOAuthClient(authDatabaseId);
-        }
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces ="application/json")
     @Transactional
-    public @ResponseBody App updateApp(HttpServletRequest request, @PathVariable Integer id, @RequestBody App app) {
+    public @ResponseBody App updateApp(final HttpServletRequest request, @PathVariable Integer id, @RequestBody App app) {
 
         App existingApp = appService.getById(id);
-        checkUserAuthorization(request, app.getSandbox().getUserRoles());
         if (existingApp == null || existingApp.getId().intValue() != id.intValue()) {
             throw new RuntimeException(String.format("Response Status : %s.\n" +
                             "Response Detail : App Id doesn't match Id in JSON body."
                     , HttpStatus.SC_BAD_REQUEST));
         }
-
-        String entity = oAuthService.putOAuthClient(existingApp.getAuthClient().getAuthDatabaseId(), app.getClientJSON());
-
-        try {
-            JSONObject jsonObject = new JSONObject(entity);
-            existingApp.getAuthClient().setClientName((String)jsonObject.get("clientName"));
-            existingApp.getAuthClient().setLogoUri(app.getLogoUri());
-            authClientService.save(existingApp.getAuthClient());
-        } catch (JSONException e) {
-            LOGGER.error("JSON Error reading entity: " + entity, e);
-            throw new RuntimeException(e);
-        }
-        existingApp.setLaunchUri(app.getLaunchUri());
-        existingApp.setLogoUri(app.getLogoUri());
-        return appService.save(existingApp);
+        checkUserAuthorization(request, existingApp.getSandbox().getUserRoles());
+        return appService.update(app);
     }
 
 
     @RequestMapping(value = "/{id}/image", method = RequestMethod.GET, produces ={
             "image/gif", "image/png", "image/jpg", "image/jpeg"
     })
-    public @ResponseBody void getFullImage(HttpServletResponse response, @PathVariable Integer id) {
+    public @ResponseBody void getFullImage(final HttpServletResponse response, @PathVariable Integer id) {
 
         App app = appService.getById(id);
         try {
@@ -161,32 +119,16 @@ public class AppRegistrationController extends AbstractController {
 
     @RequestMapping(value = "/{id}/image", method = RequestMethod.POST, consumes = {"multipart/form-data"} )
     @Transactional
-    public @ResponseBody void putFullImage(HttpServletRequest request, @PathVariable Integer id, @RequestParam("file") MultipartFile file) {
+    public @ResponseBody void putFullImage(final HttpServletRequest request, @PathVariable Integer id, @RequestParam("file") MultipartFile file) {
 
         App app = appService.getById(id);
         checkUserAuthorization(request, app.getSandbox().getUserRoles());
-
-        String clientJSON = oAuthService.getOAuthClient(app.getAuthClient().getAuthDatabaseId());
-        try {
-            JSONObject jsonObject = new JSONObject(clientJSON);
-            jsonObject.put("logoUri", request.getRequestURL().toString());
-            oAuthService.putOAuthClient(app.getAuthClient().getAuthDatabaseId(), jsonObject.toString());
-        } catch (JSONException e) {
-            LOGGER.error("JSON Error reading entity: " + clientJSON, e);
-            throw new RuntimeException(e);
-        }
-
+        app.setLogoUri(request.getRequestURL().toString());
         try {
             Image image = new Image();
             image.setBytes(file.getBytes());
             image.setContentType(file.getContentType());
-            if (app.getLogo() != null) {
-                imageService.delete(app.getLogo().getId());
-            }
-            app.setLogo(image);
-            app.setLogoUri(request.getRequestURL().toString());
-            app.getAuthClient().setLogoUri(request.getRequestURL().toString());
-            appService.save(app);
+            appService.updateAppImage(app, image);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -27,6 +27,7 @@
 .create-form {
     width: 850px;
     margin: 10px auto 0 auto;
+    overflow: auto;
 }
 
 /*.create-form img {*/
@@ -189,6 +190,140 @@
     color: #666666;
     background-color: #4593B2;
     cursor: pointer;
+}
+
+.settings-container {
+    width: 600px;
+    margin: 0 auto 0 auto;
+    overflow: auto;
+    padding: 5px 0 10px 0;
+}
+
+.settings-container .box {
+    margin: 5px 0 20px;
+    padding-bottom: 5px;
+}
+
+.right-form {
+    width: 650px;
+    margin: 10px auto 0 auto;
+}
+
+.right-form-group {
+    box-sizing: border-box;
+    clear: both;
+    padding: 4px 0 4px 5px;
+    position: relative;
+    margin: 1px 0;
+    width: 100%;
+}
+
+.right-form-label {
+    float: left;
+    margin-right: 10px;
+    padding: 5px 0 0;
+    position: relative;
+    text-align: right;
+    width: 20%;
+    font-size: 14px;
+    font-weight: 400;
+    color: #707070;
+    word-wrap: break-word;
+}
+
+.right-form-value-label {
+    float: left;
+    /*padding: 0;*/
+    position: relative;
+    text-align: left;
+    padding: 4px 25px 4px 5px;
+    border: 1px solid #f4f4f4;
+    border-radius: 3px;
+    width: 77%;
+    font-size: 14px;
+    font-weight: 700;
+    color: #707070;
+    word-wrap: break-word;
+}
+
+.right-form-input-box {
+    height: 2.14285714em;
+    line-height: 1.4285714285714;
+    padding: 4px 25px 4px 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box;
+    font-size: inherit;
+    margin: 0;
+    width: 77%;
+    vertical-align: baseline;
+}
+
+.right-form-description {
+    color: #707070;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.66666666666667;
+    margin: 5px 0 0;
+    word-wrap: break-word;
+}
+
+.right-form-description-box {
+    margin: 0;
+    width: 77%;
+    height: 86px;
+    padding: 4px 25px 4px 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    resize: none;
+}
+
+.right-box {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 0 auto 60px;
+    padding: 30px;
+}
+
+.right-form-note-label {
+    margin: 0;
+    width: 90%;
+    padding: 4px 5px 4px 5px;
+    font-weight: 500;
+}
+
+.right-form-note-label ul {
+    position: relative;
+    padding: 0 18px;
+    font-weight: bold;
+    color: #666666;
+    margin-bottom: 5px;
+}
+
+.right-form-note-label ul li {
+    position: relative;
+    display: list-item;
+    padding: 0 5px;
+    font-weight: bold;
+    color: #666666;
+}
+
+.right-form-checkbox-label {
+    float: left;
+    padding-left: 5px;
+    position: relative;
+    text-align: left;
+    width: 80%;
+    font-size: 14px;
+    font-weight: 400;
+    color: #707070;
+    word-wrap: break-word;
+}
+
+.right-form-input-checkbox {
+    float: left;
+    width: 15px;
 }
 
 .progress-box {
@@ -517,8 +652,8 @@ span.title,
 .navbar-bars .popover,
 .navbar-bars .popover-content,
 .bars-content {
-    width: 350px;
-    max-width: 350px;
+    width: 375px;
+    max-width: 375px;
 }
 
 .bars-content img {
@@ -538,9 +673,15 @@ span.title,
     text-decoration: none;
 }
 
+.bars-content .bar-item>a>.bar-item-text,
+.bars-content .bar-item-text:selected{
+    text-decoration: none;
+}
+
 .bars-content .bar-item-text {
     color: #666666;
     font-size: 16px;
+    font-weight: 400;
 }
 
 .navbar-sandboxes {
@@ -746,6 +887,12 @@ a.disabled {
     position: absolute;
     right: 25px;
     top: 20px;
+}
+
+.sandbox-details {
+    width: 600px;
+    margin: 0 auto 0 auto;
+    overflow: auto;
 }
 
 .user-management-container {
@@ -1199,7 +1346,6 @@ fieldset[disabled] .btn-cancel.active {
     /*background-color: #e6e6e6;*/
 }
 
-
 .thumb-holder .thumbnail {
     /*background-color: #fafafa;*/
     /*background-color: #f2f2f2;*/
@@ -1209,6 +1355,17 @@ fieldset[disabled] .btn-cancel.active {
     background-color: #fafafa;
     /*background-color: #cccccc;*/
     /*background-color: #e6e6e6;*/
+}
+
+.thumb-holder .custom-app {
+    /*border: 1px solid #ddd;*/
+    background-color: #fafafa;
+    /*background-color: #f2f2f2;*/
+}
+
+.thumb-holder .thumbnail  .custom-app {
+    background-color: #fafafa;
+    /*background-color: #f2f2f2;*/
 }
 
 .thumb-holder a {
@@ -1301,7 +1458,7 @@ fieldset[disabled] .btn-cancel.active {
 
 
 .detail-form-line-inline {
-    min-height: 35px
+    min-height: 60px
 }
 
 .detail-form-line-inline .detail-form-label-inline {
@@ -1453,6 +1610,7 @@ fieldset[disabled] .btn-cancel.active {
     padding: 5px 0 5px 15px;
     border-bottom: 1px solid #e6e6e6;
     color: #fff;
+    border-radius: 4px;
     background-color: #10759D;
 }
 .modal-footer {

@@ -67,48 +67,21 @@ public class SandboxInviteController extends AbstractController {
         List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesByInviteeIdAndSandboxId(sandboxInvite.getInvitee().getLdapId(), sandboxInvite.getSandbox().getSandboxId());
 
         // Resend
-        if (sandboxInvites.size() > 0 && (!isSandboxMember(sandbox, sandboxInvite.getInvitee().getLdapId()) || sandboxInvites.get(0).getStatus() != InviteStatus.ACCEPTED )) {
+        if (sandboxInvites.size() > 0 && !sandboxService.isSandboxMember(sandbox, sandboxInvite.getInvitee())) {
             SandboxInvite existingSandboxInvite = sandboxInvites.get(0);
-            existingSandboxInvite.setStatus(sandboxInvite.getStatus());
             existingSandboxInvite.setStatus(InviteStatus.PENDING);
-
             sandboxInviteService.save(existingSandboxInvite);
+
+            // Send an Email
             User inviter = userService.findByLdapId(sandboxInvite.getInvitedBy().getLdapId());
             User invitee = userService.findByLdapId(sandboxInvite.getInvitee().getLdapId());
             emailService.sendEmail(inviter, invitee, sandboxInvite.getSandbox());
         } else if (sandboxInvites.size() == 0) { // Create
-
-            boolean inUserRoles = false;
-            for(UserRole userRole : sandbox.getUserRoles()) {
-                if (userRole.getUser().getLdapId().equalsIgnoreCase(sandboxInvite.getInvitee().getLdapId())) {
-                    inUserRoles = true;
-                }
-            }
-
-            if (!inUserRoles) {  // Don't invite a user already in the sandbox
-                sandboxInvite.setSandbox(sandbox);
-
-                // Make sure the inviter is the authenticated user
-                checkUserAuthorization(request, sandboxInvite.getInvitedBy().getLdapId());
-                User invitedBy = userService.findByLdapId(sandboxInvite.getInvitedBy().getLdapId());
-
-                sandboxInvite.setInvitedBy(invitedBy);
-                sandboxInvite.setInviteTimestamp(new Timestamp(new Date().getTime()));
-                sandboxInvite.setStatus(InviteStatus.PENDING);
-
-                // Invitee may not exist, create if needed
-                User invitee = userService.findByLdapId(sandboxInvite.getInvitee().getLdapId());
-                if (invitee == null) {
-                    invitee = userService.save(sandboxInvite.getInvitee());
-                }
-                sandboxInvite.setInvitee(invitee);
-                sandboxInviteService.save(sandboxInvite);
-
-                User inviter = userService.findByLdapId(sandboxInvite.getInvitedBy().getLdapId());
-                emailService.sendEmail(inviter, invitee, sandboxInvite.getSandbox());
-            }
+            // Make sure the inviter is the authenticated user
+            User invitedBy = userService.findByLdapId(sandboxInvite.getInvitedBy().getLdapId());
+            checkUserAuthorization(request, invitedBy.getLdapId());
+            sandboxInviteService.create(sandboxInvite);
         }
-
     }
 
     @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"ldapId", "status"})
@@ -139,7 +112,6 @@ public class SandboxInviteController extends AbstractController {
     List<SandboxInvite> getSandboxInvitesBySandbox(HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId,
            @RequestParam(value = "status") InviteStatus status) throws UnsupportedEncodingException {
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-//        checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
         checkUserAuthorization(request, sandbox.getUserRoles());
 
         if (status == null) {
@@ -165,9 +137,14 @@ public class SandboxInviteController extends AbstractController {
 
         if (sandboxInvite.getStatus() == InviteStatus.PENDING && (status == InviteStatus.ACCEPTED || status == InviteStatus.REJECTED)) {
 
-            String ldapId = sandboxInvite.getInvitee().getLdapId();
             // Only invitee can accept or reject
-            checkUserAuthorization(request, ldapId);
+            User invitee = userService.findByLdapId(sandboxInvite.getInvitee().getLdapId());
+            checkUserAuthorization(request, invitee.getLdapId());
+
+            if (invitee.getName() == null || invitee.getName().isEmpty()) {
+                invitee.setName(oAuthService.getOAuthUserName(request));
+                userService.save(invitee);
+            }
 
             if (status == InviteStatus.REJECTED) {
                 sandboxInvite.setStatus(InviteStatus.REJECTED);
@@ -175,28 +152,9 @@ public class SandboxInviteController extends AbstractController {
                 return;
             }
 
-            if (!isSandboxMember(sandboxInvite.getSandbox(), sandboxInvite.getInvitee().getLdapId())) {
-                List<UserRole> userRoles = sandboxInvite.getSandbox().getUserRoles();
-                userRoles.add(new UserRole(sandboxInvite.getInvitee(), Role.ADMIN));
-                sandboxInvite.getSandbox().setUserRoles(userRoles);
-                sandboxService.save(sandboxInvite.getSandbox());
-            }
+            Sandbox sandbox = sandboxService.findBySandboxId(sandboxInvite.getSandbox().getSandboxId());
+            sandboxService.addMember(sandbox, invitee);
 
-            List<Sandbox> sandboxes = sandboxInvite.getInvitee().getSandboxes();
-            if (sandboxInvite.getInvitee().getName() == null || sandboxInvite.getInvitee().getName().isEmpty()) {
-                sandboxInvite.getInvitee().setName(oAuthService.getOAuthUserName(request));
-            }
-            boolean hasSandbox = false;
-            for(Sandbox sandbox : sandboxes) {
-                if (sandbox.getSandboxId().equalsIgnoreCase(sandboxInvite.getSandbox().getSandboxId())) {
-                    hasSandbox = true;
-                }
-            }
-            if (!hasSandbox) {
-                sandboxes.add(sandboxInvite.getSandbox());
-                sandboxInvite.getInvitee().setSandboxes(sandboxes);
-                userService.save(sandboxInvite.getInvitee());
-            }
             sandboxInvite.setStatus(status);
             sandboxInviteService.save(sandboxInvite);
         } else if ((sandboxInvite.getStatus() == InviteStatus.PENDING || sandboxInvite.getStatus() == InviteStatus.REJECTED) && status == InviteStatus.REVOKED ) {
