@@ -1,5 +1,5 @@
 {
-    "profileUpdateUri" : "http://hspcreferencemessag-uat-env.us-west-2.elasticbeanstalk.com/sandboxuser/profileupdate",
+    "profileUpdateUri" : "https://hspcreferencemessag-uat-env.us-west-2.elasticbeanstalk.com/sandboxuser/profileupdate",
     "defaultServiceUrl": "https://uat-api.hspconsortium.org/data",
     "baseServiceUrl": "https://uat-api.hspconsortium.org/hspc/",
     "oauthLogoutUrl": "https://uat-auth.hspconsortium.org/logout",
