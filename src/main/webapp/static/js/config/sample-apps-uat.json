@@ -4,20 +4,19 @@
         "authClient": {
             "clientName" : "Bilirubin Chart",
             "clientId": "bilirubin_chart",
-            "redirectUri" : "http://54.213.219.198:9080/uat/hspc-bilirubin-app/static/bilirubin-chart/"
+            "redirectUri" : "https://uat-apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/"
         },
-        "launchUri" : "http://54.213.219.198:9080/uat/hspc-bilirubin-app/static/bilirubin-chart/launch.html",
-        "redirectUri" : "http://54.213.219.198:9080/uat/hspc-bilirubin-app/static/bilirubin-chart/",
-        "logoUri" : "http://54.213.219.198:9080/uat/hspc-bilirubin-app/static/bilirubin-chart/images/bilirubin.png"
+        "launchUri" : "https://uat-apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/launch.html",
+        "logoUri" : "https://uat-apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/images/bilirubin.png"
     },
     {
         "authClient": {
             "clientName" : "Patient Data Manager",
             "clientId": "patient_data_manager",
-            "redirectUri" : "http://54.213.219.198:9080/uat/hspc-patient-data-manager/static/patient-data-manager/redirect.html"
+            "redirectUri" : "https://uat-apps.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/redirect.html"
         },
-        "launchUri" : "http://54.213.219.198:9080/uat/hspc-patient-data-manager/static/patient-data-manager/launch.html",
-        "logoUri" : "http://54.213.219.198:9080/uat/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png"
+        "launchUri" : "https://uat-apps.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/launch.html",
+        "logoUri" : "https://uat-apps.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png"
     },
     {
         "authClient": {
