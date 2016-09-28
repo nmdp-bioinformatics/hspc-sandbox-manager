@@ -21,10 +21,7 @@
 package org.hspconsortium.sandboxmanager.controllers;
 
 import org.apache.http.HttpStatus;
-import org.hspconsortium.sandboxmanager.model.App;
-import org.hspconsortium.sandboxmanager.model.LaunchScenario;
-import org.hspconsortium.sandboxmanager.model.Sandbox;
-import org.hspconsortium.sandboxmanager.model.User;
+import org.hspconsortium.sandboxmanager.model.*;
 import org.hspconsortium.sandboxmanager.services.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,16 +38,19 @@ public class LaunchScenarioController extends AbstractController  {
     private final LaunchScenarioService launchScenarioService;
     private final UserService userService;
     private final AppService appService;
+    private final UserPersonaService userPersonaService;
     private final SandboxService sandboxService;
 
     @Inject
     public LaunchScenarioController(final LaunchScenarioService launchScenarioService,
                                     final AppService appService, final UserService userService,
+                                    final UserPersonaService userPersonaService,
                                     final SandboxService sandboxService, final OAuthService oAuthService) {
         super(oAuthService);
         this.launchScenarioService = launchScenarioService;
         this.userService = userService;
         this.appService = appService;
+        this.userPersonaService = userPersonaService;
         this.sandboxService = sandboxService;
     }
 
@@ -90,6 +90,16 @@ public class LaunchScenarioController extends AbstractController  {
         checkUserAuthorization(request, app.getSandbox().getUserRoles());
 
         return launchScenarioService.findByAppIdAndSandboxId(app.getId(), app.getSandbox().getSandboxId());
+    }
+
+    @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"userPersonaId"})
+    public @ResponseBody Iterable<LaunchScenario> getLaunchScenariosForPersona(HttpServletRequest request,
+                                                                           @RequestParam(value = "userPersonaId") int personaId) {
+
+        UserPersona userPersona = userPersonaService.getById(personaId);
+        checkUserAuthorization(request, userPersona.getSandbox().getUserRoles());
+
+        return launchScenarioService.findByUserPersonaIdAndSandboxId(userPersona.getId(), userPersona.getSandbox().getSandboxId());
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces ="application/json")

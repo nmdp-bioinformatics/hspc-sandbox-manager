@@ -20,14 +20,28 @@
 
             <div class="title-box">
                 <div class="title">Persona</div>
-                <div class="content">
-                <div class="detail-form">
+                <div class="content"  ng-show="selectedScenario.persona != undefined">
+                    <div class="detail-form">
                         <label class="detail-form-label">Launch As:</label>
                         <label class="detail-form-value">{{selectedScenario.persona.name}}</label>
                     </div>
-                    <div class="detail-form">
-                        <label class="detail-form-label">Persona Type:</label>
+                    <div class="detail-form" >
+                        <label class="detail-form-label">FHIR Resource Type:</label>
                         <label class="detail-form-value"><i class='fa' ng-class="selectedScenario.persona.resource == 'Patient' ? 'fa-bed' : 'fa-user-md'"></i> {{selectedScenario.persona.resource}}</label>
+                    </div>
+                </div>
+                <div class="content"  ng-show="selectedScenario.userPersona != undefined">
+                    <div class="detail-form">
+                        <label class="detail-form-label">Launch As:</label>
+                        <label class="detail-form-value">{{selectedScenario.userPersona.fhirName}}</label>
+                    </div>
+                    <div class="detail-form">
+                        <label class="detail-form-label">User Id:</label>
+                        <label class="detail-form-value">{{selectedScenario.userPersona.ldapId}}</label>
+                    </div>
+                    <div class="detail-form" >
+                        <label class="detail-form-label">FHIR Resource Type:</label>
+                        <label class="detail-form-value"><i class='fa' ng-class="selectedScenario.userPersona.resource == 'Patient' ? 'fa-bed' : 'fa-user-md'"></i> {{selectedScenario.userPersona.resource}}</label>
                     </div>
                 </div>
             </div>

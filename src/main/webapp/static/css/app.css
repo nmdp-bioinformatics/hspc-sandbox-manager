@@ -771,6 +771,20 @@ span.title,
     cursor: pointer;
 }
 
+.sandboxes-content .sandbox-item.sandbox {
+    color: #666666;
+    padding: 4px 0 4px 5px;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.sandboxes-content .sandbox-item.sandbox:hover {
+    background-color: #10759D;
+    color: #fff;
+    cursor: pointer;
+}
+
+
 .navbar-stack-name .popover.bottom>.arrow {
     left: 186px;
 }
@@ -1461,6 +1475,44 @@ fieldset[disabled] .btn-cancel.active {
     font-weight: 600;
 }
 
+.detail-form-input-with-validation {
+    width: 85%;
+    float: left;
+    position: relative;
+    display: inline-block;
+    min-height: 20px;
+    padding: 5px 5px 5px;
+}
+
+.detail-form-input-with-validation input {
+    border-radius: 4px;
+    width: 95%;
+    float: left;
+    position: relative;
+    display: inline-block;
+    min-height: 20px;
+    padding: 5px 5px 5px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.detail-form-input-icon {
+    color: #f82219;
+    width: 5%;
+    text-align: center;
+}
+
+.detail-form-description {
+    color: #707070;
+    width: 100%;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.66666666666667;
+    margin: 5px 0 0;
+    word-wrap: break-word;
+}
+
+
 .detail-form-label-input.with-info {
     width: 56%;
 }
@@ -1507,6 +1559,23 @@ fieldset[disabled] .btn-cancel.active {
 
 .title-box .detail-form-label-input-inline {
     width: 65%;
+}
+
+.detail-form-line-inline.short {
+    min-height: 30px
+}
+
+.title-box .detail-form-label-inline.short {
+    padding: 5px 0 5px 5px;
+    width: 35%;
+}
+.title-box .detail-form-value-inline.short {
+    width: 60%;
+    padding: 5px 5px 5px;
+}
+
+.title-box .detail-form-label-input-inline.short {
+    width: 55%;
 }
 
 .detail-form-label-inline {
@@ -2104,6 +2173,27 @@ footer {
     height: 60px;
     padding-top: 5px;
 }
+
+input[type="text"]#sandboxid{
+    -webkit-appearance:none!important;
+    /*color:red;*/
+    text-align:left;
+    /*width:75px;*/
+    border-radius: 4px;
+    /*border:1px solid gray;*/
+    border-left:0px;
+    background:white;
+}
+input[type="text"]#userid{
+    -webkit-appearance:none!important;
+    border-radius: 4px;
+    /*border:1px solid gray;*/
+    text-align:right;
+    margin:0 0 0 -7px;
+    border-right:0px;
+    outline:none;
+}
+
 
 a[ng-click]{
     cursor: pointer;

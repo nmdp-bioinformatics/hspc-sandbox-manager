@@ -13,7 +13,9 @@ import java.util.List;
         @NamedQuery(name="LaunchScenario.findBySandboxId",
                 query="SELECT c FROM LaunchScenario c WHERE c.sandbox.sandboxId = :sandboxId"),
         @NamedQuery(name="LaunchScenario.findByAppIdAndSandboxId",
-        query="SELECT c FROM LaunchScenario c WHERE c.app.id = :appId and c.sandbox.sandboxId = :sandboxId")
+                query="SELECT c FROM LaunchScenario c WHERE c.app.id = :appId and c.sandbox.sandboxId = :sandboxId"),
+        @NamedQuery(name="LaunchScenario.findByUserPersonaIdAndSandboxId",
+               query="SELECT c FROM LaunchScenario c WHERE c.userPersona.id = :userPersonaId and c.sandbox.sandboxId = :sandboxId")
 })
 public class LaunchScenario {
 
@@ -24,6 +26,7 @@ public class LaunchScenario {
     private List<String> userIds = new ArrayList<>();
     private Patient patient;
     private Persona persona;
+    private UserPersona userPersona;
     private App app;
     private Sandbox sandbox;
     private List<ContextParams> contextParams;
@@ -100,6 +103,16 @@ public class LaunchScenario {
     @JoinColumn(name="persona_id")
     public Persona getPersona() {
         return persona;
+    }
+
+    public void setUserPersona(UserPersona userPersona) {
+        this.userPersona = userPersona;
+    }
+
+    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name="user_persona_id")
+    public UserPersona getUserPersona() {
+        return userPersona;
     }
 
     public void setApp(App app) {

@@ -23,14 +23,22 @@ spring:
       naming_strategy: org.hibernate.cfg.ImprovedNamingStrategy
 hspc:
   platform:
+    authorization:
+      smart:
+        launchUrl: http://localhost:8080/hspc-reference-authorization/Launch
     api:
+      oauth2:
+        clientId: hspc_resource_server
+        clientSecret: secret
       sandboxManagementEndpointURL: http://localhost:8080/hspc-reference-api/management/sandbox
       oauthUserInfoEndpointURL: http://localhost:8080/hspc-reference-authorization/userinfo
       oauthClientEndpointURL: http://localhost:8080/hspc-reference-authorization/api/clients
       oauthUserLoginEndpointURL: http://localhost:8080/hspc-reference-authorization/j_spring_security_check
+      oauthUserAuthorizationEndpointURL: http://localhost:8080/hspc-reference-authorization/static/auth/index.html
       oauthUser: admin
       oauthUserPassword: password
     messaging:
-      sendEmail: true
+      sendEmail: false
       emailSenderEndpointURL: http://localhost:8080/hspc-reference-messaging/mailsender
+      sandboxUserEndpointURL: http://localhost:8080/hspc-reference-messaging/sandboxuser
 

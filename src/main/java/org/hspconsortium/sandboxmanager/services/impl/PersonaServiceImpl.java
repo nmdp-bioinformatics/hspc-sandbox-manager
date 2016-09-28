@@ -37,6 +37,11 @@ public class PersonaServiceImpl implements PersonaService {
     }
 
     @Override
+    public Iterable<Persona> findAll(){
+        return repository.findAll();
+    }
+
+    @Override
     public Persona findByFhirIdAndSandboxId(final String fhirId, final String sandboxId) {
         return  repository.findByFhirIdAndSandboxId(fhirId, sandboxId);
     }

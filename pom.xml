@@ -39,7 +39,7 @@
         <dependency>
             <groupId>org.hspconsortium.reference</groupId>
             <artifactId>hspc-reference-messaging-common</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Spring Boot -->

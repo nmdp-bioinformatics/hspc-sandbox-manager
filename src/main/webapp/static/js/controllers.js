@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('sandManApp.controllers', []).controller('navController',[
-    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "$location", "$state", "tools",
-    function($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, $location, $state, tools) {
+    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "personaServices", "$location", "$state", "tools",
+    function($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, personaServices, $location, $state) {
 
         $scope.size = {
             navBarHeight: 60,
@@ -51,7 +51,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             } else if (toState.name == "progress" && !sandboxManagement.creatingSandbox()){
 //                $scope.signin();
                 event.preventDefault();
-            } else if (toState.scenarioBuilderStep && sandboxManagement.getScenarioBuilder().persona === "") {
+            } else if (toState.scenarioBuilderStep && sandboxManagement.getScenarioBuilder().userPersona === "") {
                 $state.go('launch-scenarios', {});
                 event.preventDefault();
             }
@@ -66,6 +66,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
             userServices.getOAuthUserFromServer().then(function(){
                 $scope.oauthUser = userServices.getOAuthUser();
+                personaServices.checkForUserPersonaById($scope.oauthUser.ldapId).then(function(persona){
+                    if (persona !== undefined && persona !== ""){
+                        $scope.signout();
+                    }
+                });
                 $scope.showing.signin = false;
                 $scope.showing.signout = true;
                 getSandboxes();
@@ -519,7 +524,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
     }).controller("PatientDetailController",
-    function($scope, $rootScope, $state, sandboxManagement, $filter, launchApp){
+    function($scope, $rootScope, $uibModal, $state, $stateParams, sandboxManagement, personaServices, $filter, launchApp){
+
+        var source = $stateParams.source;
 
         if ($state.current.name === 'patients') {
             $scope.showing.patientDataManager = true;
@@ -530,23 +537,32 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
         $scope.setPatient = function(p){
-            if (sandboxManagement.getScenarioBuilder().persona === '') {
-                sandboxManagement.getScenarioBuilder().persona =
-                    {
-                        fhirId: p.id,
-                        resource: p.resourceType,
-                        fullUrl: p.fullUrl,
-                        name: $filter('nameGivenFamily')(p)
-                    };
 
-                sandboxManagement.getScenarioBuilder().patient =
-                    {
-                        fhirId: p.id,
-                        resource: p.resourceType,
-                        name: $filter('nameGivenFamily')(p)
-                    };
-                $state.go('apps', {source: 'patient', action: 'choose'});
-//                $state.go($state.current, {source: 'patient'}, {reload: true});
+            if (source === 'persona') {
+                personaServices.getUserPersonaBuilder().fhirId = p.id;
+                personaServices.getUserPersonaBuilder().resource = p.resourceType;
+                personaServices.getUserPersonaBuilder().resourceUrl = personaServices.resourceIdFromFullUrl(p.fullUrl);
+                personaServices.getUserPersonaBuilder().fhirName = $filter('nameGivenFamily')(p);
+                personaServices.getUserPersonaBuilder().ldapName = $filter('nameGivenFamily')(p);
+                openModalDialog(personaServices.getUserPersonaBuilder());
+
+//             } else if (sandboxManagement.getScenarioBuilder().persona === '') {
+//                 sandboxManagement.getScenarioBuilder().persona =
+//                     {
+//                         fhirId: p.id,
+//                         resource: p.resourceType,
+//                         fullUrl: p.fullUrl,
+//                         name: $filter('nameGivenFamily')(p)
+//                     };
+//
+//                 sandboxManagement.getScenarioBuilder().patient =
+//                     {
+//                         fhirId: p.id,
+//                         resource: p.resourceType,
+//                         name: $filter('nameGivenFamily')(p)
+//                     };
+//                 $state.go('apps', {source: 'patient', action: 'choose'});
+// //                $state.go($state.current, {source: 'patient'}, {reload: true});
             } else {
                 sandboxManagement.getScenarioBuilder().patient =
                     {
@@ -557,6 +573,28 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $state.go('apps', {source: 'practitioner-patient', action: 'choose'});
             }
         };
+
+        function openModalDialog(user) {
+
+            var modalInstance = $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/personaModal.html',
+                controller: 'ModalPersonaInstanceCtrl',
+                size:'lg',
+                resolve: {
+                    getUser: function () {
+                        return user;
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (result) {
+                personaServices.createPersona(result);
+                $state.go('personas', {});
+            }, function () {
+            });
+        }
+
 
         $scope.launchPatientDataManager = function(patient){
             launchApp.launchPatientDataManager(patient);
@@ -791,7 +829,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
     }).controller("PractitionerDetailController",
-    function($scope, $rootScope, $state, $filter, sandboxManagement){
+    function($scope, $rootScope, $state, $stateParams, $filter, $uibModal, personaServices, sandboxManagement){
+
+        var source = $stateParams.source;
 
         if ($state.current.name === 'practitioner-view') {
             $scope.showing.selectForScenario = true;
@@ -816,15 +856,47 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.setPractitioner = function(p){
-            sandboxManagement.getScenarioBuilder().persona =
-                {
-                    fhirId: p.id,
-                    resource: p.resourceType,
-                    fullUrl: p.fullUrl,
-                    name: $filter('nameGivenFamily')(p)
-                };
-            $state.go('patient-view', {source: 'patient'});
+            // if (source === 'persona') {
+                personaServices.getUserPersonaBuilder().fhirId = p.id;
+                personaServices.getUserPersonaBuilder().resource = p.resourceType;
+                personaServices.getUserPersonaBuilder().resourceUrl = personaServices.resourceIdFromFullUrl(p.fullUrl);
+                personaServices.getUserPersonaBuilder().fhirName = $filter('nameGivenFamily')(p);
+                personaServices.getUserPersonaBuilder().ldapName = $filter('nameGivenFamily')(p);
+                openModalDialog(personaServices.getUserPersonaBuilder());
+            // } else {
+            //     sandboxManagement.getScenarioBuilder().persona =
+            //     {
+            //         fhirId: p.id,
+            //         resource: p.resourceType,
+            //         fullUrl: p.fullUrl,
+            //         name: $filter('nameGivenFamily')(p)
+            //     };
+            //     $state.go('patient-view', {source: 'patient'});
+            // }
         };
+
+        function openModalDialog(user) {
+
+            var modalInstance = $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/personaModal.html',
+                controller: 'ModalPersonaInstanceCtrl',
+                size:'lg',
+                resolve: {
+                    getUser: function () {
+                        return user;
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (result) {
+                personaServices.createPersona(result);
+                $state.go('personas', {});
+            }, function () {
+            });
+        }
+
+
     }).controller("PractitionerSearchController",
     function($scope, $rootScope, $state, $stateParams, fhirApiServices) {
 
@@ -942,9 +1014,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             sandboxManagement.updateLaunchScenario(scenario);
 
             if (scenario.patient.name === 'None'){
-                launchApp.launch(scenario.app, undefined, scenario.contextParams, scenario.persona);
+                launchApp.launch(scenario.app, undefined, scenario.contextParams, scenario.persona, scenario.userPersona);
             } else {
-                launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.persona);
+                launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.persona, scenario.userPersona);
             }
         };
 
@@ -1001,6 +1073,88 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
         });
+
+    }).controller("PersonaController",
+    function($rootScope, $scope, $state, $filter, sandboxManagement, personaServices){
+
+        $scope.showing = {
+            detail: false,
+            deletePersona: false,
+            selectForScenario: false
+        };
+        $scope.editPassword = {new: "", showEdit: false};
+        $scope.canDelete = false;
+        $scope.selectedPersona = {};
+        $scope.personaList = [];
+
+        personaServices.getPersonaListBySandbox();
+        personaServices.clearUserPersonaBuilder();
+
+        if ($state.current.name === 'personas') {
+            $scope.showing.deletePersona = true;
+        }
+
+        if ($state.current.name === 'persona-view') {
+            $scope.showing.selectForScenario = true;
+        }
+
+
+        $scope.updatePassword = function(persona){
+            persona.password = $scope.editPassword.new;
+            personaServices.updatePersona(persona);
+            $scope.editPassword.showEdit = false;
+        };
+
+        $scope.cancelPassword = function(persona){
+            $scope.editPassword.new = angular.copy(persona.password);
+            $scope.editPassword.showEdit = false;
+        };
+
+        $scope.delete = function(persona){
+            personaServices.deletePersona(persona);
+            $scope.selectedPersona = {};
+            $scope.showing.detail = false;
+        };
+
+        $scope.setPersona =  function (selectedPersona) {
+            sandboxManagement.getScenarioBuilder().userPersona = selectedPersona;
+
+            if (selectedPersona.resource === "Patient") {
+                sandboxManagement.getScenarioBuilder().patient =
+                {
+                    fhirId: selectedPersona.fhirId,
+                    resource: selectedPersona.resource,
+                    name: selectedPersona.fhirName
+                };
+                $state.go('apps', {source: 'patient', action: 'choose'});
+            } else {
+                $state.go('patient-view', {source: 'patient'});
+            }
+        };
+
+        $rootScope.$on('persona-list-update', function(){
+            $scope.personaList = personaServices.getPersonaList();
+            $rootScope.$digest();
+        });
+
+        $rootScope.personaSelected = function(persona) {
+            $scope.showing.detail = true;
+            $scope.editPassword.new = angular.copy(persona.password);
+            $scope.selectedPersona = persona;
+            canDeleteApp(persona.id)
+        };
+
+        function canDeleteApp(personaId){
+            sandboxManagement.getLaunchScenarioByUserPersona(personaId).then(function (launchScenarios) {
+                $scope.canDelete = !(launchScenarios.length > 0);
+                $rootScope.$digest();
+            });
+        }
+
+
+    }).controller("PersonaSearchController",
+    function($rootScope, $scope, $state, personaServices){
+
 
     }).controller("ContextParamController",
     function($scope, sandboxManagement){
@@ -1111,12 +1265,15 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.showCustomApp = true;
 
         appsService.getSampleApps().done(function(patientApps){
-            $scope.all_user_apps = angular.copy(appRegistrationServices.getAppList());
-            for (var i=0; i < patientApps.length; i++) {
-                if (patientApps[i]["isDefault"] !== undefined) {
-                    $scope.all_user_apps.push(angular.copy(patientApps[i]));
+            appRegistrationServices.getSandboxApps().done(function () {
+                $scope.all_user_apps = angular.copy(appRegistrationServices.getAppList());
+                for (var i=0; i < patientApps.length; i++) {
+                    if (patientApps[i]["isDefault"] !== undefined) {
+                        $scope.all_user_apps.push(angular.copy(patientApps[i]));
+                    }
                 }
-            }
+                $rootScope.$digest();
+            })
         });
 
         $scope.select = function launch(app){
@@ -1125,12 +1282,13 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             if (action === 'choose') {
                 sandboxManagement.getScenarioBuilder().app = app;
                 openModalDialog(sandboxManagement.getScenarioBuilder());
-            } else {  // Launch
-                if (source === 'patient' || source === 'practitioner-patient') {
-                    launchApp.launch(app, sandboxManagement.getSelectedScenario().patient);
-                } else {
-                    launchApp.launch(app);
-                }
+            // } else {  // Launch
+            //     //TODO fix launch only
+            //     if (source === 'patient' || source === 'practitioner-patient') {
+            //         launchApp.launch(app, sandboxManagement.getSelectedScenario().patient);
+            //     } else {
+            //         launchApp.launch(app);
+            //     }
             }
         };
 
@@ -1152,9 +1310,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 var scenario = result.scenario;
                 if (result.launch) {
                     if (scenario.patient.name === 'None'){
-                        launchApp.launch(scenario.app, undefined, scenario.contextParams, scenario.persona);
+                        launchApp.launch(scenario.app, undefined, scenario.contextParams, scenario.persona, scenario.userPersona);
                     } else {
-                        launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.persona);
+                        launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.persona, scenario.userPersona);
                     }
                 } else {
                     sandboxManagement.addFullLaunchScenarioList(scenario);
@@ -1190,6 +1348,56 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 launch: launch
             };
             $uibModalInstance.close(result);
+        };
+
+        $scope.cancel = function () {
+            $uibModalInstance.dismiss('cancel');
+        };
+    }]).controller('ModalPersonaInstanceCtrl',['$scope', '$uibModalInstance', "getUser", "sandboxManagement", "personaServices",
+    function ($scope, $uibModalInstance, getUser, sandboxManagement, personaServices) {
+
+        $scope.invalidMessage = "User Id Not Available";
+        $scope.user = getUser;
+        $scope.title = "Save " + $scope.user.resource + " Persona";
+        $scope.sandboxId = sandboxManagement.getSandbox().sandboxId;
+
+        $scope.savePersona = function (persona) {
+            persona.ldapId = persona.ldapId + "@" + $scope.sandboxId;
+            $uibModalInstance.close(persona);
+        };
+
+        $scope.$watchGroup(['user.ldapId', 'user.password'], function() {
+            $scope.validateId($scope.user.ldapId).then(function(valid){
+                $scope.isIdValid = valid;
+                $scope.showError = !$scope.isIdValid && ($scope.user.ldapId !== "" && $scope.user.ldapId !== undefined);
+                $scope.createEnabled = valueSet($scope.user.password) && $scope.isIdValid;
+            });
+        });
+
+        function valueSet(value) {
+            return (typeof value !== 'undefined' && value !== '');
+        }
+
+        $scope.validateId = function(id) {
+            var deferred = $.Deferred();
+
+            $scope.invalidMessage = "User Id Not Available";
+            if ($scope.tempUserId !== id ) {
+                $scope.tempUserId = id;
+                if (id !== undefined && id !== "" && id.length <= 50 && /^[a-zA-Z0-9]*$/.test(id)) {
+                    personaServices.checkForUserPersonaById(id + "@" + $scope.sandboxId).then(function(persona){
+                       deferred.resolve(persona === undefined || persona === "");
+                    });
+                } else {
+                    $scope.tempUserId = "<user id>";
+                    $scope.invalidMessage = "User Id Is Invalid";
+                    deferred.resolve(false);
+                }
+            } else {
+                deferred.resolve($scope.isIdValid);
+            }
+            return deferred;
+
         };
 
         $scope.cancel = function () {

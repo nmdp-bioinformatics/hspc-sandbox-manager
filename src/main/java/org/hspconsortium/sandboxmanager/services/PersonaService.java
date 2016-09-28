@@ -12,6 +12,8 @@ public interface PersonaService {
 
     void delete(final Persona persona);
 
+    Iterable<Persona> findAll();
+
     Persona findByFhirIdAndSandboxId(final String fhirId, final String sandboxId);
 
     List<Persona> findBySandboxId(final String sandboxId);

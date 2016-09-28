@@ -1,8 +1,9 @@
 {
-    "profileUpdateUri" : "https://test-messaging.hspconsortium.org/sandboxuser/profileupdate",
+    "sandboxUserUri" : "https://test-messaging.hspconsortium.org/sandboxuser/profileupdate",
     "defaultServiceUrl": "https://test-api.hspconsortium.org/data",
     "baseServiceUrl": "https://test-api.hspconsortium.org/",
     "oauthLogoutUrl": "https://test-auth.hspconsortium.org/logout",
+    "oauthAuthenticationUrl": "https://test-auth.hspconsortium.org/static/auth/index.html",
     "userManagementUrl": "https://test-pwm.hspconsortium.org",
     "defaultPersonaId": "COREPRACTITIONER1",
     "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin"],

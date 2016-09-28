@@ -2,9 +2,10 @@
         angular.module('sandManApp').constant('envInfo',
                 {
                     "env":          "<%= System.getProperty("hspcEnv") %>",
-                    "profileUpdateUri": "<%= System.getProperty("profileUpdateUri") %>",
+                    "sandboxUserUri": "<%= System.getProperty("sandboxUserUri") %>",
                     "defaultServiceUrl": "<%= System.getProperty("defaultServiceUrl") %>",
                     "baseServiceUrl": "<%= System.getProperty("baseServiceUrl") %>",
                     "oauthLogoutUrl": "<%= System.getProperty("oauthLogoutUrl") %>",
+                    "oauthAuthenticationUrl": "<%= System.getProperty("oauthAuthenticationUrl") %>",
                     "userManagementUrl": "<%= System.getProperty("userManagementUrl") %>"
                 });

@@ -40,7 +40,7 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
         })
 
         .state('practitioner-view', {
-            url: '/practitioner-view',
+            url: '/practitioner-view/:source',
             templateUrl: 'static/js/templates/practitionerView.html',
             needsSandbox: true,
             authenticate: true
@@ -57,6 +57,21 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
             url: '/apps/:source/:action',
             templateUrl: 'static/js/templates/appPickerView.html',
             scenarioBuilderStep: true,
+            needsSandbox: true,
+            authenticate: true
+        })
+
+        .state('personas', {
+            url: '/personas',
+            templateUrl: 'static/js/templates/personaView.html',
+            needsSandbox: true,
+            authenticate: true
+        })
+
+
+        .state('persona-view', {
+            url: '/persona-view/:source',
+            templateUrl: 'static/js/templates/personas.html',
             needsSandbox: true,
             authenticate: true
         })

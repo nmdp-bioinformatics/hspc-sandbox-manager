@@ -18,17 +18,17 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
     private final ContextParamsService contextParamsService;
     private final AppService appService;
     private final PatientService patientService;
-    private final PersonaService personaService;
+    private final UserPersonaService userPersonaService;
 
     @Inject
     public LaunchScenarioServiceImpl(final LaunchScenarioRepository repository,
                                      final ContextParamsService contextParamsService, final AppService appService,
-                                     final PatientService patientService, final PersonaService personaService) {
+                                     final PatientService patientService, final UserPersonaService userPersonaService) {
         this.repository = repository;
         this.contextParamsService = contextParamsService;
         this.appService = appService;
         this.patientService = patientService;
-        this.personaService = personaService;
+        this.userPersonaService = userPersonaService;
     }
 
     @Override
@@ -63,16 +63,16 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
     @Transactional
     public LaunchScenario create(final LaunchScenario launchScenario) {
         Sandbox sandbox = launchScenario.getSandbox();
-        Persona persona = null;
-        if (launchScenario.getPersona() != null) {
-            persona = personaService.findByFhirIdAndSandboxId(launchScenario.getPersona().getFhirId(), sandbox.getSandboxId());
+        UserPersona userPersona = null;
+        if (launchScenario.getUserPersona() != null) {
+            userPersona = userPersonaService.findByFhirIdAndSandboxId(launchScenario.getUserPersona().getFhirId(), sandbox.getSandboxId());
         }
-        if (persona == null && launchScenario.getPersona() != null) {
-            persona = launchScenario.getPersona();
-            persona.setSandbox(sandbox);
-            persona = personaService.save(launchScenario.getPersona());
+        if (userPersona == null && launchScenario.getUserPersona() != null) {
+            userPersona = launchScenario.getUserPersona();
+            userPersona.setSandbox(sandbox);
+            userPersona = userPersonaService.save(launchScenario.getUserPersona());
         }
-        launchScenario.setPersona(persona);
+        launchScenario.setUserPersona(userPersona);
 
         if (launchScenario.getPatient() != null) {
             Patient patient = patientService.findByFhirIdAndSandboxId(launchScenario.getPatient().getFhirId(), sandbox.getSandboxId());
@@ -160,5 +160,10 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
     @Override
     public List<LaunchScenario> findByAppIdAndSandboxId(final int appId, final String sandboxId) {
         return  repository.findByAppIdAndSandboxId(appId, sandboxId);
+    }
+
+    @Override
+    public List<LaunchScenario> findByUserPersonaIdAndSandboxId(final int userPersonaId, final String sandboxId) {
+        return  repository.findByUserPersonaIdAndSandboxId(userPersonaId, sandboxId);
     }
 }

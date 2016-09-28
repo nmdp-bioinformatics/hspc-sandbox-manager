@@ -52,7 +52,7 @@ public class SandboxServiceImpl implements SandboxService {
 
     private final UserService userService;
     private final UserRoleService userRoleService;
-//    private final SandboxInviteService sandboxInviteService;
+    private final UserPersonaService userPersonaService;
     private final AppService appService;
     private final LaunchScenarioService launchScenarioService;
     private final PatientService patientService;
@@ -61,13 +61,13 @@ public class SandboxServiceImpl implements SandboxService {
     @Inject
     public SandboxServiceImpl(final SandboxRepository repository, final UserService userService,
                               final UserRoleService userRoleService, final AppService appService,
-//                              final SandboxInviteService sandboxInviteService,
+                              final UserPersonaService userPersonaService,
                               final LaunchScenarioService launchScenarioService,
                               final PatientService patientService, final PersonaService personaService) {
         this.repository = repository;
         this.userService = userService;
         this.userRoleService = userRoleService;
-//        this.sandboxInviteService = sandboxInviteService;
+        this.userPersonaService = userPersonaService;
         this.appService = appService;
         this.launchScenarioService = launchScenarioService;
         this.patientService = patientService;
@@ -108,6 +108,11 @@ public class SandboxServiceImpl implements SandboxService {
                 personaService.delete(persona);
             }
 
+            List<UserPersona> userPersonas = userPersonaService.findBySandboxId(sandbox.getSandboxId());
+            for (UserPersona userPersona : userPersonas) {
+                userPersonaService.delete(userPersona, bearerToken);
+            }
+
             //remove user memberships
             removeAllMembers(sandbox);
 
@@ -119,7 +124,9 @@ public class SandboxServiceImpl implements SandboxService {
     @Transactional
     public Sandbox create(final Sandbox sandbox, final User user, final String bearerToken) throws UnsupportedEncodingException {
 
-        if (callCreateSandboxAPI(sandbox, bearerToken)) {
+        UserPersona userPersona = userPersonaService.findByLdapId(user.getLdapId());
+
+        if (userPersona == null && callCreateSandboxAPI(sandbox, bearerToken)) {
             sandbox.setCreatedBy(user);
             Sandbox savedSandbox = save(sandbox);
             addMember(savedSandbox, user);
