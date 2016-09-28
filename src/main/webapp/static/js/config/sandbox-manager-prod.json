@@ -1,5 +1,5 @@
 {
-    "sandboxUserUri" : "https://hspcreferencemessag-env.us-west-2.elasticbeanstalk.com/sandboxuser/profileupdate",
+    "sandboxUserUri" : "https://hspcreferencemessag-env.us-west-2.elasticbeanstalk.com/sandboxuser",
     "defaultServiceUrl": "https://secure-api.hspconsortium.org/data",
     "baseServiceUrl": "https://secure-api.hspconsortium.org/hspc/",
     "oauthLogoutUrl": "https://secure-auth.hspconsortium.org/logout",
