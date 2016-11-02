@@ -1,19 +1,17 @@
-<div class="container-fluid" ng-controller="DataManagerController">
+<div ng-controller="DataManagerController">
 
     <div class="row">
-        <div ng-class="showing.results ? 'col-lg-6' : 'col-lg-12'">
-            <div class="slim-page-header">Import JSON Bundle</div>
-            <div class="pull-left basic-text">Paste JSON FHIR Bundle in the Text Area</div>
-
-            <textarea resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+140)" ng-model="bundle" style="resize: none; background-color: #fff; cursor: text; height:400px; margin-top: 30px" class="form-control"></textarea>
-            <div class="col-md-12 content-column">
-                <div ng-disabled="!bundle" class="btn btn-basic btn-md" ng-click="upload(bundle)"><i class="fa fa-upload fa-lg"></i> Import</div>
-            </div>
-        </div>
-        <div class="col-lg-6" ng-show="showing.results">
-            <div class="slim-page-header" style="padding-bottom:20px">Import Results</div>
-            <textarea resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+140)" style="resize: none; background-color: #fff; cursor: text; height:400px" class="form-control"  readonly>{{bundleResults}}</textarea>
-        </div>
+        <uib-tabset class="sandbox-nav-tabs">
+            <uib-tab index="0" heading="Query Browser">
+                <div class="data-tab-content" ng-include="'static/js/templates/dataQueryBrowser.html'"></div>
+            </uib-tab>
+            <uib-tab index="1" heading="Import">
+                <div class="data-tab-content" ng-include="'static/js/templates/dataImport.html'"></div>
+            </uib-tab>
+            <uib-tab index="2" heading="Export">
+                <div class="data-tab-content" ng-include="'static/js/templates/dataExport.html'"></div>
+            </uib-tab>
+        </uib-tabset>
     </div>
 
 </div>

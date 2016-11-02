@@ -1,6 +1,7 @@
 package org.hspconsortium.sandboxmanager.model;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @NamedQueries({
@@ -13,6 +14,7 @@ import javax.persistence.*;
 })
 public class UserPersona {
     private Integer id;
+    private Timestamp createdTimestamp;
     private String ldapId;
     private String ldapName;
     private String password;
@@ -30,6 +32,14 @@ public class UserPersona {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
+    }
+
+    public Timestamp getCreatedTimestamp() {
+        return createdTimestamp;
+    }
+
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
     }
 
     public String getLdapId() {

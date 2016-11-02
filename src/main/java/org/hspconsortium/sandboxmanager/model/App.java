@@ -3,6 +3,7 @@ package org.hspconsortium.sandboxmanager.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @NamedQueries({
@@ -14,6 +15,7 @@ import javax.persistence.*;
 })
 public class App {
     private Integer id;
+    private Timestamp createdTimestamp;
     private String launchUri;
     private Image logo;
     private String logoUri;
@@ -29,6 +31,14 @@ public class App {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
+    }
+
+    public Timestamp getCreatedTimestamp() {
+        return createdTimestamp;
+    }
+
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
     }
 
     public void setLaunchUri(String launchUri) {

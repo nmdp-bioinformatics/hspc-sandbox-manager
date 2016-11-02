@@ -1,7 +1,8 @@
 {
     "sandboxUserUri" : "http://localhost:8080/hspc-reference-messaging/sandboxuser",
     "defaultServiceUrl": "http://localhost:8080/hspc-reference-api/hspc/data",
-    "baseServiceUrl": "http://localhost:8080/hspc-reference-api/",
+    "baseServiceUrl_1": "http://localhost:8080/hspc-reference-api/",
+    "baseServiceUrl_2": "http://localhost:8081/hspc-reference-api/",
     "oauthLogoutUrl": "http://localhost:8080/hspc-reference-authorization/logout",
     "oauthAuthenticationUrl": "http://localhost:8080/hspc-reference-authorization/static/auth/index.html",
     "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",

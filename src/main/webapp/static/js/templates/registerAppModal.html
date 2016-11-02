@@ -40,8 +40,7 @@
         <div class="form-group">
             <label class="detail-form-label">App Logo</label>
             <div class="detail-form-label-input">
-                <!--<input type="file" class="filestyle" data-classButton="btn btn-primary" data-input="false" data-classIcon="icon-plus" data-buttonText="Your label here.">-->
-                <input type="file" name="file" onchange="angular.element(this).scope().uploadFile(this.files)" alt="(width: 210px X height: 150px)"/>
+                <label class="btn btn-basic btn-md"><input type="file" name="file" onchange="angular.element(this).scope().uploadFile(this.files)" required/><i class="fa fa-upload fa-lg"></i><span> Select Image</span></label>
                 <label style="margin-top: 5px">(width: 210px X height: 150px)</label>
                 <div class="thumbnail">
                     <img ng-show="clientJSON.logo" ng-src="{{clientJSON.logo}}" alt="Image (width: 210px X height: 150px)">

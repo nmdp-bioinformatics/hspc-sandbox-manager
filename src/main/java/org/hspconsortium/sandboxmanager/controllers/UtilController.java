@@ -56,13 +56,6 @@ public class UtilController {
     @Value("${hspc.platform.api.oauth2.clientSecret}")
     private String apiServerClientSecret;
 
-//    @RequestMapping(value = "/profileUpdate", method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
-//    @Transactional
-//    public @ResponseBody String profileUpdate(HttpServletRequest request, @RequestBody final String json) throws UnsupportedEncodingException{
-//
-//    }
-
-
     @RequestMapping(value = "/registerContext", method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
     public void handleLaunchRequest(HttpServletRequest request, HttpServletResponse response, @RequestBody String jsonString) {
         HttpPost postRequest = new HttpPost(this.authorizationServerLaunchEndpointURL);

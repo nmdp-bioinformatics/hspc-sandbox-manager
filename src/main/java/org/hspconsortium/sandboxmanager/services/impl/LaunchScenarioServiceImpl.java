@@ -7,8 +7,9 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -63,6 +64,8 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
     @Transactional
     public LaunchScenario create(final LaunchScenario launchScenario) {
         Sandbox sandbox = launchScenario.getSandbox();
+        launchScenario.setCreatedTimestamp(new Timestamp(new Date().getTime()));
+
         UserPersona userPersona = null;
         if (launchScenario.getUserPersona() != null) {
             userPersona = userPersonaService.findByFhirIdAndSandboxId(launchScenario.getUserPersona().getFhirId(), sandbox.getSandboxId());

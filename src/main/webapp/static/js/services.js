@@ -9,7 +9,7 @@ angular.module('sandManApp.services', [])
             authorizing: function(){
                 return authorizing;
             },
-            authorize: function(s, sandboxId){
+            authorize: function(s, sandboxId, sandboxVersion){
                 // window.location.origin does not exist in some non-webkit browsers
                 if (!window.location.origin) {
                     window.location.origin = window.location.protocol + "//"
@@ -29,7 +29,10 @@ angular.module('sandManApp.services', [])
 
                 var serviceUrl = s.defaultServiceUrl;
                 if (sandboxId !== undefined && sandboxId !== "") {
-                    serviceUrl = s.baseServiceUrl + sandboxId + "/data";
+                    serviceUrl = s.baseServiceUrl_1 + sandboxId + "/data";
+                    if (sandboxVersion !== undefined && sandboxVersion !== "" && sandboxVersion === "2") {
+                        serviceUrl = s.baseServiceUrl_2 + sandboxId + "/data";
+                    }
                 }
                 FHIR.oauth2.authorize({
                     client: client,
@@ -58,8 +61,8 @@ angular.module('sandManApp.services', [])
                 
                 var that = this;
                 appsSettings.getSettings().then(function(settings){
-                    tools.validateSandboxIdFromUrl().then(function (resultSandboxId) {
-                        that.authorize(settings, resultSandboxId);
+                    tools.validateSandboxIdFromUrl().then(function (resultSandboxId, schemaVersion) {
+                        that.authorize(settings, resultSandboxId, schemaVersion);
                     }, function () {
                         that.authorize(settings);
                     });
@@ -67,7 +70,7 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('fhirApiServices', function (oauth2, notification, appsSettings, $rootScope, $location) {
+    }).factory('fhirApiServices', function ($q, oauth2, notification, appsSettings, $rootScope, $location, exportResources) {
 
         /**
          *
@@ -184,6 +187,81 @@ angular.module('sandManApp.services', [])
                     });
                 return deferred;
             },
+            runRawQuery: function(query) {
+                var deferred = $.Deferred();
+                var that = this;
+
+                $.ajax({
+                    url: that.fhirClient().server.serviceUrl + "/" + query,
+                    type: 'GET',
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + that.fhirClient().server.auth.token );
+                    }
+                }).done(function(results){
+                    deferred.resolve(results);
+                }).fail(function(){
+                    deferred.reject();
+                });
+                return deferred;
+            },
+            getAllPages: function(lastSearch) {
+                var that = this;
+                var deferred = $.Deferred();
+                var resourceResults = [];
+
+                $.when(fhirClient.api.nextPage({bundle: lastSearch.data}))
+                    .done(function (pageResult) {
+                        var resourceResults = [];
+                        if (pageResult.data.entry) {
+                            pageResult.data.entry.forEach(function (entry) {
+                                resourceResults.push(entry.resource);
+                            });
+                            if (pageResult.data.entry.length === 50) {
+                                that.getAllPages(pageResult).then(function(resourceList){
+                                    resourceList.forEach(function(resource){
+                                        resourceResults.push(resource);
+                                    });
+                                    deferred.resolve(resourceResults);
+                                });
+                            } else {
+                                deferred.resolve(resourceResults);
+                            }
+                        }
+                    });
+
+                return deferred;
+            },
+            queryAllResourcePages: function(resource) {
+                var that = this;
+                var deferred = $.Deferred();
+
+                $.when(fhirClient.api.search({type: resource, count: 50}))
+                    .done(function(resourceSearchResult){
+                        var resourceResults = [];
+                        if (resourceSearchResult.data.entry) {
+                            resourceSearchResult.data.entry.forEach(function(entry){
+                                resourceResults.push(entry.resource);
+                            });
+                        }
+
+                        if (resourceSearchResult.data.entry !== undefined && resourceSearchResult.data.total > resourceSearchResult.data.entry.length) {
+
+                            that.getAllPages(resourceSearchResult).then(function (resourceList) {
+                                resourceList.forEach(function (resource) {
+                                    resourceResults.push(resource);
+                                });
+                                deferred.resolve(resourceResults);
+                            });
+                        }  else {
+                            deferred.resolve(resourceResults);
+                        }
+
+                    }).fail(function(error){
+                    deferred.reject();
+                    var test = error;
+                });
+                return deferred;
+            },
             readResourceInstance: function(resource, id) {
                 var deferred = $.Deferred();
 
@@ -218,7 +296,7 @@ angular.module('sandManApp.services', [])
 
                 return true;
             },
-            createBundle: function(bundle) {
+            importBundle: function(bundle) {
                 var deferred = $.Deferred();
 
                 $.when(fhirClient.api.transaction({data: angular.copy(bundle)}))
@@ -229,44 +307,77 @@ angular.module('sandManApp.services', [])
                         deferred.reject(error.data.responseText);
                     });
                 return deferred;
-        },
-        // registerContext: function(app, params){
-        //         var deferred = $.Deferred();
-        //
-        //         var req = fhirClient.authenticated({
-        //             url: fhirClient.server.serviceUrl + '/_services/smart/Launch',
-        //             type: 'POST',
-        //             contentType: "application/json",
-        //             data: JSON.stringify({
-        //                 client_id: app.authClient.clientId,
-        //                 parameters:  params
-        //             })
-        //         });
-        //
-        //         $.ajax(req)
-        //             .done(deferred.resolve)
-        //             .fail(deferred.reject);
-        //
-        //         return deferred;
-        //     },
-            registerContext: function(app, params){
+           },
+            exportAllData: function (){
+                var that = this;
+                var deferred = $.Deferred();
+                var transactionBundle = {
+                    resourceType:"Bundle",
+                    type : "transaction",
+                    entry:[]
+                };
+
+                var promises = [];
+                exportResources.getExportResources().done(function(resources){
+                    angular.forEach(resources, function (resourceType) {
+                        promises.push(that.queryAllResourcePages(resourceType));
+                    });
+                    $q.all(promises).then(function(resourceTypeList){
+                        angular.forEach(resourceTypeList, function (resourceList) {
+                            angular.forEach(resourceList, function (resource) {
+                                var resourceObject = angular.copy(resource);
+                                delete resourceObject.meta;
+                                delete resourceObject.fullUrl;
+                                var transactionEntry = {
+                                    resource: resourceObject,
+                                    request : {
+                                        method : "PUT",
+                                        url : resource.resourceType + "/" + resource.id
+                                    }
+                                };
+                                transactionBundle.entry.push(transactionEntry);
+                            });
+                        });
+                        deferred.resolve(transactionBundle );
+                    });
+                });
+                return deferred;
+            },
+            registerContext: function(app, params, isSandboxLaunch){
                 var deferred = $.Deferred();
 
-                var req = fhirClient.authenticated({
-                    // url: fhirClient.server.serviceUrl + '/_services/smart/Launch',
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/util/registerContext",
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: JSON.stringify({
-                        client_id: app.authClient.clientId,
-                        parameters:  params
-                    })
-                });
+                if (isSandboxLaunch === true) {
+                    var reqPDM = fhirClient.authenticated({
+                        url: fhirClient.server.serviceUrl + '/_services/smart/Launch',
+                        type: 'POST',
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            client_id: app.authClient.clientId,
+                            parameters:  params
+                        })
+                    });
 
-                $.ajax(req)
-                    .done(deferred.resolve)
-                    .fail(deferred.reject);
+                    $.ajax(reqPDM)
+                        .done(deferred.resolve)
+                        .fail(deferred.reject);
+                } else {
 
+                    var req = fhirClient.authenticated({
+                        // url: fhirClient.server.serviceUrl + '/_services/smart/Launch',
+                        url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/util/registerContext",
+                        type: 'POST',
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            client_id: app.authClient.clientId,
+                            parameters: params
+                        })
+                    });
+
+                    $.ajax(req)
+                        .done(deferred.resolve)
+                        .fail(deferred.reject);
+
+                }
                 return deferred;
             }
         }
@@ -508,6 +619,7 @@ angular.module('sandManApp.services', [])
                     name: newSandbox.sandboxName,
                     sandboxId: newSandbox.sandboxId,
                     description: newSandbox.description,
+                    schemaVersion: newSandbox.schemaVersion,
                     users: [userServices.getOAuthUser()]
                 };
 
@@ -548,6 +660,7 @@ angular.module('sandManApp.services', [])
                     }
                 }).done(function(){
                     that.getSandboxById();
+                    notification.message("Sandbox Updated");
                     deferred.resolve(true);
                 }).fail(function(){
                 });
@@ -648,6 +761,51 @@ angular.module('sandManApp.services', [])
                         that.clearSandbox();
                         deferred.resolve(false);
                     }
+                });
+                return deferred;
+            },
+            sandboxLogin: function(ldapId) {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "/login" + "?userId=" + encodeURIComponent(ldapId),
+                    type: 'POST',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(sandboxResult){
+                    deferred.resolve(true);
+                }).fail(function(){
+                });
+                return deferred;
+            },
+            fhirQuerySuggestions: function() {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/config/0",
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(results){
+                    var suggestions = [];
+                    var defaultSuggestions = [];
+                    if (results) {
+                        results.forEach(function(item){
+                            suggestions.push(item.value);
+                        });
+                        results.forEach(function(item){
+                            if (item.keyName.startsWith("Default")) {
+                                defaultSuggestions.push(item.value);
+                            }
+                        });
+                    }
+                    deferred.resolve(suggestions, defaultSuggestions);
+                }).fail(function(){
+                    deferred.reject();
                 });
                 return deferred;
             }
@@ -1169,7 +1327,7 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('launchApp', function($rootScope, fhirApiServices, personaServices, appsService, appsSettings, random, userServices) {
+    }).factory('launchApp', function($rootScope, fhirApiServices, personaServices, appsService, appsSettings, random) {
 
         var patientDataManagerApp;
         var settings;
@@ -1181,16 +1339,19 @@ angular.module('sandManApp.services', [])
 
         getPatientDataManagerApp();
 
-        function registerContext(app, params, key, isUserPersona) {
+        function registerContext(app, params, key, isUserPersona, isSandboxLaunch) {
             var launchApp = angular.copy(app);
             delete launchApp.clientJSON;
             var issuer = fhirApiServices.fhirClient().server.serviceUrl;
             if (isUserPersona) {
                 issuer = fhirApiServices.fhirClient().server.serviceUrl.replace("secure-api", "persona-api");
+                if (launchApp.sandbox.schemaVersion === "2") {
+                    issuer = fhirApiServices.fhirClient().server.serviceUrl.replace("api2", "persona-api2");
+                }
             }
 
             fhirApiServices
-                .registerContext(launchApp, params)
+                .registerContext(launchApp, params, isSandboxLaunch)
                 .done(function(c){
                     console.log(fhirApiServices.fhirClient());
                     window.localStorage[key] = JSON.stringify({
@@ -1224,7 +1385,7 @@ angular.module('sandManApp.services', [])
              (The window.open needs to be synchronous with the click event to
              avoid triggering  popup blockers. */
 
-            launch: function(app, patientContext, contextParams, persona, userPersona) {
+            launch: function(app, patientContext, contextParams, persona, userPersona, sandboxLaunch) {
                 var key = random(32);
                 window.localStorage[key] = "requested-launch";
                 // var appWindow;
@@ -1249,22 +1410,17 @@ angular.module('sandManApp.services', [])
                         '&username=' + encodeURIComponent(userPersona.ldapId) +
                         '&password=' + encodeURIComponent(userPersona.password) +
                         '&auth=' + encodeURIComponent(settings.oauthAuthenticationUrl));
-                        registerContext(app, params, key, true);
-                } else if (persona !== null && persona !== undefined && persona !== "" ) {
-                    appWindow = window.open('launch.html?'+key, '_blank');
-                    userServices.updateProfile(persona).then(function(){
-                        registerContext(app, params, key, false);
-                    });
+                        registerContext(app, params, key, true, sandboxLaunch);
                 } else {
                     appWindow = window.open('launch.html?'+key, '_blank');
-                    registerContext(app, params, key, false);
+                    registerContext(app, params, key, false, sandboxLaunch);
                 }
             },
             launchPatientDataManager: function(patient){
                 if (patient.fhirId === undefined){
                     patient.fhirId = patient.id;
                 }
-                this.launch(patientDataManagerApp, patient);
+                this.launch(patientDataManagerApp, patient, undefined, undefined, undefined, true );
             }
     }
 
@@ -1315,6 +1471,24 @@ angular.module('sandManApp.services', [])
                 errorMessage = error;
             }
         };
+    }).factory('dataManagerService', function() {
+        var settings = {
+            showing: {import: {results: false}, export: {results: false}},
+            bundleResults: "",
+            resourceList: [],
+            fhirQuery: "",
+            selected: {selectedResource: undefined},
+            allQuerySuggestions: [],
+            dataManagerService: [],
+            querySuggestions: [],
+            selectedResourceType: {}
+        };
+    
+        return {
+            getSettings: function () {
+                return settings;
+            }
+        };
     }).factory('tools', function(appsSettings, $rootScope) {
 
         return {
@@ -1324,7 +1498,7 @@ angular.module('sandManApp.services', [])
                 if (appsSettings.getSandboxUrlSettings().sandboxId !== undefined) {
                     this.checkForSandboxById(appsSettings.getSandboxUrlSettings().sandboxId).then(function(sandbox){
                         if (sandbox !== undefined && sandbox !== "") {
-                            deferred.resolve(appsSettings.getSandboxUrlSettings().sandboxId);
+                            deferred.resolve(appsSettings.getSandboxUrlSettings().sandboxId, sandbox.schemaVersion);
                         } else {
                             deferred.reject();
                         }
@@ -1470,6 +1644,56 @@ angular.module('sandManApp.services', [])
         }
     };
 
+}]).factory('exportResources', ['$http',function($http)  {
+    var resources;
+
+    return {
+        loadSettings: function(){
+            var deferred = $.Deferred();
+            $http.get('static/js/config/export-resources.json').success(function(result){
+                resources = result;
+                deferred.resolve(result);
+            });
+            return deferred;
+        },
+        getExportResources: function(){
+            var deferred = $.Deferred();
+            if (resources !== undefined) {
+                deferred.resolve(resources);
+            } else {
+                this.loadSettings().then(function(result){
+                    deferred.resolve(result);
+                });
+            }
+            return deferred;
+        }
+    };
+
+}]).factory('dataManagerResources', ['$http',function($http)  {
+    var resources;
+
+    return {
+        loadSettings: function(){
+            var deferred = $.Deferred();
+            $http.get('static/js/config/data-manager-resources.json').success(function(result){
+                resources = result;
+                deferred.resolve(result);
+            });
+            return deferred;
+        },
+        getDataManagerResources: function(){
+            var deferred = $.Deferred();
+            if (resources !== undefined) {
+                deferred.resolve(resources);
+            } else {
+                this.loadSettings().then(function(result){
+                    deferred.resolve(result);
+                });
+            }
+            return deferred;
+        }
+    };
+
 }]).factory('appsSettings', ['$http', 'envInfo',function($http, envInfo)  {
 
     var settings;
@@ -1540,7 +1764,8 @@ angular.module('sandManApp.services', [])
                 if (envInfo.sandboxUserUri !== "null") {
                     settings.sandboxUserUri = envInfo.sandboxUserUri;
                     settings.defaultServiceUrl = envInfo.defaultServiceUrl;
-                    settings.baseServiceUrl = envInfo.baseServiceUrl;
+                    settings.baseServiceUrl_1 = envInfo.baseServiceUrl_1;
+                    settings.baseServiceUrl_2 = envInfo.baseServiceUrl_2;
                     settings.oauthLogoutUrl = envInfo.oauthLogoutUrl;
                     settings.oauthAuthenticationUrl = envInfo.oauthAuthenticationUrl;
                     settings.userManagementUrl = envInfo.userManagementUrl;

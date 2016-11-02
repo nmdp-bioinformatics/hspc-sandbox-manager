@@ -1,5 +1,6 @@
 package org.hspconsortium.sandboxmanager.services;
 
+import org.hspconsortium.sandboxmanager.model.Role;
 import org.hspconsortium.sandboxmanager.model.Sandbox;
 import org.hspconsortium.sandboxmanager.model.User;
 import org.hspconsortium.sandboxmanager.model.UserRole;
@@ -16,13 +17,15 @@ public interface SandboxService {
 
     Sandbox create(final Sandbox sandbox, final User user, final String bearerToken) throws UnsupportedEncodingException;
 
-    Sandbox update(final Sandbox sandbox);
+    Sandbox update(final Sandbox sandbox, final User user, final String bearerToken) throws UnsupportedEncodingException;
 
     void removeMember(final Sandbox sandbox, final User user);
 
     void removeAllMembers(final Sandbox sandbox);
 
-    void addMember(final Sandbox sandbox, final User user);
+    void addMember(final Sandbox sandbox, final User user, final Role role, final boolean isCreate);
+
+    void sandboxLogin(final String sandboxId, final String userId);
 
     boolean isSandboxMember(final Sandbox sandbox, final User user);
 

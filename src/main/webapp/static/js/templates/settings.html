@@ -18,6 +18,14 @@
                         <label class="right-form-value-label">{{fhirVersion}}</label>
                     </div>
                     <div class="right-form-group">
+                        <label class="right-form-label">Allow Open FHIR Endpoint </label>
+                        <input type="checkbox" class="right-form-input-box" ng-model="sandbox.allowOpenAccess"/>
+                    </div>
+                    <div class="right-form-group" ng-show="sandbox.allowOpenAccess">
+                        <label class="right-form-label">Open FHIR Server URL </label>
+                        <label class="right-form-value-label">{{openFhirUrl}}</label>
+                    </div>
+                    <div class="right-form-group">
                         <label class="right-form-label">Sandbox Name</label>
                         <input ng-model="sandbox.name" class="right-form-input-box"/>
                     </div>

@@ -3,7 +3,6 @@ package org.hspconsortium.sandboxmanager.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.lang.annotation.Target;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +19,12 @@ import java.util.List;
 public class LaunchScenario {
 
     private Integer id;
+    private Timestamp createdTimestamp;
     private String description;
     private User createdBy;
     private List<User> users = new ArrayList<>();
     private List<String> userIds = new ArrayList<>();
     private Patient patient;
-    private Persona persona;
     private UserPersona userPersona;
     private App app;
     private Sandbox sandbox;
@@ -41,6 +40,14 @@ public class LaunchScenario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
+    }
+
+    public Timestamp getCreatedTimestamp() {
+        return createdTimestamp;
+    }
+
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
     }
 
     public void setPatient(Patient patient) {
@@ -93,16 +100,6 @@ public class LaunchScenario {
     @JoinColumn(name="patient_id")
     public Patient getPatient() {
         return patient;
-    }
-
-    public void setPersona(Persona persona) {
-        this.persona = persona;
-    }
-
-    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name="persona_id")
-    public Persona getPersona() {
-        return persona;
     }
 
     public void setUserPersona(UserPersona userPersona) {

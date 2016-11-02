@@ -33,7 +33,9 @@ import java.io.UnsupportedEncodingException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,8 +45,11 @@ public class SandboxServiceImpl implements SandboxService {
     private static Logger LOGGER = LoggerFactory.getLogger(SandboxServiceImpl.class.getName());
     private final SandboxRepository repository;
 
-    @Value("${hspc.platform.api.sandboxManagementEndpointURL}")
-    private String sandboxManagementEndpointURL;
+    @Value("${hspc.platform.api.sandboxManagementEndpointURL_1}")
+    private String sandboxManagementEndpointURL_1;
+
+    @Value("${hspc.platform.api.sandboxManagementEndpointURL_2}")
+    private String sandboxManagementEndpointURL_2;
 
     @Value("${hspc.platform.api.oauthUserInfoEndpointURL}")
     private String oauthUserInfoEndpointURL;
@@ -56,14 +61,15 @@ public class SandboxServiceImpl implements SandboxService {
     private final AppService appService;
     private final LaunchScenarioService launchScenarioService;
     private final PatientService patientService;
-    private final PersonaService personaService;
+    private final SandboxActivityLogService sandboxActivityLogService;
 
     @Inject
     public SandboxServiceImpl(final SandboxRepository repository, final UserService userService,
                               final UserRoleService userRoleService, final AppService appService,
                               final UserPersonaService userPersonaService,
                               final LaunchScenarioService launchScenarioService,
-                              final PatientService patientService, final PersonaService personaService) {
+                              final PatientService patientService,
+                              final SandboxActivityLogService sandboxActivityLogService) {
         this.repository = repository;
         this.userService = userService;
         this.userRoleService = userRoleService;
@@ -71,7 +77,7 @@ public class SandboxServiceImpl implements SandboxService {
         this.appService = appService;
         this.launchScenarioService = launchScenarioService;
         this.patientService = patientService;
-        this.personaService = personaService;
+        this.sandboxActivityLogService = sandboxActivityLogService;
     }
 
     @Override
@@ -103,10 +109,7 @@ public class SandboxServiceImpl implements SandboxService {
             for (Patient patient : patients) {
                 patientService.delete(patient);
             }
-            List<Persona> personas = personaService.findBySandboxId(sandbox.getSandboxId());
-            for (Persona persona : personas) {
-                personaService.delete(persona);
-            }
+
 
             List<UserPersona> userPersonas = userPersonaService.findBySandboxId(sandbox.getSandboxId());
             for (UserPersona userPersona : userPersonas) {
@@ -116,6 +119,7 @@ public class SandboxServiceImpl implements SandboxService {
             //remove user memberships
             removeAllMembers(sandbox);
 
+            sandboxActivityLogService.sandboxDelete(sandbox, sandbox.getCreatedBy());
             delete(sandbox.getId());
         }
     }
@@ -126,10 +130,12 @@ public class SandboxServiceImpl implements SandboxService {
 
         UserPersona userPersona = userPersonaService.findByLdapId(user.getLdapId());
 
-        if (userPersona == null && callCreateSandboxAPI(sandbox, bearerToken)) {
+        if (userPersona == null && callCreateOrUpdateSandboxAPI(sandbox, bearerToken)) {
             sandbox.setCreatedBy(user);
+            sandbox.setCreatedTimestamp(new Timestamp(new Date().getTime()));
             Sandbox savedSandbox = save(sandbox);
-            addMember(savedSandbox, user);
+            addMember(savedSandbox, user, Role.ADMIN, true);
+            sandboxActivityLogService.sandboxCreate(sandbox, user);
             return savedSandbox;
         }
         return null;
@@ -137,10 +143,15 @@ public class SandboxServiceImpl implements SandboxService {
 
     @Override
     @Transactional
-    public Sandbox update(final Sandbox sandbox)  {
+    public Sandbox update(final Sandbox sandbox, final User user, final String bearerToken) throws UnsupportedEncodingException  {
         Sandbox existingSandbox = findBySandboxId(sandbox.getSandboxId());
         existingSandbox.setName(sandbox.getName());
         existingSandbox.setDescription(sandbox.getDescription());
+        if (existingSandbox.isAllowOpenAccess() != sandbox.isAllowOpenAccess()) {
+            sandboxActivityLogService.sandboxOpenEndpoint(existingSandbox, user, sandbox.isAllowOpenAccess());
+            existingSandbox.setAllowOpenAccess(sandbox.isAllowOpenAccess());
+            callCreateOrUpdateSandboxAPI(existingSandbox, bearerToken);
+        }
         return save(existingSandbox);
     }
 
@@ -165,6 +176,7 @@ public class SandboxServiceImpl implements SandboxService {
                 save(sandbox);
                 userRoleService.delete(userRole);
             }
+            sandboxActivityLogService.sandboxUserRemoved(sandbox, sandbox.getCreatedBy(), user);
         }
     }
 
@@ -184,13 +196,16 @@ public class SandboxServiceImpl implements SandboxService {
 
     @Override
     @Transactional
-    public void addMember(final Sandbox sandbox, final User user) {
+    public void addMember(final Sandbox sandbox, final User user, final Role role, final boolean isCreate) {
         if (!isSandboxMember(sandbox, user)) {
             List<UserRole> userRoles = sandbox.getUserRoles();
-            userRoles.add(new UserRole(user, Role.ADMIN));
+            userRoles.add(new UserRole(user, role));
             sandbox.setUserRoles(userRoles);
             userService.addSandbox(sandbox, user);
             save(sandbox);
+            if (!isCreate) {
+                sandboxActivityLogService.sandboxUserInviteAccepted(sandbox, user);
+            }
         }
     }
 
@@ -206,6 +221,16 @@ public class SandboxServiceImpl implements SandboxService {
 
     @Override
     @Transactional
+    public void sandboxLogin(final String sandboxId, final String userId) {
+        Sandbox sandbox = findBySandboxId(sandboxId);
+        User user = userService.findByLdapId(userId);
+        if (isSandboxMember(sandbox, user)) {
+            sandboxActivityLogService.sandboxLogin(sandbox, user);
+        }
+    }
+
+    @Override
+    @Transactional
     public Sandbox save(final Sandbox sandbox) {
         return repository.save(sandbox);
     }
@@ -215,14 +240,18 @@ public class SandboxServiceImpl implements SandboxService {
         return repository.findBySandboxId(sandboxId);
     }
 
-    private boolean callCreateSandboxAPI(final Sandbox sandbox, final String bearerToken ) throws UnsupportedEncodingException{
-        String url = this.sandboxManagementEndpointURL + "/" + sandbox.getSandboxId();
+    private boolean callCreateOrUpdateSandboxAPI(final Sandbox sandbox, final String bearerToken ) throws UnsupportedEncodingException{
+        String url = this.sandboxManagementEndpointURL_1 + "/" + sandbox.getSandboxId();
+
+        if (sandbox.getSchemaVersion().equalsIgnoreCase("2")) {
+            url = this.sandboxManagementEndpointURL_2 + "/" + sandbox.getSandboxId();
+        }
 
         HttpPut putRequest = new HttpPut(url);
         putRequest.addHeader("Content-Type", "application/json");
         StringEntity entity;
 
-        String jsonString = "{\"teamId\": \"" + sandbox.getSandboxId() + "\"}";
+        String jsonString = "{\"teamId\": \"" + sandbox.getSandboxId() + "\",\"schemaVersion\": \"" + sandbox.getSchemaVersion()  + "\",\"allowOpenAccess\": \"" + sandbox.isAllowOpenAccess() + "\"}";
         entity = new StringEntity(jsonString);
         putRequest.setEntity(entity);
         putRequest.setHeader("Authorization", "BEARER " + bearerToken);
@@ -273,7 +302,11 @@ public class SandboxServiceImpl implements SandboxService {
     }
 
     private boolean callDeleteSandboxAPI(final Sandbox sandbox, final String bearerToken ) {
-        String url = this.sandboxManagementEndpointURL + "/" + sandbox.getSandboxId();
+        String url = this.sandboxManagementEndpointURL_1 + "/" + sandbox.getSandboxId();
+
+        if (sandbox.getSchemaVersion().equalsIgnoreCase("2")) {
+            url = this.sandboxManagementEndpointURL_2 + "/" + sandbox.getSandboxId();
+        }
 
         HttpDelete deleteRequest = new HttpDelete(url);
         deleteRequest.addHeader("Authorization", "BEARER " + bearerToken);

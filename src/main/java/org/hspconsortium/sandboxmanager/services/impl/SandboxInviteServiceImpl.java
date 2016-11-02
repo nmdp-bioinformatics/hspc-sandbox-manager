@@ -5,10 +5,7 @@ import org.hspconsortium.sandboxmanager.model.Sandbox;
 import org.hspconsortium.sandboxmanager.model.SandboxInvite;
 import org.hspconsortium.sandboxmanager.model.User;
 import org.hspconsortium.sandboxmanager.repositories.SandboxInviteRepository;
-import org.hspconsortium.sandboxmanager.services.EmailService;
-import org.hspconsortium.sandboxmanager.services.SandboxInviteService;
-import org.hspconsortium.sandboxmanager.services.SandboxService;
-import org.hspconsortium.sandboxmanager.services.UserService;
+import org.hspconsortium.sandboxmanager.services.*;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -24,14 +21,17 @@ public class SandboxInviteServiceImpl implements SandboxInviteService {
     private final UserService userService;
     private final SandboxService sandboxService;
     private final EmailService emailService;
+    private final SandboxActivityLogService sandboxActivityLogService;
 
     @Inject
     public SandboxInviteServiceImpl(final SandboxInviteRepository repository,final UserService userService,
-                                    final SandboxService sandboxService, final EmailService emailService) {
+                                    final SandboxService sandboxService, final EmailService emailService,
+                                    final SandboxActivityLogService sandboxActivityLogService) {
         this.repository = repository;
         this.userService = userService;
         this.sandboxService = sandboxService;
         this.emailService = emailService;
+        this.sandboxActivityLogService = sandboxActivityLogService;
     }
 
     @Override
@@ -72,6 +72,7 @@ public class SandboxInviteServiceImpl implements SandboxInviteService {
 
             // Send an Email
             emailService.sendEmail(invitedBy, invitee, sandboxInvite.getSandbox());
+            sandboxActivityLogService.sandboxUserInvited(sandbox, invitedBy, invitee);
             return save(sandboxInvite);
         }
         return null;

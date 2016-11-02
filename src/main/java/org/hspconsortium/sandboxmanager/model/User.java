@@ -3,6 +3,7 @@ package org.hspconsortium.sandboxmanager.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
 })
 public class User {
     private Integer id;
+    private Timestamp createdTimestamp;
     private String ldapId;
     private String name;
     private List<Sandbox> sandboxes = new ArrayList<>();
@@ -26,6 +28,14 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
+    }
+
+    public Timestamp getCreatedTimestamp() {
+        return createdTimestamp;
+    }
+
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
     }
 
     public String getLdapId() {

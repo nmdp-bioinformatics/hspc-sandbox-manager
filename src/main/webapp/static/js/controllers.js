@@ -86,6 +86,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                         } else {
                             sandboxManagement.getSandboxById().then(function(sandboxExists){
                                 if (sandboxExists) {
+                                    sandboxManagement.sandboxLogin($scope.oauthUser.ldapId);
                                     $scope.title.blueBarTitle = sandboxManagement.getSandbox().name;
                                     sandboxSignIn();
                                 } else {
@@ -314,7 +315,18 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.confirmDelete = false;
         $scope.sandbox = angular.copy(sandboxManagement.getSandbox());
         $scope.sandboxURL = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + $scope.sandbox.sandboxId;
+        $scope.allowOpenAccess = $scope.sandbox.allowOpenAccess;
+
+        appsSettings.getSettings().then(function(settings){
+            $scope.openFhirUrl = settings.baseServiceUrl_1 + $scope.sandbox.sandboxId + "/open";
+            if ($scope.sandbox.schemaVersion === "2") {
+                $scope.openFhirUrl = settings.baseServiceUrl_2 + $scope.sandbox.sandboxId + "/open";
+            }
+        });
         $scope.fhirVersion = "DSTU 2";
+        if ($scope.sandbox.schemaVersion === "2") {
+            $scope.fhirVersion = "STU 3";
+        }
 
         $scope.canDelete = function () {
             return (sandboxManagement.getSandbox().createdBy.ldapId.toLowerCase() === userServices.getOAuthUser().ldapId.toLowerCase());
@@ -359,26 +371,203 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     function(){
 
     }).controller("DataManagerController",
-    function($scope, fhirApiServices, $uibModal, $filter){
+    function($scope, $rootScope, $http, fhirApiServices, sandboxManagement, $uibModal, $filter, dataManagerResources, dataManagerService){
 
-        $scope.showing = {results: false};
-        $scope.bundleResults = "";
+        $scope.settings = dataManagerService.getSettings();
+
+        if ($scope.settings.allQuerySuggestions === undefined || $scope.settings.allQuerySuggestions.length === 0) {
+            sandboxManagement.fhirQuerySuggestions().then(function (suggestions, defaultSuggestions) {
+                $scope.settings.allQuerySuggestions = suggestions;
+                $scope.settings.defaultSuggestions = defaultSuggestions;
+            });
+        }
+
+        $scope.getDynamicModel = function(inputResource, path, item) {
+            var resource = angular.copy(inputResource);
+            var root = $scope.getModelParent(resource, path);
+            var leaf = $scope.getModelLeaf(path);
+
+            if (typeof root !== 'undefined' && typeof leaf !== 'undefined' ) {
+                if (typeof root[ leaf ] !== 'undefined') {
+                    item.show = true;
+                    return root[ leaf ];
+                } else {
+                    item.show = false;
+                    return "";
+                }
+            }
+            item.show = false;
+            return "";
+        };
+
+        $scope.getModelParent = function(obj,path) {
+            var segs = path.split('.');
+            var rootParent = obj;
+            var parentStep = "";
+            var root = obj;
+
+            while (segs.length > 1) {
+                var pathStep = segs.shift();
+                if (typeof root[pathStep] === 'undefined') {
+                    if (isNaN(pathStep)) {
+                        root[pathStep] = {};
+                    } else {
+                        rootParent[parentStep] = [{}];
+                        root = rootParent[parentStep];
+                    }
+                }
+                parentStep = pathStep;
+                rootParent = root;
+                root = root[pathStep];
+            }
+            return root;
+        };
+
+        $scope.getModelLeaf = function(path) {
+            var segs = path.split('.');
+            return segs[segs.length-1];
+        };
+
+        $scope.filterQuery = function(filterValue) {
+            if ($scope.settings.allQuerySuggestions.length === 0) {
+                sandboxManagement.fhirQuerySuggestions().then(function (suggestions, defaultSuggestions) {
+                    $scope.settings.allQuerySuggestions = suggestions;
+                    $scope.settings.defaultSuggestions = defaultSuggestions;
+                    if (filterValue.length === 0){
+                        return $scope.settings.defaultSuggestions;
+                    }
+                    return $filter('filter')($scope.settings.allQuerySuggestions, filterValue);
+                });
+            } else {
+                if (filterValue.length === 0){
+                    return $scope.settings.defaultSuggestions;
+                }
+                return $filter('filter')($scope.settings.allQuerySuggestions, filterValue);
+            }
+        };
+
+        $scope.runQuery = function(query) {
+            $scope.settings.resourceList = [];
+            $scope.settings.queryResults = '';
+            $scope.settings.resultTotal = 0;
+            $scope.settings.resultSet = 0;
+            $scope.settings.showing.results = false;
+            if (query === 'clear') {
+                return;
+            }
+
+            if(query.indexOf('_count=') === -1){
+                if(query.indexOf('?') === -1){
+                    query = query + "?_count=50";
+                } else {
+                    query = query + "&_count=50";
+                }
+            }
+
+            fhirApiServices.runRawQuery(query).then(function (results) {
+                dataManagerResources.getDataManagerResources().done(function(resources){
+                    if (results.resourceType == "Bundle") {
+                        if (results && results.entry && results.entry.length > 0) {
+                            $scope.settings.resourceList = results.entry;
+                            selectResourceType(resources, $scope.settings.resourceList[0].resource.resourceType);
+                        }
+                    } else {
+                       $scope.settings.resourceList[0] = {resource: results} ;
+                        selectResourceType(resources, $scope.settings.resourceList[0].resource.resourceType);
+                    }
+                });
+
+                $scope.settings.queryResults = $filter('json')(results);
+                if (results && results.total) {
+                    $scope.settings.resultTotal = results.total;
+                    $scope.settings.resultSet = results.entry.length;
+                }
+                $scope.settings.showing.results = true;
+                $rootScope.$digest();
+            });
+        };
+
+        function selectResourceType (resourceTypes, type) {
+            $scope.settings.selectedResourceType = "";
+            angular.forEach(resourceTypes, function (resource) {
+                if (resource.resourceType === type) {
+                    $scope.settings.selectedResourceType = resource;
+                }
+            });
+            if ($scope.settings.selectedResourceType === "") {
+                selectResourceType (resourceTypes, "Default")
+            }
+        }
+
+        $scope.selectResource = function (resource){
+            $scope.settings.selected.selectedResource = resource;
+            var temp = {};
+            $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/resourceDetailModal.html',
+                controller: 'ResourceDetailModalInstanceCtrl',
+                resolve: {
+                    getSettings: function () {
+                        return {
+                            title:"Details",
+                            ok:"OK",
+                            cancel:"Cancel",
+                            type:"confirm-error",
+                            text:resource.resource,
+                            patient: $scope.getDynamicModel(resource.resource, $scope.settings.selectedResourceType.patient, temp),
+                            callback:function(result){ //setting callback
+                            }
+                        };
+                    }
+                }
+            });
+        };
 
         $scope.upload = function (bundle){
 
-            var modalProgress = openModalProgressDialog();
-            fhirApiServices.createBundle(bundle).then(function (results) {
-                $scope.bundleResults = $filter('json')(results);
-                $scope.showing.results = true;
+            var modalProgress = openModalProgressDialog("Importing...");
+            $scope.settings.bundle = bundle;
+            $scope.saveFileName = 'sandbox-import-results.json';
+            fhirApiServices.importBundle(bundle).then(function (results) {
+                $scope.settings.bundleResults = $filter('json')(results);
+                $scope.resultsTitle = "Import Results";
+                $scope.settings.showing.import.results = true;
                 modalProgress.dismiss();
             }, function(results) {
-                $scope.bundleResults = results;
-                $scope.showing.results = true;
+                $scope.settings.bundleResults = results;
+                $scope.resultsTitle = "Import Results";
+                $scope.settings.showing.import.results = true;
                 modalProgress.dismiss();
             });
         };
 
-        function openModalProgressDialog() {
+        $scope.export = function (){
+            $scope.settings.bundle = "";
+            var modalProgress = openModalProgressDialog("Exporting...");
+            $scope.saveFileName = 'sandbox-export.json';
+            fhirApiServices.exportAllData().then(function (results) {
+                $scope.settings.exportResults = $filter('json')(results);
+                $scope.resultsTitle = "Export Results";
+                $scope.settings.showing.export.results = true;
+                modalProgress.dismiss();
+            }, function(results) {
+                $scope.settings.exportResults = results;
+                $scope.resultsTitle = "Export Results";
+                $scope.settings.showing.export.results = true;
+                modalProgress.dismiss();
+            });
+        };
+
+        $scope.uploadFile = function(files) {
+
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $scope.upload(e.target.result);
+            };
+            reader.readAsText(files[0]);
+        };
+
+        function openModalProgressDialog(progressTitle) {
             return $uibModal.open({
                 animation: true,
                 templateUrl: 'static/js/templates/progressModal.html',
@@ -386,12 +575,46 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 size: 'sm',
                 resolve: {
                     getTitle: function () {
-                        return "Importing...";
+                        return progressTitle;
                     }
                 }
             });
         }
 
+        $scope.save = function (filename) {
+
+            if (!$scope.settings.bundleResults) {
+                console.error('No data');
+                return;
+            }
+
+            if (!filename) {
+                filename = 'sandbox-export.json';
+            }
+
+            if (typeof $scope.settings.bundleResults === 'object') {
+                $scope.settings.bundleResults = JSON.stringify($scope.settings.bundleResults, undefined, 2);
+            }
+
+            var blob = new Blob([$scope.settings.bundleResults], {type: 'text/json'});
+
+            // FOR IE:
+
+            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                window.navigator.msSaveOrOpenBlob(blob, filename);
+            }
+            else{
+                var e = document.createEvent('MouseEvents'),
+                    a = document.createElement('a');
+
+                a.download = filename;
+                a.href = window.URL.createObjectURL(blob);
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+                e.initEvent('click', true, false, window,
+                    0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                a.dispatchEvent(e);
+            }
+        };
     }).controller("CreateSandboxController",
     function($rootScope, $scope, $state, sandboxManagement, tools, appsSettings){
 
@@ -405,6 +628,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.sandboxName = "";
         $scope.sandboxId = "";
         $scope.sandboxDesc = "";
+        $scope.schemaVersion = "2";
         $scope.createEnabled = true;
         $scope.title.blueBarTitle = "Create Sandbox";
 
@@ -460,7 +684,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             if ($scope.sandboxName === undefined || $scope.sandboxName === "") {
                 $scope.sandboxName = $scope.sandboxId;
             }
-            sandboxManagement.createSandbox({sandboxId: $scope.sandboxId, sandboxName: $scope.sandboxName, description: $scope.sandboxDesc}).then(function(sandbox){
+            sandboxManagement.createSandbox({sandboxId: $scope.sandboxId, sandboxName: $scope.sandboxName, 
+                description: $scope.sandboxDesc, schemaVersion: $scope.schemaVersion}).then(function(sandbox){
                 sandboxManagement.setCreatingSandbox(false);
                 $scope.showing.progress = false;
                 $rootScope.$emit('sandbox-created', $scope.sandboxId);
@@ -1880,6 +2105,38 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.ok = (getSettings.ok !== undefined) ? getSettings.ok : "Yes";
         $scope.cancel = (getSettings.cancel !== undefined) ? getSettings.cancel : "No";
         $scope.text = (getSettings.text !== undefined) ? getSettings.text : "Continue?";
+        var callback = (getSettings.callback !== undefined) ? getSettings.callback : null;
+
+        $scope.confirm = function (result) {
+            $uibModalInstance.close(result);
+            callback(result);
+        };
+    }]).controller('ResourceDetailModalInstanceCtrl',['$scope', '$rootScope', '$filter', '$uibModalInstance', 'getSettings', 'fhirApiServices', 'launchApp',
+    function ($scope, $rootScope, $filter, $uibModalInstance, getSettings, fhirApiServices, launchApp) {
+
+        $scope.hasPatient = false;
+
+        $scope.launchPatientDataManager = function(patient){
+            launchApp.launchPatientDataManager(patient);
+        };
+
+        if (getSettings.text.resourceType === 'Patient') {
+            $scope.patient = getSettings.text;
+            $scope.hasPatient = true;
+        } else {
+            fhirApiServices.runRawQuery(getSettings.patient).then(function (patient) {
+                $scope.hasPatient = true;
+                $scope.patient = patient;
+                $rootScope.$digest();
+            }, function(results) {
+                $scope.hasPatient = false;
+            });
+        }
+
+        $scope.title = (getSettings.title !== undefined) ? getSettings.title : "";
+        $scope.ok = (getSettings.ok !== undefined) ? getSettings.ok : "Yes";
+        $scope.cancel = (getSettings.cancel !== undefined) ? getSettings.cancel : "No";
+        $scope.text = $filter('json')(getSettings.text);
         var callback = (getSettings.callback !== undefined) ? getSettings.callback : null;
 
         $scope.confirm = function (result) {

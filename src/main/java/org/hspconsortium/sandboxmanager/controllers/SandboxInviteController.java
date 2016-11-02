@@ -44,16 +44,18 @@ public class SandboxInviteController extends AbstractController {
     private final UserService userService;
     private final SandboxService sandboxService;
     private final EmailService emailService;
+    private final SandboxActivityLogService sandboxActivityLogService;
 
     @Inject
     public SandboxInviteController(final SandboxInviteService sandboxInviteService, final UserService userService,
                                    final SandboxService sandboxService, final OAuthService oAuthService,
-                                   final EmailService emailService) {
+                                   final EmailService emailService, final SandboxActivityLogService sandboxActivityLogService) {
         super(oAuthService);
         this.sandboxInviteService = sandboxInviteService;
         this.userService = userService;
         this.sandboxService = sandboxService;
         this.emailService = emailService;
+        this.sandboxActivityLogService = sandboxActivityLogService;
     }
 
     @RequestMapping(method = RequestMethod.PUT, consumes = "application/json")
@@ -147,20 +149,23 @@ public class SandboxInviteController extends AbstractController {
             }
 
             if (status == InviteStatus.REJECTED) {
+                sandboxActivityLogService.sandboxUserInviteRejected(sandboxInvite.getSandbox(), sandboxInvite.getInvitee());
                 sandboxInvite.setStatus(InviteStatus.REJECTED);
                 sandboxInviteService.save(sandboxInvite);
                 return;
             }
 
             Sandbox sandbox = sandboxService.findBySandboxId(sandboxInvite.getSandbox().getSandboxId());
-            sandboxService.addMember(sandbox, invitee);
+            sandboxService.addMember(sandbox, invitee, Role.USER, false);
 
             sandboxInvite.setStatus(status);
             sandboxInviteService.save(sandboxInvite);
         } else if ((sandboxInvite.getStatus() == InviteStatus.PENDING || sandboxInvite.getStatus() == InviteStatus.REJECTED) && status == InviteStatus.REVOKED ) {
 
             List<UserRole> userRoles = sandboxInvite.getSandbox().getUserRoles();
-            checkUserAuthorization(request, userRoles);
+            String ldapId = checkUserAuthorization(request, userRoles);
+            User user = userService.findByLdapId(ldapId);
+            sandboxActivityLogService.sandboxUserInviteRevoked(sandboxInvite.getSandbox(), user);
             sandboxInvite.setStatus(status);
             sandboxInviteService.save(sandboxInvite);
         }

@@ -35,7 +35,9 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -71,6 +73,7 @@ public class SandboxController extends AbstractController {
 
         // Create User if needed or set User name
         if (user == null) {
+            sandbox.getCreatedBy().setCreatedTimestamp(new Timestamp(new Date().getTime()));
             user = userService.save(sandbox.getCreatedBy());
         } else if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(oAuthService.getOAuthUserName(request));
@@ -80,10 +83,13 @@ public class SandboxController extends AbstractController {
         return sandboxService.create(sandbox, user, oAuthService.getBearerToken(request));
     }
 
-    @RequestMapping(method = RequestMethod.GET, params = {"lookUpId"})
+    @RequestMapping(method = RequestMethod.GET, params = {"lookUpId"}, produces ="application/json")
     public @ResponseBody String checkForSandboxById(@RequestParam(value = "lookUpId")  String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
-        return (sandbox == null) ? null : sandbox.getSandboxId();
+        if (sandbox != null) {
+            return  "{\"sandboxId\": \"" + sandbox.getSandboxId() + "\",\"schemaVersion\": \"" + sandbox.getSchemaVersion() + "\",\"allowOpenAccess\": \"" + sandbox.isAllowOpenAccess() + "\"}";
+        }
+        return null;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces ="application/json")
@@ -110,10 +116,11 @@ public class SandboxController extends AbstractController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces ="application/json")
     @Transactional
-    public void updateSandboxById(HttpServletRequest request, @PathVariable String id, @RequestBody final Sandbox sandbox) {
+    public void updateSandboxById(HttpServletRequest request, @PathVariable String id, @RequestBody final Sandbox sandbox) throws UnsupportedEncodingException {
         Sandbox existingSandbox = sandboxService.findBySandboxId(id);
-        checkUserAuthorization(request, existingSandbox.getUserRoles());
-        sandboxService.update(sandbox);
+        String ldapId = checkUserAuthorization(request, existingSandbox.getUserRoles());
+        User user = userService.findByLdapId(ldapId);
+        sandboxService.update(sandbox, user, oAuthService.getBearerToken(request));
     }
 
     @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"userId"})
@@ -132,7 +139,7 @@ public class SandboxController extends AbstractController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = "application/json", params = {"removeUserId"})
     @Transactional
-    public void removeSandboxUser(HttpServletRequest request, @PathVariable String id, @RequestParam(value = "removeUserId") String userIdEncoded) throws UnsupportedEncodingException {
+    public void removeSandboxMember(HttpServletRequest request, @PathVariable String id, @RequestParam(value = "removeUserId") String userIdEncoded) throws UnsupportedEncodingException {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
         //Only the Sandbox creator can remove a user right now
         checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
@@ -141,4 +148,13 @@ public class SandboxController extends AbstractController {
         User user = userService.findByLdapId(removeUserId);
         sandboxService.removeMember(sandbox, user);
     }
+
+    @RequestMapping(value = "/{id}/login", method = RequestMethod.POST, params = {"userId"})
+    @Transactional
+    public void sandboxLogin(HttpServletRequest request, @PathVariable String id, @RequestParam(value = "userId") String userIdEncoded) throws UnsupportedEncodingException{
+        String userId = java.net.URLDecoder.decode(userIdEncoded, "UTF-8");
+        checkUserAuthorization(request, userId);
+        sandboxService.sandboxLogin(id, userId);
+    }
+
 }

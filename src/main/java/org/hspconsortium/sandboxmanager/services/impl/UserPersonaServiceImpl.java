@@ -38,6 +38,8 @@ import java.lang.reflect.Type;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -144,6 +146,8 @@ public class UserPersonaServiceImpl implements UserPersonaService {
     public UserPersona create(UserPersona userPersona, String bearerToken) throws UnsupportedEncodingException {
 
         SandboxUserInfo sandboxUserInfo = createUser(userPersona);
+        userPersona.setCreatedTimestamp(new Timestamp(new Date().getTime()));
+
         return createOrUpdate(userPersona, sandboxUserInfo, bearerToken);
     }
 

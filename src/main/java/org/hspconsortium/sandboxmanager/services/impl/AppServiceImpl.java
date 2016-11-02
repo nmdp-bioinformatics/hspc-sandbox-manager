@@ -4,7 +4,10 @@ import org.hspconsortium.sandboxmanager.model.App;
 import org.hspconsortium.sandboxmanager.model.AuthClient;
 import org.hspconsortium.sandboxmanager.model.Image;
 import org.hspconsortium.sandboxmanager.repositories.AppRepository;
-import org.hspconsortium.sandboxmanager.services.*;
+import org.hspconsortium.sandboxmanager.services.AppService;
+import org.hspconsortium.sandboxmanager.services.AuthClientService;
+import org.hspconsortium.sandboxmanager.services.ImageService;
+import org.hspconsortium.sandboxmanager.services.OAuthClientService;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -13,7 +16,8 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -74,6 +78,7 @@ public class AppServiceImpl implements AppService {
     @Transactional
     public App create(final App app) {
         app.setLogo(null);
+        app.setCreatedTimestamp(new Timestamp(new Date().getTime()));
 
         String entity = oAuthClientService.postOAuthClient(app.getClientJSON());
         try {

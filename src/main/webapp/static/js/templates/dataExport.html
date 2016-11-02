@@ -1,0 +1,10 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="slim-page-header">Export JSON Bundle</div>
+        <textarea resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+135)" style="resize: none; background-color: #fff; cursor: text; height:400px" class="form-control"  readonly>{{settings.exportResults}}</textarea>
+        <div class="col-md-12 content-column">
+            <div class="btn btn-basic btn-md" ng-click="export()"><i class="fa fa-download fa-lg"></i> Export</div>
+            <div ng-disabled="!settings.showing.export.results" class="btn btn-basic btn-md" ng-click="save(saveFileName)"><i class="fa fa-save fa-lg"></i> Save To File</div>
+        </div>
+    </div>
+</div>

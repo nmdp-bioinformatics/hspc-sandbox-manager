@@ -68,7 +68,7 @@ abstract class AbstractController {
         }
     }
 
-    void checkUserAuthorization(final HttpServletRequest request, List<UserRole> users) {
+    String checkUserAuthorization(final HttpServletRequest request, List<UserRole> users) {
         String oauthUserId = oAuthService.getOAuthUserId(request);
         boolean userIsAuthorized = false;
 
@@ -83,5 +83,6 @@ abstract class AbstractController {
                             "Response Detail : User not authorized to perform this action."
                     , HttpStatus.SC_UNAUTHORIZED));
         }
+        return oauthUserId;
     }
 }
