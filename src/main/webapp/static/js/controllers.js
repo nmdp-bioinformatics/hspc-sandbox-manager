@@ -628,6 +628,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.sandboxName = "";
         $scope.sandboxId = "";
         $scope.sandboxDesc = "";
+        $scope.sandboxAllowOpenAccess = false;
         $scope.schemaVersion = "2";
         $scope.createEnabled = true;
         $scope.title.blueBarTitle = "Create Sandbox";
@@ -685,7 +686,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.sandboxName = $scope.sandboxId;
             }
             sandboxManagement.createSandbox({sandboxId: $scope.sandboxId, sandboxName: $scope.sandboxName, 
-                description: $scope.sandboxDesc, schemaVersion: $scope.schemaVersion}).then(function(sandbox){
+                description: $scope.sandboxDesc, schemaVersion: $scope.schemaVersion, 
+                allowOpenAccess: $scope.sandboxAllowOpenAccess}).then(function(sandbox){
                 sandboxManagement.setCreatingSandbox(false);
                 $scope.showing.progress = false;
                 $rootScope.$emit('sandbox-created', $scope.sandboxId);
@@ -698,7 +700,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
     }).controller("LoginController",
-    function($rootScope, $scope, $state, oauth2, fhirApiServices, sandboxManagement){
+    function($rootScope, $scope, $state, oauth2, fhirApiServices){
 
         if (fhirApiServices.clientInitialized()) {
             $rootScope.$emit('signed-in');

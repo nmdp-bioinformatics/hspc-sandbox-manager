@@ -619,6 +619,7 @@ angular.module('sandManApp.services', [])
                     name: newSandbox.sandboxName,
                     sandboxId: newSandbox.sandboxId,
                     description: newSandbox.description,
+                    allowOpenAccess: newSandbox.allowOpenAccess,
                     schemaVersion: newSandbox.schemaVersion,
                     users: [userServices.getOAuthUser()]
                 };
@@ -1344,10 +1345,12 @@ angular.module('sandManApp.services', [])
             delete launchApp.clientJSON;
             var issuer = fhirApiServices.fhirClient().server.serviceUrl;
             if (isUserPersona) {
-                issuer = fhirApiServices.fhirClient().server.serviceUrl.replace("secure-api", "persona-api");
-                if (launchApp.sandbox.schemaVersion === "2") {
-                    issuer = fhirApiServices.fhirClient().server.serviceUrl.replace("api2", "persona-api2");
-                }
+                appsSettings.getSettings().then(function(settings){
+                    issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_1, settings.basePersonaServiceUrl_1);
+                    if (launchApp.sandbox.schemaVersion === "2") {
+                        issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_2, settings.basePersonaServiceUrl_2);
+                    }
+                });
             }
 
             fhirApiServices
@@ -1766,6 +1769,8 @@ angular.module('sandManApp.services', [])
                     settings.defaultServiceUrl = envInfo.defaultServiceUrl;
                     settings.baseServiceUrl_1 = envInfo.baseServiceUrl_1;
                     settings.baseServiceUrl_2 = envInfo.baseServiceUrl_2;
+                    settings.basePersonaServiceUrl_1 = envInfo.basePersonaServiceUrl_1;
+                    settings.basePersonaServiceUrl_2 = envInfo.basePersonaServiceUrl_2;
                     settings.oauthLogoutUrl = envInfo.oauthLogoutUrl;
                     settings.oauthAuthenticationUrl = envInfo.oauthAuthenticationUrl;
                     settings.userManagementUrl = envInfo.userManagementUrl;

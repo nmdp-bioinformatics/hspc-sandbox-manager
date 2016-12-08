@@ -3,10 +3,12 @@
     "defaultServiceUrl": "http://localhost:8080/hspc-reference-api/hspc/data",
     "baseServiceUrl_1": "http://localhost:8080/hspc-reference-api/",
     "baseServiceUrl_2": "http://localhost:8081/hspc-reference-api/",
+    "basePersonaServiceUrl_1": "http://localhost:8082/hspc-reference-api/",
+    "basePersonaServiceUrl_2": "http://localhost:8083/hspc-reference-api/",
     "oauthLogoutUrl": "http://localhost:8080/hspc-reference-authorization/logout",
     "oauthAuthenticationUrl": "http://localhost:8080/hspc-reference-authorization/static/auth/index.html",
     "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
     "defaultPersonaId": "COREPRACTITIONER1",
-    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static"],
+    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static", "open", "data", "test"],
     "defaultLaunchScenarios": ["bilirubin_chart", "Growth Chart", "BP Centiles", "Cardiac Risk"]
 }
