@@ -11,7 +11,7 @@ Welcome to the HSPC Sandbox Manager!
 #### Configuration ####
 HSPC Sandbox Manager is a tools for helping developers of SMART on FHIR applications test their launch their apps, manage their app's registration with the auth server and create/manage data in a FHIR server.
 
-## Running in a local Tocat container ##
+## Running in a local Tomcat container ##
 Sandbox Manager uses url rewriting as part of it's implementation. To configure Tomcat to rewrite you need to: 
 
 1. Copy sandbox-manager/src/main/resources/ebextensions/context.xml to <tomcat-root>/conf directory
