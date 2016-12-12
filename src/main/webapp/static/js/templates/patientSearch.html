@@ -24,7 +24,7 @@
                 <a class="pull-left" ng-click="open()">Create new patient</a>
             </div>
         </div>
-        <div class="row table-container" style="min-height: 400px" resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+225)">
+        <div class="row table-container" style="min-height: 400px" resize ng-style="showing.isModal ? {'height': '400px'} : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+225)">
             <div class="col-md-12 result">
                 <div id="patient-results-list" ng-cloak>
                     <table class="table table-striped table-hover">
