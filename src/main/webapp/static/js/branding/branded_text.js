@@ -42,8 +42,14 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
             whiteImage2x: "",
             imageStyle: {
                 height: '50px',
-                marginTop: '-4px',
+                marginTop: '-10px',
                 marginLeft: '-35px'
+            },
+            imageTextStyle: {
+                marginTop: '-29px',
+                marginLeft: '63px',
+                fontSize: '28px',
+                fontWeight: '200'
             },
             mainTitle: "",
             sandboxText: "Sandbox",
