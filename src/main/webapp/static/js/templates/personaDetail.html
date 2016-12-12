@@ -48,7 +48,7 @@
     </div>
     <div class="row">
         <div class="col-md-12 content-column" ng-show="showing.deletePersona">
-            <div class="btn btn-delete btn-md" ng-disabled="!canDelete" ng-click="delete(selectedPersona)"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
+            <div class="btn btn-delete btn-md" ng-show="canModify" ng-disabled="!canDelete" ng-click="delete(selectedPersona)"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
         </div>
     </div>
 </div>

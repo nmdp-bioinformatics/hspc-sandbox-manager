@@ -20,16 +20,19 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
     private final AppService appService;
     private final PatientService patientService;
     private final UserPersonaService userPersonaService;
+    private final UserLaunchService userLaunchService;
 
     @Inject
     public LaunchScenarioServiceImpl(final LaunchScenarioRepository repository,
                                      final ContextParamsService contextParamsService, final AppService appService,
-                                     final PatientService patientService, final UserPersonaService userPersonaService) {
+                                     final PatientService patientService, final UserPersonaService userPersonaService,
+                                     final UserLaunchService userLaunchService) {
         this.repository = repository;
         this.contextParamsService = contextParamsService;
         this.appService = appService;
         this.patientService = patientService;
         this.userPersonaService = userPersonaService;
+        this.userLaunchService = userLaunchService;
     }
 
     @Override
@@ -57,6 +60,12 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
         for (ContextParams contextParams : contextParamsList) {
             contextParamsService.delete(contextParams);
         }
+
+        List<UserLaunch> userLaunches = userLaunchService.findByLaunchScenarioId(launchScenario.getId());
+        for (UserLaunch userLaunch : userLaunches) {
+            userLaunchService.delete(userLaunch.getId());
+        }
+
         delete(launchScenario.getId());
     }
 
@@ -169,4 +178,26 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
     public List<LaunchScenario> findByUserPersonaIdAndSandboxId(final int userPersonaId, final String sandboxId) {
         return  repository.findByUserPersonaIdAndSandboxId(userPersonaId, sandboxId);
     }
+
+    @Override
+    public List<LaunchScenario> findBySandboxIdAndCreatedByOrVisibility(final String sandboxId, final String createdBy, final Visibility visibility) {
+        return repository.findBySandboxIdAndCreatedByOrVisibility(sandboxId, createdBy, visibility);
+    }
+
+    @Override
+    public List<LaunchScenario> findBySandboxIdAndCreatedBy(final String sandboxId, final String createdBy) {
+        return repository.findBySandboxIdAndCreatedBy(sandboxId, createdBy);
+    }
+
+    @Override
+    public List<LaunchScenario> updateLastLaunchForCurrentUser(final List<LaunchScenario> launchScenarios, final User user) {
+        for (LaunchScenario launchScenario : launchScenarios) {
+            UserLaunch userLaunch = userLaunchService.findByUserIdAndLaunchScenarioId(user.getLdapId(), launchScenario.getId());
+            if (userLaunch != null) {
+                launchScenario.setLastLaunchSeconds(userLaunch.getLastLaunchSeconds());
+            }
+        }
+        return launchScenarios;
+    }
+
 }

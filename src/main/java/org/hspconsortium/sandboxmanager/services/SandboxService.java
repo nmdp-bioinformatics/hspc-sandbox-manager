@@ -1,11 +1,9 @@
 package org.hspconsortium.sandboxmanager.services;
 
-import org.hspconsortium.sandboxmanager.model.Role;
-import org.hspconsortium.sandboxmanager.model.Sandbox;
-import org.hspconsortium.sandboxmanager.model.User;
-import org.hspconsortium.sandboxmanager.model.UserRole;
+import org.hspconsortium.sandboxmanager.model.*;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 public interface SandboxService {
 
@@ -19,15 +17,23 @@ public interface SandboxService {
 
     Sandbox update(final Sandbox sandbox, final User user, final String bearerToken) throws UnsupportedEncodingException;
 
-    void removeMember(final Sandbox sandbox, final User user);
+    void removeMember(final Sandbox sandbox, final User user, final String bearerToken);
 
-    void removeAllMembers(final Sandbox sandbox);
+    void addMember(final Sandbox sandbox, final User user);
 
-    void addMember(final Sandbox sandbox, final User user, final Role role, final boolean isCreate);
+    void addMember(final Sandbox sandbox, final User user, final Role role);
+
+    void addMemberRole(final Sandbox sandbox, final User user, final Role role);
+
+    boolean hasMemberRole(final Sandbox sandbox, final User user, final Role role);
 
     void sandboxLogin(final String sandboxId, final String userId);
 
     boolean isSandboxMember(final Sandbox sandbox, final User user);
 
+    List<Sandbox> getAllowedSandboxes(final User user);
+
     Sandbox findBySandboxId(final String sandboxId);
+
+    List<Sandbox> findByVisibility(final Visibility visibility);
 }

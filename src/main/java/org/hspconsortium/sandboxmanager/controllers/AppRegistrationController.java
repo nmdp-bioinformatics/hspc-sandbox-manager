@@ -21,12 +21,11 @@
 package org.hspconsortium.sandboxmanager.controllers;
 
 import org.apache.http.HttpStatus;
-import org.hspconsortium.sandboxmanager.model.App;
-import org.hspconsortium.sandboxmanager.model.Image;
-import org.hspconsortium.sandboxmanager.model.Sandbox;
+import org.hspconsortium.sandboxmanager.model.*;
 import org.hspconsortium.sandboxmanager.services.AppService;
 import org.hspconsortium.sandboxmanager.services.OAuthService;
 import org.hspconsortium.sandboxmanager.services.SandboxService;
+import org.hspconsortium.sandboxmanager.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -46,36 +45,43 @@ public class AppRegistrationController extends AbstractController {
 
     private final AppService appService;
     private final SandboxService sandboxService;
+    private final UserService userService;
 
     @Inject
     public AppRegistrationController(final AppService appService, final OAuthService oAuthService,
-                                     final SandboxService sandboxService) {
+                                     final SandboxService sandboxService, final UserService userService) {
         super(oAuthService);
         this.appService = appService;
         this.sandboxService = sandboxService;
+        this.userService = userService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
     @Transactional
     public @ResponseBody App createApp(final HttpServletRequest request, @RequestBody App app) {
         Sandbox sandbox = sandboxService.findBySandboxId(app.getSandbox().getSandboxId());
-        checkUserAuthorization(request, sandbox.getUserRoles());
+        String ldapId = checkSandboxUserCreateAuthorization(request, sandbox);
+        checkCreatedByIsCurrentUserAuthorization(request, app.getCreatedBy().getLdapId());
+
         app.setSandbox(sandbox);
+        User user = userService.findByLdapId(ldapId);
+        app.setVisibility(getDefaultVisibility(user, sandbox));
+        app.setCreatedBy(user);
         return appService.create(app);
     }
 
     @RequestMapping(method = RequestMethod.GET, params = {"sandboxId"})
     public @ResponseBody List<App> getApps(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId) {
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-        checkUserAuthorization(request, sandbox.getUserRoles());
-        return appService.findBySandboxId(sandboxId);
+        String ldapId = checkSandboxUserReadAuthorization(request, sandbox);
+        return appService.findBySandboxIdAndCreatedByOrVisibility(sandboxId, ldapId, Visibility.PUBLIC);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces ="application/json")
     public @ResponseBody App getApp(final HttpServletRequest request, @PathVariable Integer id) {
 
         App app = appService.getById(id);
-        checkUserAuthorization(request, app.getSandbox().getUserRoles());
+        checkSandboxUserReadAuthorization(request, app.getSandbox());
         return appService.getClientJSON(app);
     }
 
@@ -84,7 +90,7 @@ public class AppRegistrationController extends AbstractController {
     public @ResponseBody void deleteApp(final HttpServletRequest request, @PathVariable Integer id) {
 
         App app = appService.getById(id);
-        checkUserAuthorization(request, app.getSandbox().getUserRoles());
+        checkSandboxUserModifyAuthorization(request, app.getSandbox(), app);
         appService.delete(app);
     }
 
@@ -98,7 +104,7 @@ public class AppRegistrationController extends AbstractController {
                             "Response Detail : App Id doesn't match Id in JSON body."
                     , HttpStatus.SC_BAD_REQUEST));
         }
-        checkUserAuthorization(request, existingApp.getSandbox().getUserRoles());
+        checkSandboxUserModifyAuthorization(request, existingApp.getSandbox(), existingApp);
         return appService.update(app);
     }
 
@@ -122,7 +128,7 @@ public class AppRegistrationController extends AbstractController {
     public @ResponseBody void putFullImage(final HttpServletRequest request, @PathVariable Integer id, @RequestParam("file") MultipartFile file) {
 
         App app = appService.getById(id);
-        checkUserAuthorization(request, app.getSandbox().getUserRoles());
+        checkSandboxUserModifyAuthorization(request, app.getSandbox(), app);
         app.setLogoUri(request.getRequestURL().toString());
         try {
             Image image = new Image();

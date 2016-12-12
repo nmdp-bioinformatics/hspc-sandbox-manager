@@ -20,15 +20,14 @@
 
 package org.hspconsortium.sandboxmanager.controllers;
 
-import org.hspconsortium.sandboxmanager.model.Sandbox;
-import org.hspconsortium.sandboxmanager.model.SandboxInvite;
-import org.hspconsortium.sandboxmanager.model.User;
+import org.hspconsortium.sandboxmanager.model.*;
 import org.hspconsortium.sandboxmanager.services.OAuthService;
 import org.hspconsortium.sandboxmanager.services.SandboxInviteService;
 import org.hspconsortium.sandboxmanager.services.SandboxService;
 import org.hspconsortium.sandboxmanager.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -36,9 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/REST/sandbox")
@@ -68,7 +65,7 @@ public class SandboxController extends AbstractController {
         }
 
         LOGGER.info("Creating sandbox: " + sandbox.getName());
-        checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
+        checkCreatedByIsCurrentUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
         User user = userService.findByLdapId(sandbox.getCreatedBy().getLdapId());
 
         // Create User if needed or set User name
@@ -80,9 +77,11 @@ public class SandboxController extends AbstractController {
             user = userService.save(user);
         }
 
+        checkUserSystemRole(user, SystemRole.CREATE_SANDBOX);
         return sandboxService.create(sandbox, user, oAuthService.getBearerToken(request));
     }
 
+    //TODO check all usages
     @RequestMapping(method = RequestMethod.GET, params = {"lookUpId"}, produces ="application/json")
     public @ResponseBody String checkForSandboxById(@RequestParam(value = "lookUpId")  String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
@@ -95,7 +94,11 @@ public class SandboxController extends AbstractController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces ="application/json")
     public @ResponseBody Sandbox getSandboxById(HttpServletRequest request, @PathVariable String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
-        checkUserAuthorization(request, sandbox.getUserRoles());
+        User user = userService.findByLdapId(getSystemUserId(request));
+        if (!sandboxService.isSandboxMember(sandbox, user) && sandbox.getVisibility() == Visibility.PUBLIC ) {
+            sandboxService.addMember(sandbox, user);
+        }
+        checkSandboxUserReadAuthorization(request, sandbox);
         return sandbox;
     }
 
@@ -103,8 +106,9 @@ public class SandboxController extends AbstractController {
     @Transactional
     public void deleteSandboxById(HttpServletRequest request, @PathVariable String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
-        //Only the Sandbox creator can delete the sandbox right now
-        checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
+        User user = userService.findByLdapId(getSystemUserId(request));
+        checkSystemUserCanModifySandboxAuthorization(request, sandbox, user);
+
         //delete sandbox invites
         List<SandboxInvite> invites = sandboxInviteService.findInvitesBySandboxId(sandbox.getSandboxId());
         for (SandboxInvite invite : invites) {
@@ -117,9 +121,8 @@ public class SandboxController extends AbstractController {
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces ="application/json")
     @Transactional
     public void updateSandboxById(HttpServletRequest request, @PathVariable String id, @RequestBody final Sandbox sandbox) throws UnsupportedEncodingException {
-        Sandbox existingSandbox = sandboxService.findBySandboxId(id);
-        String ldapId = checkUserAuthorization(request, existingSandbox.getUserRoles());
-        User user = userService.findByLdapId(ldapId);
+        User user = userService.findByLdapId(getSystemUserId(request));
+        checkSystemUserCanModifySandboxAuthorization(request, sandbox, user);
         sandboxService.update(sandbox, user, oAuthService.getBearerToken(request));
     }
 
@@ -130,23 +133,20 @@ public class SandboxController extends AbstractController {
         String userId = java.net.URLDecoder.decode(userIdEncoded, "UTF-8");
         checkUserAuthorization(request, userId);
         User user = userService.findByLdapId(userId);
-        if (user != null) {
-            return user.getSandboxes();
-        }
-
-        return Collections.EMPTY_LIST;
+        return sandboxService.getAllowedSandboxes(user);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = "application/json", params = {"removeUserId"})
     @Transactional
     public void removeSandboxMember(HttpServletRequest request, @PathVariable String id, @RequestParam(value = "removeUserId") String userIdEncoded) throws UnsupportedEncodingException {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
-        //Only the Sandbox creator can remove a user right now
-        checkUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
+        User user = userService.findByLdapId(getSystemUserId(request));
+
+        checkSystemUserCanModifySandboxAuthorization(request, sandbox, user);
         String removeUserId = java.net.URLDecoder.decode(userIdEncoded, "UTF-8");
 
-        User user = userService.findByLdapId(removeUserId);
-        sandboxService.removeMember(sandbox, user);
+        User removedUser = userService.findByLdapId(removeUserId);
+        sandboxService.removeMember(sandbox, removedUser, oAuthService.getBearerToken(request));
     }
 
     @RequestMapping(value = "/{id}/login", method = RequestMethod.POST, params = {"userId"})

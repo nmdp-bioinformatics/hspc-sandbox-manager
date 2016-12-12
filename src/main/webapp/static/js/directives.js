@@ -78,6 +78,19 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
                     return (newValue.h < height) || (newValue.w < width)
                 };
 
+                scope.$parent.scrollHeight = function (height) {
+
+                    scope.$parent.$eval(attr.notifier);
+
+                    return (newValue.h < height)
+                };
+
+                scope.$parent.scrollWidth = function (width) {
+
+                    scope.$parent.$eval(attr.notifier);
+
+                    return (newValue.w < width)
+                };
             }, true);
 
             w.bind('screenSize', function () {

@@ -14,12 +14,16 @@
                         <label class="right-form-value-label">{{sandboxURL}}</label>
                     </div>
                     <div class="right-form-group">
+                        <label class="right-form-label">Secured FHIR Server URL </label>
+                        <label class="right-form-value-label">{{secureFhirUrl}}</label>
+                    </div>
+                    <div class="right-form-group">
                         <label class="right-form-label">Sandbox FHIR Version </label>
                         <label class="right-form-value-label">{{fhirVersion}}</label>
                     </div>
                     <div class="right-form-group">
                         <label class="right-form-label">Allow Open FHIR Endpoint </label>
-                        <input type="checkbox" class="right-form-input-box" ng-model="sandbox.allowOpenAccess"/>
+                        <input ng-disabled="!canEdit()" type="checkbox" class="right-form-input-box" ng-model="sandbox.allowOpenAccess"/>
                     </div>
                     <div class="right-form-group" ng-show="sandbox.allowOpenAccess">
                         <label class="right-form-label">Open FHIR Server URL </label>
@@ -27,13 +31,13 @@
                     </div>
                     <div class="right-form-group">
                         <label class="right-form-label">Sandbox Name</label>
-                        <input ng-model="sandbox.name" class="right-form-input-box"/>
+                        <input ng-disabled="!canEdit()" ng-model="sandbox.name" class="right-form-input-box"/>
                     </div>
                     <div class="right-form-group">
                         <label class="right-form-label">Description</label>
-                        <textarea class="right-form-description-box" ng-model="sandbox.description"></textarea>
+                        <textarea ng-disabled="!canEdit()" class="right-form-description-box" ng-model="sandbox.description"></textarea>
                     </div>
-                    <div  class="btn btn-basic btn-md" ng-click="updateSandbox()"><i class="fa fa-save fa-lg"></i> Save</div>
+                    <div  class="btn btn-basic btn-md" ng-disabled="!canEdit()" ng-click="updateSandbox()"><i class="fa fa-save fa-lg"></i> Save</div>
                 </div>
 
                 <div class="sub-header">Delete Sandbox</div>
@@ -46,12 +50,12 @@
                             <li>remove access for all sandbox members</li>
                         </ul>
                         This is NOT reversible!</label>
-                    <div tooltip-placement="top" uib-tooltip="Only the sanbox creator can delete the sandbox" tooltip-trigger="{{!canDelete() ? 'mouseenter' : 'none'}}">
+                    <div tooltip-placement="top" uib-tooltip="Only the sanbox creator can delete the sandbox" tooltip-trigger="!canDelete() ? 'mouseenter' : 'none'">
                     <div class="right-form-group">
                         <input ng-disabled="!canDelete()" type="checkbox" ng-model="confirmDelete" class="right-form-input-checkbox"/>
                         <label class="right-form-checkbox-label">Are you sure you want to delete sandbox <b>{{sandbox.name}}</b>? </label>
                     </div>
-                    <div ng-disabled="!showDelete()" class="btn btn-basic btn-md" ng-click="deleteSandbox()"><i class="fa fa-remove fa-lg"></i> Delete Sandbox</div>
+                    <div ng-disabled="!canDelete() || !confirmDelete" class="btn btn-basic btn-md" ng-click="deleteSandbox()"><i class="fa fa-remove fa-lg"></i> Delete Sandbox</div>
 
                     </div>
                 </div>

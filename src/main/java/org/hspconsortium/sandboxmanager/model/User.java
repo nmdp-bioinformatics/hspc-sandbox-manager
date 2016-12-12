@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @NamedQueries({
@@ -17,17 +19,17 @@ public class User {
     private Timestamp createdTimestamp;
     private String ldapId;
     private String name;
+    private Set<SystemRole> systemRoles = new HashSet<>();
     private List<Sandbox> sandboxes = new ArrayList<>();
-//    private List<String> sandboxIds = new ArrayList<>();
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     @Id // @Id indicates that this it a unique primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Integer getId() {
         return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public Timestamp getCreatedTimestamp() {
@@ -46,13 +48,24 @@ public class User {
         this.ldapId = ldapId;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
 
         this.name = name;
     }
 
-    public String getName() {
-        return name;
+    @ElementCollection(targetClass = SystemRole.class)
+    @CollectionTable(name = "system_role",joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name ="role", nullable = false)
+    public Set<SystemRole> getSystemRoles() {
+        return systemRoles;
+    }
+
+    public void setSystemRoles(Set<SystemRole> systemRoles) {
+        this.systemRoles = systemRoles;
     }
 
     @ManyToMany(cascade={CascadeType.ALL})
@@ -62,20 +75,11 @@ public class User {
                     nullable = false, updatable = false) })
     @JsonIgnore
     public List<Sandbox> getSandboxes() {
-//        for (Sandbox sandbox : sandboxes) {
-//            sandboxIds.add(sandbox.getSandboxId());
-//        }
-
         return sandboxes;
     }
 
     public void setSandboxes(List<Sandbox> sandboxes) {
         this.sandboxes = sandboxes;
     }
-
-//    @Transient
-//    public List<String> getSandboxIds() {
-//        return this.sandboxIds;
-//    }
 
 }

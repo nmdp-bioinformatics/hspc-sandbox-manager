@@ -1,9 +1,6 @@
 package org.hspconsortium.sandboxmanager.services;
 
-import org.hspconsortium.sandboxmanager.model.Sandbox;
-import org.hspconsortium.sandboxmanager.model.SandboxActivity;
-import org.hspconsortium.sandboxmanager.model.SandboxActivityLog;
-import org.hspconsortium.sandboxmanager.model.User;
+import org.hspconsortium.sandboxmanager.model.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -31,6 +28,14 @@ public interface SandboxActivityLogService {
     SandboxActivityLog sandboxUserInvited(final Sandbox sandbox, final User user, final User invitedUser);
 
     SandboxActivityLog sandboxOpenEndpoint(final Sandbox sandbox, final User user, final Boolean openEndpoint);
+
+    SandboxActivityLog sandboxUserAdded(final Sandbox sandbox, final User user);
+
+    SandboxActivityLog sandboxUserRoleChange(final Sandbox sandbox, final User user, final Role role, final boolean roleAdded);
+
+    SandboxActivityLog systemUserCreated(final Sandbox sandbox, final User user);
+
+    SandboxActivityLog systemUserRoleChange(final Sandbox sandbox, final User user, final SystemRole systemRole, final boolean roleAdded);
 
     List<SandboxActivityLog> findBySandboxId(final String sandboxId);
 

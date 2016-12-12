@@ -2,6 +2,7 @@ package org.hspconsortium.sandboxmanager.services;
 
 import org.hspconsortium.sandboxmanager.model.App;
 import org.hspconsortium.sandboxmanager.model.Image;
+import org.hspconsortium.sandboxmanager.model.Visibility;
 
 import java.util.List;
 
@@ -27,4 +28,7 @@ public interface AppService {
 
     List<App> findBySandboxId(final String sandboxId);
 
+    List<App> findBySandboxIdAndCreatedByOrVisibility(final String sandboxId, final String createdBy, final Visibility visibility);
+
+    List<App> findBySandboxIdAndCreatedBy(final String sandboxId, final String createdBy);
 }

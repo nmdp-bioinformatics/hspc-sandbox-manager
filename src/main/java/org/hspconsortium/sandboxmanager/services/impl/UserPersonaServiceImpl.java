@@ -22,6 +22,7 @@ import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.hspconsortium.platform.messaging.model.user.SandboxUserInfo;
 import org.hspconsortium.sandboxmanager.model.UserPersona;
+import org.hspconsortium.sandboxmanager.model.Visibility;
 import org.hspconsortium.sandboxmanager.repositories.UserPersonaRepository;
 import org.hspconsortium.sandboxmanager.services.UserPersonaService;
 import org.slf4j.Logger;
@@ -77,6 +78,16 @@ public class UserPersonaServiceImpl implements UserPersonaService {
     @Override
     public UserPersona findByFhirIdAndSandboxId(final String fhirId, final String sandboxId) {
         return  repository.findByFhirIdAndSandboxId(fhirId, sandboxId);
+    }
+
+    @Override
+    public List<UserPersona> findBySandboxIdAndCreatedByOrVisibility(String sandboxId, String createdBy, Visibility visibility) {
+        return  repository.findBySandboxIdAndCreatedByOrVisibility(sandboxId, createdBy, visibility);
+    }
+
+    @Override
+    public List<UserPersona> findBySandboxIdAndCreatedBy(String sandboxId, String createdBy) {
+        return  repository.findBySandboxIdAndCreatedBy(sandboxId, createdBy);
     }
 
     @Override

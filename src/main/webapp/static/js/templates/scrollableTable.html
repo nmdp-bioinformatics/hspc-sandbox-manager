@@ -1,4 +1,4 @@
-<div class="scrollableContainer referenceTable" resize ng-style="{height: fullTable ? resizeTable(510, 150) : '150px' }">
+<div class="scrollableContainer referenceTable" resize ng-style="{height: fullTable ? resizeTable(530, 150) : '150px' }">
     <div class="headerSpacer"></div>
     <div class="scrollArea">
         <table class="table table-striped">
@@ -6,7 +6,6 @@
             <tr>
                 <th><div class="th-inner" table-header-inner>Description</div></th>
                 <th><div class="th-inner" table-header-inner>User Persona</div></th>
-                <!--<th><div class="th-inner" table-header-inner>Persona</div></th>-->
                 <th><div class="th-inner" table-header-inner>Patient Context</div></th>
                 <th><div class="th-inner" table-header-inner>App</div></th>
             </tr>
@@ -16,7 +15,6 @@
                 ng-class="{selected: selectedScenario === scenario}" style="cursor: pointer;">
                 <td>{{scenario.description}}</td>
                 <td><i class='fa' ng-show="scenario.userPersona" ng-class="scenario.userPersona.resource == 'Patient' ? 'fa-bed' : 'fa-user-md'"></i> {{scenario.userPersona.fhirName}}</td>
-                <!--<td><i class='fa' ng-show="scenario.persona" ng-class="scenario.persona.resource == 'Patient' ? 'fa-bed' : 'fa-user-md'"></i> {{scenario.persona.name}}</td>-->
                 <td>{{scenario.patient.name}}</td>
                 <td>{{scenario.app.authClient.clientName}}</td>
             </tr>

@@ -117,6 +117,37 @@ public class SandboxActivityLogServiceImpl implements SandboxActivityLogService 
     }
 
     @Override
+    public SandboxActivityLog sandboxUserAdded(Sandbox sandbox, User user) {
+        SandboxActivityLog sandboxActivityLog = createSandboxActivityLog(sandbox, user);
+        sandboxActivityLog.setActivity(SandboxActivity.USER_ADDED);
+        return this.save(sandboxActivityLog);
+    }
+
+    @Override
+    public SandboxActivityLog sandboxUserRoleChange(Sandbox sandbox, User user, Role role, boolean roleAdded) {
+        SandboxActivityLog sandboxActivityLog = createSandboxActivityLog(sandbox, user);
+        sandboxActivityLog.setActivity(SandboxActivity.USER_SANDBOX_ROLE_CHANGE);
+        sandboxActivityLog.setAdditionalInfo("Role " + role.toString() + (roleAdded ? " added" : " removed"));
+        return this.save(sandboxActivityLog);
+    }
+
+    @Override
+    public SandboxActivityLog systemUserCreated(Sandbox sandbox, User user) {
+        SandboxActivityLog sandboxActivityLog = createSandboxActivityLog(sandbox, user);
+        sandboxActivityLog.setActivity(SandboxActivity.USER_CREATED);
+        sandboxActivityLog.setAdditionalInfo("Ldap Id " + user.getLdapId());
+        return this.save(sandboxActivityLog);
+    }
+
+    @Override
+    public SandboxActivityLog systemUserRoleChange(Sandbox sandbox, User user, SystemRole systemRole, boolean roleAdded) {
+        SandboxActivityLog sandboxActivityLog = createSandboxActivityLog(sandbox, user);
+        sandboxActivityLog.setActivity(SandboxActivity.USER_SYSTEM_ROLE_CHANGE);
+        sandboxActivityLog.setAdditionalInfo("Role " + systemRole.toString() + (roleAdded ? " added" : " removed"));
+        return this.save(sandboxActivityLog);
+    }
+
+    @Override
     public List<SandboxActivityLog> findBySandboxId(String sandboxId) {
         return repository.findBySandboxId(sandboxId);
     }

@@ -5,7 +5,7 @@
             <div class="search-field typeahead">
                 <input enter-key="runQuery(settings.fhirQuery)" type="text" class="input-box form-control" ng-model="settings.fhirQuery"
                        uib-typeahead="item for item in filterQuery($viewValue)"
-                       typeahead-on-select="settings.fhirQuery = $item" typeahead-min-length="0">
+                       typeahead-on-select="settings.fhirQuery = $item; runQuery(settings.fhirQuery)" typeahead-min-length="0">
 
                 <a href='#' class='undo-icon' ng-show="settings.fhirQuery != ''" ng-click="settings.fhirQuery = ''; runQuery('clear')"><i class='fa fa-remove fa-lg'></i></a>
                 <a href='#' class='search-icon' ng-click="runQuery(settings.fhirQuery)"><i class='fa fa-search fa-lg'></i></a>

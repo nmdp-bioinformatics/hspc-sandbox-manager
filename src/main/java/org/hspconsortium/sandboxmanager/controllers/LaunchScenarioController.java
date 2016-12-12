@@ -29,7 +29,10 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/REST/launchScenario")
@@ -40,18 +43,21 @@ public class LaunchScenarioController extends AbstractController  {
     private final AppService appService;
     private final UserPersonaService userPersonaService;
     private final SandboxService sandboxService;
+    private final UserLaunchService userLaunchService;
 
     @Inject
     public LaunchScenarioController(final LaunchScenarioService launchScenarioService,
                                     final AppService appService, final UserService userService,
                                     final UserPersonaService userPersonaService,
-                                    final SandboxService sandboxService, final OAuthService oAuthService) {
+                                    final SandboxService sandboxService, final OAuthService oAuthService,
+                                    final UserLaunchService userLaunchService) {
         super(oAuthService);
         this.launchScenarioService = launchScenarioService;
         this.userService = userService;
         this.appService = appService;
         this.userPersonaService = userPersonaService;
         this.sandboxService = sandboxService;
+        this.userLaunchService = userLaunchService;
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
@@ -59,27 +65,52 @@ public class LaunchScenarioController extends AbstractController  {
     public @ResponseBody LaunchScenario createLaunchScenario(HttpServletRequest request, @RequestBody final LaunchScenario launchScenario) {
 
         Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
-        checkUserAuthorization(request, sandbox.getUserRoles());
+        checkSandboxUserCreateAuthorization(request, sandbox);
+        checkCreatedByIsCurrentUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
+
         launchScenario.setSandbox(sandbox);
-
-        checkUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
         User user = userService.findByLdapId(launchScenario.getCreatedBy().getLdapId());
+        launchScenario.setVisibility(getDefaultVisibility(user, sandbox));
         launchScenario.setCreatedBy(user);
+        userLaunchService.create(new UserLaunch(user, launchScenario, new Timestamp(new Date().getTime())));
 
-        return launchScenarioService.create(launchScenario);
+        LaunchScenario createdLaunchScenario = launchScenarioService.create(launchScenario);
+        userLaunchService.create(new UserLaunch(user, createdLaunchScenario, new Timestamp(new Date().getTime())));
+        return createdLaunchScenario;
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces ="application/json")
     @Transactional
     public @ResponseBody LaunchScenario updateLaunchScenario(HttpServletRequest request, @PathVariable Integer id, @RequestBody final LaunchScenario launchScenario) {
-        if (id.intValue() != launchScenario.getId().intValue()) {
+        LaunchScenario existingLaunchScenario = launchScenarioService.getById(id);
+        if (existingLaunchScenario == null || id.intValue() != launchScenario.getId().intValue()) {
             throw new RuntimeException(String.format("Response Status : %s.\n" +
                             "Response Detail : Launch Scenario Id doesn't match Id in JSON body."
                     , HttpStatus.SC_BAD_REQUEST));
         }
         Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
-        checkUserAuthorization(request, sandbox.getUserRoles());
+        checkSandboxUserModifyAuthorization(request, sandbox, launchScenario);
         return launchScenarioService.update(launchScenario);
+    }
+
+    @RequestMapping(value = "/{id}/launched", method = RequestMethod.PUT, produces ="application/json")
+    @Transactional
+    public void updateLaunchTimestamp(HttpServletRequest request, @PathVariable Integer id, @RequestBody final LaunchScenario launchScenario) {
+        LaunchScenario existingLaunchScenario = launchScenarioService.getById(id);
+        if (existingLaunchScenario == null || id.intValue() != launchScenario.getId().intValue()) {
+            throw new RuntimeException(String.format("Response Status : %s.\n" +
+                            "Response Detail : Launch Scenario Id doesn't match Id in JSON body."
+                    , HttpStatus.SC_BAD_REQUEST));
+        }
+        Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
+        checkSandboxUserReadAuthorization(request, sandbox);
+        UserLaunch userLaunch = userLaunchService.findByUserIdAndLaunchScenarioId(getSystemUserId(request), existingLaunchScenario.getId());
+        if (userLaunch == null) {
+            User user = userService.findByLdapId(getSystemUserId(request));
+            userLaunchService.create(new UserLaunch(user, existingLaunchScenario, new Timestamp(new Date().getTime())));
+        } else {
+            userLaunchService.update(userLaunch);
+        }
     }
 
     @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"appId"})
@@ -87,7 +118,7 @@ public class LaunchScenarioController extends AbstractController  {
                    @RequestParam(value = "appId") int appId) {
 
         App app = appService.getById(appId);
-        checkUserAuthorization(request, app.getSandbox().getUserRoles());
+        checkSandboxUserReadAuthorization(request, app.getSandbox());
 
         return launchScenarioService.findByAppIdAndSandboxId(app.getId(), app.getSandbox().getSandboxId());
     }
@@ -97,7 +128,7 @@ public class LaunchScenarioController extends AbstractController  {
                                                                            @RequestParam(value = "userPersonaId") int personaId) {
 
         UserPersona userPersona = userPersonaService.getById(personaId);
-        checkUserAuthorization(request, userPersona.getSandbox().getUserRoles());
+        checkSandboxUserReadAuthorization(request, userPersona.getSandbox());
 
         return launchScenarioService.findByUserPersonaIdAndSandboxId(userPersona.getId(), userPersona.getSandbox().getSandboxId());
     }
@@ -107,7 +138,7 @@ public class LaunchScenarioController extends AbstractController  {
     public @ResponseBody void deleteLaunchScenario(HttpServletRequest request, @PathVariable Integer id) {
         LaunchScenario launchScenario = launchScenarioService.getById(id);
         Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
-        checkUserAuthorization(request, sandbox.getUserRoles());
+        checkSandboxUserModifyAuthorization(request, sandbox, launchScenario);
         launchScenarioService.delete(launchScenario);
     }
 
@@ -117,10 +148,9 @@ public class LaunchScenarioController extends AbstractController  {
         @RequestParam(value = "sandboxId") String sandboxId) throws UnsupportedEncodingException{
 
         String oauthUserId = oAuthService.getOAuthUserId(request);
-        if (sandboxId != null && sandboxService.isSandboxMember(sandboxService.findBySandboxId(sandboxId),
-                                                                userService.findByLdapId(oauthUserId))) {
-            return launchScenarioService.findBySandboxId(sandboxId);
-        }
-        return Collections.EMPTY_LIST;
+        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
+        checkSandboxUserReadAuthorization(request, sandbox);
+        List<LaunchScenario> launchScenarios = launchScenarioService.findBySandboxIdAndCreatedByOrVisibility(sandboxId, oauthUserId, Visibility.PUBLIC);
+        return launchScenarioService.updateLastLaunchForCurrentUser(launchScenarios, userService.findByLdapId(oauthUserId));
     }
 }

@@ -8,36 +8,22 @@ import java.util.List;
 @Entity
 @NamedQueries({
         @NamedQuery(name="Sandbox.findBySandboxId",
-                query="SELECT c FROM Sandbox c WHERE c.sandboxId = :sandboxId")
+                query="SELECT c FROM Sandbox c WHERE c.sandboxId = :sandboxId"),
+        @NamedQuery(name="Sandbox.findByVisibility",
+                query="SELECT c FROM Sandbox c WHERE c.visibility = :visibility")
+
 })
-public class Sandbox {
-    private Integer id;
-    private Timestamp createdTimestamp;
+public class Sandbox extends AbstractItem {
+
     private String sandboxId;
     private String name;
     private String description;
     private String schemaVersion;
+    private String fhirServerEndPoint;
     private boolean allowOpenAccess;
-    private User createdBy;
     private List<UserRole> userRoles = new ArrayList<>();
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    @Id // @Id indicates that this it a unique primary key
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Integer getId() {
-        return id;
-    }
-
-    public Timestamp getCreatedTimestamp() {
-        return createdTimestamp;
-    }
-
-    public void setCreatedTimestamp(Timestamp createdTimestamp) {
-        this.createdTimestamp = createdTimestamp;
-    }
+    /******************* Sandbox Property Getter/Setters ************************/
 
     public String getSandboxId() {
         return sandboxId;
@@ -47,31 +33,12 @@ public class Sandbox {
         this.sandboxId = sandboxId;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getName() {
         return name;
     }
 
-    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name="created_by_id")
-    public User getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(User createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    @OneToMany(cascade={CascadeType.ALL})
-    public List<UserRole> getUserRoles() {
-        return userRoles;
-    }
-
-    public void setUserRoles(List<UserRole> userRoles) {
-        this.userRoles = userRoles;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -90,6 +57,14 @@ public class Sandbox {
         this.schemaVersion = schemaVersion;
     }
 
+    public String getFhirServerEndPoint() {
+        return fhirServerEndPoint;
+    }
+
+    public void setFhirServerEndPoint(String fhirServerEndPoint) {
+        this.fhirServerEndPoint = fhirServerEndPoint;
+    }
+
     public boolean isAllowOpenAccess() {
         return allowOpenAccess;
     }
@@ -97,4 +72,52 @@ public class Sandbox {
     public void setAllowOpenAccess(boolean allowOpenAccess) {
         this.allowOpenAccess = allowOpenAccess;
     }
+
+    @OneToMany(cascade={CascadeType.ALL})
+    public List<UserRole> getUserRoles() {
+        return userRoles;
+    }
+
+    public void setUserRoles(List<UserRole> userRoles) {
+        this.userRoles = userRoles;
+    }
+
+    /******************* Inherited Property Getter/Setters ************************/
+
+    @Id // @Id indicates that this it a unique primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name="created_by_id")
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Timestamp getCreatedTimestamp() {
+        return createdTimestamp;
+    }
+
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
+    }
+
 }

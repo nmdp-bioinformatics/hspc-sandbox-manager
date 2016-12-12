@@ -8,21 +8,14 @@
             <div class="columns-group">
                 <div class="single-column">
                     <div class="start-form-info-box">
-                        <h1>What is a sandbox?</h1>
-                        <p>A sandbox is your very own instance of an HSPC Platform* combined with tools and utilities to help you build and test your medical apps.</p>
+                        <h1>{{title}}</h1>
+                        <p>{{description}}</p>
 
                         <ul class="feature-checkmark-list">
-                            <li class="feature-checkmark-list--item">Create apps for practitioners that launch within an EHR, smart phone, tablet, or web browser</li>
-                            <li class="feature-checkmark-list--item">Create apps for patients and their related persons that launch from a smart phone, tablet, web browser, or personal computer</li>
-                            <li class="feature-checkmark-list--item">Create backend services that interact directly with HSPC Platforms*</li>
-                            <li class="feature-checkmark-list--item">Verify your app follows the SMART security and launch context standards</li>
-                            <li class="feature-checkmark-list--item">Run your app against your very own FHIR server</li>
-                            <li class="feature-checkmark-list--item">Test your apps by creating various launch scenarios</li>
-                            <li class="feature-checkmark-list--item">Create practitioners, patients, and clinical data</li>
-                            <li class="feature-checkmark-list--item">Verify that your app is HSPC compliant</li>
+                            <li class="feature-checkmark-list--item" ng-repeat="item in checkList">{{item}}</li>
                         </ul>
 
-                        <p>*An HSPC Platform is a standardized way to interact with a medical system such as an EHR, Hospital, Clinic, HIE, PHR, Lab, Insurer, etc.</p>
+                        <p>{{bottomNote}}</p>
                     </div>
                 </div>
             </div>
@@ -30,6 +23,8 @@
         <div class="col-lg-12 create-section ">
             <button class="form-btn btn btn-basic" type="button" ng-click="signin()">Sign In</button>
             <button class="form-btn btn btn-basic" type="button" ng-click="signup()">Sign Up</button>
+            <a ng-show="loginDoc !== ''" class="form-btn btn btn-basic" type="button"
+               href={{loginDoc}} target="_blank">Learn More</a>
         </div>
     </div>
 </div>

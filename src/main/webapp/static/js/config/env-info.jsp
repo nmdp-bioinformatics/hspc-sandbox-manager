@@ -8,5 +8,6 @@
                     "baseServiceUrl_2": "<%= System.getProperty("baseServiceUrl_2") %>",
                     "oauthLogoutUrl": "<%= System.getProperty("oauthLogoutUrl") %>",
                     "oauthAuthenticationUrl": "<%= System.getProperty("oauthAuthenticationUrl") %>",
-                    "userManagementUrl": "<%= System.getProperty("userManagementUrl") %>"
+                    "userManagementUrl": "<%= System.getProperty("userManagementUrl") %>",
+                    "hostOrg": "<%= System.getProperty("hostOrg") %>"
                 });

@@ -20,22 +20,24 @@
 
 package org.hspconsortium.sandboxmanager.controllers;
 
-import org.apache.http.cookie.Cookie;
-import org.hspconsortium.sandboxmanager.model.LaunchScenario;
 import org.hspconsortium.sandboxmanager.model.Sandbox;
+import org.hspconsortium.sandboxmanager.model.User;
 import org.hspconsortium.sandboxmanager.model.UserPersona;
-import org.hspconsortium.sandboxmanager.services.*;
+import org.hspconsortium.sandboxmanager.model.Visibility;
+import org.hspconsortium.sandboxmanager.services.OAuthService;
+import org.hspconsortium.sandboxmanager.services.SandboxService;
+import org.hspconsortium.sandboxmanager.services.UserPersonaService;
+import org.hspconsortium.sandboxmanager.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
-import java.util.List;
 
 @RestController
 @RequestMapping("/REST/userPersona")
@@ -45,17 +47,14 @@ public class UserPersonaController extends AbstractController {
     private final SandboxService sandboxService;
     private final UserService userService;
     private final UserPersonaService userPersonaService;
-    private final OAuthClientService oAuthClientService;
 
     @Inject
     public UserPersonaController(final SandboxService sandboxService, final UserPersonaService userPersonaService,
-                                 final UserService userService,
-                                 final OAuthService oAuthService, final OAuthClientService oAuthClientService) {
+                                 final UserService userService, final OAuthService oAuthService) {
         super(oAuthService);
         this.sandboxService = sandboxService;
         this.userService = userService;
         this.userPersonaService = userPersonaService;
-        this.oAuthClientService = oAuthClientService;
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
@@ -63,8 +62,11 @@ public class UserPersonaController extends AbstractController {
     public @ResponseBody UserPersona createUserPersona(HttpServletRequest request, @RequestBody final UserPersona userPersona) throws UnsupportedEncodingException{
 
         Sandbox sandbox = sandboxService.findBySandboxId(userPersona.getSandbox().getSandboxId());
-        checkUserAuthorization(request, sandbox.getUserRoles());
+        String ldapId = checkSandboxUserCreateAuthorization(request, sandbox);
         userPersona.setSandbox(sandbox);
+        User user = userService.findByLdapId(ldapId);
+        userPersona.setVisibility(getDefaultVisibility(user, sandbox));
+        userPersona.setCreatedBy(user);
         return userPersonaService.create(userPersona, oAuthService.getBearerToken(request));
     }
 
@@ -73,7 +75,7 @@ public class UserPersonaController extends AbstractController {
     public @ResponseBody UserPersona updateUserPersona(HttpServletRequest request, @RequestBody final UserPersona userPersona) throws UnsupportedEncodingException{
 
         Sandbox sandbox = sandboxService.findBySandboxId(userPersona.getSandbox().getSandboxId());
-        checkUserAuthorization(request, sandbox.getUserRoles());
+        checkSandboxUserModifyAuthorization(request, sandbox, userPersona);
         return userPersonaService.update(userPersona, oAuthService.getBearerToken(request));
     }
 
@@ -83,11 +85,9 @@ public class UserPersonaController extends AbstractController {
                                                                      @RequestParam(value = "sandboxId") String sandboxId) throws UnsupportedEncodingException{
 
         String oauthUserId = oAuthService.getOAuthUserId(request);
-        if (sandboxId != null && sandboxService.isSandboxMember(sandboxService.findBySandboxId(sandboxId),
-                userService.findByLdapId(oauthUserId))) {
-            return userPersonaService.findBySandboxId(sandboxId);
-        }
-        return Collections.EMPTY_LIST;
+        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
+        checkSandboxUserReadAuthorization(request, sandbox);
+        return userPersonaService.findBySandboxIdAndCreatedByOrVisibility(sandboxId, oauthUserId, Visibility.PUBLIC);
     }
 
    @RequestMapping(method = RequestMethod.GET, params = {"lookUpId"})
@@ -100,7 +100,7 @@ public class UserPersonaController extends AbstractController {
     @Transactional
     public void deleteSandboxUserPersona(HttpServletRequest request, @PathVariable Integer id) {
         UserPersona userPersona = userPersonaService.getById(id);
-        checkUserAuthorization(request, userPersona.getSandbox().getUserRoles());
+        checkSandboxUserModifyAuthorization(request, userPersona.getSandbox(), userPersona);
 
         userPersonaService.delete(userPersona, oAuthService.getBearerToken(request));
     }

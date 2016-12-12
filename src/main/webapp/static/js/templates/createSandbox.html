@@ -1,12 +1,11 @@
 <div ng-controller="CreateSandboxController" class="container-fluid full-screen create-form  resize" ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+10)">
     <div class="row create-box">
-        <!--<div class="create-title">Create Sandbox</div>-->
         <div class="col-lg-12 create-section">
 
             <div class="columns-group">
                 <div class="single-column">
                     <div class="create-form-group">
-                        <label class="create-form-label">Sandbox ID</label>
+                        <label class="create-form-label">Sandbox ID<span class="required">*</span></label>
                         <input ng-model="sandboxId" class="create-form-input-box red-popover" popover-is-open="showError" popover-trigger="none" popover-placement="right" uib-popover="{{invalidMessage}}" required/>
                         <i ng-show="!isIdValid" class='create-form-input-icon fa fa-close fa-lg'></i>
                         <label class="create-form-description">Your sandbox will be available at {{baseUrl}}/{{tempSandboxId}}</label>
@@ -19,12 +18,15 @@
                     </div>
                     <div class="create-form-group">
                         <label class="create-form-label">Sandbox Version</label>
-                        <select class="create-form-select" ng-model="schemaVersion">
-                            <option value="2">FHIR STU 3</option>
-                            <option value="1">FHIR DSTU 2</option>
+                        <select class="create-form-select"  ng-model="schemaVersion"
+                                ng-options="version.version as version.name for version in sandboxSchemaVersions">
                         </select>
                         <a href='https://healthservices.atlassian.net/wiki/display/HSPC/Sandbox+Versions' target="_blank"><i class="fa fa-question-circle-o"></i></a>
-                        <label class="create-form-description">Not sure what this should say...</label>
+                        <label class="create-form-description">Choose a version of the FHIR Standard</label>
+                    </div>
+                    <div class="create-form-group">
+                        <label class="create-form-label">Allow Open FHIR Endpoint </label>
+                        <input type="checkbox" class="create-form-input-box" ng-model="sandboxAllowOpenAccess"/>
                     </div>
                     <div class="create-form-group">
                         <label class="create-form-label">Description</label>
@@ -32,32 +34,23 @@
                         <!--<input ng-model="sandboxDesc" class="create-form-input-box"/>-->
                         <label class="create-form-description">e.g., This sandbox is the QA environment for NewCo.</label>
                     </div>
+                    <div class="form-group">
+                        <label class="detail-form-label" style="width: 100%"><span class="required">*</span>Indicates a required field</label>
+                    </div>
+
                 </div>
                 <div class="single-column">
                     <div class="create-form-info-box">
-                        <h1>What is a sandbox?</h1>
-                        <p>A sandbox is your very own instance of an HSPC Platform* combined with tools and utilities to help you build and test your medical apps.</p>
-
+                        <h1>{{title}}</h1>
+                        <p>{{description}}</p>
                         <ul class="feature-checkmark-list">
-                            <li class="feature-checkmark-list--item">Create apps for practitioners that launch within an EHR, smart phone, tablet, or web browser</li>
-                            <li class="feature-checkmark-list--item">Create apps for patients and their related persons that launch from a smart phone, tablet, web browser, or personal computer</li>
-                            <li class="feature-checkmark-list--item">Create backend services that interact directly with HSPC Platforms*</li>
-                            <li class="feature-checkmark-list--item">Verify your app follows the SMART security and launch context standards</li>
-                            <li class="feature-checkmark-list--item">Run your app against your very own FHIR server</li>
-                            <li class="feature-checkmark-list--item">Test your apps by creating various launch scenarios</li>
-                            <li class="feature-checkmark-list--item">Create practitioners, patients, and clinical data</li>
-                            <li class="feature-checkmark-list--item">Verify that your app is HSPC compliant</li>
+                            <li class="feature-checkmark-list--item" ng-repeat="item in checkList">{{item}}</li>
                         </ul>
 
-                        <p>*An HSPC Platform is a standardized way to interact with a medical system such as an EHR, Hospital, Clinic, HIE, PHR, Lab, Insurer, etc.</p>
+                        <p>{{bottomNote}}</p>
                     </div>
                 </div>
             </div>
-            <!--<div class="col-lg-12 create-section ">-->
-                <!--<div class="create-form-info-box">-->
-                    <!--<h1>Invite users</h1>-->
-                <!--</div>-->
-            <!--</div>    -->
             <div class="col-lg-12 create-section " style="border-top: 1px solid #ccc;">
                 <button class="form-btn btn btn-basic" type="button" ng-disabled="!createEnabled" ng-click="createSandbox()">Create Sandbox</button>
                 <button class="form-btn btn btn-cancel" type="button" ng-click="cancel()">Cancel</button>

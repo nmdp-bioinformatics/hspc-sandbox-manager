@@ -24,6 +24,7 @@ import org.hspconsortium.sandboxmanager.model.*;
 import org.hspconsortium.sandboxmanager.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -31,9 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/REST/sandboxinvite")
@@ -64,7 +63,8 @@ public class SandboxInviteController extends AbstractController {
 
         // Make sure the inviter has rights to this sandbox
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxInvite.getSandbox().getSandboxId());
-        checkUserAuthorization(request, sandbox.getUserRoles());
+        checkUserSandboxRole(request, sandbox, Role.MANAGE_USERS);
+
         // Check for an existing invite for this invitee
         List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesByInviteeIdAndSandboxId(sandboxInvite.getInvitee().getLdapId(), sandboxInvite.getSandbox().getSandboxId());
 
@@ -114,7 +114,7 @@ public class SandboxInviteController extends AbstractController {
     List<SandboxInvite> getSandboxInvitesBySandbox(HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId,
            @RequestParam(value = "status") InviteStatus status) throws UnsupportedEncodingException {
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-        checkUserAuthorization(request, sandbox.getUserRoles());
+        checkUserSandboxRole(request, sandbox, Role.MANAGE_USERS);
 
         if (status == null) {
             List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesBySandboxId(sandboxId);
@@ -156,15 +156,16 @@ public class SandboxInviteController extends AbstractController {
             }
 
             Sandbox sandbox = sandboxService.findBySandboxId(sandboxInvite.getSandbox().getSandboxId());
-            sandboxService.addMember(sandbox, invitee, Role.USER, false);
+
+            sandboxService.addMember(sandbox, invitee);
+            sandboxActivityLogService.sandboxUserInviteAccepted(sandbox, invitee);
 
             sandboxInvite.setStatus(status);
             sandboxInviteService.save(sandboxInvite);
         } else if ((sandboxInvite.getStatus() == InviteStatus.PENDING || sandboxInvite.getStatus() == InviteStatus.REJECTED) && status == InviteStatus.REVOKED ) {
 
-            List<UserRole> userRoles = sandboxInvite.getSandbox().getUserRoles();
-            String ldapId = checkUserAuthorization(request, userRoles);
-            User user = userService.findByLdapId(ldapId);
+            checkUserSandboxRole(request, sandboxInvite.getSandbox(), Role.MANAGE_USERS);
+            User user = userService.findByLdapId(getSystemUserId(request));
             sandboxActivityLogService.sandboxUserInviteRevoked(sandboxInvite.getSandbox(), user);
             sandboxInvite.setStatus(status);
             sandboxInviteService.save(sandboxInvite);

@@ -4,7 +4,7 @@
             <div class="detail-form">
                 <label class="detail-form-label">App Name</label>
                 <div class="detail-form-label-input">
-                    <input ng-model="clientJSON.clientName" class="form-control"/>
+                    <input ng-disabled="!canModify" ng-model="clientJSON.clientName" class="form-control"/>
                 </div>
             </div>
 
@@ -26,21 +26,22 @@
             <div class="detail-form">
                 <label class="detail-form-label">App Launch URI</label>
                 <div class="detail-form-label-input">
-                    <input ng-model="clientJSON.launchUri" class="form-control"/>
+                    <input ng-disabled="!canModify" ng-model="clientJSON.launchUri" class="form-control"/>
                 </div>
             </div>
 
             <div class="detail-form">
                 <label class="detail-form-label">App Redirect URIs</label>
                 <div class="detail-form-label-input">
-                    <input ng-model="clientJSON.redirectUris" class="form-control"/>
+                    <input ng-disabled="!canModify" ng-model="clientJSON.redirectUris" class="form-control"/>
                 </div>
             </div>
 
             <div class="detail-form">
                 <label class="detail-form-label">App Logo</label>
                 <div class="detail-form-label-input">
-                    <input type="file" name="file" style="margin-bottom: 5px" onchange="angular.element(this).scope().updateFile(this.files)"/>
+                    <label ng-disabled="!canModify" class="btn btn-basic btn-md"><input type="file" name="file" onchange="angular.element(this).scope().uploadFile(this.files)" required/><i class="fa fa-upload fa-lg"></i><span> Upload Image</span></label>
+                    <!--<input ng-disabled="!canModify" type="file" name="file" style="margin-bottom: 5px" onchange="angular.element(this).scope().updateFile(this.files)"/>-->
                     <label style="margin-top: 5px">(width: 210px X height: 150px)</label>
                     <div class="thumbnail">
                         <img ng-show="clientJSON.logo" ng-src="{{clientJSON.logo}}">
@@ -54,7 +55,7 @@
             <div class="detail-form">
                 <label class="detail-form-label">Scopes</label>
                 <div class="detail-form-label-input with-info">
-                    <input ng-model="clientJSON.scope" class="form-control"/>
+                    <input ng-disabled="!canModify" ng-model="clientJSON.scope" class="form-control"/>
                 </div>
                 <a href='http://docs.smarthealthit.org/authorization/scopes-and-launch-context/' target="_blank" class='float-right-dark-btn'>
                     <img src="static/images/circle_info-128.png" class="info-btn">
@@ -62,12 +63,21 @@
 
             </div>
 
+            <div class="detail-form">
+                <label class="detail-form-label">Sample Patients</label>
+                <div class="detail-form-label-input">
+                    <input ng-disabled="!canModify" ng-model="clientJSON.samplePatients" class="form-control"  placeholder="e.g.: Patient?_id=SMART-1032702,SMART-621799"/>
+                    <label class="create-form-description">This is a FHIR query to limit the Patient Picker on launch.</label>
+                </div>
+            </div>
+
         </div>
     </div>
     <div class="row">
         <div class="col-md-12 content-column">
-            <div class="btn btn-basic btn-md" ng-click="save()"><i class="fa fa-save fa-lg"></i> Save</div>
-            <div class="btn btn-delete btn-md" ng-disabled="!canDelete" ng-click="delete()"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
+            <div class="btn btn-basic btn-md" ng-click="quickLaunch(selected.selectedApp, clientJSON.samplePatients)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
+            <div class="btn btn-basic btn-md" ng-show="canModify" ng-click="save()"><i class="fa fa-save fa-lg"></i> Save</div>
+            <div class="btn btn-delete btn-md" ng-show="canModify" ng-disabled="!canDelete" ng-click="delete()"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
         </div>
     </div>
 

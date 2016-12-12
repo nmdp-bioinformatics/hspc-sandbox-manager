@@ -6,7 +6,8 @@
         <div class="row">
             <div class="detail-form">
                 <label class="detail-form-label" style="width: 50px">Patient:</label>
-                <label class="detail-form-label" ng-show="hasPatient"><a style="font-weight: 600" ng-click="launchPatientDataManager(patient)">{{patient | nameGivenFamily}}</a></label>
+                <label class="detail-form-label" ng-show="hasPatient && canManageData()"><a style="font-weight: 600" ng-click="launchPatientDataManager(patient)">{{patient | nameGivenFamily}}</a></label>
+                <label class="detail-form-label" ng-show="hasPatient && !canManageData()">{{patient | nameGivenFamily}}</label>
                 <label class="detail-form-label" ng-show="!hasPatient">No Associated Patient</label>
             </div>
         </div>

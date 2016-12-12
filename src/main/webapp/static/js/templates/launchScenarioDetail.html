@@ -6,7 +6,7 @@
             <div class="detail-form-line-inline">
                 <label class="detail-form-label-inline">Description:</label>
                 <label ng-hide="editDesc.showEdit" class="detail-form-value-inline">{{selectedScenario.description}}</label>
-                <a ng-hide="editDesc.showEdit" ng-click="editDesc.showEdit = true" class='float-right-dark-btn'>
+                <a ng-hide="editDesc.showEdit || !canDelete" ng-click="editDesc.showEdit = true" class='float-right-dark-btn'>
                     <i class='fa fa-pencil fa-lg'></i>
                 </a>
                 <input ng-show="editDesc.showEdit" class="detail-form-label-input-inline" ng-model="editDesc.new"/>
@@ -20,17 +20,7 @@
 
             <div class="title-box">
                 <div class="title">Persona</div>
-                <div class="content"  ng-show="selectedScenario.persona != undefined">
-                    <div class="detail-form">
-                        <label class="detail-form-label">Launch As:</label>
-                        <label class="detail-form-value">{{selectedScenario.persona.name}}</label>
-                    </div>
-                    <div class="detail-form" >
-                        <label class="detail-form-label">FHIR Resource Type:</label>
-                        <label class="detail-form-value"><i class='fa' ng-class="selectedScenario.persona.resource == 'Patient' ? 'fa-bed' : 'fa-user-md'"></i> {{selectedScenario.persona.resource}}</label>
-                    </div>
-                </div>
-                <div class="content"  ng-show="selectedScenario.userPersona != undefined">
+                <div class="content">
                     <div class="detail-form">
                         <label class="detail-form-label">Launch As:</label>
                         <label class="detail-form-value">{{selectedScenario.userPersona.fhirName}}</label>
@@ -51,7 +41,8 @@
                 <div class="content">
                     <div class="detail-form">
                         <label class="detail-form-label">Patient:</label>
-                        <label class="detail-form-value"><a ng-click="launchPatientDataManager(selectedScenario.patient)">{{selectedScenario.patient.name}}</a></label>
+                        <label class="detail-form-value" ng-show="canManageData()"><a ng-click="launchPatientDataManager(selectedScenario.patient)">{{selectedScenario.patient.name}}</a></label>
+                        <label class="detail-form-value" ng-show="!canManageData()">{{selectedScenario.patient.name}}</label>
                     </div>
                     <div class="detail-form">
                         <label class="detail-form-label">Encounter:</label>
@@ -110,7 +101,7 @@
     <div class="row">
         <div class="col-md-12 content-column">
             <div class="btn btn-basic btn-md" ng-click="launch(selectedScenario)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
-            <div class="btn btn-delete btn-md" ng-click="delete(selectedScenario)"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
+            <div class="btn btn-delete btn-md" ng-show="canDelete" ng-click="delete(selectedScenario)"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
         </div>
     </div>
 </div>

@@ -2,6 +2,8 @@ package org.hspconsortium.sandboxmanager.services;
 
 import org.hspconsortium.sandboxmanager.model.ContextParams;
 import org.hspconsortium.sandboxmanager.model.LaunchScenario;
+import org.hspconsortium.sandboxmanager.model.User;
+import org.hspconsortium.sandboxmanager.model.Visibility;
 
 import java.util.List;
 
@@ -28,4 +30,10 @@ public interface LaunchScenarioService {
     List<LaunchScenario> findByAppIdAndSandboxId(final int appId, final String sandboxId);
 
     List<LaunchScenario> findByUserPersonaIdAndSandboxId(final int userPersonaId, final String sandboxId);
+
+    List<LaunchScenario> findBySandboxIdAndCreatedByOrVisibility(final String sandboxId, final String createdBy, final Visibility visibility);
+
+    List<LaunchScenario> findBySandboxIdAndCreatedBy(final String sandboxId, final String createdBy);
+
+    List<LaunchScenario> updateLastLaunchForCurrentUser(final List<LaunchScenario> launchScenarios, final User user);
 }

@@ -3,6 +3,7 @@ package org.hspconsortium.sandboxmanager.services.impl;
 import org.hspconsortium.sandboxmanager.model.App;
 import org.hspconsortium.sandboxmanager.model.AuthClient;
 import org.hspconsortium.sandboxmanager.model.Image;
+import org.hspconsortium.sandboxmanager.model.Visibility;
 import org.hspconsortium.sandboxmanager.repositories.AppRepository;
 import org.hspconsortium.sandboxmanager.services.AppService;
 import org.hspconsortium.sandboxmanager.services.AuthClientService;
@@ -113,6 +114,7 @@ public class AppServiceImpl implements AppService {
         }
         existingApp.setLaunchUri(app.getLaunchUri());
         existingApp.setLogoUri(app.getLogoUri());
+        existingApp.setSamplePatients(app.getSamplePatients());
         return save(existingApp);
 
     }
@@ -161,4 +163,13 @@ public class AppServiceImpl implements AppService {
         return  repository.findBySandboxId(sandboxId);
     }
 
+    @Override
+    public List<App> findBySandboxIdAndCreatedByOrVisibility(final String sandboxId, final String createdBy, final Visibility visibility) {
+        return repository.findBySandboxIdAndCreatedByOrVisibility(sandboxId, createdBy, visibility);
+    }
+
+    @Override
+    public List<App> findBySandboxIdAndCreatedBy(final String sandboxId, final String createdBy) {
+        return repository.findBySandboxIdAndCreatedBy(sandboxId, createdBy);
+    }
 }
