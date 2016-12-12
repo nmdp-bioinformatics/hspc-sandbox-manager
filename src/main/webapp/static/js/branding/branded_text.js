@@ -34,6 +34,42 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                         "Verify that your app is HSPC compliant"
                     ]
                 }
+            },
+        smart: {
+            mainImage: "static/branding/smart/images/SMART-Logo.png",
+            mainImage2x: "static/branding/smart/images/SMART-Logo@2x.png",
+            whiteImage: "",
+            whiteImage2x: "",
+            imageStyle: {
+                height: '50px',
+                marginTop: '-4px',
+                marginLeft: '-35px'
+            },
+            mainTitle: "",
+            sandboxText: "Sandbox",
+            moreLinks: false,
+            dashboardTitle: "Dashboard",
+            showEmptyInviteList: false,
+            copyright: "© Harvard Medical School / Boston Children's Hospital / SMART Health IT, 2016",
+            showCert: false,
+            loginDoc: "http://docs.smarthealthit.org/sandbox/",
+            defaultSchemaVersion : "1",
+            sandboxSchemaVersions : [
+                {version: "1", name: "FHIR DSTU 2"}
+            ],
+            sandboxDescription: {
+                title: "What is a sandbox?",
+                description: "",
+                bottomNote: "",
+                checkList: [
+                    "Create apps for practitioners that launch within an EHR, smart phone, tablet, or web browser",
+                    "Create apps for patients and their related persons that launch from a smart phone, tablet, web browser, or personal computer",
+                    "Create backend services that interact directly with SMART of FHIR Platforms",
+                    "Verify your app follows the SMART security and launch context standards",
+                    "Test your apps by creating various launch scenarios",
+                    "Verify that your app is SMART of FHIR compliant"
+                ]
+            }
             }
     });
 }]);
