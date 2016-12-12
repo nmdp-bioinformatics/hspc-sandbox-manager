@@ -56,7 +56,7 @@
 <!-- NAVIGATION -->
 <nav class="navbar" role="navigation" ng-show="showing.navBar">
     <div class="navbar-bars" ng-show="showing.moreLinks"><a tabindex="0" href="#" uib-popover-template="'static/js/templates/barsPopover.html'" popover-trigger="'focus'" popover-placement="bottom"><i class="fa fa-bars fa-lg"></i></a></div>
-    <div class="navbar-img" ng-cloak><img ng-style="imgStyle()" ng-click="dashboard()" ng-src="{{mainImage}}" ng-srcset="{{mainImage2x}}" style="cursor: pointer" ng-cloak /> {{sandboxText}}</div>
+    <div class="navbar-img" style="cursor: pointer" ng-click="dashboard()" ng-cloak><img ng-style="imgStyle()" ng-src="{{mainImage}}" ng-srcset="{{mainImage2x}}" ng-cloak /><div ng-style="imgTextStyle()" ng-cloak> {{sandboxText}}</div></div>
     <div class="navbar-sandboxes" ng-show="showing.signout && dashboard.sandboxes.length > 0"><a tabindex="1" style="cursor: pointer"  href="#" uib-popover-template="'static/js/templates/sandboxPopover.html'" popover-trigger="'focus'" popover-placement="bottom">Sandboxes <i class="fa fa-sort-desc fa-lg"></i></a></div>
     <div class="navbar-stack-name" ng-show="showing.signout" ng-cloak>
     Welcome <a id="welcome" tabindex="2" href="#" uib-popover-template="'static/js/templates/settingsPopover.html'" popover-trigger="'focus'" popover-placement="bottom" ><span style="font-weight: bold">{{oauthUser.name}}</span></a></div>

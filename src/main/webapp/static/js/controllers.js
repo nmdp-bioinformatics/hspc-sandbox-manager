@@ -38,6 +38,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 return branded.imageStyle;
             }
         };
+        $scope.imgTextStyle = function (){
+            if (branded.imageTextStyle !== undefined){
+                return branded.imageTextStyle;
+            }
+        };
         $scope.showing.moreLinks = branded.moreLinks;
         $scope.messages = [];
         $scope.dashboard = {

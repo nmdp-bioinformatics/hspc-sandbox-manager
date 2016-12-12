@@ -574,11 +574,8 @@
 
 .navbar-img {
     position: absolute;
-    top: 8px;
+    top: 15px;
     left: 55px;
-    font-weight: 100;
-    font-size: 28px;
-
 }
 .navbar-bars {
     position: absolute;
