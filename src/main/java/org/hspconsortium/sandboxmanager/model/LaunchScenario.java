@@ -4,47 +4,43 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name="LaunchScenario.findByOwnerId",
-                query="SELECT c FROM LaunchScenario c WHERE c.owner.ldapId = :id")
+        @NamedQuery(name="LaunchScenario.findBySandboxId",
+                query="SELECT c FROM LaunchScenario c WHERE c.sandbox.sandboxId = :sandboxId"),
+        @NamedQuery(name="LaunchScenario.findByAppIdAndSandboxId",
+                query="SELECT c FROM LaunchScenario c WHERE c.app.id = :appId and c.sandbox.sandboxId = :sandboxId"),
+        @NamedQuery(name="LaunchScenario.findByUserPersonaIdAndSandboxId",
+                query="SELECT c FROM LaunchScenario c WHERE c.userPersona.id = :userPersonaId and c.sandbox.sandboxId = :sandboxId"),
+        @NamedQuery(name="LaunchScenario.findBySandboxIdAndCreatedByOrVisibility",
+                query="SELECT c FROM LaunchScenario c WHERE c.sandbox.sandboxId = :sandboxId and " +
+                "(c.createdBy.ldapId = :createdBy or c.visibility = :visibility)"),
+        @NamedQuery(name="LaunchScenario.findBySandboxIdAndCreatedBy",
+        query="SELECT c FROM LaunchScenario c WHERE c.sandbox.sandboxId = :sandboxId and " +
+                "c.createdBy.ldapId = :createdBy")
 })
-public class LaunchScenario {
+public class LaunchScenario extends AbstractSandboxItem {
 
-    private Integer id;
     private String description;
-    private User owner;
     private Patient patient;
-    private Persona persona;
+    private UserPersona userPersona;
     private App app;
     private List<ContextParams> contextParams;
     private Timestamp lastLaunch;
     private Long lastLaunchSeconds;
 
-    public void setId(Integer id) {
-        this.id = id;
+
+    /******************* Launch Scenario Property Getter/Setters ************************/
+
+    public String getDescription() {
+        return description;
     }
 
-    @Id // @Id indicates that this it a unique primary key
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Integer getId() {
-        return id;
-    }
-
-    public void setPatient(Patient patient) {
-        this.patient = patient;
-    }
-
-    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name="owner_id")
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
@@ -53,18 +49,18 @@ public class LaunchScenario {
         return patient;
     }
 
-    public void setPersona(Persona persona) {
-        this.persona = persona;
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name="persona_id")
-    public Persona getPersona() {
-        return persona;
+    @JoinColumn(name="user_persona_id")
+    public UserPersona getUserPersona() {
+        return userPersona;
     }
 
-    public void setApp(App app) {
-        this.app = app;
+    public void setUserPersona(UserPersona userPersona) {
+        this.userPersona = userPersona;
     }
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
@@ -73,8 +69,8 @@ public class LaunchScenario {
         return app;
     }
 
-    public void setContextParams(List<ContextParams> contextParams) {
-        this.contextParams = contextParams;
+    public void setApp(App app) {
+        this.app = app;
     }
 
     @OneToMany(cascade={CascadeType.ALL})
@@ -82,12 +78,8 @@ public class LaunchScenario {
         return contextParams;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
+    public void setContextParams(List<ContextParams> contextParams) {
+        this.contextParams = contextParams;
     }
 
     @JsonIgnore
@@ -113,4 +105,53 @@ public class LaunchScenario {
             this.lastLaunch = new Timestamp(lastLaunchSeconds);
         }
     }
+
+    /******************* Inherited Property Getter/Setters ************************/
+
+    @Id // @Id indicates that this it a unique primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name="created_by_id")
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Timestamp getCreatedTimestamp() {
+        return createdTimestamp;
+    }
+
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
+    }
+
+    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name="sandbox_id")
+    public Sandbox getSandbox() {
+        return sandbox;
+    }
+
+    public void setSandbox(Sandbox sandbox) {
+        this.sandbox = sandbox;
+    }
+
+    public Visibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
+    }
+
 }

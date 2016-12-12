@@ -1,0 +1,11 @@
+{
+    "sandboxUserUri" : "https://hspcreferencemessag-uat-env.us-west-2.elasticbeanstalk.com/sandboxuser",
+    "defaultServiceUrl": "https://uat-api.hspconsortium.org/data",
+    "baseServiceUrl": "https://uat-api.hspconsortium.org/hspc/",
+    "oauthLogoutUrl": "https://uat-auth.hspconsortium.org/logout",
+    "oauthAuthenticationUrl": "https://uat-auth.hspconsortium.org/static/auth/index.html",
+    "userManagementUrl": "https://secure-pwm.hspconsortium.org",
+    "defaultPersonaId": "COREPRACTITIONER1",
+    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin"],
+    "defaultLaunchScenarios": ["bilirubin_chart", "Growth Chart", "BP Centiles", "Cardiac Risk"]
+}

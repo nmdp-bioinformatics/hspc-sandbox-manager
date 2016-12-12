@@ -1,25 +1,91 @@
 package org.hspconsortium.sandboxmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
-import java.math.BigInteger;
+import java.sql.Timestamp;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name="App.findByLaunchUri",
-                query="SELECT c FROM App c WHERE c.launch_uri = :uri"),
-        @NamedQuery(name="App.findByClientId",
-        query="SELECT c FROM App c WHERE c.client_id = :client_id")
+        @NamedQuery(name="App.findByLaunchUriAndClientIdAndSandboxId",
+        query="SELECT c FROM App c WHERE c.launchUri = :launchUri and " +
+                "c.authClient.clientId = :clientId and c.sandbox.sandboxId = :sandboxId"),
+        @NamedQuery(name="App.findBySandboxId",
+        query="SELECT c FROM App c WHERE c.sandbox.sandboxId = :sandboxId and c.authClient.authDatabaseId IS NOT NULL"),
+        @NamedQuery(name="App.findBySandboxIdAndCreatedByOrVisibility",
+        query="SELECT c FROM App c WHERE c.sandbox.sandboxId = :sandboxId and c.authClient.authDatabaseId IS NOT NULL and " +
+                "(c.createdBy.ldapId = :createdBy or c.visibility = :visibility)"),
+        @NamedQuery(name="App.findBySandboxIdAndCreatedBy",
+        query="SELECT c FROM App c WHERE c.sandbox.sandboxId = :sandboxId and c.authClient.authDatabaseId IS NOT NULL and " +
+                "c.createdBy.ldapId = :createdBy")
 })
-public class App {
-    private Integer id;
-    private String client_name;
-    private String client_id;
-    private String launch_uri;
-    private String logo_uri;
+public class App extends AbstractSandboxItem {
 
-    public void setId(Integer id) {
-        this.id = id;
+    private String launchUri;
+    private String logoUri;
+    private Image logo;
+    private AuthClient authClient;
+    private String samplePatients;
+    private String clientJSON;
+
+    /******************* App Property Getter/Setters ************************/
+
+    public void setLaunchUri(String launchUri) {
+        this.launchUri = launchUri;
     }
+
+    public String getLaunchUri() {
+        return launchUri;
+    }
+
+    public String getLogoUri() {
+        return logoUri;
+    }
+
+    public void setLogoUri(String logoUri) {
+        this.logoUri = logoUri;
+    }
+
+    @OneToOne(cascade={CascadeType.ALL})
+    @JoinColumn(name="logo_id")
+    @JsonIgnore
+    public Image getLogo() {
+        return logo;
+    }
+
+    public void setLogo(Image logo) {
+        this.logo = logo;
+    }
+
+    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name="auth_client_id")
+    public AuthClient getAuthClient() {
+        return authClient;
+    }
+
+    public void setAuthClient(AuthClient authClient) {
+        this.authClient = authClient;
+    }
+
+    public String getSamplePatients() {
+        return samplePatients;
+    }
+
+    public void setSamplePatients(String samplePatients) {
+        this.samplePatients = samplePatients;
+    }
+
+    @Transient
+    public String getClientJSON() {
+        return clientJSON;
+    }
+
+    public void setClientJSON(String clientJSON) {
+        this.clientJSON = clientJSON;
+    }
+
+
+    /******************* Inherited Property Getter/Setters ************************/
 
     @Id // @Id indicates that this it a unique primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,37 +93,44 @@ public class App {
         return id;
     }
 
-    public void setClient_name(String client_name) {
-        this.client_name = client_name;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public String getClient_name() {
-        return client_name;
+    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name="created_by_id")
+    public User getCreatedBy() {
+        return createdBy;
     }
 
-
-    public String getClient_id() {
-        return client_id;
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
     }
 
-    public void setClient_id(String client_id) {
-        this.client_id = client_id;
+    public Timestamp getCreatedTimestamp() {
+        return createdTimestamp;
     }
 
-    public void setLaunch_uri(String launch_uri) {
-        this.launch_uri = launch_uri;
+    public void setCreatedTimestamp(Timestamp createdTimestamp) {
+        this.createdTimestamp = createdTimestamp;
     }
 
-    public String getLaunch_uri() {
-        return launch_uri;
+    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name="sandbox_id")
+    public Sandbox getSandbox() {
+        return sandbox;
     }
 
-    public String getLogo_uri() {
-        return logo_uri;
+    public void setSandbox(Sandbox sandbox) {
+        this.sandbox = sandbox;
     }
 
-    public void setLogo_uri(String logo_uri) {
-        this.logo_uri = logo_uri;
+    public Visibility getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(Visibility visibility) {
+        this.visibility = visibility;
     }
 
 }

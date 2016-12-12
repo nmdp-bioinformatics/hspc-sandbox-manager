@@ -1,0 +1,30 @@
+<div class="container-fluid" ng-controller="AppsController">
+    <div class="row">
+        <div class="content-column" resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight)" ng-class="showing.appDetail ? 'col-lg-8 right-border' : 'col-lg-12'">
+            <div style="margin-bottom: 10px">
+                <div class="slim-page-header">Registered Sandbox Apps
+                    <a href='https://healthservices.atlassian.net/wiki/display/HSPC/Sandbox+Registered+Apps' target="_blank"><i class="fa fa-question-circle-o"></i></a>
+                </div>
+                <button ng-click="registration()" class="btn btn-basic"><i class="fa fa-plus fa-lg"></i> Register New App</button>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div ng-class="showing.appDetail ? 'app-gallery-container-slim' : 'app-gallery-container'" resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+120)">
+                        <br style="clear: both;" />
+                        <div  class="row-fluid">
+                            <div ng-include="'static/js/templates/appsView.html'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 content-column" ng-show="showing.appDetail">
+            <div class="details-header">
+                <div class="slim-page-header">Registered App Details</div>
+            </div>
+
+            <div ng-include="'static/js/templates/appsDetail.html'"></div>
+        </div>
+    </div>
+</div>
+

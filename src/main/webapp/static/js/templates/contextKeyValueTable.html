@@ -33,7 +33,7 @@
         </div>
     </div>
     <div class="col-md-12 content-column">
-        <div ng-show="!showing.addingContext && !contextSelected">
+        <div ng-show="!showing.addingContext && !contextSelected && canDelete">
             <a ng-click="toggleAddingContext()"><i class="fa fa-plus"></i> Add</a>
         </div>
         <div ng-show="!showing.addingContext && contextSelected">

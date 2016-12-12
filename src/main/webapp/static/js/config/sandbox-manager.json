@@ -1,7 +1,12 @@
 {
-    "profile_update_uri" : "http://localhost:8080/hspc-reference-messaging/sandboxuser/profileupdate",
-    "serviceUrl": "http://localhost:8080/hspc-reference-api/data",
-    "baseUrl": "http://localhost:8080/hspc-sandbox-manager",
+    "sandboxUserUri" : "http://localhost:8080/hspc-reference-messaging/sandboxuser",
+    "defaultServiceUrl": "http://localhost:8080/hspc-reference-api/hspc/data",
+    "baseServiceUrl_1": "http://localhost:8080/hspc-reference-api/",
+    "baseServiceUrl_2": "http://localhost:8081/hspc-reference-api/",
+    "basePersonaServiceUrl_1": "http://localhost:8080/hspc-reference-api/",
+    "basePersonaServiceUrl_2": "http://localhost:8081/hspc-reference-api/",
     "oauthLogoutUrl": "http://localhost:8080/hspc-reference-authorization/logout",
-    "userManagementUrl": "https://sandbox.hspconsortium.org/pwm/private/"
+    "oauthAuthenticationUrl": "http://localhost:8080/hspc-reference-authorization/static/auth/index.html",
+    "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
+    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static", "open", "data", "test", "1", "2"]
 }

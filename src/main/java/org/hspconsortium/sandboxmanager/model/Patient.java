@@ -5,14 +5,17 @@ import java.math.BigInteger;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name="Patient.findByFhirId",
-                query="SELECT c FROM Patient c WHERE c.fhirId = :id")
+        @NamedQuery(name="Patient.findByFhirIdAndSandboxId",
+                query="SELECT c FROM Patient c WHERE c.fhirId = :fhirId and c.sandbox.sandboxId = :sandboxId"),
+        @NamedQuery(name="Patient.findBySandboxId",
+                query="SELECT c FROM Patient c WHERE c.sandbox.sandboxId = :sandboxId")
 })
 public class Patient {
     private Integer id;
     private String name;
     private String fhirId;
     private String resource;
+    private Sandbox sandbox;
 
     public void setId(Integer id) {
         this.id = id;
@@ -47,4 +50,15 @@ public class Patient {
     public String getResource() {
         return resource;
     }
+
+    @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name="sandbox_id")
+    public Sandbox getSandbox() {
+        return sandbox;
+    }
+
+    public void setSandbox(Sandbox sandbox) {
+        this.sandbox = sandbox;
+    }
+
 }

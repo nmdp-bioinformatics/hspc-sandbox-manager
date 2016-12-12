@@ -1,12 +1,34 @@
 package org.hspconsortium.sandboxmanager.services;
 
 import org.hspconsortium.sandboxmanager.model.App;
+import org.hspconsortium.sandboxmanager.model.Image;
+import org.hspconsortium.sandboxmanager.model.Visibility;
+
+import java.util.List;
 
 public interface AppService {
 
-    App save(App app);
+    App save(final App app);
 
-    App findByLaunchUri(String uri);
+    void delete(final int id);
 
-    App findByClientId(String clientId);
+    void delete(final App app);
+
+    App create(final App app);
+
+    App update(final App app);
+
+    App getClientJSON(final App app);
+
+    App updateAppImage(final App app, final Image image);
+
+    App getById(final int id);
+
+    App findByLaunchUriAndClientIdAndSandboxId(final String launchUri, final String clientId, final String sandboxId);
+
+    List<App> findBySandboxId(final String sandboxId);
+
+    List<App> findBySandboxIdAndCreatedByOrVisibility(final String sandboxId, final String createdBy, final Visibility visibility);
+
+    List<App> findBySandboxIdAndCreatedBy(final String sandboxId, final String createdBy);
 }

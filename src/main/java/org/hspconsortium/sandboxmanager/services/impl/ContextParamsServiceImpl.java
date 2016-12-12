@@ -20,7 +20,20 @@ public class ContextParamsServiceImpl implements ContextParamsService {
 
     @Override
     @Transactional
-    public ContextParams save(final ContextParams patient) {
-        return repository.save(patient);
+    public ContextParams save(final ContextParams contextParams) {
+        return repository.save(contextParams);
     }
+
+    @Override
+    @Transactional
+    public void delete(final int id) {
+        repository.delete(id);
+    }
+
+    @Override
+    @Transactional
+    public void delete(final ContextParams contextParams) {
+        delete(contextParams.getId());
+    }
+
 }

@@ -1,12 +1,15 @@
 <div class="container-fluid" ng-controller="LaunchScenariosController">
     <div class="row">
-        <div class="content-column" resize ng-style="resizeWithOffset(80)" ng-class="showing.detail ? 'col-lg-8 right-border' : 'col-lg-12'">
+        <div class="content-column" resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight)" ng-class="showing.detail ? 'col-lg-8 right-border' : 'col-lg-12'">
             <div style="margin-bottom: 10px">
-                <div class="slim-page-header">Build a new Launch Scenario</div>
-                <div class="btn btn-basic btn-md" ui-sref="patient-view({source: 'persona'})">As Patient <i class="fa fa-chevron-right"></i></div>
-                <div class="btn btn-basic btn-md" ui-sref="practitioner-view">As Practitioner <i class="fa fa-chevron-right"></i></div>
+                <div class="slim-page-header">Build a new Launch Scenario
+                    <a href='https://healthservices.atlassian.net/wiki/display/HSPC/Sandbox+Launch+Scenarios' target="_blank"><i class="fa fa-question-circle-o"></i></a>
+                </div>
+                <div class="btn btn-basic btn-md" ui-sref="persona-view({source: 'persona'})">Build Launch Scenario <i class="fa fa-chevron-right"></i></div>
+                <!--<div class="btn btn-basic btn-md" ui-sref="patient-view({source: 'scenario'})">As Patient <i class="fa fa-chevron-right"></i></div>-->
+                <!--<div class="btn btn-basic btn-md" ui-sref="practitioner-view">As Practitioner <i class="fa fa-chevron-right"></i></div>-->
             </div>
-            <div class="row horizontal-scroll" resize ng-style="resizeWithOffset(200)">
+            <div class="row horizontal-scroll" resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+100)">
             <div class="col-lg-12">
                 <div class="box">
                     <div class="sub-header">Recent Launch Scenarios</div>
@@ -23,8 +26,10 @@
             </div>
             </div>
         </div>
-        <div class="col-lg-4" ng-show="showing.detail">
-            <div class="slim-page-header">Details</div>
+        <div class="col-lg-4 content-column" ng-show="showing.detail">
+            <div class="details-header">
+                <div class="slim-page-header">Launch Scenario Details</div>
+            </div>
             <div ng-include="'static/js/templates/launchScenarioDetail.html'"></div>
         </div>
     </div>

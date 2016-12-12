@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('sandManApp.services', [])
-    .factory('oauth2', function($rootScope, $location, appsSettings) {
+    .factory('oauth2', function($rootScope, $location, appsSettings, tools) {
 
         var authorizing = false;
 
@@ -9,7 +9,7 @@ angular.module('sandManApp.services', [])
             authorizing: function(){
                 return authorizing;
             },
-            authorize: function(s){
+            authorize: function(s, sandboxId, sandboxVersion){
                 // window.location.origin does not exist in some non-webkit browsers
                 if (!window.location.origin) {
                     window.location.origin = window.location.protocol + "//"
@@ -26,9 +26,17 @@ angular.module('sandManApp.services', [])
                     "scope":  "smart/orchestrate_launch user/*.* profile openid"
                 };
                 authorizing = true;
+
+                var serviceUrl = s.defaultServiceUrl;
+                if (sandboxId !== undefined && sandboxId !== "") {
+                    serviceUrl = s.baseServiceUrl_1 + sandboxId + "/data";
+                    if (sandboxVersion !== undefined && sandboxVersion !== "" && sandboxVersion === "2") {
+                        serviceUrl = s.baseServiceUrl_2 + sandboxId + "/data";
+                    }
+                }
                 FHIR.oauth2.authorize({
                     client: client,
-                    server: s.serviceUrl,
+                    server: serviceUrl,
                     from: $location.url()
                 }, function (err) {
                     authorizing = false;
@@ -43,26 +51,26 @@ angular.module('sandManApp.services', [])
                 });
             },
             logout: function(){
-                var deferred = $.Deferred();
-                appsSettings.getSettings().then(function(settings){
-                    $.ajax({
-                        url: settings.oauthLogoutUrl
-                }).done(function(){
-                            deferred.resolve();
-                        }).fail(function(){
-                        });
+                appsSettings.getSettings().then(function(settings) {
+                    window.location.href = settings.oauthLogoutUrl
+                        + "?hspcRedirectUrl="
+                        + encodeURI(appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl);
                 });
-                return deferred;
             },
-            login: function(){
+            login: function(sandboxId){
+                
                 var that = this;
                 appsSettings.getSettings().then(function(settings){
-                    that.authorize(settings);
+                    tools.validateSandboxIdFromUrl().then(function (resultSandboxId, schemaVersion) {
+                        that.authorize(settings, resultSandboxId, schemaVersion);
+                    }, function () {
+                        that.authorize(settings);
+                    });
                 });
             }
         };
 
-    }).factory('fhirApiServices', function (oauth2, appsSettings, notification, $rootScope, $location) {
+    }).factory('fhirApiServices', function ($q, oauth2, notification, appsSettings, $rootScope, $location, exportResources) {
 
         /**
          *
@@ -106,18 +114,16 @@ angular.module('sandManApp.services', [])
                 if (params.code){
                     delete sessionStorage.tokenResponse;
                     FHIR.oauth2.ready(params, function(newSmart){
-                        if (newSmart && newSmart.state && newSmart.state.from !== undefined){
-                            $location.url(newSmart.state.from);
-                            fhirClient = newSmart;
-                            window.fhirClient = fhirClient;
-                            $rootScope.$emit('signed-in');
-                            $rootScope.$digest();
-                        }
+                        // if (newSmart.state && newSmart.state.from !== undefined){
+                        //     $location.url(newSmart.state.from);
+                        // }
+                        sessionStorage.setItem("hspcAuthorized", true);
+                        fhirClient = newSmart;
+                        $rootScope.$emit('signed-in');
+                        $rootScope.$digest();
                     });
                 } else {
-                    appsSettings.getSettings().then(function(settings){
-                        oauth2.authorize(settings);
-                    });
+                    oauth2.login();
                 }
             },
             hasNext: function(lastSearch) {
@@ -127,6 +133,19 @@ angular.module('sandManApp.services', [])
                 } else {
                     lastSearch.data.link.forEach(function(link) {
                         if (link.relation == "next") {
+                            hasLink = true;
+                        }
+                    });
+                }
+                return hasLink;
+            },
+            hasPrev: function(lastSearch) {
+                var hasLink = false;
+                if (lastSearch  === undefined) {
+                    return false;
+                } else {
+                    lastSearch.data.link.forEach(function(link) {
+                        if (link.relation == "previous") {
                             hasLink = true;
                         }
                     });
@@ -156,7 +175,7 @@ angular.module('sandManApp.services', [])
 
                 var searchParams = {type: resource, count: count};
                 searchParams.query = {};
-                if (searchValue !== undefined) {
+                if (typeof searchValue !== 'undefined' && searchValue !== "") {
                     searchParams.query = searchValue;
                 }
                 if (typeof sort !== 'undefined' ) {
@@ -176,10 +195,101 @@ angular.module('sandManApp.services', [])
                             });
                         }
                         deferred.resolve(resourceResults, resourceSearchResult);
+                    }).fail(function(error){
+                    var test = error;
                     });
                 return deferred;
             },
-            create: function(resource){
+            runRawQuery: function(query) {
+                var deferred = $.Deferred();
+                var that = this;
+
+                $.ajax({
+                    url: that.fhirClient().server.serviceUrl + "/" + query,
+                    type: 'GET',
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + that.fhirClient().server.auth.token );
+                    }
+                }).done(function(results){
+                    deferred.resolve(results);
+                }).fail(function(){
+                    deferred.reject();
+                });
+                return deferred;
+            },
+            getAllPages: function(lastSearch) {
+                var that = this;
+                var deferred = $.Deferred();
+                var resourceResults = [];
+
+                $.when(fhirClient.api.nextPage({bundle: lastSearch.data}))
+                    .done(function (pageResult) {
+                        var resourceResults = [];
+                        if (pageResult.data.entry) {
+                            pageResult.data.entry.forEach(function (entry) {
+                                resourceResults.push(entry.resource);
+                            });
+                            if (pageResult.data.entry.length === 50) {
+                                that.getAllPages(pageResult).then(function(resourceList){
+                                    resourceList.forEach(function(resource){
+                                        resourceResults.push(resource);
+                                    });
+                                    deferred.resolve(resourceResults);
+                                });
+                            } else {
+                                deferred.resolve(resourceResults);
+                            }
+                        }
+                    });
+
+                return deferred;
+            },
+            queryAllResourcePages: function(resource) {
+                var that = this;
+                var deferred = $.Deferred();
+
+                $.when(fhirClient.api.search({type: resource, count: 50}))
+                    .done(function(resourceSearchResult){
+                        var resourceResults = [];
+                        if (resourceSearchResult.data.entry) {
+                            resourceSearchResult.data.entry.forEach(function(entry){
+                                resourceResults.push(entry.resource);
+                            });
+                        }
+
+                        if (resourceSearchResult.data.entry !== undefined && resourceSearchResult.data.total > resourceSearchResult.data.entry.length) {
+
+                            that.getAllPages(resourceSearchResult).then(function (resourceList) {
+                                resourceList.forEach(function (resource) {
+                                    resourceResults.push(resource);
+                                });
+                                deferred.resolve(resourceResults);
+                            });
+                        }  else {
+                            deferred.resolve(resourceResults);
+                        }
+
+                    }).fail(function(error){
+                    deferred.reject();
+                    var test = error;
+                });
+                return deferred;
+            },
+            readResourceInstance: function(resource, id) {
+                var deferred = $.Deferred();
+
+                $.when(fhirClient.api.read({type: resource, id: id}))
+                    .done(function(resourceResult){
+                        var resource;
+                        resource = resourceResult.data.entry;
+                        resource = resourceResult.data.entry.fullUrl;
+                        deferred.resolve(resource);
+                    }).fail(function(error){
+                        var test = error;
+                    });
+                return deferred;
+            },
+            createResourceInstance: function(resource){
                 var req =fhirClient.authenticated({
                     url: fhirClient.server.serviceUrl + '/' + resource.resourceType,
                     type: 'POST',
@@ -199,39 +309,116 @@ angular.module('sandManApp.services', [])
 
                 return true;
             },
-            registerContext: function(app, params){
+            importBundle: function(bundle) {
                 var deferred = $.Deferred();
 
-                var req = fhirClient.authenticated({
-                    url: fhirClient.server.serviceUrl + '/_services/smart/Launch',
-                    type: 'POST',
-                    contentType: "application/json",
-                    data: JSON.stringify({
-                        client_id: app.client_id,
-                        parameters:  params
-                    })
+                $.when(fhirClient.api.transaction({data: angular.copy(bundle)}))
+                    .done(function(results){
+                        // notification.message("Bundle Uploaded");
+                        deferred.resolve(results.data);
+                    }).fail(function(error){
+                        deferred.reject(error.data.responseText);
+                    });
+                return deferred;
+           },
+            exportAllData: function (){
+                var that = this;
+                var deferred = $.Deferred();
+                var transactionBundle = {
+                    resourceType:"Bundle",
+                    type : "transaction",
+                    entry:[]
+                };
+
+                var promises = [];
+                exportResources.getExportResources().done(function(resources){
+                    angular.forEach(resources, function (resourceType) {
+                        promises.push(that.queryAllResourcePages(resourceType));
+                    });
+                    $q.all(promises).then(function(resourceTypeList){
+                        angular.forEach(resourceTypeList, function (resourceList) {
+                            angular.forEach(resourceList, function (resource) {
+                                var resourceObject = angular.copy(resource);
+                                delete resourceObject.meta;
+                                delete resourceObject.fullUrl;
+                                var transactionEntry = {
+                                    resource: resourceObject,
+                                    request : {
+                                        method : "PUT",
+                                        url : resource.resourceType + "/" + resource.id
+                                    }
+                                };
+                                transactionBundle.entry.push(transactionEntry);
+                            });
+                        });
+                        deferred.resolve(transactionBundle );
+                    });
                 });
+                return deferred;
+            },
+            registerContext: function(app, params, isSandboxLaunch){
+                var deferred = $.Deferred();
 
-                $.ajax(req)
-                    .done(deferred.resolve)
-                    .fail(deferred.reject);
+                if (isSandboxLaunch === true) {
+                    var reqLaunch = fhirClient.authenticated({
+                        url: fhirClient.server.serviceUrl + '/_services/smart/Launch',
+                        type: 'POST',
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            client_id: app.authClient.clientId,
+                            parameters:  params
+                        })
+                    });
 
+                    $.ajax(reqLaunch)
+                        .done(deferred.resolve)
+                        .fail(deferred.reject);
+                } else {
+                    // Launch as User Persona
+                    var req = fhirClient.authenticated({
+                        url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/util/registerContext",
+                        type: 'POST',
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            client_id: app.authClient.clientId,
+                            parameters: params
+                        })
+                    });
+
+                    $.ajax(req)
+                        .done(deferred.resolve)
+                        .fail(deferred.reject);
+
+                }
                 return deferred;
             }
         }
-    }).factory('launchScenarios', function($rootScope, $location, $filter, appsSettings, userServices, notification) {
+    }).factory('sandboxManagement', function($rootScope, $location, $filter, fhirApiServices,
+                                           errorService, appsSettings, userServices, notification, tools) {
 
         var scenarioBuilder = {
-            owner: '',
+            createdBy: '',
             description: '',
-            persona: '',
+            userPersona: '',
             patient: '',
             app: ''
+        };
+
+        var sandbox = {
+            sandboxId: '',
+            name: '',
+            description: '',
+            createdBy: '',
+            users: [],
+            userRoles: []
         };
 
         var selectedScenario;
         var recentLaunchScenarioList = [];
         var fullLaunchScenarioList = [];
+        var sandboxes = [];
+        var hasSandbox = false;
+        var creatingSandbox = false;
 
         function orderByLastLaunch() {
             if(fullLaunchScenarioList){
@@ -243,30 +430,67 @@ angular.module('sandManApp.services', [])
             }
         }
 
+        function prepLaunchScenario(launchScenario) {
+            var newLaunchScenario = {
+                createdBy: launchScenario.owner,
+                description: launchScenario.description,
+                lastLaunchSeconds: new Date().getTime(),
+                app: angular.copy(launchScenario.app)
+            };
+            delete newLaunchScenario.app.clientJSON;
+            if (launchScenario.userPersona !== undefined && launchScenario.userPersona !== '') {
+                newLaunchScenario.userPersona = launchScenario.userPersona;
+            }
+            if (launchScenario.patient !== undefined && launchScenario.patient !== '') {
+                newLaunchScenario.patient = launchScenario.patient;
+            }
+            return newLaunchScenario;
+        }
+
         return {
-            clearBuilder: function() {
-                scenarioBuilder = {
-                    owner: userServices.getOAuthUser(),
+            getSandboxes: function() {
+                return sandboxes;
+            },
+            getSandbox: function() {
+                return sandbox;
+            },
+            hasSandbox: function() {
+                return hasSandbox;
+            },
+            setHasSandbox: function(exists) {
+                hasSandbox = exists;
+            },
+            creatingSandbox: function() {
+                return creatingSandbox;
+            },
+            setCreatingSandbox: function(creating) {
+                creatingSandbox = creating;
+            },
+            clearSandbox: function() {
+                sandbox = {
+                    id: '',
+                    sandboxId: '',
+                    name: '',
                     description: '',
-                    persona: '',
+                    createdBy: '',
+                    users: [],
+                    userRoles: []
+                };
+            },
+            clearSandboxes: function() {
+                sandboxes = [];
+            },
+            clearScenarioBuilder: function() {
+                scenarioBuilder = {
+                    createdBy: userServices.getOAuthUser(),
+                    description: '',
+                    userPersona: '',
                     patient: '',
                     app: ''
                 };
             },
-            getBuilder: function() {
+            getScenarioBuilder: function() {
                 return scenarioBuilder;
-            },
-            setDescription: function(desc) {
-                scenarioBuilder.description = desc;
-            },
-            setPersona: function(persona) {
-                scenarioBuilder.persona = persona;
-            },
-            setPatient: function(patient) {
-                scenarioBuilder.patient = patient;
-            },
-            setApp: function(app) {
-                scenarioBuilder.app = app;
             },
             setSelectedScenario: function(scenario) {
                 selectedScenario = scenario;
@@ -279,101 +503,357 @@ angular.module('sandManApp.services', [])
             },
             addFullLaunchScenarioList: function(launchScenario) {
                 this.addLaunchScenario(angular.copy(launchScenario));
-                this.clearBuilder();
+                this.clearScenarioBuilder();
             },
             getRecentLaunchScenarioList: function() {
                 return recentLaunchScenarioList;
             },
-            addLaunchScenario: function(launchScenario){
+            addLaunchScenario: function(launchScenario, showNotification){
                 var that = this;
-                appsSettings.getSettings().then(function(settings){
-                    $.ajax({
-                        url: settings.baseUrl + "/launchScenario",
-                        type: 'POST',
-                        data: JSON.stringify(launchScenario),
-                        contentType: "application/json"
-                    }).done(function(result){
-                            that.getLaunchScenarios();
+                launchScenario = prepLaunchScenario(launchScenario);
+                if (sandbox.sandboxId !== '') {
+                    launchScenario.sandbox = sandbox;
+                }
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario",
+                    type: 'POST',
+                    data: JSON.stringify(launchScenario),
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(result){
+                        that.getSandboxLaunchScenarios();
+                        if (showNotification) {
                             notification.message("Launch Scenario Created");
-                        }).fail(function(){
-                        notification.message({ type:"error", text: "Failed to Create Launch Scenario" });
-                    });
+                        }
+                    }).fail(function(){
+                    if (showNotification) {
+                            notification.message({ type:"error", text: "Failed to Create Launch Scenario" });
+                        }
                 });
             },
             updateLaunchScenario: function(launchScenario){
                 var that = this;
-                appsSettings.getSettings().then(function(settings){
-                    $.ajax({
-                        url: settings.baseUrl + "/launchScenario",
-                        type: 'PUT',
-                        data: JSON.stringify(launchScenario),
-                        contentType: "application/json"
-                    }).done(function(result){
-                            that.getLaunchScenarios();
-                        }).fail(function(){
-                        });
+                var updatedLaunchScenario = angular.copy(launchScenario);
+                updatedLaunchScenario.app = angular.copy(updatedLaunchScenario.app);
+                delete updatedLaunchScenario.app.clientJSON;
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario/" + updatedLaunchScenario.id,
+                    type: 'PUT',
+                    data: JSON.stringify(updatedLaunchScenario),
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(result){
+                        that.getSandboxLaunchScenarios();
+                    }).fail(function(){
+                });
+            },
+            launchScenarioLaunched: function(launchScenario){
+                var that = this;
+                var updatedLaunchScenario = angular.copy(launchScenario);
+                updatedLaunchScenario.app = angular.copy(updatedLaunchScenario.app);
+                delete updatedLaunchScenario.app.clientJSON;
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario/" + updatedLaunchScenario.id + "/launched",
+                    type: 'PUT',
+                    data: JSON.stringify(updatedLaunchScenario),
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(result){
+                    that.getSandboxLaunchScenarios();
+                }).fail(function(){
                 });
             },
             deleteLaunchScenario: function(launchScenario){
                 var that = this;
-                appsSettings.getSettings().then(function(settings){
-                    $.ajax({
-                        url: settings.baseUrl + "/launchScenario",
-                        type: 'DELETE',
-                        data: JSON.stringify(launchScenario),
-                        contentType: "application/json"
-                    }).done(function(result){
-                            notification.message("Launch Scenario Deleted");
-                            that.getLaunchScenarios();
-                        }).fail(function(){
-                        });
-                });
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario/" + launchScenario.id,
+                    type: 'DELETE',
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(result){
+                        notification.message("Launch Scenario Deleted");
+                        that.getSandboxLaunchScenarios();
+                    }).fail(function(){
+                        notification.message("Failed to Delete Launch Scenario");
+                    });
             },
-            getLaunchScenarios: function() {
+            getLaunchScenarioByApp: function(appId){
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario?appId=" + appId,
+                    type: 'GET',
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(results){
+                    deferred.resolve(results);
+                }).fail(function(){
+                    deferred.reject();
+                });
+                return deferred;
+            },
+            getLaunchScenarioByUserPersona: function(userPersonaId){
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario?userPersonaId=" + userPersonaId,
+                    type: 'GET',
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(results){
+                    deferred.resolve(results);
+                }).fail(function(){
+                    deferred.reject();
+                });
+                return deferred;
+            },
+            getSandboxLaunchScenarios: function() {
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario?sandboxId=" + sandbox.sandboxId,
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(launchScenarioList){
+                        fullLaunchScenarioList = [];
+                        if (launchScenarioList) {
+                            launchScenarioList.forEach(function(launchScenario){
+                                fullLaunchScenarioList.push(launchScenario);
+                            });
+                            orderByLastLaunch();
+                            $rootScope.$emit('launch-scenario-list-update');
+                        }
+                        deferred.resolve();
+                    }).fail(function(){
+                    deferred.reject();
+                });
+                return deferred;
+            },
+            createSandbox: function(newSandbox) {
+                var that = this;
+                var deferred = $.Deferred();
+                var createSandbox = {
+                    createdBy: userServices.getOAuthUser(),
+                    name: newSandbox.sandboxName,
+                    sandboxId: newSandbox.sandboxId,
+                    description: newSandbox.description,
+                    schemaVersion: newSandbox.schemaVersion,
+                    users: [userServices.getOAuthUser()]
+                };
+
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox",
+                    type: 'POST',
+                    data: JSON.stringify(createSandbox),
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(sandboxResult){
+                        sandbox = {
+                            id: sandboxResult.id,
+                            createdBy: sandboxResult.createdBy,
+                            name: sandboxResult.name,
+                            sandboxId: sandboxResult.sandboxId,
+                            description: sandboxResult.description
+                        };
+                        deferred.resolve(sandbox);
+                    }).fail(function(error){
+                        errorService.setErrorMessage(error.responseText);
+                        that.clearSandbox();
+                        deferred.reject();
+                    });
+                return deferred;
+            },
+            updateSandbox: function(sandbox) {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId,
+                    type: 'PUT',
+                    data: JSON.stringify(sandbox),
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(){
+                    that.getSandboxById();
+                    notification.message("Sandbox Updated");
+                    deferred.resolve(true);
+                }).fail(function(){
+                });
+                return deferred;
+            },
+            deleteSandbox: function() {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId,
+                    type: 'DELETE',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(){
+                    deferred.resolve(true);
+                }).fail(function(){
+                });
+                return deferred;
+            },
+            getUserSandboxesByUserId: function() {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox?userId=" + encodeURIComponent(userServices.getOAuthUser().ldapId),
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(sandboxResult){
+                    if (sandboxResult.length > 0) {
+                        that.setHasSandbox(true);
+                        sandboxes = sandboxResult;
+                        deferred.resolve(true);
+                    } else {
+                        that.clearSandboxes();
+                        deferred.resolve(false);
+                    }
+                }).fail(function(){
+                    that.clearSandboxes();
+                    deferred.resolve(false);
+                });
+                return deferred;
+            },
+            removeUserFromSandboxByUserId: function(ldapId) {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "?removeUserId=" + encodeURIComponent(ldapId),
+                    type: 'PUT',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(sandboxResult){
+                    deferred.resolve(true);
+                }).fail(function(){
+                });
+                return deferred;
+            },
+            getSandboxById: function() {
+                var that = this;
                 var deferred = $.Deferred();
                 appsSettings.getSettings().then(function(settings){
-                    $.ajax({
-                        url: settings.baseUrl + "/launchScenarios?id=" + encodeURIComponent(userServices.oauthUser().ldapId),
-                        type: 'GET',
-                        contentType: "application/json"
-                    }).done(function(launchScenarioList){
-                            fullLaunchScenarioList = [];
-                            if (launchScenarioList) {
-                                launchScenarioList.forEach(function(launchScenario){
-                                    fullLaunchScenarioList.push(launchScenario);
-                                });
-                                orderByLastLaunch();
-                                $rootScope.$emit('launch-scenario-list-update');
+                    var sandboxId = appsSettings.getSandboxUrlSettings().sandboxId;
+                    if (sandboxId !== undefined && settings.reservedEndpoints.indexOf(sandboxId.toLowerCase()) > -1) {
+                        deferred.resolve("reserved");
+                    } else if (sandboxId !== undefined) {
+                        $.ajax({
+                            url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandboxId,
+                            type: 'GET',
+                            contentType: "application/json",
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
                             }
-                            deferred.resolve();
-                        }).fail(function(){
+                        }).done(function (sandboxResult) {
+                            if (sandboxResult !== undefined && sandboxResult !== "") {
+                                if (sandboxId !== undefined && sandboxId !== "" && sandboxId !== sandboxResult.sandboxId) {
+                                    deferred.resolve('invalid');
+                                } else {
+                                    that.setHasSandbox(true);
+                                    sandbox = sandboxResult;
+                                    $rootScope.$emit('refresh-sandboxes');
+                                    that.getSandboxLaunchScenarios();
+                                    deferred.resolve(true);
+                                }
+                            } else {
+                                that.clearSandbox();
+                                deferred.resolve(false);
+                            }
+                        }).fail(function () {
+                            that.clearSandbox();
+                            deferred.resolve(false);
                         });
+                    } else {
+                        that.clearSandbox();
+                        deferred.resolve(false);
+                    }
+                });
+                return deferred;
+            },
+            sandboxLogin: function(ldapId) {
+                var that = this;
+                var deferred = $.Deferred();
+                // Record the sandbox login 
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "/login" + "?userId=" + encodeURIComponent(ldapId),
+                    type: 'POST',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(sandboxResult){
+                    deferred.resolve(true);
+                }).fail(function(){
+                });
+                return deferred;
+            },
+            fhirQuerySuggestions: function() {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/config/0",
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(results){
+                    var suggestions = [];
+                    var defaultSuggestions = [];
+                    if (results) {
+                        results.forEach(function(item){
+                            suggestions.push(item.value);
+                        });
+                        results.forEach(function(item){
+                            if (item.keyName.startsWith("Default")) {
+                                defaultSuggestions.push(item.value);
+                            }
+                        });
+                    }
+                    deferred.resolve(suggestions, defaultSuggestions);
+                }).fail(function(){
+                    deferred.reject();
                 });
                 return deferred;
             }
-
         }
 
     }).factory('userServices', function($rootScope, fhirApiServices, $filter, appsSettings) {
-        var persona = {};
-        var oauthUser = {};
+        var oauthUser;
+        var sandboxManagerUser;
 
         return {
-            persona: function(){
-                return persona;
-            },
-            oauthUser: function(){
-                return oauthUser;
-            },
             updateProfile: function(selectedUser){
                 var deferred = $.Deferred();
+                var that = this;
                 appsSettings.getSettings().then(function(settings){
 
                     $.ajax({
-                        url: settings.profile_update_uri,
+                        url: settings.sandboxUserUri + "/profileupdate",
                         type: 'POST',
                         data: JSON.stringify({
-                            user_id: oauthUser.ldapId,
+                            user_id: that.getOAuthUser().ldapId,
                             profile_url: selectedUser.fullUrl
                         }),
                         contentType: "application/json"
@@ -406,43 +886,537 @@ angular.module('sandManApp.services', [])
                         var user = {name:""};
                         user.name = $filter('nameGivenFamily')(userResult.data);
                         user.id  = userResult.data.id;
-                        persona = user;
-                        persona.fullUrl = userResult.config.url;
                         deferred.resolve(user);
                     });
                 return deferred;
             },
             getOAuthUser: function() {
-                if (fhirApiServices.fhirClient().tokenIdPayload === null ||
-                    typeof fhirApiServices.fhirClient().tokenIdPayload === "undefined"){
-                    oauthUser = null;
-                } else {
-                    var payload = fhirApiServices.fhirClient().tokenIdPayload;
-                    oauthUser.ldapId = payload.sub;
-                    oauthUser.name = payload.displayName;
-                    oauthUser.email = payload.email;
-                }
                 return oauthUser;
             },
+            clearOAuthUser: function () {
+                oauthUser = undefined;
+                this.clearSandboxManagerUser();
+            },
+            sandboxManagerUser: function() {
+                return sandboxManagerUser;
+            },
+            clearSandboxManagerUser: function () {
+                sandboxManagerUser = undefined;
+            },
+            getOAuthUserFromServer: function() {
+                var deferred = $.Deferred();
+                if (oauthUser !== undefined) {
+                    deferred.resolve(oauthUser);
+                } else {
+                    var userInfoEndpoint = fhirApiServices.fhirClient().state.provider.oauth2.authorize_uri.replace("authorize", "userinfo");
+                    $.ajax({
+                        url: userInfoEndpoint,
+                        type: 'GET',
+                        contentType: "application/json",
+                        beforeSend : function( xhr ) {
+                            xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                        }
+                    }).done(function(result){
+                            oauthUser = {
+                                ldapId: result.sub.toLowerCase(),
+                                name: result.name
+                            };
+                            deferred.resolve(oauthUser);
+                        }).fail(function(){
+                        });
+                }
+                return deferred;
+            },
+            getSandboxManagerUser: function(ldapId) {
+                var deferred = $.Deferred();
+                if (sandboxManagerUser !== undefined) {
+                    deferred.resolve(sandboxManagerUser);
+                } else {
+                    $.ajax({
+                        url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/user?ldapId=" + ldapId,
+                        type: 'GET',
+                        contentType: "application/json",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                        }
+                    }).done(function (userResult) {
+                        sandboxManagerUser = userResult;
+                        deferred.resolve(userResult);
+                    }).fail(function () {
+                        deferred.reject();
+                    });
+                }
+                return deferred;
+            },
             userSettings: function() {
-
+                var that = this;
                 appsSettings.getSettings().then(function(settings){
                     $.ajax({
-                        url: "https://sandbox.hspconsortium.org/pwm",
+                        url: settings.userManagementUrl,
                         type: 'GET',
                         beforeSend : function( xhr ) {
-                            xhr.setRequestHeader( 'c8381465-a7f8-4ecc-958d-ec296d6e8671', oauthUser.ldapId);
+                            xhr.setRequestHeader( 'c8381465-a7f8-4ecc-958d-ec296d6e8671', that.getOAuthUser().ldapId);
                             xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
                         }
 
                     }).done(function(data){
-                            window.location.href = "https://sandbox.hspconsortium.org/pwm/private/"
+                            window.location.href = settings.userManagementUrl + "/private/"
                         }).fail(function(){
                         });
                 });
+            },
+            hasSystemRole: function(role) {
+                var hasRole = false;
+                sandboxManagerUser.systemRoles.forEach(function(systemRole){
+                    if (systemRole === role) {
+                        hasRole = true;
+                    }
+                });
+                return hasRole;
+            },
+            hasSandboxRole: function(roles, role) {
+                var hasRole = false;
+                roles.forEach(function(userRole){
+                    if (sandboxManagerUser != undefined && userRole.user.ldapId.toLocaleLowerCase() === sandboxManagerUser.ldapId.toLocaleLowerCase()
+                        && userRole.role === role) {
+                        hasRole = true;
+                    }
+                });
+                return hasRole;
+            },
+            canModify: function(item, sandbox) {
+                if (item.visibility === "PRIVATE") {
+                    return item.createdBy.ldapId.toLocaleLowerCase() === this.sandboxManagerUser().ldapId.toLocaleLowerCase();
+                } else { // PUBLIC Item
+                    if (sandbox.visibility === "PRIVATE") {
+                        return !this.hasSandboxRole(item.sandbox.userRoles, "READ_ONLY");
+                    } else {
+                        return this.hasSandboxRole(sandbox.userRoles, "ADMIN");
+                    }
+                }
+            },
+            canModifySandbox: function(sandbox) {
+                if (sandbox.visibility === "PRIVATE") {
+                    return !this.hasSandboxRole(sandbox.userRoles, "READ_ONLY");
+                } else {
+                    return this.hasSandboxRole(sandbox.userRoles, "ADMIN");
+                }
+            },
+            canInviteUsers: function(sandbox) {
+                if (sandbox.visibility === "PRIVATE") { // No invite needed on a PUBLIC sandbox
+                    return !this.hasSandboxRole(sandbox.userRoles, "READ_ONLY");
+                }
+            },
+            createUser: function() {
+                var that = this;
+                appsSettings.getSettings().then(function(settings){
+                    window.location.href = settings.userManagementUrl + "/public/newuser/"
+                });
             }
         };
-    }).factory('customFhirApp', function() {
+    }).factory('personaServices', function($rootScope, sandboxManagement, fhirApiServices, userServices, appsSettings) {
+    var personaList = [];
+    var personaBuilder = {
+        fhirId: '',
+        fhirName: '',
+        ldapId: '',
+        ldapName: '',
+        resource: '',
+        resourceUrl: '',
+        password: '',
+        sandbox: sandboxManagement.getSandbox()
+    };
+
+    return {
+        getUserPersonaBuilder: function() {
+            return personaBuilder;
+        },
+        resourceIdFromFullUrl: function(fullUrl) {
+            var resourceId = angular.copy(fullUrl);
+            if (resourceId.startsWith(fhirApiServices.fhirClient().server.serviceUrl)) {
+                resourceId = resourceId.substr(fhirApiServices.fhirClient().server.serviceUrl.length + 1);
+            }
+            return resourceId;
+        },
+        getPersonaList: function() {
+            return personaList;
+        },
+        clearUserPersonaBuilder: function() {
+            return personaBuilder = {
+                fhirId: '',
+                fhirName: '',
+                ldapId: '',
+                ldapName: '',
+                resource: '',
+                resourceUrl: '',
+                password: '',
+                sandbox: sandboxManagement.getSandbox(),
+                createdBy: userServices.getOAuthUser()
+            };
+        },
+        createPersona: function(){
+            var deferred = $.Deferred();
+            var that = this;
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona",
+                type: 'POST',
+                data: JSON.stringify(personaBuilder),
+                contentType: "application/json",
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(){
+                that.clearUserPersonaBuilder();
+                that.getPersonaListBySandbox();
+                deferred.resolve();
+                $rootScope.$digest();
+            }).fail(function(){
+                deferred.reject();
+            });
+            return deferred;
+        },
+        updatePersona: function(persona){
+            var deferred = $.Deferred();
+            var that = this;
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona",
+                type: 'PUT',
+                data: JSON.stringify(persona),
+                contentType: "application/json",
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(){
+                that.clearUserPersonaBuilder();
+                that.getPersonaListBySandbox();
+                deferred.resolve();
+                $rootScope.$digest();
+            }).fail(function(){
+                deferred.reject();
+            });
+            return deferred;
+        },
+        deletePersona: function(persona){
+            var deferred = $.Deferred();
+            var that = this;
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona/" + persona.id,
+                type: 'DELETE',
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(){
+                that.getPersonaListBySandbox();
+                deferred.resolve();
+                $rootScope.$digest();
+            }).fail(function(){
+                deferred.reject();
+            });
+            return deferred;
+        },
+        getPersonaListBySandbox: function() {
+            var deferred = $.Deferred();
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
+                type: 'GET',
+                contentType: "application/json",
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(results){
+                personaList = results;
+                $rootScope.$emit('persona-list-update');
+                deferred.resolve(results);
+            }).fail(function(){
+            });
+            return deferred;
+        },
+        checkForUserPersonaById: function(userPersonaId) {
+            var deferred = $.Deferred();
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona?lookUpId=" + userPersonaId,
+                type: 'GET'
+            }).done(function(persona){
+                if (persona !== undefined && persona !== "") {
+                    deferred.resolve(persona);
+                } else {
+                    deferred.resolve(undefined);
+                }
+
+                $rootScope.$digest();
+
+            }).fail(function(error){
+                deferred.resolve(undefined);
+                $rootScope.$digest();
+            });
+            return deferred;
+        }
+    };
+}).factory('appRegistrationServices', function($rootScope, $http, appsSettings, userServices,
+                                                   fhirApiServices, sandboxManagement, notification, errorService) {
+
+    var selectedApp;
+    var fullAppList = [];
+
+    return {
+        setSelectedApp: function(app) {
+            selectedApp = app;
+        },
+        getSelectedApp: function() {
+            return selectedApp;
+        },
+        getAppList: function() {
+            return fullAppList;
+        },
+        createSandboxApp: function(app){
+            var deferred = $.Deferred();
+            var that = this;
+            app.sandbox = sandboxManagement.getSandbox();
+            app.createdBy = userServices.getOAuthUser();
+
+            var logo = app.logo;
+            delete app.logo;
+
+            app.clientJSON = JSON.stringify(app.clientJSON);
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/app",
+                type: 'POST',
+                data: JSON.stringify(app),
+                contentType: "application/json",
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(result){
+                if (logo) {
+                    that.uploadAppImage(result.id, logo).then(function () {
+                        that.getSandboxApps();
+                        notification.message("App Created");
+                        deferred.resolve();
+                    }, function(err) {
+                        deferred.reject();
+                    });
+                }else {
+                    that.getSandboxApps();
+                    notification.message("App Created");
+                    deferred.resolve();
+                }
+            }).fail(function(error){
+                errorService.setErrorMessage(error.message);
+                notification.message({ type:"error", text: "Failed to Create App" });
+                deferred.reject();
+            });
+            return deferred;
+        },
+        updateSandboxApp: function(app){
+            var deferred = $.Deferred();
+            var that = this;
+            var logo = app.logo;
+            delete app.logo;
+            var newApp = angular.copy(app);
+            newApp.clientJSON = JSON.stringify(newApp.clientJSON);
+
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/app/" + newApp.id,
+                type: 'PUT',
+                data: JSON.stringify(newApp),
+                contentType: "application/json",
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(result){
+                if (logo) {
+                    that.uploadAppImage(result.id, logo).then(function () {
+                        that.getSandboxApps();
+                        notification.message("App Updated");
+                        deferred.resolve();
+                    }, function(err) {
+                        deferred.reject();
+                    });
+                }else {
+                    that.getSandboxApps();
+                    notification.message("App Updated");
+                    deferred.resolve();
+                }
+            }).fail(function(error){
+                errorService.setErrorMessage(error.message);
+                notification.message({ type:"error", text: "Failed to Update App" });
+                deferred.reject();
+            });
+            return deferred;
+        },
+        deleteSandboxApp: function(appId){
+            var deferred = $.Deferred();
+            var that = this;
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/app/" + appId,
+                type: 'DELETE',
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(result){
+                that.getSandboxApps();
+                deferred.resolve();
+                notification.message("App Deleted");
+            }).fail(function(error){
+                errorService.setErrorMessage(error.message);
+                notification.message({ type:"error", text: "Failed to Delete App" });
+                deferred.reject();
+            });
+            return deferred;
+        },
+        getSandboxApp: function(appId){
+            var deferred = $.Deferred();
+            var that = this;
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/app/" + appId,
+                type: 'GET',
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(clientJSON){
+                deferred.resolve(clientJSON);
+            }).fail(function(error){
+                errorService.setErrorMessage(error.message);
+                deferred.reject();
+                notification.message({ type:"error", text: "Failed to Retrieve App Info" });
+            });
+            return deferred;
+        },
+        getSandboxApps: function(){
+            var deferred = $.Deferred();
+            var that = this;
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/app?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
+                type: 'GET',
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(results){
+                fullAppList = [];
+                if (results) {
+                    results.forEach(function(app){
+                        fullAppList.push(app);
+                    });
+                    $rootScope.$emit('app-list-update');
+                }
+                deferred.resolve(fullAppList);
+                // $rootScope.$digest();
+            }).fail(function(){
+                deferred.reject();
+            });
+            return deferred;
+        },
+        uploadAppImage: function(id, file){
+            var deferred = $.Deferred();
+            var formData = new FormData();
+            formData.append("file", file);
+            $http.post(appsSettings.getSandboxUrlSettings().baseRestUrl + "/app/" + id + "/image", formData, {
+                transformRequest: angular.identity,
+                headers: {
+                    'Content-Type': undefined,
+                    'Authorization': 'BEARER ' + fhirApiServices.fhirClient().server.auth.token
+                }
+            }).success(function(){
+                deferred.resolve();
+            }).error(function(error){
+                errorService.setErrorMessage(error.message);
+                deferred.reject();
+                // notification.message({ type:"error", text: "Failed to Upload Image" });
+            });
+            return deferred;
+        }
+
+    };
+}).factory('sandboxInviteServices', function($rootScope, $http, fhirApiServices, userServices,
+                                             appsSettings, sandboxManagement, notification, errorService) {
+
+    return {
+        createSandboxInvite: function(ldapId){
+            var deferred = $.Deferred();
+            
+            var sandboxInvite = {
+                invitedBy: {
+                    ldapId: userServices.getOAuthUser().ldapId
+                },
+                invitee: {
+                    ldapId: ldapId
+                },
+                sandbox: sandboxManagement.getSandbox()
+            };
+
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite",
+                type: 'PUT',
+                data: JSON.stringify(sandboxInvite),
+                contentType: "application/json",
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(){
+                // notification.message("Invite Sent");
+                deferred.resolve();
+            }).fail(function(error){
+                // notification.message({ type:"error", text: "Failed to Send Invite" });
+                deferred.reject();
+            });
+            return deferred;
+        },
+        getSandboxInvitesByLdapId: function(status){
+            var deferred = $.Deferred();
+            var that = this;
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite?ldapId=" + encodeURIComponent(userServices.getOAuthUser().ldapId) +
+                    "&status=" + status,
+                type: 'GET',
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(results){
+                deferred.resolve(results);
+                $rootScope.$digest();
+            }).fail(function(){
+                deferred.reject();
+            });
+            return deferred;
+        },
+        getSandboxInvitesBySandboxId: function(status){
+            var deferred = $.Deferred();
+            var that = this;
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite?sandboxId=" + sandboxManagement.getSandbox().sandboxId +
+                "&status=" + status,
+                type: 'GET',
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(results){
+                deferred.resolve(results);
+                $rootScope.$digest();
+            }).fail(function(){
+                deferred.reject();
+            });
+            return deferred;
+        },
+        updateSandboxInvite: function(sandboxInvite, status){
+            var deferred = $.Deferred();
+            var that = this;
+            $.ajax({                                                                                                 
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite/" + sandboxInvite.id + "?status=" + status,
+                type: 'PUT',
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(results){
+                deferred.resolve(results);
+                $rootScope.$digest();
+            }).fail(function(){
+                deferred.reject();
+            });
+            return deferred;
+        }
+
+    };
+}).factory('customFhirApp', function() {
 
         var app = localStorage.customFhirApp ?
             JSON.parse(localStorage.customFhirApp) : {id: "", url: ""};
@@ -454,20 +1428,38 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('launchApp', function($rootScope, fhirApiServices, apps, random, userServices) {
+    }).factory('launchApp', function($rootScope, fhirApiServices, personaServices, appsService, appsSettings, random) {
 
         var patientDataManagerApp;
+        var settings;
+        var appWindow;
+
+        appsSettings.getSettings().then(function(results) {
+            settings = results;
+        });
 
         getPatientDataManagerApp();
 
-        function registerContext(app, params, key) {
+        function registerAppContext(app, params, key, launchAsUserPersona, isSandboxLaunch) {
+            var appToLaunch = angular.copy(app);
+            delete appToLaunch.clientJSON;
+            var issuer = fhirApiServices.fhirClient().server.serviceUrl;
+            if (launchAsUserPersona) {
+                appsSettings.getSettings().then(function(settings){
+                    issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_1, settings.basePersonaServiceUrl_1);
+                    if (appToLaunch.sandbox.schemaVersion === "2") {
+                        issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_2, settings.basePersonaServiceUrl_2);
+                    }
+                });
+            }
+
             fhirApiServices
-                .registerContext(app, params)
+                .registerContext(appToLaunch, params, isSandboxLaunch)
                 .done(function(c){
                     console.log(fhirApiServices.fhirClient());
                     window.localStorage[key] = JSON.stringify({
-                        app: app,
-                        iss: fhirApiServices.fhirClient().server.serviceUrl,
+                        app: appToLaunch,
+                        iss: issuer,
                         context: c
                     });
                 }).fail( function(err){
@@ -480,10 +1472,10 @@ angular.module('sandManApp.services', [])
         }
 
         function getPatientDataManagerApp() {
-            apps.getPractitionerPatientApps().done(function(patientApps){
+            appsService.getSampleApps().done(function(patientApps){
                 var pdm;
                 for (var i=0; i < patientApps.length; i++) {
-                    if (patientApps[i]["client_id"] == "patient_data_manager") {
+                    if (patientApps[i]["authClient"]["clientId"] == "patient_data_manager") {
                         pdm = patientApps[i];
                     }
                 }
@@ -496,13 +1488,17 @@ angular.module('sandManApp.services', [])
              (The window.open needs to be synchronous with the click event to
              avoid triggering  popup blockers. */
 
-            launch: function(app, patientContext, contextParams, persona) {
+            launch: function(app, patientContext, contextParams, userPersona, sandboxLaunch) {
                 var key = random(32);
                 window.localStorage[key] = "requested-launch";
-                var appWindow = window.open('launch.html?'+key, '_blank');
+                // var appWindow;
+                    // = window.open('launch.html' + "" +
+                    // '?username=' + encodeURIComponent(userPersona.ldapId) +
+                    // '&password=' + encodeURIComponent(userPersona.password) +
+                    // '&redirect=' + encodeURIComponent(window.location.href + '/launch.html?key='+key ), '_blank');
 
                 var params = {};
-                if (patientContext !== undefined && patientContext !== "") {
+                if (patientContext !== undefined && patientContext.name !== 'None' && patientContext !== "") {
                     params = {patient: patientContext.fhirId}
                 }
 
@@ -512,19 +1508,25 @@ angular.module('sandManApp.services', [])
                     }
                 }
 
-                if (persona !== undefined && persona !== "" ) {
-                    userServices.updateProfile(persona).then(function(){
-                        registerContext(app, params, key);
-                    });
+                if (userPersona !== null && userPersona !== undefined && userPersona !== "" ) {
+                    appWindow = window.open('launch.html?key='+key +
+                        '&username=' + encodeURIComponent(userPersona.ldapId) +
+                        '&password=' + encodeURIComponent(userPersona.password) +
+                        '&auth=' + encodeURIComponent(settings.oauthAuthenticationUrl));
+                        registerAppContext(app, params, key, true, sandboxLaunch);
                 } else {
-                    registerContext(app, params, key);
+                    appWindow = window.open('launch.html?'+key, '_blank');
+                    registerAppContext(app, params, key, false, sandboxLaunch);
                 }
             },
             launchPatientDataManager: function(patient){
                 if (patient.fhirId === undefined){
                     patient.fhirId = patient.id;
                 }
-                this.launch(patientDataManagerApp, patient);
+                this.launch(patientDataManagerApp, patient, undefined, undefined, true );
+            },
+            launchFromApp: function(app, patient){
+                this.launch(app, patient, undefined, undefined, true );
             }
     }
 
@@ -534,9 +1536,9 @@ angular.module('sandManApp.services', [])
 
                 var desc = {title: "", detail: ""};
 
-                if (scenario.persona.resource === 'Practitioner') {
+                if (scenario.userPersona !== null && scenario.userPersona.resource === 'Practitioner') {
                     desc.title = "Launch App as a Practitioner";
-                    if (scenario.patient !== "") {
+                    if (scenario.patient.resource !== "None") {
                         desc.title = desc.title + " with Patient Context";
                     } else {
                         desc.title = desc.title + " with NO Patient Context";
@@ -558,9 +1560,79 @@ angular.module('sandManApp.services', [])
             }
             return result;
         }
-    }).factory('tools', function() {
+    }).factory('errorService', function() {
+        var errorMessage;
+        return {
+            getErrorMessage: function () {
+                return errorMessage;
+            },
+            setErrorMessage: function (error) {
+                errorMessage = error;
+            }
+        };
+    }).factory('dataManagerService', function() {
+        var settings = {
+            showing: {import: {results: false}, export: {results: false}},
+            bundleResults: "",
+            resourceList: [],
+            fhirQuery: "",
+            selected: {selectedResource: undefined},
+            allQuerySuggestions: [],
+            dataManagerService: [],
+            querySuggestions: [],
+            selectedResourceType: {}
+        };
+    
+        return {
+            getSettings: function () {
+                return settings;
+            }
+        };
+    }).factory('tools', function(appsSettings, $rootScope) {
 
         return {
+            validateSandboxIdFromUrl: function() {
+                var deferred = $.Deferred();
+
+                if (appsSettings.getSandboxUrlSettings().sandboxId !== undefined) {
+                    this.checkForSandboxById(appsSettings.getSandboxUrlSettings().sandboxId).then(function(sandbox){
+                        if (sandbox !== undefined && sandbox !== "") {
+                            deferred.resolve(appsSettings.getSandboxUrlSettings().sandboxId, sandbox.schemaVersion);
+                        } else {
+                            deferred.reject();
+                        }
+                    });
+                } else {
+                    deferred.reject();
+                }
+                return deferred;
+            },
+            checkForSandboxById: function(sandboxId) {
+                var deferred = $.Deferred();
+                appsSettings.getSettings().then(function(settings){
+                    if (settings.reservedEndpoints.indexOf(sandboxId.toLowerCase()) > -1) {
+                        deferred.resolve("reserved");
+                    } else {
+                        $.ajax({
+                            url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox?lookUpId=" + sandboxId,
+                            type: 'GET'
+                        }).done(function(sandbox){
+                            if (sandbox !== undefined && sandbox !== "") {
+                                deferred.resolve(sandbox);
+                            } else {
+                                deferred.resolve(undefined);
+                            }
+
+                            $rootScope.$digest();
+
+                        }).fail(function(error){
+                            deferred.resolve(undefined);
+                            $rootScope.$digest();
+                        });
+                    }
+                });
+                return deferred;
+            },
             decodeURLParam: function (url, param) {
                 var query;
                 var data;
@@ -613,86 +1685,35 @@ angular.module('sandManApp.services', [])
             }
         }
 
-    }).factory('apps', ['$http',function($http)  {
+    }).factory('appsService', ['$http', 'envInfo',function($http, envInfo)  {
 
-    var patientApps;
-    var practitionerPatientApps;
-    var practitionerApps;
-    var galleryApps;
-    var galleryAppDetails;
+    var sampleApps;
 
     return {
-        getPatientApps : function() {
+        getSampleApps : function() {
             var deferred = $.Deferred();
-            if (patientApps !== undefined) {
-                deferred.resolve(patientApps);
+            if (sampleApps !== undefined) {
+                deferred.resolve(sampleApps);
             } else {
                 this.loadSettings().then(function(){
-                    deferred.resolve(patientApps);
-                });
-            }
-            return deferred;
-        },
-        getPractitionerPatientApps : function() {
-            var deferred = $.Deferred();
-            if (practitionerPatientApps !== undefined) {
-                deferred.resolve(practitionerPatientApps);
-            } else {
-                this.loadSettings().then(function(){
-                    deferred.resolve(practitionerPatientApps);
-                });
-            }
-            return deferred;
-        },
-        getPractitionerApps : function() {
-            var deferred = $.Deferred();
-            if (practitionerApps !== undefined) {
-                deferred.resolve(practitionerApps);
-            } else {
-                this.loadSettings().then(function(){
-                    deferred.resolve(practitionerApps);
-                });
-            }
-            return deferred;
-        },
-        getGalleryApps : function() {
-            var deferred = $.Deferred();
-            if (galleryApps !== undefined) {
-                deferred.resolve(galleryApps);
-            } else {
-                this.loadSettings().then(function(){
-                    deferred.resolve(galleryApps);
+                    deferred.resolve(sampleApps);
                 });
             }
             return deferred;
         },
         loadSettings: function(){
             var deferred = $.Deferred();
-            $http.get('static/js/config/patient-apps.json').success(function(result){
-                patientApps = result;
-                $http.get('static/js/config/practitioner-patient-apps.json').success(function(result){
-                    practitionerPatientApps = result;
-                    $http.get('static/js/config/practitioner-apps.json').success(function(result){
-                        practitionerApps = result;
-                        $http.get('static/js/config/gallery-app-details.json').success(function(result){
-                            galleryAppDetails = result;
-                            $http.get('static/js/config/gallery-apps.json').success(function(result){
-                                galleryApps = result;
-                                angular.forEach(galleryApps, function (app) {
-                                    angular.forEach(galleryAppDetails, function (appDetails) {
-                                        if (app.client_id === appDetails.client_id) {
-                                            app.info = appDetails.info;
-                                            app.company_url = appDetails.company_url;
-                                            app.author = appDetails.author;
-                                        }
-                                    });
-                                });
-                                deferred.resolve();
-                            });
-                        });
-                    });
+            if (envInfo.env !== "null") {
+                $http.get('static/js/config/sample-apps-' + envInfo.env + '.json').success(function (result) {
+                    sampleApps = result;
+                    deferred.resolve(sampleApps);
                 });
-            });
+            } else {
+                $http.get('static/js/config/sample-apps-localhost.json').success(function (result) {
+                    sampleApps = result;
+                    deferred.resolve(sampleApps);
+                });
+            }
             return deferred;
             }
         };
@@ -722,16 +1743,141 @@ angular.module('sandManApp.services', [])
         }
     };
 
-}]).factory('appsSettings', ['$http',function($http)  {
-
-    var settings;
+}]).factory('exportResources', ['$http',function($http)  {
+    var resources;
 
     return {
         loadSettings: function(){
             var deferred = $.Deferred();
-            $http.get('static/js/config/sandbox-manager.json').success(function(result){
-                    settings = result;
+            $http.get('static/js/config/export-resources.json').success(function(result){
+                resources = result;
+                deferred.resolve(result);
+            });
+            return deferred;
+        },
+        getExportResources: function(){
+            var deferred = $.Deferred();
+            if (resources !== undefined) {
+                deferred.resolve(resources);
+            } else {
+                this.loadSettings().then(function(result){
                     deferred.resolve(result);
+                });
+            }
+            return deferred;
+        }
+    };
+
+}]).factory('dataManagerResources', ['$http',function($http)  {
+    var resources;
+
+    return {
+        loadSettings: function(){
+            var deferred = $.Deferred();
+            $http.get('static/js/config/data-manager-resources.json').success(function(result){
+                resources = result;
+                deferred.resolve(result);
+            });
+            return deferred;
+        },
+        getDataManagerResources: function(){
+            var deferred = $.Deferred();
+            if (resources !== undefined) {
+                deferred.resolve(resources);
+            } else {
+                this.loadSettings().then(function(result){
+                    deferred.resolve(result);
+                });
+            }
+            return deferred;
+        }
+    };
+
+}]).factory('branded', ['brandedText', 'envInfo',function(brandedText, envInfo)  {
+    var text = brandedText["hspc"];
+    if (envInfo.hostOrg !== undefined && envInfo.hostOrg !== "null") {
+        text = brandedText[envInfo.hostOrg];
+    }
+    return text;
+}]).factory('appsSettings', ['$http', 'envInfo',function($http, envInfo)  {
+
+    var settings;
+    var sandboxUrlSettings;
+
+    function getDashboardUrl(isLocal, fullBaseUrl) {
+
+        if (!isLocal) {
+            // In test/prod the dashboard url is the part of the URL which does not include the path
+            var path = window.location.pathname;
+            var trailingPathSlash = path.lastIndexOf("/");
+            if (trailingPathSlash > -1 && trailingPathSlash === path.length - 1) {
+                path = path.substring(0, path.length - 1);
+            }
+            return fullBaseUrl.substring(0, fullBaseUrl.length - path.length);
+        } else {
+            var urlPath = window.location.pathname;
+            var trailingSlash = urlPath.lastIndexOf("/");
+            if (trailingSlash > -1 && trailingSlash === urlPath.length - 1) {
+                urlPath = urlPath.substring(0, urlPath.length - 1);
+            }
+            var leadingSlash = urlPath.indexOf("/");
+            if (leadingSlash === 0) {
+                urlPath = urlPath.substring(1, urlPath.length);
+            }
+            var pathSegments = urlPath.split("/");
+            switch (pathSegments.length) {
+                case 1:   // For localhost, the dashboard url includes the first path segment
+                    return fullBaseUrl;
+                    break;
+                default:  // For localhost, the dashboard url includes the first path segment,
+                          // the second path segment (if exists) is the sandboxId
+                    var additionalPath = urlPath.substring(pathSegments[0].length);
+                    return fullBaseUrl.substring(0, fullBaseUrl.length - additionalPath.length);
+                    break;
+            }
+        }
+    }
+
+    return {
+        getSandboxUrlSettings: function () {
+            if (sandboxUrlSettings !== undefined) {
+                return sandboxUrlSettings;
+            } else {
+                sandboxUrlSettings = {};
+                var sandboxBaseUrlWithoutHash = window.location.href.split("#")[0].substring(0, window.location.href.split("#")[0].length);
+                if (sandboxBaseUrlWithoutHash.endsWith("/")) {
+                    sandboxBaseUrlWithoutHash = sandboxBaseUrlWithoutHash.substring(0, sandboxBaseUrlWithoutHash.length-1);
+                }
+                sandboxUrlSettings.sandboxManagerRootUrl = getDashboardUrl(envInfo.defaultServiceUrl === "null", sandboxBaseUrlWithoutHash);
+                sandboxUrlSettings.sandboxId = sandboxBaseUrlWithoutHash.substring(sandboxUrlSettings.sandboxManagerRootUrl.length + 1);
+                var trailingSlash = sandboxUrlSettings.sandboxId.lastIndexOf("/");
+                if (trailingSlash > -1 && trailingSlash === sandboxUrlSettings.sandboxId.length - 1) {
+                    sandboxUrlSettings.sandboxId = sandboxUrlSettings.sandboxId.substring(0, sandboxUrlSettings.sandboxId.length - 1);
+                }
+                if (sandboxUrlSettings.sandboxId === "") {
+                    sandboxUrlSettings.sandboxId = undefined;
+                }
+                sandboxUrlSettings.baseRestUrl = sandboxUrlSettings.sandboxManagerRootUrl + "/REST";
+                
+            }
+            return sandboxUrlSettings;    
+        },
+        loadSettings: function(){
+            var deferred = $.Deferred();
+            $http.get('static/js/config/sandbox-manager.json').success(function(result){
+                settings = result;
+                if (envInfo.sandboxUserUri !== "null") {
+                    settings.sandboxUserUri = envInfo.sandboxUserUri;
+                    settings.defaultServiceUrl = envInfo.defaultServiceUrl;
+                    settings.baseServiceUrl_1 = envInfo.baseServiceUrl_1;
+                    settings.baseServiceUrl_2 = envInfo.baseServiceUrl_2;
+                    settings.basePersonaServiceUrl_1 = envInfo.basePersonaServiceUrl_1;
+                    settings.basePersonaServiceUrl_2 = envInfo.basePersonaServiceUrl_2;
+                    settings.oauthLogoutUrl = envInfo.oauthLogoutUrl;
+                    settings.oauthAuthenticationUrl = envInfo.oauthAuthenticationUrl;
+                    settings.userManagementUrl = envInfo.userManagementUrl;
+                }
+                deferred.resolve(settings);
                 });
             return deferred;
         },
@@ -745,6 +1891,9 @@ angular.module('sandManApp.services', [])
                 });
             }
             return deferred;
+        },
+        settings: function(){
+            return settings;
         }
     };
 

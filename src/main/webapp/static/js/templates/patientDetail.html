@@ -6,7 +6,8 @@
                 <div class="content">
                     <div class="detail-form">
                         <label class="detail-form-label">Name:</label>
-                        <label class="detail-form-value"><a ng-click="launchPatientDataManager(selected.selectedPatient)">{{selected.selectedPatient | nameGivenFamily}}</a></label>
+                        <label class="detail-form-value" ng-show="showing.patientDataManager"><a ng-click="launchPatientDataManager(selected.selectedPatient)">{{selected.selectedPatient | nameGivenFamily}}</a></label>
+                        <label class="detail-form-value" ng-show="!showing.patientDataManager">{{selected.selectedPatient | nameGivenFamily}}</label>
                     </div>
                     <div class="detail-form">
                         <label class="detail-form-label">Gender:</label>

@@ -1,14 +1,40 @@
 <html>
   <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+
     <script>
-      // A hack to get around the window popup behavior in modern web browsers
-      var launched = false;
-      var key = window.location.search.slice(1);
-      if (!(key in window.localStorage)){
-        console.log('Failed to launch app -- no launch key.');
+
+      var username = decodeURIComponent(getParameterByName('username'));
+      var password = decodeURIComponent(getParameterByName('password'));
+      var authenticationURL = decodeURIComponent(getParameterByName('auth'));
+
+      if (username !== undefined && username !== "" && password !== undefined  && password !== "") {
+        var passedKey = decodeURIComponent(getParameterByName('key'));
+        if (!window.location.origin) {
+          window.location.origin = window.location.protocol + "//"
+                  + window.location.hostname
+                  + (window.location.port ? ':' + window.location.port: '');
+        }
+
+        var thisUri = window.location.origin + window.location.pathname;
+        var thisUrl = thisUri.replace(/\/+$/, "/");
+
+        window.location = authenticationURL +
+                '?username=' + encodeURIComponent(username) +
+                '&password=' + encodeURIComponent(password) +
+                '&redirect=' + encodeURIComponent(thisUrl + '?' + passedKey )
+      } else {
+
+        // A hack to get around the window popup behavior in modern web browsers
+        var launched = false;
+        var key = window.location.search.slice(1);
+        if (!(key in window.localStorage)) {
+          console.log('Failed to launch app -- no launch key.');
+        }
+        onStorage();
+        window.addEventListener('storage', onStorage, false);
       }
-      onStorage();
-      window.addEventListener('storage', onStorage, false);
+
       function onStorage(){
       
         if (launched || window.localStorage[key] === 'requested-launch') {
@@ -21,13 +47,21 @@
         
         // Session storage is inherited from opening window, so
         // we need to purge the tokenResponse here to avoid passing
-        // the FHIR Starter's token credentials to the app
+        // the Sandbox Manager's token credentials to the app
         delete sessionStorage.tokenResponse;
         
-        window.location = details.app.launch_uri + 
+        window.location = details.app.launchUri +
         '?iss=' + encodeURIComponent(details.iss) + 
         '&launch=' + encodeURIComponent(details.context.launch_id);
       }
+
+      function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+      }
+
     </script>
   </head>
   <body>

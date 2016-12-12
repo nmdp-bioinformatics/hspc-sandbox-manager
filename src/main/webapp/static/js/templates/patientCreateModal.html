@@ -42,10 +42,10 @@
             <label class="control-label col-sm-3" >Birth Date:</label>
 
             <div class="col-sm-9">
-                <input type="datetime-local" class="form-control" id="birthDate"
+                <input type="text" class="form-control" id="birthDate"
                        required ng-model="modalPatient.birthDate"
                        aria-describedby="birthDateErrorStatus"
-                       placeholder="yyyy-MM-ddTHH:mm:ss" >
+                       placeholder="yyyy-MM-dd" >
                 <span id="birthDateIcon" ng-class="isBirthDateValid() ? 'glyphicon glyphicon-ok form-control-feedback' : 'glyphicon glyphicon-remove form-control-feedback'" aria-hidden="true"></span>
             </div>
         </div>
@@ -55,6 +55,6 @@
     <div class="form-group">
             <button id="createPatientButton" ng-class="{'disabled' : !isPatientValid()}" type="button" class="btn btn-basic" ng-click="createPatient()" tabindex="104">Create
             </button>
-            <button id="cancelButton" type="button" class="btn btn-basic" data-dismiss="modal" ng-click="cancel()" tabindex="105">Cancel</button>
+            <button id="cancelButton" type="button" class="btn btn-cancel" data-dismiss="modal" ng-click="cancel()" tabindex="105">Cancel</button>
     </div>
 </div>

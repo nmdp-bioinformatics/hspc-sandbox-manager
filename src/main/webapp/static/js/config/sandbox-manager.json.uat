@@ -1,7 +1,0 @@
-{
-    "profile_update_uri" : "http://54.213.219.198:9080/uat/hspc-reference-messaging/sandboxuser/profileupdate",
-    "serviceUrl": "http://54.213.219.198:9080/uat/hspc-reference-api/data",
-    "baseUrl": "http://54.213.219.198:9080/uat/hspc-sandbox-manager",
-    "oauthLogoutUrl": "http://54.213.219.198:9080/uat/hspc-reference-authorization/logout",
-    "userManagementUrl": "https://sandbox.hspconsortium.org/pwm/private/"
-}

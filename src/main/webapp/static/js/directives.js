@@ -4,6 +4,7 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
     return function (scope, element, attr) {
 
         var w = angular.element($window);
+        var toggle = 0;
         scope.$parent.$watch(function () {
             return {
                 'h': w.height(),
@@ -38,6 +39,18 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
 
                 return height + 'px'
             };
+            // Hack to force the table to redraw so that the headers will redraw
+            scope.$parent.redrawTable = function (height, width) {
+
+                scope.$parent.$eval(attr.notifier);
+
+                toggle = (toggle === 1) ? -1 : 1;
+
+                return {
+                    'height': height + 'px',
+                    'width' : (width + toggle) + 'px'
+                };
+            };
 
         }, true);
 
@@ -65,6 +78,19 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
                     return (newValue.h < height) || (newValue.w < width)
                 };
 
+                scope.$parent.scrollHeight = function (height) {
+
+                    scope.$parent.$eval(attr.notifier);
+
+                    return (newValue.h < height)
+                };
+
+                scope.$parent.scrollWidth = function (width) {
+
+                    scope.$parent.$eval(attr.notifier);
+
+                    return (newValue.w < width)
+                };
             }, true);
 
             w.bind('screenSize', function () {
@@ -218,4 +244,83 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
                 }, 3000);
             }
         }
-    });
+    }).directive('fileModel', ['$parse', function ($parse) {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs) {
+            var model = $parse(attrs.fileModel);
+            var modelSetter = model.assign;
+
+            element.bind('change', function(){
+                scope.$apply(function(){
+                    modelSetter(scope, element[0].files[0]);
+                });
+            });
+        }
+    };
+}]).directive('a', function() {
+    return {
+        restrict: 'E',
+        link: function(scope, elem, attrs) {
+            if(!attrs.uiSref && (attrs.ngClick || attrs.href === '' || attrs.href === '#')){
+                elem.on('click', function(e){
+                    e.preventDefault();
+                });
+            }
+        }
+    };
+}).directive('resizer', function($document) {
+
+    return function($scope, $element, $attrs) {
+
+        $element.on('mousedown', function(event) {
+            event.preventDefault();
+
+            $document.on('mousemove', mousemove);
+            $document.on('mouseup', mouseup);
+        });
+
+        function mousemove(event) {
+
+            if ($attrs.resizer == 'vertical') {
+                // Handle vertical resizer
+                var x = event.pageX;
+
+                if ($attrs.resizerMax && x > $attrs.resizerMax) {
+                    x = parseInt($attrs.resizerMax);
+                }
+
+                $element.css({
+                    left: x + 'px'
+                });
+
+                $($attrs.resizerLeft).css({
+                    width: x + 'px'
+                });
+                $($attrs.resizerRight).css({
+                    left: (x + parseInt($attrs.resizerWidth)) + 'px'
+                });
+
+            } else {
+                // Handle horizontal resizer
+                var y = window.innerHeight - event.pageY;
+
+                $element.css({
+                    bottom: y + 'px'
+                });
+
+                $($attrs.resizerTop).css({
+                    bottom: (y + parseInt($attrs.resizerHeight)) + 'px'
+                });
+                $($attrs.resizerBottom).css({
+                    height: y + 'px'
+                });
+            }
+        }
+
+        function mouseup() {
+            $document.unbind('mousemove', mousemove);
+            $document.unbind('mouseup', mouseup);
+        }
+    };
+});

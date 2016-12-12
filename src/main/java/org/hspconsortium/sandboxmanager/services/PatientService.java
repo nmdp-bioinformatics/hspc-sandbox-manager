@@ -2,9 +2,17 @@ package org.hspconsortium.sandboxmanager.services;
 
 import org.hspconsortium.sandboxmanager.model.Patient;
 
+import java.util.List;
+
 public interface PatientService {
 
-    Patient save(Patient patient);
+    Patient save(final Patient patient);
 
-    Patient findByFhirId(String fhirId);
+    void delete(final int id);
+
+    void delete(final Patient patient);
+
+    Patient findByFhirIdAndSandboxId(final String fhirId, final String sandboxId);
+
+    List<Patient> findBySandboxId(final String sandboxId);
 }

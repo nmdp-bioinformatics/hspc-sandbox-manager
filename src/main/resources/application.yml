@@ -2,13 +2,18 @@ endpoints:
   jmx:
     enabled: false
 
+multipart:
+  enabled: true
+
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/sandman?autoReconnect=true
+    url: jdbc:mysql://localhost:3306/sandman
     username: root
     password: password
 #    persistenceUnitName: sandman
     driverClassName: com.mysql.jdbc.Driver
+    validation-query: SELECT 1
+    test-on-borrow: true
   jpa:
     database: MYSQL
     show-sql: true
@@ -16,3 +21,33 @@ spring:
       ddl-auto: update
       dialect: org.hibernate.dialect.MySQL5InnoDBDialect
       naming_strategy: org.hibernate.cfg.ImprovedNamingStrategy
+hspc:
+  platform:
+    defaultPublicSandboxRoles: USER
+    defaultPrivateSandboxRoles: USER,MANAGE_USERS,MANAGE_DATA
+
+#    defaultSandboxCreatorRoles: ADMIN,MANAGE_USERS,MANAGE_DATA
+#    defaultSystemRoles: USER
+#    defaultSandboxVisibility: PUBLIC
+    defaultSandboxCreatorRoles: ADMIN,MANAGE_USERS,MANAGE_DATA
+    defaultSystemRoles: USER,CREATE_SANDBOX
+    defaultSandboxVisibility: PRIVATE
+    authorization:
+      smart:
+        launchUrl: http://localhost:8080/hspc-reference-authorization/Launch
+    api:
+      oauth2:
+        clientId: hspc_resource_server
+        clientSecret: secret
+      sandboxManagementEndpointURL_1: http://localhost:8080/hspc-reference-api/management/sandbox
+      sandboxManagementEndpointURL_2: http://localhost:8081/hspc-reference-api/management/sandbox
+      oauthUserInfoEndpointURL: http://localhost:8080/hspc-reference-authorization/userinfo
+      oauthClientEndpointURL: http://localhost:8080/hspc-reference-authorization/api/clients
+      oauthUserLoginEndpointURL: http://localhost:8080/hspc-reference-authorization/j_spring_security_check
+      oauthUser: admin
+      oauthUserPassword: password
+    messaging:
+      sendEmail: false
+      emailSenderEndpointURL: http://localhost:8080/hspc-reference-messaging/mailsender
+      sandboxUserEndpointURL: http://localhost:8080/hspc-reference-messaging/sandboxuser
+

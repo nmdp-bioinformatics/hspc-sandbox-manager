@@ -20,85 +20,137 @@
 
 package org.hspconsortium.sandboxmanager.controllers;
 
+import org.apache.http.HttpStatus;
 import org.hspconsortium.sandboxmanager.model.*;
 import org.hspconsortium.sandboxmanager.services.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 @RestController
-public class LaunchScenarioController {
+@RequestMapping("/REST/launchScenario")
+public class LaunchScenarioController extends AbstractController  {
 
     private final LaunchScenarioService launchScenarioService;
     private final UserService userService;
-    private final PatientService patientService;
-    private final PersonaService personaService;
     private final AppService appService;
+    private final UserPersonaService userPersonaService;
+    private final SandboxService sandboxService;
+    private final UserLaunchService userLaunchService;
 
     @Inject
     public LaunchScenarioController(final LaunchScenarioService launchScenarioService,
-                                    final PatientService patientService, final PersonaService personaService,
-                                    final AppService appService, final UserService userService) {
+                                    final AppService appService, final UserService userService,
+                                    final UserPersonaService userPersonaService,
+                                    final SandboxService sandboxService, final OAuthService oAuthService,
+                                    final UserLaunchService userLaunchService) {
+        super(oAuthService);
         this.launchScenarioService = launchScenarioService;
         this.userService = userService;
-        this.patientService = patientService;
-        this.personaService = personaService;
         this.appService = appService;
+        this.userPersonaService = userPersonaService;
+        this.sandboxService = sandboxService;
+        this.userLaunchService = userLaunchService;
     }
 
-    @RequestMapping(value = "/launchScenario", method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
-    public @ResponseBody LaunchScenario createLaunchScenario(@RequestBody @Valid final LaunchScenario launchScenario) {
-        User user = userService.findByLdapId(launchScenario.getOwner().getLdapId());
-        if (user == null) {
-            user = userService.save(launchScenario.getOwner());
-        }
-        launchScenario.setOwner(user);
+    @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
+    @Transactional
+    public @ResponseBody LaunchScenario createLaunchScenario(HttpServletRequest request, @RequestBody final LaunchScenario launchScenario) {
 
-        Persona persona = personaService.findByFhirId(launchScenario.getPersona().getFhirId());
-        if (persona == null) {
-            persona = personaService.save(launchScenario.getPersona());
-        }
-        launchScenario.setPersona(persona);
+        Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
+        checkSandboxUserCreateAuthorization(request, sandbox);
+        checkCreatedByIsCurrentUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
 
-        if (launchScenario.getPatient() != null) {
-            Patient patient = patientService.findByFhirId(launchScenario.getPatient().getFhirId());
-            if (patient == null) {
-                patient = patientService.save(launchScenario.getPatient());
-            }
-            launchScenario.setPatient(patient);
-        }
+        launchScenario.setSandbox(sandbox);
+        User user = userService.findByLdapId(launchScenario.getCreatedBy().getLdapId());
+        launchScenario.setVisibility(getDefaultVisibility(user, sandbox));
+        launchScenario.setCreatedBy(user);
+        userLaunchService.create(new UserLaunch(user, launchScenario, new Timestamp(new Date().getTime())));
 
-        App app = appService.findByClientId(launchScenario.getApp().getClient_id());
-        if (app == null) {
-            app = appService.save(launchScenario.getApp());
-        }
-        launchScenario.setApp(app);
-
-        return launchScenarioService.save(launchScenario);
+        LaunchScenario createdLaunchScenario = launchScenarioService.create(launchScenario);
+        userLaunchService.create(new UserLaunch(user, createdLaunchScenario, new Timestamp(new Date().getTime())));
+        return createdLaunchScenario;
     }
 
-    @RequestMapping(value = "/launchScenario", method = RequestMethod.PUT, produces ="application/json")
-    public @ResponseBody LaunchScenario updateLaunchScenario(@RequestBody @Valid final LaunchScenario launchScenario) {
-        return launchScenarioService.save(launchScenario);
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces ="application/json")
+    @Transactional
+    public @ResponseBody LaunchScenario updateLaunchScenario(HttpServletRequest request, @PathVariable Integer id, @RequestBody final LaunchScenario launchScenario) {
+        LaunchScenario existingLaunchScenario = launchScenarioService.getById(id);
+        if (existingLaunchScenario == null || id.intValue() != launchScenario.getId().intValue()) {
+            throw new RuntimeException(String.format("Response Status : %s.\n" +
+                            "Response Detail : Launch Scenario Id doesn't match Id in JSON body."
+                    , HttpStatus.SC_BAD_REQUEST));
+        }
+        Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
+        checkSandboxUserModifyAuthorization(request, sandbox, launchScenario);
+        return launchScenarioService.update(launchScenario);
     }
 
-    @RequestMapping(value = "/launchScenario", method = RequestMethod.DELETE, produces ="application/json")
-    public @ResponseBody void deleteLaunchScenario(@RequestBody @Valid final LaunchScenario launchScenario) {
+    @RequestMapping(value = "/{id}/launched", method = RequestMethod.PUT, produces ="application/json")
+    @Transactional
+    public void updateLaunchTimestamp(HttpServletRequest request, @PathVariable Integer id, @RequestBody final LaunchScenario launchScenario) {
+        LaunchScenario existingLaunchScenario = launchScenarioService.getById(id);
+        if (existingLaunchScenario == null || id.intValue() != launchScenario.getId().intValue()) {
+            throw new RuntimeException(String.format("Response Status : %s.\n" +
+                            "Response Detail : Launch Scenario Id doesn't match Id in JSON body."
+                    , HttpStatus.SC_BAD_REQUEST));
+        }
+        Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
+        checkSandboxUserReadAuthorization(request, sandbox);
+        UserLaunch userLaunch = userLaunchService.findByUserIdAndLaunchScenarioId(getSystemUserId(request), existingLaunchScenario.getId());
+        if (userLaunch == null) {
+            User user = userService.findByLdapId(getSystemUserId(request));
+            userLaunchService.create(new UserLaunch(user, existingLaunchScenario, new Timestamp(new Date().getTime())));
+        } else {
+            userLaunchService.update(userLaunch);
+        }
+    }
+
+    @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"appId"})
+    public @ResponseBody Iterable<LaunchScenario> getLaunchScenariosForApp(HttpServletRequest request,
+                   @RequestParam(value = "appId") int appId) {
+
+        App app = appService.getById(appId);
+        checkSandboxUserReadAuthorization(request, app.getSandbox());
+
+        return launchScenarioService.findByAppIdAndSandboxId(app.getId(), app.getSandbox().getSandboxId());
+    }
+
+    @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"userPersonaId"})
+    public @ResponseBody Iterable<LaunchScenario> getLaunchScenariosForPersona(HttpServletRequest request,
+                                                                           @RequestParam(value = "userPersonaId") int personaId) {
+
+        UserPersona userPersona = userPersonaService.getById(personaId);
+        checkSandboxUserReadAuthorization(request, userPersona.getSandbox());
+
+        return launchScenarioService.findByUserPersonaIdAndSandboxId(userPersona.getId(), userPersona.getSandbox().getSandboxId());
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces ="application/json")
+    @Transactional
+    public @ResponseBody void deleteLaunchScenario(HttpServletRequest request, @PathVariable Integer id) {
+        LaunchScenario launchScenario = launchScenarioService.getById(id);
+        Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
+        checkSandboxUserModifyAuthorization(request, sandbox, launchScenario);
         launchScenarioService.delete(launchScenario);
     }
 
-    @RequestMapping(value = "/launchScenarios", method = RequestMethod.GET, produces ="application/json",
-            params = {"id"})
-    public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios(@RequestParam(value = "id") String id) {
-        String ownerId = null;
-        try {
-            ownerId = java.net.URLDecoder.decode(id, "UTF-8");
-            return launchScenarioService.findByOwnerId(ownerId);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        return null;
+    @RequestMapping(method = RequestMethod.GET, produces = "application/json", params = {"sandboxId"})
+    @SuppressWarnings("unchecked")
+    public @ResponseBody Iterable<LaunchScenario> getLaunchScenarios(HttpServletRequest request,
+        @RequestParam(value = "sandboxId") String sandboxId) throws UnsupportedEncodingException{
+
+        String oauthUserId = oAuthService.getOAuthUserId(request);
+        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
+        checkSandboxUserReadAuthorization(request, sandbox);
+        List<LaunchScenario> launchScenarios = launchScenarioService.findBySandboxIdAndCreatedByOrVisibility(sandboxId, oauthUserId, Visibility.PUBLIC);
+        return launchScenarioService.updateLastLaunchForCurrentUser(launchScenarios, userService.findByLdapId(oauthUserId));
     }
 }
