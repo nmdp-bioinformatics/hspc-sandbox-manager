@@ -8,37 +8,37 @@
 
     <rule>
         <from>^/[^/\.]+/static/.*$</from>
-        <to type="redirect">^(.*)/.*/static/(.*)$ $1/static/$2</to>
+        <to last="true" type="redirect">^(.*)/.*/static/(.*)$ $1/static/$2</to>
     </rule>
 
     <rule>
         <from>^/static/.*$</from>
-        <to type="redirect">^.*$</to>
+        <to last="true" type="redirect">^.*$</to>
     </rule>
 
     <rule>
         <from>^/[^/\.]+/REST/.*$</from>
-        <to qsappend="true" type="redirect">^(.*)/.*/REST/(.*)$ $1/REST/$2</to>
+        <to last="true" qsappend="true" type="redirect">^(.*)/.*/REST/(.*)$ $1/REST/$2</to>
     </rule>
 
     <rule>
         <from>^/REST/.*</from>
-        <to qsappend="true" type="redirect">^.*$</to>
+        <to last="true" qsappend="true" type="redirect">^.*$</to>
     </rule>
 
     <rule>
         <from>^/[^/\.]+/launch.html/.*$</from>
-        <to qsappend="true" type="redirect">^(.*)/.*/launch.html/(.*)$ $1/launch.html/$2</to>
+        <to last="true" qsappend="true" type="redirect">^(.*)/.*/launch.html/(.*)$ $1/launch.html/$2</to>
     </rule>
 
     <rule>
         <from>^/launch.html/.*$</from>
-        <to qsappend="true" type="redirect">^.*$</to>
+        <to last="true" qsappend="true" type="redirect">^.*$</to>
     </rule>
 
     <rule>
         <from>!(.*)/</from>
-        <to type="permanent-redirect">^(.*)$ $1/</to>
+        <to last="true" type="permanent-redirect">^(.*)$ $1/</to>
     </rule>
 
     <rule>
