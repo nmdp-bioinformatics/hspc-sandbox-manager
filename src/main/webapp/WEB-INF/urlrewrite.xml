@@ -18,22 +18,22 @@
 
     <rule>
         <from>^/[^/\.]+/REST/.*$</from>
-        <to type="redirect">^(.*)/.*/REST/(.*)$ $1/REST/$2</to>
+        <to qsappend="true" type="redirect">^(.*)/.*/REST/(.*)$ $1/REST/$2</to>
     </rule>
 
     <rule>
         <from>^/REST/.*</from>
-        <to type="redirect">^.*$</to>
+        <to qsappend="true" type="redirect">^.*$</to>
     </rule>
 
     <rule>
         <from>^/[^/\.]+/launch.html/.*$</from>
-        <to type="redirect">^(.*)/.*/launch.html/(.*)$ $1/launch.html/$2</to>
+        <to qsappend="true" type="redirect">^(.*)/.*/launch.html/(.*)$ $1/launch.html/$2</to>
     </rule>
 
     <rule>
         <from>^/launch.html/.*$</from>
-        <to type="redirect">^.*$</to>
+        <to qsappend="true" type="redirect">^.*$</to>
     </rule>
 
     <rule>
@@ -43,7 +43,7 @@
 
     <rule>
         <from>^/([^/\.]+/)?$</from>
-        <to type="redirect">^.*$ /index.html</to>
+        <to qsappend="true" type="redirect">^.*$ /index.html</to>
     </rule>
 
 </urlrewrite>
