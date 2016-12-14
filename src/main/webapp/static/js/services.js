@@ -1794,7 +1794,7 @@ angular.module('sandManApp.services', [])
     };
 
 }]).factory('branded', ['brandedText', 'envInfo',function(brandedText, envInfo)  {
-    var text = brandedText["smart"];
+    var text = brandedText["hspc"];
     if (envInfo.hostOrg !== undefined && envInfo.hostOrg !== "null") {
         text = brandedText[envInfo.hostOrg];
     }
