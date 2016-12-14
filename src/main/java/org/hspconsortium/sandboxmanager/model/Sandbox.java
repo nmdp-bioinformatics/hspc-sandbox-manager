@@ -74,6 +74,10 @@ public class Sandbox extends AbstractItem {
     }
 
     @OneToMany(cascade={CascadeType.ALL})
+    @JoinTable(name = "sandbox_user_roles", joinColumns = {
+            @JoinColumn(name = "sandbox", nullable = false, updatable = false) },
+            inverseJoinColumns = { @JoinColumn(name = "user_roles",
+                    nullable = false, updatable = false) })
     public List<UserRole> getUserRoles() {
         return userRoles;
     }
