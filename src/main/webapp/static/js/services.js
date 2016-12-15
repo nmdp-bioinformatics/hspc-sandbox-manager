@@ -1848,7 +1848,7 @@ angular.module('sandManApp.services', [])
                 if (sandboxBaseUrlWithoutHash.endsWith("/")) {
                     sandboxBaseUrlWithoutHash = sandboxBaseUrlWithoutHash.substring(0, sandboxBaseUrlWithoutHash.length-1);
                 }
-                sandboxUrlSettings.sandboxManagerRootUrl = getDashboardUrl(false, sandboxBaseUrlWithoutHash);
+                sandboxUrlSettings.sandboxManagerRootUrl = getDashboardUrl(envInfo.defaultServiceUrl === "null", sandboxBaseUrlWithoutHash);
                 sandboxUrlSettings.sandboxId = sandboxBaseUrlWithoutHash.substring(sandboxUrlSettings.sandboxManagerRootUrl.length + 1);
                 var trailingSlash = sandboxUrlSettings.sandboxId.lastIndexOf("/");
                 if (trailingSlash > -1 && trailingSlash === sandboxUrlSettings.sandboxId.length - 1) {
