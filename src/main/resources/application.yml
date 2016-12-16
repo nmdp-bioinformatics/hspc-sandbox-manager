@@ -26,31 +26,46 @@ spring:
       naming_strategy: org.hibernate.cfg.ImprovedNamingStrategy
 hspc:
   platform:
+    hostUrl: http://localhost
     defaultPublicSandboxRoles: USER
     defaultPrivateSandboxRoles: USER,MANAGE_USERS,MANAGE_DATA
 
-    defaultSandboxCreatorRoles: ADMIN,MANAGE_USERS,MANAGE_DATA
-    defaultSystemRoles: USER
-    defaultSandboxVisibility: PUBLIC
 #    defaultSandboxCreatorRoles: ADMIN,MANAGE_USERS,MANAGE_DATA
-#    defaultSystemRoles: USER,CREATE_SANDBOX
-#    defaultSandboxVisibility: PRIVATE
+#    defaultSystemRoles: USER
+#    defaultSandboxVisibility: PUBLIC
+    defaultSandboxCreatorRoles: ADMIN,MANAGE_USERS,MANAGE_DATA
+    defaultSystemRoles: USER,CREATE_SANDBOX
+    defaultSandboxVisibility: PRIVATE
     authorization:
+      port: 8080
+      context: /hspc-reference-authorization
+      baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.authorization.port}${hspc.platform.authorization.context}
       smart:
-        launchUrl: http://localhost:8080/hspc-reference-authorization/Launch
+        launchUrl: ${hspc.platform.authorization.baseUrl}/Launch
     api:
+      version1:
+        port: 8080
+        context: /hspc-reference-api
+        baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version1.port}${hspc.platform.api.version1.context}
+      version2:
+        port: 8081
+        context: /hspc-reference-api
+        baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version2.port}${hspc.platform.api.version2.context}
       oauth2:
         clientId: hspc_resource_server
         clientSecret: secret
-      sandboxManagementEndpointURL_1: http://localhost:8080/hspc-reference-api/management/sandbox
-      sandboxManagementEndpointURL_2: http://localhost:8081/hspc-reference-api/management/sandbox
-      oauthUserInfoEndpointURL: http://localhost:8080/hspc-reference-authorization/userinfo
-      oauthClientEndpointURL: http://localhost:8080/hspc-reference-authorization/api/clients
-      oauthUserLoginEndpointURL: http://localhost:8080/hspc-reference-authorization/j_spring_security_check
+      sandboxManagementEndpointURL_1: ${hspc.platform.api.version1.baseUrl}/management/sandbox
+      sandboxManagementEndpointURL_2: ${hspc.platform.api.version2.baseUrl}/management/sandbox
+      oauthUserInfoEndpointURL: ${hspc.platform.authorization.baseUrl}/userinfo
+      oauthClientEndpointURL: ${hspc.platform.authorization.baseUrl}/api/clients
+      oauthUserLoginEndpointURL: ${hspc.platform.authorization.baseUrl}/j_spring_security_check
       oauthUser: admin
       oauthUserPassword: password
     messaging:
+      port: 8080
+      context: /hspc-reference-messaging
       sendEmail: false
-      emailSenderEndpointURL: http://localhost:8080/hspc-reference-messaging/mailsender
-      sandboxUserEndpointURL: http://localhost:8080/hspc-reference-messaging/sandboxuser
+      baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.messaging.port}${hspc.platform.messaging.context}
+      emailSenderEndpointURL: ${hspc.platform.messaging.baseUrl}/mailsender
+      sandboxUserEndpointURL: ${hspc.platform.messaging.baseUrl}/sandboxuser
 
