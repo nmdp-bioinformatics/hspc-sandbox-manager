@@ -30,12 +30,12 @@ hspc:
     defaultPublicSandboxRoles: USER
     defaultPrivateSandboxRoles: USER,MANAGE_USERS,MANAGE_DATA
 
-#    defaultSandboxCreatorRoles: ADMIN,MANAGE_USERS,MANAGE_DATA
-#    defaultSystemRoles: USER
-#    defaultSandboxVisibility: PUBLIC
     defaultSandboxCreatorRoles: ADMIN,MANAGE_USERS,MANAGE_DATA
-    defaultSystemRoles: USER,CREATE_SANDBOX
-    defaultSandboxVisibility: PRIVATE
+    defaultSystemRoles: USER
+    defaultSandboxVisibility: PUBLIC
+#    defaultSandboxCreatorRoles: ADMIN,MANAGE_USERS,MANAGE_DATA
+#    defaultSystemRoles: USER,CREATE_SANDBOX
+#    defaultSandboxVisibility: PRIVATE
     authorization:
       port: 8080
       context: /hspc-reference-authorization
