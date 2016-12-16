@@ -37,7 +37,9 @@ hspc:
     defaultSystemRoles: USER,CREATE_SANDBOX
     defaultSandboxVisibility: PRIVATE
     authorization:
-      baseUrl: ${hspc.platform.hostUrl}:8080/hspc-reference-authorization
+      port: 8080
+      context: /hspc-reference-authorization
+      baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.authorization.port}${hspc.platform.authorization.context}
       smart:
         launchUrl: ${hspc.platform.authorization.baseUrl}/Launch
     api:
