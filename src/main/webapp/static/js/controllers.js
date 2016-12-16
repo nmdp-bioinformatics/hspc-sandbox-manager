@@ -798,7 +798,17 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
     }).controller("SideBarController",
-    function($rootScope, $scope, appsSettings){
+    function($rootScope, $scope, sandboxManagement, userServices){
+
+        if (sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "MANAGE_DATA")) {
+            $scope.dataManageTitle = "Data Management";
+            $scope.patientsTitle = "Patients";
+            $scope.practitionerTitle = "Practitioners";
+        } else {
+            $scope.dataManageTitle = "Data Browser";
+            $scope.patientsTitle = "Browse Patients";
+            $scope.practitionerTitle = "Browse Practitioners";
+        }
 
         var sideBarStates = ['launch-scenarios','users', 'patients', 'practitioners', 'manage-apps'];
 
@@ -922,6 +932,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.createPatient =  true;
         }
 
+        $scope.count = {start: 0, end: 0, total: 0};
+
         var natural = true;
         var inverse = false;
         $scope.sortMap = new Map();
@@ -1017,7 +1029,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                                     resourcesNames.push(resource.resourceType);
                                     resourceCounts.push(parseInt(resource.count));
                                 });
-
                                 $rootScope.$digest();
                             });
                     }
@@ -1053,6 +1064,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 lastQueryResult = queryResult;
                 $scope.patients = p;
                 $scope.showing.searchloading = false;
+                $scope.count = fhirApiServices.calculateResultSet(queryResult);
                 $rootScope.$digest();
 
                 modalProgress.dismiss();
@@ -1113,6 +1125,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     $scope.patients = p;
                     $scope.showing.searchloading = false;
                     $rootScope.$digest();
+                    $scope.count = fhirApiServices.calculateResultSet(queryResult);
 
                     modalProgress.dismiss();
                 });
