@@ -27,15 +27,22 @@ spring:
 hspc:
   platform:
     hostUrl: http://localhost
+    #When a user is added to a PUBLIC sandbox, these are their default Sandbox Roles
     defaultPublicSandboxRoles: USER
+    #When a user is added to a PRIVATE sandbox, these are their default Sandbox Roles
     defaultPrivateSandboxRoles: USER,MANAGE_USERS,MANAGE_DATA
 
-#    defaultSandboxCreatorRoles: ADMIN,MANAGE_USERS,MANAGE_DATA
-#    defaultSystemRoles: USER
-#    defaultSandboxVisibility: PUBLIC
+    #When a user creates a brand new sandbox, these are the default Sandbox Roles they are given in the new sandbox
     defaultSandboxCreatorRoles: ADMIN,MANAGE_USERS,MANAGE_DATA
-    defaultSystemRoles: USER,CREATE_SANDBOX
-    defaultSandboxVisibility: PRIVATE
+#    defaultSandboxCreatorRoles: ADMIN,MANAGE_USERS,MANAGE_DATA
+
+    #When a user logs in to SBM for the first time, these are the System Roles they are given
+    defaultSystemRoles: USER
+#    defaultSystemRoles: USER,CREATE_SANDBOX
+
+    #When a user creates a brand new sandbox, this is the default visibility of the new sandbox
+    defaultSandboxVisibility: PUBLIC
+#    defaultSandboxVisibility: PRIVATE
     authorization:
       port: 8080
       context: /hspc-reference-authorization
