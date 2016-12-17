@@ -38,7 +38,7 @@ hspc:
     defaultSystemRoles: USER,CREATE_SANDBOX
     # When a user creates a brand new sandbox, this is the default visibility of the new sandbox
     #    defaultSandboxVisibility: PUBLIC
-    defaultSandboxVisibilty: PRIVATE
+    defaultSandboxVisibility: PRIVATE
     authorization:
       port: 8080
       context: /hspc-reference-authorization
