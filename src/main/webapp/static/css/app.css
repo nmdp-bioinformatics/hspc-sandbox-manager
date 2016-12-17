@@ -978,7 +978,9 @@ a.selected {
     color: var(--darker-border-gray);
 }
 
-.float-right-white-btn {
+.float-right-white-btn,
+.float-right-white-btn:focus,
+.float-right-white-btn:hover {
     cursor:pointer;
     float:right;
     border: none;
@@ -988,10 +990,11 @@ a.selected {
 }
 
 .modal-header .float-right-white-btn {
-    font-size: 24px;
+    font-size: 16px;
     position: absolute;
     right: 25px;
     top: 20px;
+    outline: none;
 }
 
 .sandbox-details {
@@ -1133,6 +1136,14 @@ a.selected {
 }
 .table-container{
     overflow-y: auto;
+}
+
+.table-container table {
+    margin-bottom: 0;
+}
+
+.table-container table tbody tr:last-child td {
+    border-bottom: 1px solid var(--darker-border-gray);
 }
 
 .input-long {
