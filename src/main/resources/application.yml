@@ -13,7 +13,6 @@ spring:
     url: jdbc:mysql://localhost:3306/sandman
     username: root
     password: password
-#    persistenceUnitName: sandman
     driverClassName: com.mysql.jdbc.Driver
     validation-query: SELECT 1
     test-on-borrow: true
@@ -38,7 +37,7 @@ hspc:
     defaultSystemRoles: USER,CREATE_SANDBOX
     # When a user creates a brand new sandbox, this is the default visibility of the new sandbox
     #    defaultSandboxVisibility: PUBLIC
-    defaultSandboxVisibilty: PRIVATE
+    defaultSandboxVisibility: PRIVATE
     authorization:
       port: 8080
       context: /hspc-reference-authorization
