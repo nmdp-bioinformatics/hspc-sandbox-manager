@@ -12,6 +12,5 @@
                     "oauthLogoutUrl": "<%= System.getProperty("oauthLogoutUrl") %>",
                     "oauthAuthenticationUrl": "<%= System.getProperty("oauthAuthenticationUrl") %>",
                     "userManagementUrl": "<%= System.getProperty("userManagementUrl") %>",
-                    "hostOrg": "<%= System.getProperty("hostOrg") %>",
-                    "branding": "<%= System.getProperty("branding") %>"
+                    "hostOrg": "<%= System.getProperty("hostOrg") %>"
                 });
