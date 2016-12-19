@@ -4,7 +4,7 @@ START TRANSACTION;
 
 -- Sandbox Manager
 
-INSERT INTO sandman.config (key_name, value, config_type) VALUES
+INSERT INTO config (key_name, value, config_type) VALUES
   ('Patient_1', 'Patient', 0),
   ('Patient_2', 'Patient?name=s', 0),
   ('Default_Patient_3', 'Patient?birthdate=>2010-01-01&birthdate=<2011-12-31', 0),
