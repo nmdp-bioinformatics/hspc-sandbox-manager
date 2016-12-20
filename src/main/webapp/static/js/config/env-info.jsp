@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="application/javascript; charset=UTF-8" pageEncoding="UTF-8"%>
         angular.module('sandManApp').constant('envInfo',
                 {
+                    "active":          "<%= System.getProperty("envInfo.active") %>",
                     "env":          "<%= System.getProperty("hspcEnv") %>",
                     "sandboxUserUri": "<%= System.getProperty("sandboxUserUri") %>",
                     "defaultServiceUrl": "<%= System.getProperty("defaultServiceUrl") %>",

@@ -1946,7 +1946,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             $http.get('static/js/config/sandbox-manager.json').success(function(result){
                 settings = result;
-                if (envInfo.sandboxUserUri !== "null") {
+                if (envInfo.active !== "null" && envInfo.active !== "false") {
                     settings.sandboxUserUri = envInfo.sandboxUserUri;
                     settings.defaultServiceUrl = envInfo.defaultServiceUrl;
                     settings.baseServiceUrl_1 = envInfo.baseServiceUrl_1;
