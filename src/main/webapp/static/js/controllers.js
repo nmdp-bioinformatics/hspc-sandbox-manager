@@ -800,16 +800,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     }).controller("SideBarController",
     function($rootScope, $scope, sandboxManagement, userServices){
 
-        if (sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "MANAGE_DATA")) {
-            $scope.dataManageTitle = "Data Management";
-            $scope.patientsTitle = "Patients";
-            $scope.practitionerTitle = "Practitioners";
-        } else {
-            $scope.dataManageTitle = "Data Browser";
-            $scope.patientsTitle = "Browse Patients";
-            $scope.practitionerTitle = "Browse Practitioners";
-        }
-
         var sideBarStates = ['launch-scenarios','users', 'patients', 'practitioners', 'manage-apps'];
 
         $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
