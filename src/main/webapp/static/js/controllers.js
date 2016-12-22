@@ -1585,7 +1585,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         var action = $stateParams.action;
 
         $scope.title =  "Select a Registered App for the Launch Scenario";
-        $scope.showCustomApp = true;
+        $scope.isAppsPicker = true;
 
         appsService.getSampleApps().done(function(patientApps){
             appRegistrationServices.getSandboxApps().done(function () {
@@ -1958,7 +1958,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     $scope.galleryOffset = 246;
     $scope.canDelete = false;
     $scope.canModify = false;
-    $scope.showCustomApp = false;
+    $scope.isAppsPicker = false;
 
     $scope.showing = {appDetail: false};
 

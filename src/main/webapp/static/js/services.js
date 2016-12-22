@@ -1783,7 +1783,7 @@ angular.module('sandManApp.services', [])
         },
         loadSettings: function(){
             var deferred = $.Deferred();
-            if (envInfo.env !== "null") {
+            if (envInfo.active === true && envInfo.env !== "null") {
                 $http.get('static/js/config/sample-apps-' + envInfo.env + '.json').success(function (result) {
                     sampleApps = result;
                     deferred.resolve(sampleApps);
@@ -1791,6 +1791,13 @@ angular.module('sandManApp.services', [])
             } else {
                 $http.get('static/js/config/sample-apps-localhost.json').success(function (result) {
                     sampleApps = result;
+                    if (envInfo.active !== "null" && envInfo.active !== false) {
+                        for (var i=0; i < sampleApps.length; i++) {
+                            if (sampleApps[i]["isDefault"] !== undefined) {
+                                delete sampleApps[i]["isDefault"];
+                            }
+                        }
+                    }
                     deferred.resolve(sampleApps);
                 });
             }
