@@ -10,12 +10,12 @@
                         </div>
                         <a>{{app.authClient.clientName}}</a>
                         <div class="btn-holder">
-                            <div class="btn btn-basic btn-sm" style="width: 70px; margin-right: 5px" ng-click="edit(app)"><i class='fa fa-pencil fa-lg'></i> Edit</div>
-                            <div class="btn btn-basic btn-sm" style="width: 70px" ng-click="quickLaunch(app)"><i class='fa fa-external-link fa-lg'></i> Launch</div>
+                            <div ng-show="!isAppsPicker" class="btn btn-basic btn-sm" style="width: 70px; margin-right: 5px" ng-click="edit(app)"><i class='fa fa-pencil fa-lg'></i> Edit</div>
+                            <div ng-show="!isAppsPicker" class="btn btn-basic btn-sm" style="width: 70px" ng-click="quickLaunch(app)"><i class='fa fa-external-link fa-lg'></i> Launch</div>
                         </div>
                     </div>
                 </li>
-                <li ng-show="showCustomApp" ng-class="showing.appDetail ? 'col-md-4' : 'col-md-3'">
+                <li ng-show="isAppsPicker" ng-class="showing.appDetail ? 'col-md-4' : 'col-md-3'">
                     <div class="thumb-holder custom-app">
                     <div class="thumbnail">
                             <input type="text" ng-model="customapp.id" placeholder="Client ID" required /><br/>

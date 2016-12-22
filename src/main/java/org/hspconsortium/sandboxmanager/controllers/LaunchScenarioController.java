@@ -72,7 +72,6 @@ public class LaunchScenarioController extends AbstractController  {
         User user = userService.findByLdapId(launchScenario.getCreatedBy().getLdapId());
         launchScenario.setVisibility(getDefaultVisibility(user, sandbox));
         launchScenario.setCreatedBy(user);
-        userLaunchService.create(new UserLaunch(user, launchScenario, new Timestamp(new Date().getTime())));
 
         LaunchScenario createdLaunchScenario = launchScenarioService.create(launchScenario);
         userLaunchService.create(new UserLaunch(user, createdLaunchScenario, new Timestamp(new Date().getTime())));
