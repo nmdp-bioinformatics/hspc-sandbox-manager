@@ -151,7 +151,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.selectSandbox = function(sandbox) {
             if (sandboxManagement.getSandbox().sandboxId !== sandbox.sandboxId) {
-                window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + sandbox.sandboxId
+                var sandboxUrlSettings = appsSettings.getSandboxUrlSettings();
+                var routeToUrl = sandboxUrlSettings.sandboxManagerRootUrl + "/" + sandbox.sandboxId;
+                window.location.href = routeToUrl;
             } else if (sandboxManagement.getSandbox().sandboxId === sandbox.sandboxId && $state.current.name === "create-sandbox") {
                 $scope.showing.sideNavBar = true;
                 $state.go('manage-apps', {});
