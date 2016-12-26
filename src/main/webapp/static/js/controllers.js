@@ -258,7 +258,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.selectSandbox = function(sandbox) {
-            window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + sandbox.sandboxId
+            var sandboxUrlSettings = appsSettings.getSandboxUrlSettings();
+            var routeToUrl = sandboxUrlSettings.sandboxManagerRootUrl + "/" + sandbox.sandboxId;
+            window.location.href = routeToUrl;
         };
 
         $scope.updateSandboxInvite = function (sandboxInvite, status) {
