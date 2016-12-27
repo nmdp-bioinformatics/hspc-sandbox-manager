@@ -63,10 +63,16 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 }
                 event.preventDefault();
             } else if (toState.needsSandbox && !sandboxManagement.hasSandbox()){
-                // User can't go to a page which requires a sandbox without a sandbox
-                $scope.showing.navBar = false;
-                $scope.showing.sideNavBar = false;
-                $state.go('create-sandbox', {});
+                appsSettings.getSettings().then(function(settings){
+                    if (fhirApiServices.fhirClient().server.serviceUrl === settings.defaultServiceUrl) {
+                        $scope.dashboard();
+                    } else {
+                        // User can't go to a page which requires a sandbox without a sandbox
+                        $scope.showing.navBar = false;
+                        $scope.showing.sideNavBar = false;
+                        $state.go('create-sandbox', {});
+                    }
+                });
                 event.preventDefault();
             } else if (toState.name == "progress" && !sandboxManagement.creatingSandbox()){
 //                $scope.signin();
@@ -101,7 +107,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     appsSettings.getSettings().then(function(settings){
                         
                         //Initial sign in with no sandbox specified
-                        if (fhirApiServices.fhirClient().server.serviceUrl === settings.defaultServiceUrl) {
+                        if (appsSettings.getSandboxUrlSettings().sandboxId === undefined && fhirApiServices.fhirClient().server.serviceUrl === settings.defaultServiceUrl) {
                             $scope.dashboard();
                         } else {
                             sandboxManagement.getSandboxById().then(function(sandboxExists){
