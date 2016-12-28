@@ -2164,7 +2164,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.selected.selectedApp.clientJSON = updateClientJSON;
         $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
-        $scope.selected.selectedApp.samplePatients = $updateClientJSON.samplePatients;
+        $scope.selected.selectedApp.samplePatients = updateClientJSON.samplePatients;
         var modalProgress = openModalProgressDialog();
         appRegistrationServices.updateSandboxApp($scope.selected.selectedApp).then(function (result) {
             modalProgress.dismiss();
