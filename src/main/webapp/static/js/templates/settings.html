@@ -37,11 +37,11 @@
                         <label class="right-form-label">Description</label>
                         <textarea ng-disabled="!canEdit()" class="right-form-description-box" ng-model="sandbox.description"></textarea>
                     </div>
-                    <div  class="btn btn-basic btn-md" ng-disabled="!canEdit()" ng-click="updateSandbox()"><i class="fa fa-save fa-lg"></i> Save</div>
+                    <div ng-show="canEdit()" class="btn btn-basic btn-md" ng-disabled="!canEdit()" ng-click="updateSandbox()"><i class="fa fa-save fa-lg"></i> Save</div>
                 </div>
 
-                <div class="sub-header">Delete Sandbox</div>
-                <div class="box">
+                <div ng-show="canEdit()" class="sub-header">Delete Sandbox</div>
+                <div ng-show="canEdit()" class="box">
                     <label class="right-form-note-label">Deleting the sandbox will delete:
                         <ul>
                             <li>all FHIR data</li>
@@ -50,7 +50,7 @@
                             <li>remove access for all sandbox members</li>
                         </ul>
                         This is NOT reversible!</label>
-                    <div tooltip-placement="top" uib-tooltip="Only the sanbox creator can delete the sandbox" tooltip-trigger="!canDelete() ? 'mouseenter' : 'none'">
+                    <div tooltip-placement="top" uib-tooltip="Only the sandbox creator can delete the sandbox" tooltip-trigger="!canDelete() ? 'mouseenter' : 'none'">
                     <div class="right-form-group">
                         <input ng-disabled="!canDelete()" type="checkbox" ng-model="confirmDelete" class="right-form-input-checkbox"/>
                         <label class="right-form-checkbox-label">Are you sure you want to delete sandbox <b>{{sandbox.name}}</b>? </label>
