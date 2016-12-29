@@ -2051,6 +2051,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         });
     }
 
+    $scope.canModifyApp = function(app) {
+        return userServices.canModify(app, sandboxManagement.getSandbox());
+    };
+
+
     $scope.updateFile = function(files) {
 
         $scope.myFile = files[0];
