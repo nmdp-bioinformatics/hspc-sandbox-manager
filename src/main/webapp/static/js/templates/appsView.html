@@ -10,7 +10,7 @@
                         </div>
                         <a>{{app.authClient.clientName}}</a>
                         <div class="btn-holder">
-                            <div ng-show="!isAppsPicker" class="btn btn-basic btn-sm" style="width: 70px; margin-right: 5px" ng-click="edit(app)"><i class='fa fa-pencil fa-lg'></i> Edit</div>
+                            <div ng-show="!isAppsPicker && canModifyApp(app)" class="btn btn-basic btn-sm" style="width: 70px; margin-right: 5px" ng-click="edit(app)"><i class='fa fa-pencil fa-lg'></i> Edit</div>
                             <div ng-show="!isAppsPicker" class="btn btn-basic btn-sm" style="width: 70px" ng-click="quickLaunch(app)"><i class='fa fa-external-link fa-lg'></i> Launch</div>
                         </div>
                     </div>
