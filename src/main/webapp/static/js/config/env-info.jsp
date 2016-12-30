@@ -10,7 +10,8 @@
                     "basePersonaServiceUrl_1": "<%= System.getProperty("basePersonaServiceUrl_1") %>",
                     "basePersonaServiceUrl_2": "<%= System.getProperty("basePersonaServiceUrl_2") %>",
                     "oauthLogoutUrl": "<%= System.getProperty("oauthLogoutUrl") %>",
-                    "oauthAuthenticationUrl": "<%= System.getProperty("oauthAuthenticationUrl") %>",
+                    "oauthPersonaAuthenticationUrl_1": "<%= System.getProperty("oauthPersonaAuthenticationUrl_1") %>",
+                    "oauthPersonaAuthenticationUrl_2": "<%= System.getProperty("oauthPersonaAuthenticationUrl_2") %>",
                     "userManagementUrl": "<%= System.getProperty("userManagementUrl") %>",
                     "hostOrg": "<%= System.getProperty("hostOrg") %>"
                 });
