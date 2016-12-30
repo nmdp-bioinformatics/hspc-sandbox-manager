@@ -436,12 +436,12 @@ angular.module('sandManApp.services', [])
                 });
                 return deferred;
             },
-            registerContext: function(app, params, isSandboxLaunch){
+            registerContext: function(app, params, issuer){
                 var deferred = $.Deferred();
 
-                if (isSandboxLaunch === true) {
+                // if (isSandboxLaunch === true) {
                     var reqLaunch = fhirClient.authenticated({
-                        url: fhirClient.server.serviceUrl + '/_services/smart/Launch',
+                        url: issuer + '/_services/smart/Launch',
                         type: 'POST',
                         contentType: "application/json",
                         data: JSON.stringify({
@@ -453,23 +453,23 @@ angular.module('sandManApp.services', [])
                     $.ajax(reqLaunch)
                         .done(deferred.resolve)
                         .fail(deferred.reject);
-                } else {
-                    // Launch as User Persona
-                    var req = fhirClient.authenticated({
-                        url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/util/registerContext",
-                        type: 'POST',
-                        contentType: "application/json",
-                        data: JSON.stringify({
-                            client_id: app.authClient.clientId,
-                            parameters: params
-                        })
-                    });
-
-                    $.ajax(req)
-                        .done(deferred.resolve)
-                        .fail(deferred.reject);
-
-                }
+                // } else {
+                //     // Launch as User Persona
+                //     var req = fhirClient.authenticated({
+                //         url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/util/registerContext",
+                //         type: 'POST',
+                //         contentType: "application/json",
+                //         data: JSON.stringify({
+                //             client_id: app.authClient.clientId,
+                //             parameters: params
+                //         })
+                //     });
+                //
+                //     $.ajax(req)
+                //         .done(deferred.resolve)
+                //         .fail(deferred.reject);
+                //
+                // }
                 return deferred;
             }
         }
@@ -1520,35 +1520,40 @@ angular.module('sandManApp.services', [])
 
         getPatientDataManagerApp();
 
-        function registerAppContext(app, params, key, launchAsUserPersona, isSandboxLaunch) {
+        function registerAppContext(app, params, key, launchAsUserPersona) {
             var appToLaunch = angular.copy(app);
             delete appToLaunch.clientJSON;
-            var issuer = fhirApiServices.fhirClient().server.serviceUrl;
+
             if (launchAsUserPersona) {
-                appsSettings.getSettings().then(function(settings){
-                    issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_1, settings.basePersonaServiceUrl_1);
+                appsSettings.getSettings().then(function (settings) {
+                    var issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_1, settings.basePersonaServiceUrl_1);
                     if (appToLaunch.sandbox.schemaVersion === "2") {
                         issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_2, settings.basePersonaServiceUrl_2);
                     }
+                    callRegisterContext(appToLaunch, params, issuer, key);
                 });
+            } else {
+                callRegisterContext(appToLaunch, params, fhirApiServices.fhirClient().server.serviceUrl, key);
             }
+        }
 
+        function callRegisterContext(appToLaunch, params, issuer, key) {
             fhirApiServices
-                .registerContext(appToLaunch, params, isSandboxLaunch)
-                .done(function(c){
-                    console.log(fhirApiServices.fhirClient());
+                .registerContext(appToLaunch, params, issuer)
+                .done(function (c) {
                     window.localStorage[key] = JSON.stringify({
                         app: appToLaunch,
                         iss: issuer,
                         context: c
                     });
-                }).fail( function(err){
-                    console.log("Could not register launch context: ", err);
-                    appWindow.close();
-                    //                    $rootScope.$emit('reconnect-request');
-                    $rootScope.$emit('error', 'Could not register launch context (see console)');
-                    $rootScope.$digest();
-                });
+                }).fail(function (err) {
+                console.log("Could not register launch context: ", err);
+                appWindow.close();
+                //                    $rootScope.$emit('reconnect-request');
+                $rootScope.$emit('error', 'Could not register launch context (see console)');
+                $rootScope.$digest();
+            });
+        
         }
 
         function getPatientDataManagerApp() {
@@ -1568,7 +1573,7 @@ angular.module('sandManApp.services', [])
              (The window.open needs to be synchronous with the click event to
              avoid triggering  popup blockers. */
 
-            launch: function(app, patientContext, contextParams, userPersona, sandboxLaunch) {
+            launch: function(app, patientContext, contextParams, userPersona) {
                 var key = random(32);
                 window.localStorage[key] = "requested-launch";
                 // var appWindow;
@@ -1589,24 +1594,29 @@ angular.module('sandManApp.services', [])
                 }
 
                 if (userPersona !== null && userPersona !== undefined && userPersona !== "" ) {
+                    var authUrl = settings.oauthPersonaAuthenticationUrl_1;
+                    if (app.sandbox.schemaVersion === "2") {
+                        authUrl = settings.oauthPersonaAuthenticationUrl_2;
+                    }
+
                     appWindow = window.open('launch.html?key='+key +
                         '&username=' + encodeURIComponent(userPersona.ldapId) +
                         '&password=' + encodeURIComponent(userPersona.password) +
-                        '&auth=' + encodeURIComponent(settings.oauthAuthenticationUrl));
-                        registerAppContext(app, params, key, true, sandboxLaunch);
+                        '&auth=' + encodeURIComponent(authUrl));
+                        registerAppContext(app, params, key, true);
                 } else {
                     appWindow = window.open('launch.html?'+key, '_blank');
-                    registerAppContext(app, params, key, false, sandboxLaunch);
+                    registerAppContext(app, params, key, false);
                 }
             },
             launchPatientDataManager: function(patient){
                 if (patient.fhirId === undefined){
                     patient.fhirId = patient.id;
                 }
-                this.launch(patientDataManagerApp, patient, undefined, undefined, true );
+                this.launch(patientDataManagerApp, patient);
             },
             launchFromApp: function(app, patient){
-                this.launch(app, patient, undefined, undefined, true );
+                this.launch(app, patient);
             }
     }
 
@@ -1961,7 +1971,8 @@ angular.module('sandManApp.services', [])
                     settings.basePersonaServiceUrl_1 = envInfo.basePersonaServiceUrl_1;
                     settings.basePersonaServiceUrl_2 = envInfo.basePersonaServiceUrl_2;
                     settings.oauthLogoutUrl = envInfo.oauthLogoutUrl;
-                    settings.oauthAuthenticationUrl = envInfo.oauthAuthenticationUrl;
+                    settings.oauthPersonaAuthenticationUrl_1 = envInfo.oauthPersonaAuthenticationUrl_1;
+                    settings.oauthPersonaAuthenticationUrl_2 = envInfo.oauthPersonaAuthenticationUrl_2;
                     settings.userManagementUrl = envInfo.userManagementUrl;
                 }
                 deferred.resolve(settings);

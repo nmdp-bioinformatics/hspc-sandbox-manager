@@ -22,8 +22,10 @@ package org.hspconsortium.sandboxmanager.controllers;
 
 import org.hspconsortium.sandboxmanager.model.SystemRole;
 import org.hspconsortium.sandboxmanager.model.User;
+import org.hspconsortium.sandboxmanager.model.UserPersona;
 import org.hspconsortium.sandboxmanager.services.OAuthService;
 import org.hspconsortium.sandboxmanager.services.SandboxActivityLogService;
+import org.hspconsortium.sandboxmanager.services.UserPersonaService;
 import org.hspconsortium.sandboxmanager.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +50,16 @@ public class UserController extends AbstractController {
     private static Logger LOGGER = LoggerFactory.getLogger(UserController.class.getName());
 
     private final UserService userService;
+    private final UserPersonaService userPersonaService;
     private final SandboxActivityLogService sandboxActivityLogService;
 
     @Inject
     public UserController(final OAuthService oAuthService, final UserService userService,
-                          final SandboxActivityLogService sandboxActivityLogService) {
+                          final SandboxActivityLogService sandboxActivityLogService,
+                          final UserPersonaService userPersonaService) {
         super(oAuthService);
         this.userService = userService;
+        this.userPersonaService = userPersonaService;
         this.sandboxActivityLogService = sandboxActivityLogService;
     }
 
@@ -67,6 +72,12 @@ public class UserController extends AbstractController {
 
         // Create User if needed (if it's the first login to the system)
         if (user == null) {
+            UserPersona userPersona = userPersonaService.findByLdapId(ldapId);
+            if (userPersona != null) {
+                //This is a user persona. A user persona cannot be a sandbox user also
+                return null;
+            }
+
             user = new User();
             user.setCreatedTimestamp(new Timestamp(new Date().getTime()));
             user.setLdapId(ldapId);

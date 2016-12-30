@@ -65,9 +65,9 @@ hspc:
       oauthUserPassword: password
     messaging:
       port: 8080
-      context: /hspc-reference-messaging
+      context: /hspc-reference-messaging/
       sendEmail: false
       baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.messaging.port}${hspc.platform.messaging.context}
-      emailSenderEndpointURL: ${hspc.platform.messaging.baseUrl}/mailsender
-      sandboxUserEndpointURL: ${hspc.platform.messaging.baseUrl}/sandboxuser
+      emailSenderEndpointURL: ${hspc.platform.messaging.baseUrl}mailsender
+      sandboxUserEndpointURL: ${hspc.platform.messaging.baseUrl}sandboxuser
 
