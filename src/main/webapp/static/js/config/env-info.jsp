@@ -3,7 +3,6 @@
                 {
                     "active":          "<%= System.getProperty("envInfo.active") %>",
                     "env":          "<%= System.getProperty("hspcEnv") %>",
-                    "sandboxUserUri": "<%= System.getProperty("sandboxUserUri") %>",
                     "defaultServiceUrl": "<%= System.getProperty("defaultServiceUrl") %>",
                     "baseServiceUrl_1": "<%= System.getProperty("baseServiceUrl_1") %>",
                     "baseServiceUrl_2": "<%= System.getProperty("baseServiceUrl_2") %>",

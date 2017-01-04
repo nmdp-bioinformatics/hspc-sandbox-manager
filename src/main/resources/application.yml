@@ -42,8 +42,6 @@ hspc:
       port: 8080
       context: /hspc-reference-authorization
       baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.authorization.port}${hspc.platform.authorization.context}
-      smart:
-        launchUrl: ${hspc.platform.authorization.baseUrl}/Launch
     api:
       version1:
         port: 8080
