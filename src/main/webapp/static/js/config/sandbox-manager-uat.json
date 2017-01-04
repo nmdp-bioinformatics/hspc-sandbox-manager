@@ -1,5 +1,4 @@
 {
-    "sandboxUserUri" : "https://hspcreferencemessag-uat-env.us-west-2.elasticbeanstalk.com/sandboxuser",
     "defaultServiceUrl": "https://uat-api.hspconsortium.org/data",
     "baseServiceUrl": "https://uat-api.hspconsortium.org/hspc/",
     "oauthLogoutUrl": "https://uat-auth.hspconsortium.org/logout",

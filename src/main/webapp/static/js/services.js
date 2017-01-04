@@ -439,37 +439,19 @@ angular.module('sandManApp.services', [])
             registerContext: function(app, params, issuer){
                 var deferred = $.Deferred();
 
-                // if (isSandboxLaunch === true) {
-                    var reqLaunch = fhirClient.authenticated({
-                        url: issuer + '/_services/smart/Launch',
-                        type: 'POST',
-                        contentType: "application/json",
-                        data: JSON.stringify({
-                            client_id: app.authClient.clientId,
-                            parameters:  params
-                        })
-                    });
+                var reqLaunch = fhirClient.authenticated({
+                    url: issuer + '/_services/smart/Launch',
+                    type: 'POST',
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        client_id: app.authClient.clientId,
+                        parameters:  params
+                    })
+                });
 
-                    $.ajax(reqLaunch)
-                        .done(deferred.resolve)
-                        .fail(deferred.reject);
-                // } else {
-                //     // Launch as User Persona
-                //     var req = fhirClient.authenticated({
-                //         url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/util/registerContext",
-                //         type: 'POST',
-                //         contentType: "application/json",
-                //         data: JSON.stringify({
-                //             client_id: app.authClient.clientId,
-                //             parameters: params
-                //         })
-                //     });
-                //
-                //     $.ajax(req)
-                //         .done(deferred.resolve)
-                //         .fail(deferred.reject);
-                //
-                // }
+                $.ajax(reqLaunch)
+                    .done(deferred.resolve)
+                    .fail(deferred.reject);
                 return deferred;
             }
         }
@@ -924,52 +906,6 @@ angular.module('sandManApp.services', [])
         var sandboxManagerUser;
 
         return {
-            updateProfile: function(selectedUser){
-                var deferred = $.Deferred();
-                var that = this;
-                appsSettings.getSettings().then(function(settings){
-
-                    $.ajax({
-                        url: settings.sandboxUserUri + "/profileupdate",
-                        type: 'POST',
-                        data: JSON.stringify({
-                            user_id: that.getOAuthUser().ldapId,
-                            profile_url: selectedUser.fullUrl
-                        }),
-                        contentType: "application/json"
-                    }).done(function(result){
-                            deferred.resolve();
-                            $rootScope.$digest();
-                        }).fail(function(){
-                            deferred.reject();
-                        });
-                });
-                return deferred;
-            },
-            getFhirProfileUser: function() {
-                var deferred = $.Deferred();
-                if (fhirApiServices.fhirClient().userId === null ||
-                    typeof fhirApiServices.fhirClient().userId === "undefined"){
-                    deferred.resolve(null);
-                    return deferred;
-                }
-                var historyIndex = fhirApiServices.fhirClient().userId.lastIndexOf("/_history");
-                var userUrl = fhirApiServices.fhirClient().userId;
-                if (historyIndex > -1 ){
-                    userUrl = fhirApiServices.fhirClient().userId.substring(0, historyIndex);
-                }
-                var userIdSections = userUrl.split("/");
-
-                $.when(fhirApiServices.fhirClient().api.read({type: userIdSections[userIdSections.length-2], id: userIdSections[userIdSections.length-1]}))
-                    .done(function(userResult){
-
-                        var user = {name:""};
-                        user.name = $filter('nameGivenFamily')(userResult.data);
-                        user.id  = userResult.data.id;
-                        deferred.resolve(user);
-                    });
-                return deferred;
-            },
             getOAuthUser: function() {
                 return oauthUser;
             },
@@ -1964,7 +1900,6 @@ angular.module('sandManApp.services', [])
             $http.get('static/js/config/sandbox-manager.json').success(function(result){
                 settings = result;
                 if (envInfo.active !== "null" && envInfo.active !== "false") {
-                    settings.sandboxUserUri = envInfo.sandboxUserUri;
                     settings.defaultServiceUrl = envInfo.defaultServiceUrl;
                     settings.baseServiceUrl_1 = envInfo.baseServiceUrl_1;
                     settings.baseServiceUrl_2 = envInfo.baseServiceUrl_2;
