@@ -1,4 +1,4 @@
-<div class="col-md-12 horizontal-scroll" ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+70)" resize >
+<div class="col-md-12 horizontal-scroll" ng-style="scrollScreen(size.screenH, size.screenW) ? '' : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+40)" resize >
     <div class="row">
         <div class="col-md-12 content-column">
             <div class="detail-description">{{desc.title}}</div>
@@ -15,12 +15,12 @@
                         <label class="detail-form-value">{{selectedPersona.ldapId}}</label>
                     </div>
                     <div class="detail-form">
-                        <label class="detail-form-label">FHIR Resource Type:</label>
-                        <label class="detail-form-value"><i class='fa' ng-class="selectedPersona.resource == 'Patient' ? 'fa-bed' : 'fa-user-md'"></i> {{selectedPersona.resource}}</label>
-                    </div>
-                    <div class="detail-form">
                         <label class="detail-form-label">Password:</label>
                         <label class="detail-form-value">{{selectedPersona.password}}</label>
+                    </div>
+                    <div class="detail-form">
+                        <label class="detail-form-label">FHIR Resource Type:</label>
+                        <label class="detail-form-value"><i class='fa' ng-class="selectedPersona.resource == 'Patient' ? 'fa-bed' : 'fa-user-md'"></i> {{selectedPersona.resource}}</label>
                     </div>
                     <!--<div class="detail-form-line-inline short">-->
                         <!--<label class="detail-form-label-inline short">Password:</label>-->

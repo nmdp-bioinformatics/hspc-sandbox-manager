@@ -1047,13 +1047,6 @@ angular.module('sandManApp.services', [])
         getUserPersonaBuilder: function() {
             return personaBuilder;
         },
-        resourceIdFromFullUrl: function(fullUrl) {
-            var resourceId = angular.copy(fullUrl);
-            if (resourceId.startsWith(fhirApiServices.fhirClient().server.serviceUrl)) {
-                resourceId = resourceId.substr(fhirApiServices.fhirClient().server.serviceUrl.length + 1);
-            }
-            return resourceId;
-        },
         getPersonaList: function() {
             return personaList;
         },
@@ -1832,6 +1825,18 @@ angular.module('sandManApp.services', [])
         text = brandedText[envInfo.hostOrg];
     }
     return text;
+}]).factory('docLinks', ['branded',function(branded)  {
+    return {
+        docLink: function(docName){
+            var doc;
+            branded.documentationLinks.forEach(function(link) {
+                if (link.name === docName) {
+                    doc = link.link;
+                }
+            });
+            return doc;
+        }
+    };
 }]).factory('appsSettings', ['$http', 'envInfo',function($http, envInfo)  {
 
     var settings;

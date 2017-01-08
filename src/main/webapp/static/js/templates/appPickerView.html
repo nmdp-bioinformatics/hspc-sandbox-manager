@@ -1,19 +1,14 @@
 <div class="container-fluid" ng-controller="AppPickerController">
-    <!--<div class="text-center">-->
-        <div class="slim-page-header">{{title}}</div>
-    <!--</div>-->
-
+    <div class="slim-page-header">{{title}}</div>
     <div class="row">
         <div class="col-md-12 content-column">
-            <!--<div class="box">-->
-            <!--<div class="sub-header">Choose an App for {{name}}</div>-->
-            <div class="app-gallery-container" resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+120)">
+            <div class="app-gallery-container" resize
+                 ng-style="scrollScreen(size.screenH, size.screenW) ? '' : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+80)">
                 <br style="clear: both;" />
                 <div  class="row-fluid">
                     <div ng-include="'static/js/templates/appsView.html'"></div>
                 </div>
             </div>
-            <!--</div>-->
         </div>
     </div>
 </div>

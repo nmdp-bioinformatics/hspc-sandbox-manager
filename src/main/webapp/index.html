@@ -51,7 +51,7 @@
 </head>
 
 <!-- apply our angular app to our site -->
-<body ng-app="sandManApp" ng-class="scrollScreen(400, 1200) ? 'full-screen-scroll' : 'full-screen'" screen-size ng-controller="navController">
+<body ng-app="sandManApp" ng-class="scrollScreen(size.screenH, size.screenW) ? 'full-screen-scroll' : 'full-screen'" screen-size ng-controller="navController">
 
 <!-- NAVIGATION -->
 <nav class="navbar" role="navigation" ng-show="showing.navBar">
@@ -72,10 +72,10 @@
 <div>
     <div class="row container-fluid">
         <div ng-class="showing.largeSidebar ? 'col-xs-2' : 'col-xs-1'" class="col-xs-2 sidebar"
-            ng-show="showing.sideNavBar" resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight)">
+            ng-show="showing.sideNavBar" ng-style="{height: sideNavHeight}">
             <div ng-include src="'static/js/templates/sideNav.html'"></div>
         </div>
-        <div ng-class="showing.sideNavBar ? showing.largeSidebar ? 'col-xs-10' : 'col-xs-11' : 'col-xs-12'">
+        <div id="uiView" ng-class="showing.sideNavBar ? showing.largeSidebar ? 'col-xs-10' : 'col-xs-11' : 'col-xs-12'">
             <div ui-view></div>
         </div>
     </div>
@@ -85,7 +85,7 @@
     <div notification ng-repeat="message in messages"></div>
 </div>
 
-<footer ng-show="showing.navBar">
+<footer ng-show="showing.footer" ng-cloak>
     <div class="container">
         <div class="copyright" ng-cloak resize ng-style="{textAlign: scrollWidth(750) ? 'left' : 'center', marginLeft: showCert ? '100px' : '0px'}">
             {{copyright}}

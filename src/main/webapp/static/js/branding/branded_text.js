@@ -11,13 +11,13 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                 moreLinks: true,
                 dashboardTitle: "Dashboard",
                 showEmptyInviteList: true,
-                copyright: "© 2016 by Healthcare Services Platform Consortium",
+                copyright: "© 2017 by Healthcare Services Platform Consortium",
                 showCert: true,
                 loginDoc: "",
                 defaultSchemaVersion : "2",
                 sandboxSchemaVersions : [
-                    {version: "1", name: "FHIR DSTU 2"},
-                    {version: "2", name: "FHIR STU 3"}
+                    {version: "1", name: "FHIR DSTU 2 (v1.0.2)"},
+                    {version: "2", name: "FHIR STU 3 (v1.6.0)"}
                 ],
                 sandboxDescription: {
                     title: "What is a sandbox?",
@@ -33,7 +33,14 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                         "Create practitioners, patients, and clinical data",
                         "Verify that your app is HSPC compliant"
                     ]
-                }
+                },
+                documentationLinks : [
+                    {name: "registerAnApp", link: "https://healthservices.atlassian.net/wiki/display/HSPC/Sandbox+Registered+Apps"},
+                    {name: "sandboxVersions", link: "http://hl7.org/fhir/directory.html"},
+                    {name: "launchScenarios", link: "https://healthservices.atlassian.net/wiki/display/HSPC/Sandbox+Launch+Scenarios"},
+                    {name: "sandboxPersona", link: "https://healthservices.atlassian.net/wiki/display/HSPC/Sandbox+Persona"},       
+                    {name: "mainDocs", link: "https://healthservices.atlassian.net/wiki/display/HSPC/HSPC+Sandbox"}
+                ]
             }
     });
 }]);

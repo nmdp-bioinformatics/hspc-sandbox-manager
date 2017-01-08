@@ -1,13 +1,15 @@
 'use strict';
 
 angular.module('sandManApp.controllers', []).controller('navController',[
-    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "personaServices", "$location", "$state", "branded",
-    function($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, personaServices, $location, $state, branded) {
+    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "personaServices", "$location", "$state", "branded", "$timeout", "$window",
+    function($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, personaServices, $location, $state, branded, $timeout, $window) {
 
         $scope.size = {
             navBarHeight: 60,
             footerHeight: 60,
-            sandboxBarHeight: 0
+            sandboxBarHeight: 0,
+            screenH: 670,
+            screenW: 1200
         };
 
         $scope.showing = {
@@ -19,6 +21,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             searchloading: false,
             navBar: true,
             sideNavBar: false,
+            footer: true,
             largeSidebar: true,
             moreLinks: false,
             start: false
@@ -69,6 +72,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     } else {
                         // User can't go to a page which requires a sandbox without a sandbox
                         $scope.showing.navBar = false;
+                        $scope.showing.footer = false;
                         $scope.showing.sideNavBar = false;
                         $state.go('create-sandbox', {});
                     }
@@ -134,15 +138,20 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.signin = false;
             $scope.showing.signout = true;
             $scope.showing.navBar = true;
+            $scope.showing.footer = true;
             $scope.showing.sideNavBar = true;
             $scope.showing.slimBlueBar = true;
-            $scope.size.sandboxBarHeight = 30;
+            $scope.size.sandboxBarHeight = 50;
+            $scope.patientsLabel = $scope.canManageData() ? "Patients" : "Browse Patients";
+            $scope.practitionersLabel = $scope.canManageData() ? "Practitioner" : "Browse Practitioner";
+            $scope.dataLabel = $scope.canManageData() ? "Data Manager" : "Data Browser";
             $state.go('manage-apps', {});
         }
 
         $rootScope.$on('hide-nav', function(){
             $scope.showing.navBar = false;
             $scope.showing.sideNavBar = false;
+            $scope.showing.footer = false;
         });
 
         $scope.signout = function() {
@@ -152,6 +161,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.signout = false;
             $scope.showing.navBar = true;
             $scope.showing.sideNavBar = false;
+            $scope.showing.footer = true;
             oauth2.logout();
         };
 
@@ -219,6 +229,39 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
         // });
 
+        // Set the Side Nav Bar to the height to the height of the uiView
+        // This sets a watcher to catch when the uiView and Side Nav Bar heights
+        // are different. A timeout runs after each digest to check since the
+        // uiView height is modified outside of angular's detection.
+        $scope.sideNavHeight = document.getElementById('uiView').offsetHeight;
+        function postDigest(callback){
+            var unregister = $rootScope.$watch(function(){
+                unregister();
+                $timeout(function(){
+                    callback();
+                    postDigest(callback);
+                },0,false);
+            });
+        }
+
+        postDigest(function(){
+            var offset = $scope.size.navBarHeight+$scope.size.footerHeight+$scope.size.sandboxBarHeight;
+            var uiViewHeight = document.getElementById('uiView').offsetHeight;
+            var windowHeight = $window.innerHeight - offset;
+            var sideNav = 0;
+            if (document.getElementById('sideNav')) {
+                sideNav = document.getElementById('sideNav').offsetHeight;
+            }
+            var largerHeight = uiViewHeight > windowHeight ? uiViewHeight : windowHeight;
+            largerHeight = largerHeight > sideNav ? largerHeight : sideNav;
+
+            if ($scope.sideNavHeight !== largerHeight) {
+
+                $scope.sideNavHeight = largerHeight;
+                $rootScope.$digest();
+            }
+        });
+
     }]).controller("AfterAuthController", // After auth
         function(fhirApiServices){
             fhirApiServices.initClient();
@@ -233,6 +276,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     function($scope, $state, $timeout, userServices, branded){
         $scope.showing.navBar = true;
         $scope.showing.sideNavBar = false;
+        $scope.showing.footer = !sessionStorage.hspcAuthorized;
         $scope.showing.start = !sessionStorage.hspcAuthorized;
 
         $scope.title = branded.sandboxDescription.title;
@@ -251,6 +295,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     }).controller("DashboardViewController",
     function($scope, $rootScope, $state, userServices, sandboxManagement, sandboxInviteServices, appsSettings, branded){
         $scope.showing.navBar = true;
+        $scope.showing.footer = true;
         $scope.showing.sideNavBar = false;
         $scope.showing.slimBlueBar = false;
         $scope.size.sandboxBarHeight = 0;
@@ -709,9 +754,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             }
         };
     }).controller("CreateSandboxController",
-    function($rootScope, $scope, $state, sandboxManagement, tools, appsSettings, branded){
+    function($rootScope, $scope, $state, sandboxManagement, tools, appsSettings, branded, docLinks){
 
         $scope.showing.navBar = true;
+        $scope.showing.footer = true;
         $scope.showing.sideNavBar = false;
         $scope.showing.slimBlueBar = false;
         $scope.isIdValid = false;
@@ -731,6 +777,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.description = branded.sandboxDescription.description;
         $scope.bottomNote = branded.sandboxDescription.bottomNote;
         $scope.checkList = branded.sandboxDescription.checkList;
+        $scope.docLink = docLinks.docLink;
 
         $scope.baseUrl = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl;
 
@@ -801,6 +848,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     }).controller("LoginController",
     function($rootScope, $scope, $state, oauth2, fhirApiServices){
 
+        $scope.showing.footer = false;
         if (fhirApiServices.clientInitialized()) {
             $rootScope.$emit('signed-in');
         } else {
@@ -808,7 +856,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
     }).controller("SideBarController",
-    function($rootScope, $scope, sandboxManagement, userServices){
+    function($rootScope, $scope, docLinks){
+
+        $scope.docLink = docLinks.docLink;
 
         var sideBarStates = ['launch-scenarios','users', 'patients', 'practitioners', 'manage-apps'];
 
@@ -867,7 +917,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             if (source === 'persona') {
                 personaServices.getUserPersonaBuilder().fhirId = p.id;
                 personaServices.getUserPersonaBuilder().resource = p.resourceType;
-                personaServices.getUserPersonaBuilder().resourceUrl = personaServices.resourceIdFromFullUrl(p.fullUrl);
+                personaServices.getUserPersonaBuilder().resourceUrl = p.resourceType + '/' + p.id;
                 personaServices.getUserPersonaBuilder().fhirName = $filter('nameGivenFamily')(p);
                 personaServices.getUserPersonaBuilder().ldapName = $filter('nameGivenFamily')(p);
                 openModalDialog(personaServices.getUserPersonaBuilder());
@@ -926,6 +976,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.createPatient =  false;
             $scope.showing.navBar = false;
             $scope.showing.sideNavBar = false;
+            $scope.showing.footer = false;
             $rootScope.$emit('hide-nav');
         } else { // Patient View
             $scope.showing.noPatientContext =  false;
@@ -1203,7 +1254,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.setPractitioner = function(p){
             personaServices.getUserPersonaBuilder().fhirId = p.id;
             personaServices.getUserPersonaBuilder().resource = p.resourceType;
-            personaServices.getUserPersonaBuilder().resourceUrl = personaServices.resourceIdFromFullUrl(p.fullUrl);
+            personaServices.getUserPersonaBuilder().resourceUrl = p.resourceType +'/' + p.id;
             personaServices.getUserPersonaBuilder().fhirName = $filter('nameGivenFamily')(p);
             personaServices.getUserPersonaBuilder().ldapName = $filter('nameGivenFamily')(p);
             openModalDialog(personaServices.getUserPersonaBuilder());
@@ -1244,6 +1295,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.createPractitioner =  true;
         }
 
+        $scope.count = {start: 0, end: 0, total: 0};
 
         $scope.practitioners = [];
         $scope.searchterm = "";
@@ -1259,6 +1311,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             fhirApiServices.getNextOrPrevPage(direction, lastQueryResult).then(function(p, queryResult){
                 lastQueryResult = queryResult;
                 $scope.practitioners = p;
+                $scope.count = fhirApiServices.calculateResultSet(queryResult);
                 $scope.showing.searchloading = false;
                 $rootScope.$digest();
                 modalProgress.dismiss();
@@ -1299,6 +1352,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     }
                     $scope.practitioners = p;
                     $scope.showing.searchloading = false;
+                    $scope.count = fhirApiServices.calculateResultSet(queryResult);
                     modalProgress.dismiss();
                     $rootScope.$digest();
                 });
@@ -1328,7 +1382,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         });
 
     }).controller("LaunchScenariosController",
-    function($rootScope, $scope, $state, sandboxManagement, launchApp, userServices, descriptionBuilder){
+    function($rootScope, $scope, $state, sandboxManagement, launchApp, userServices, descriptionBuilder, docLinks){
         $scope.showing = {detail: false, addingContext: false};
         $scope.isCustom = false;
         $scope.canDelete = false;
@@ -1338,6 +1392,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         sandboxManagement.getSandboxLaunchScenarios();
         sandboxManagement.clearScenarioBuilder();
         sandboxManagement.getScenarioBuilder().owner = userServices.getOAuthUser();
+        $scope.docLink = docLinks.docLink;
 
         $scope.launch = function(scenario){
             scenario.lastLaunchSeconds = new Date().getTime();
@@ -1403,7 +1458,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         });
 
     }).controller("PersonaController",
-    function($rootScope, $scope, $state, $filter, sandboxManagement, userServices, personaServices){
+    function($rootScope, $scope, $state, $filter, sandboxManagement, userServices, personaServices, docLinks){
 
         $scope.showing = {
             detail: false,
@@ -1415,6 +1470,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.canModify = false;
         $scope.selectedPersona = {};
         $scope.personaList = [];
+        $scope.docLink = docLinks.docLink;
 
         personaServices.getPersonaListBySandbox();
         personaServices.clearUserPersonaBuilder();
@@ -1682,13 +1738,14 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
         };
-    }]).controller('ModalPersonaInstanceCtrl',['$scope', '$uibModalInstance', "getUser", "sandboxManagement", "personaServices",
-    function ($scope, $uibModalInstance, getUser, sandboxManagement, personaServices) {
+    }]).controller('ModalPersonaInstanceCtrl',['$scope', '$uibModalInstance', "getUser", "sandboxManagement", "personaServices", "docLinks",
+    function ($scope, $uibModalInstance, getUser, sandboxManagement, personaServices, docLinks) {
 
         $scope.invalidMessage = "User Id Not Available";
         $scope.user = getUser;
         $scope.title = "Save " + $scope.user.resource + " Persona";
         $scope.sandboxId = sandboxManagement.getSandbox().sandboxId;
+        $scope.docLink = docLinks.docLink;
 
         $scope.savePersona = function (persona) {
             persona.ldapId = persona.ldapId + "@" + $scope.sandboxId;
@@ -1962,13 +2019,14 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                         });
                 }
             };
-    }).controller("AppsController", function($scope, $rootScope, $state, appRegistrationServices, sandboxManagement, userServices, fhirApiServices, launchApp, $uibModal) {
+    }).controller("AppsController", function($scope, $rootScope, $state, appRegistrationServices, sandboxManagement, userServices, fhirApiServices, launchApp, $uibModal, docLinks) {
 
     $scope.all_user_apps = [];
     $scope.galleryOffset = 246;
     $scope.canDelete = false;
     $scope.canModify = false;
     $scope.isAppsPicker = false;
+    $scope.docLink = docLinks.docLink;
 
     $scope.showing = {appDetail: false};
 
@@ -2206,13 +2264,14 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         });
     };
 
-}).controller('AppRegistrationModalCtrl',function ($scope, $rootScope, sandboxManagement, $uibModalInstance) {
+}).controller('AppRegistrationModalCtrl',function ($scope, $rootScope, sandboxManagement, docLinks, $uibModalInstance) {
 
     $scope.clientType = "Public Client";
     // $scope.clientTypes = ["Confidential Client", "Public Client", "Backend Service"];
     $scope.clientTypes = ["Public Client", "Confidential Client"];
     $scope.patientScoped = true;
     $scope.offlineAccess = false;
+    $scope.docLink = docLinks.docLink;
 
     $scope.clientJSON = {};
 
@@ -2293,6 +2352,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.createProgress = 0;
         $scope.showing.navBar = false;
         $scope.showing.sideNavBar = false;
+        $scope.showing.footer = false;
 
         var messageNum = 0;
         var messages = branded.sandboxDescription.checkList;
