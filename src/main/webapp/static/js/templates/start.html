@@ -1,6 +1,5 @@
-<div  ng-controller="StartController">
-    <!--<img src="static/images/SandboxLogo.png"/>-->
-    <!--<div class="start-title">Create Your Sandbox</div>-->
+<div  ng-controller="StartController" resize
+      ng-style="scrollScreen(size.screenH, size.screenW) ? '' : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+60)">
     <div class="slim-page-header" ng-show="!showing.start" ng-cloak>Loading...</div>
     <div class="row start-box start-form" ng-show="showing.start">
         <div class="col-lg-12 start-section ">

@@ -3,7 +3,7 @@
         <div class="slim-page-header">Import JSON Bundle</div>
         <div class="pull-left basic-text">Paste JSON FHIR Bundle in the Text Area</div>
 
-        <textarea resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+160)" ng-model="settings.bundle" style="resize: none; background-color: #fff; cursor: text; height:400px; margin-top: 30px" class="form-control"></textarea>
+        <textarea resize ng-style="scrollScreen(size.screenH, size.screenW) ? {'min-height': '380px'} : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+160)" ng-model="settings.bundle" style="resize: none; background-color: #fff; cursor: text; height:400px; margin-top: 30px" class="form-control"></textarea>
         <div class="col-md-12 content-column">
             <div ng-disabled="!settings.bundle" class="btn btn-basic btn-md" ng-click="upload(settings.bundle)"><i class="fa fa-upload fa-lg"></i> Import</div>
             <label class="btn btn-basic btn-md"><input type="file" name="file" onchange="angular.element(this).scope().uploadFile(this.files)" required/><i class="fa fa-upload fa-lg"></i><span> Import File</span></label>
@@ -11,7 +11,7 @@
     </div>
     <div class="col-lg-6">
         <div class="slim-page-header" style="padding-bottom:25px" >Import Results</div>
-        <textarea resize ng-style="resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+160)" style="resize: none; background-color: #fff; cursor: text; height:400px" class="form-control"  readonly>{{settings.bundleResults}}</textarea>
+        <textarea resize ng-style="scrollScreen(size.screenH, size.screenW) ? {'min-height': '380px'} : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+160)" style="resize: none; background-color: #fff; cursor: text; height:400px" class="form-control"  readonly>{{settings.bundleResults}}</textarea>
         <div class="col-md-12 content-column">
             <div class="btn btn-basic btn-md" ng-disabled="!settings.showing.import.results" ng-click="save(saveFileName)"><i class="fa fa-save fa-lg"></i> Save To File</div>
         </div>
