@@ -2055,12 +2055,31 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             var modalProgress = openModalProgressDialog();
             appRegistrationServices.createSandboxApp(app).then(function (result) {
                 modalProgress.dismiss();
+                showClientId(result.authClient.clientId);
             }, function(err) {
                 modalProgress.dismiss();
                 $state.go('error', {});
             });
         });
     };
+
+    function showClientId(client_id) {
+        $uibModal.open({
+            animation: true,
+            templateUrl: 'static/js/templates/messageModal.html',
+            controller: 'MessageModalInstanceCtrl',
+            size: 'md',
+            resolve: {
+                getSettings: function () {
+                    return {
+                        title:"App Client Id",
+                        message:"Use this Client Id in your app with the authorization request.",
+                        displayValue: {label: "Client Id:", value: client_id}
+                    }
+                }
+            }
+        });
+    }
 
     function openModalProgressDialog() {
         return $uibModal.open({
@@ -2401,6 +2420,16 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.confirm = function (result) {
             $uibModalInstance.close(result);
             callback(result);
+        };
+    }]).controller('MessageModalInstanceCtrl',['$scope', '$uibModalInstance', 'getSettings',
+    function ($scope, $uibModalInstance, getSettings) {
+
+        $scope.title = (getSettings.title !== undefined) ? getSettings.title : "";
+        $scope.message = getSettings.message;
+        $scope.displayValue = getSettings.displayValue;
+
+        $scope.close = function () {
+            $uibModalInstance.close();
         };
     }]).controller('SandboxDeleteModalInstanceCtrl',['$scope', '$uibModalInstance', 'getSettings',
     function ($scope, $uibModalInstance, getSettings) {

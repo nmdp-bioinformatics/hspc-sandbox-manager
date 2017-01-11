@@ -1200,14 +1200,14 @@ angular.module('sandManApp.services', [])
                     that.uploadAppImage(result.id, logo).then(function () {
                         that.getSandboxApps();
                         notification.message("App Created");
-                        deferred.resolve();
+                        deferred.resolve(result);
                     }, function(err) {
                         deferred.reject();
                     });
                 }else {
                     that.getSandboxApps();
                     notification.message("App Created");
-                    deferred.resolve();
+                    deferred.resolve(result);
                 }
             }).fail(function(error){
                 errorService.setErrorMessage(error.message);
