@@ -32,6 +32,8 @@ angular.module('sandManApp.services', [])
                     serviceUrl = s.baseServiceUrl_1 + sandboxId + "/data";
                     if (sandboxVersion !== undefined && sandboxVersion !== "" && sandboxVersion === "2") {
                         serviceUrl = s.baseServiceUrl_2 + sandboxId + "/data";
+                    } else if (sandboxVersion !== undefined && sandboxVersion !== "" && sandboxVersion === "3") {
+                        serviceUrl = s.baseServiceUrl_3 + sandboxId + "/data";
                     }
                 }
                 FHIR.oauth2.authorize({
@@ -709,6 +711,7 @@ angular.module('sandManApp.services', [])
                     sandboxId: newSandbox.sandboxId,
                     description: newSandbox.description,
                     schemaVersion: newSandbox.schemaVersion,
+                    allowOpenAccess: newSandbox.allowOpenAccess,
                     users: [userServices.getOAuthUser()]
                 };
 
@@ -1458,6 +1461,8 @@ angular.module('sandManApp.services', [])
                     var issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_1, settings.basePersonaServiceUrl_1);
                     if (appToLaunch.sandbox.schemaVersion === "2") {
                         issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_2, settings.basePersonaServiceUrl_2);
+                    } else if (appToLaunch.sandbox.schemaVersion === "3") {
+                        issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_3, settings.basePersonaServiceUrl_3);
                     }
                     callRegisterContext(appToLaunch, params, issuer, key);
                 });
@@ -1523,15 +1528,10 @@ angular.module('sandManApp.services', [])
                 }
 
                 if (userPersona !== null && userPersona !== undefined && userPersona !== "" ) {
-                    var authUrl = settings.oauthPersonaAuthenticationUrl_1;
-                    if (app.sandbox.schemaVersion === "2") {
-                        authUrl = settings.oauthPersonaAuthenticationUrl_2;
-                    }
-
                     appWindow = window.open('launch.html?key='+key +
                         '&username=' + encodeURIComponent(userPersona.ldapId) +
                         '&password=' + encodeURIComponent(userPersona.password) +
-                        '&auth=' + encodeURIComponent(authUrl));
+                        '&auth=' + encodeURIComponent(settings.oauthPersonaAuthenticationUrl));
                         registerAppContext(app, params, key, true);
                 } else {
                     appWindow = window.open('launch.html?'+key, '_blank');
@@ -1722,7 +1722,7 @@ angular.module('sandManApp.services', [])
         },
         loadSettings: function(){
             var deferred = $.Deferred();
-            if (envInfo.active === true && envInfo.env !== "null") {
+            if (envInfo.active === "true" && envInfo.env !== "null") {
                 $http.get('static/js/config/sample-apps-' + envInfo.env + '.json').success(function (result) {
                     sampleApps = result;
                     deferred.resolve(sampleApps);
@@ -1908,11 +1908,12 @@ angular.module('sandManApp.services', [])
                     settings.defaultServiceUrl = envInfo.defaultServiceUrl;
                     settings.baseServiceUrl_1 = envInfo.baseServiceUrl_1;
                     settings.baseServiceUrl_2 = envInfo.baseServiceUrl_2;
+                    settings.baseServiceUrl_3 = envInfo.baseServiceUrl_3;
                     settings.basePersonaServiceUrl_1 = envInfo.basePersonaServiceUrl_1;
                     settings.basePersonaServiceUrl_2 = envInfo.basePersonaServiceUrl_2;
+                    settings.basePersonaServiceUrl_3 = envInfo.basePersonaServiceUrl_3;
                     settings.oauthLogoutUrl = envInfo.oauthLogoutUrl;
-                    settings.oauthPersonaAuthenticationUrl_1 = envInfo.oauthPersonaAuthenticationUrl_1;
-                    settings.oauthPersonaAuthenticationUrl_2 = envInfo.oauthPersonaAuthenticationUrl_2;
+                    settings.oauthPersonaAuthenticationUrl = envInfo.oauthPersonaAuthenticationUrl;
                     settings.userManagementUrl = envInfo.userManagementUrl;
                 }
                 deferred.resolve(settings);

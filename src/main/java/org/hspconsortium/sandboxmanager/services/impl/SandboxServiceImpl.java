@@ -60,6 +60,9 @@ public class SandboxServiceImpl implements SandboxService {
     @Value("${hspc.platform.api.sandboxManagementEndpointURL_2}")
     private String sandboxManagementEndpointURL_2;
 
+    @Value("${hspc.platform.api.sandboxManagementEndpointURL_3}")
+    private String sandboxManagementEndpointURL_3;
+
     @Value("${hspc.platform.api.oauthUserInfoEndpointURL}")
     private String oauthUserInfoEndpointURL;
 
@@ -348,6 +351,8 @@ public class SandboxServiceImpl implements SandboxService {
 
         if (sandbox.getSchemaVersion().equalsIgnoreCase("2")) {
             url = this.sandboxManagementEndpointURL_2 + "/" + sandbox.getSandboxId();
+        } else if (sandbox.getSchemaVersion().equalsIgnoreCase("3")) {
+            url = this.sandboxManagementEndpointURL_3 + "/" + sandbox.getSandboxId();
         }
 
         HttpPut putRequest = new HttpPut(url);
@@ -409,6 +414,8 @@ public class SandboxServiceImpl implements SandboxService {
 
         if (sandbox.getSchemaVersion().equalsIgnoreCase("2")) {
             url = this.sandboxManagementEndpointURL_2 + "/" + sandbox.getSandboxId();
+        } else if (sandbox.getSchemaVersion().equalsIgnoreCase("3")) {
+            url = this.sandboxManagementEndpointURL_3 + "/" + sandbox.getSandboxId();
         }
 
         HttpDelete deleteRequest = new HttpDelete(url);

@@ -452,10 +452,14 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.openFhirUrl = settings.baseServiceUrl_1 + $scope.sandbox.sandboxId + "/open";
             if ($scope.sandbox.schemaVersion === "2") {
                 $scope.openFhirUrl = settings.baseServiceUrl_2 + $scope.sandbox.sandboxId + "/open";
+            } else  if ($scope.sandbox.schemaVersion === "3") {
+                $scope.openFhirUrl = settings.baseServiceUrl_3 + $scope.sandbox.sandboxId + "/open";
             }
             $scope.secureFhirUrl = settings.baseServiceUrl_1 + $scope.sandbox.sandboxId + "/data";
             if ($scope.sandbox.schemaVersion === "2") {
                 $scope.secureFhirUrl = settings.baseServiceUrl_2 + $scope.sandbox.sandboxId + "/data";
+            } else  if ($scope.sandbox.schemaVersion === "3") {
+                $scope.secureFhirUrl = settings.baseServiceUrl_3 + $scope.sandbox.sandboxId + "/data";
             }
         });
 

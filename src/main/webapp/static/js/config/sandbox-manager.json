@@ -2,11 +2,12 @@
     "defaultServiceUrl": "http://localhost:8080/hspc-reference-api/hspc/data",
     "baseServiceUrl_1": "http://localhost:8080/hspc-reference-api/",
     "baseServiceUrl_2": "http://localhost:8081/hspc-reference-api/",
-    "basePersonaServiceUrl_1": "http://localhost:8081/hspc-reference-api1/",
-    "basePersonaServiceUrl_2": "http://localhost:8081/hspc-reference-api1/",
+    "baseServiceUrl_3": "http://localhost:8082/hspc-reference-api/",
+    "basePersonaServiceUrl_1": "http://localhost:8080/hspc-reference-api1/",
+    "basePersonaServiceUrl_2": "http://localhost:8081/hspc-reference-api2/",
+    "basePersonaServiceUrl_3": "http://localhost:8082/hspc-reference-api3/",
     "oauthLogoutUrl": "http://localhost:8080/hspc-reference-authorization/logout",
-    "oauthPersonaAuthenticationUrl_1": "http://localhost:8081/hspc-reference-authorization1/static/auth/index.html",
-    "oauthPersonaAuthenticationUrl_2": "http://localhost:8081/hspc-reference-authorization1/static/auth/index.html",
+    "oauthPersonaAuthenticationUrl": "http://localhost:8080/hspc-reference-authorization1/static/auth/index.html",
     "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
-    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static", "open", "data", "test", "1", "2"]
+    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static", "open", "data", "test", "1", "2", "3", "4", "5", "6"]
 }

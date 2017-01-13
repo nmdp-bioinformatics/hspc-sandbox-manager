@@ -14,10 +14,10 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                 copyright: "© 2017 by Healthcare Services Platform Consortium",
                 showCert: true,
                 loginDoc: "",
-                defaultSchemaVersion : "2",
+                defaultSchemaVersion : "3",
                 sandboxSchemaVersions : [
                     {version: "1", name: "FHIR DSTU 2 (v1.0.2)"},
-                    {version: "2", name: "FHIR STU 3 (v1.6.0)"}
+                    {version: "3", name: "FHIR STU 3 (v1.8.0)"}
                 ],
                 sandboxDescription: {
                     title: "What is a sandbox?",
