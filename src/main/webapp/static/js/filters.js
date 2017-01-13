@@ -11,46 +11,57 @@ angular.module('sandManApp.filters', []).filter('formatAttribute', function ($fi
             }
         };
 }).filter('nameGivenFamily', function () {
-        return function(p){
-            var isArrayName = p && p.name && p.name[0];
+    return function(p){
+        var isArrayName = p && p.name && p.name[0];
+        var personName;
 
-            if (isArrayName) {
-                var patientName = p && p.name && p.name[0];
-                if (!patientName) return null;
+        if (isArrayName) {
+            personName = p && p.name && p.name[0];
+            if (!personName) return null;
 
-                return patientName.given.join(" ") + " " + patientName.family.join(" ");
-            } else {
-                var practitionerName = p && p.name;
-                if (!practitionerName) return null;
+        } else {
+            personName = p && p.name;
+            if (!personName) return null;
+        }
 
-                var practitioner =  practitionerName.given.join(" ") + " " + practitionerName.family.join(" ");
-                if (practitionerName.suffix) {
-                    practitioner = practitioner + ", " + practitionerName.suffix.join(", ");
-                }
-                return practitioner;
-            }
-        };
-    }).filter('nameFamilyGiven', function () {
-        return function(p){
-            var isArrayName = p && p.name && p.name[0];
+        var user;
+        if (Object.prototype.toString.call(personName.family) === '[object Array]') {
+            user = personName.given.join(" ") + " " + personName.family.join(" ");
+        } else {
+            user = personName.given.join(" ") + " " + personName.family;
+        }
+        if (personName.suffix) {
+            user = user + ", " + personName.suffix.join(", ");
+        }
+        return user;
+    };
+}).filter('nameFamilyGiven', function () {
+    return function(p){
+        var isArrayName = p && p.name && p.name[0];
+        var personName;
 
-            if (isArrayName) {
-                var patientName = p && p.name && p.name[0];
-                if (!patientName) return null;
+        if (isArrayName) {
+            personName = p && p.name && p.name[0];
+            if (!personName) return null;
 
-                return patientName.family.join(" ") + ", " + patientName.given.join(" ");
-            } else {
-                var practitionerName = p && p.name;
-                if (!practitionerName) return null;
+        } else {
+            personName = p && p.name;
+            if (!personName) return null;
+        }
 
-                var practitioner =  practitionerName.family.join(" ") + ", " + practitionerName.given.join(" ");
-                if (practitionerName.suffix) {
-                    practitioner = practitioner + ", " + practitionerName.suffix.join(", ");
-                }
-                return practitioner;
-            }
-        };
-    }).filter('ageFilter', function () {
+        var user;
+        if (Object.prototype.toString.call(personName.family) === '[object Array]') {
+            user = personName.family.join(" ") + ", " + personName.given.join(" ");
+        } else {
+            user = personName.family + ", " + personName.given.join(" ");
+        }
+        if (personName.suffix) {
+            user = user + ", " + personName.suffix.join(", ");
+        }
+
+        return user;
+    };
+}).filter('ageFilter', function () {
     return function(dob) {
         // var dob = patient.birthDate;
         if (!dob) return "";

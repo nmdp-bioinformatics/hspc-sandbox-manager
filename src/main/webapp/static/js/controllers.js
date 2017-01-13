@@ -82,7 +82,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 //                $scope.signin();
                 event.preventDefault();
             } else if (toState.scenarioBuilderStep && sandboxManagement.getScenarioBuilder().userPersona === "") {
-                $state.go('manage-apps', {});
+                $state.go('launch-scenarios', {});
+                // $state.go('manage-apps', {});
                 event.preventDefault();
             }
         });
@@ -145,7 +146,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.patientsLabel = $scope.canManageData() ? "Patients" : "Browse Patients";
             $scope.practitionersLabel = $scope.canManageData() ? "Practitioner" : "Browse Practitioner";
             $scope.dataLabel = $scope.canManageData() ? "Data Manager" : "Data Browser";
-            $state.go('manage-apps', {});
+            $rootScope.$digest();
+            // $state.go('manage-apps', {});
+            $state.go('launch-scenarios', {});
         }
 
         $rootScope.$on('hide-nav', function(){
@@ -172,7 +175,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 window.location.href = routeToUrl;
             } else if (sandboxManagement.getSandbox().sandboxId === sandbox.sandboxId && $state.current.name === "create-sandbox") {
                 $scope.showing.sideNavBar = true;
-                $state.go('manage-apps', {});
+                $state.go('launch-scenarios', {});
+                // $state.go('manage-apps', {});
             }
         };
 
@@ -437,12 +441,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
     }).controller("SettingsViewController",
-    function($scope, $rootScope, sandboxManagement, appsSettings, userServices, $uibModal, branded){
+    function($scope, $rootScope, sandboxManagement, appsSettings, userServices, $uibModal, schemaServices){
 
         $scope.sandbox = angular.copy(sandboxManagement.getSandbox());
         $scope.sandboxURL = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + $scope.sandbox.sandboxId;
         $scope.allowOpenAccess = $scope.sandbox.allowOpenAccess;
-        $scope.sandboxSchemaVersions = branded.sandboxSchemaVersions;
 
         $scope.canEdit = function (){
             return userServices.canModifySandbox(sandboxManagement.getSandbox())
@@ -463,16 +466,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             }
         });
 
-        $scope.fhirVersion = schemaVersionName ($scope.sandbox.schemaVersion);
-        function schemaVersionName (schemaVersion) {
-            var name = "";
-            $scope.sandboxSchemaVersions.forEach(function(schema){
-                if (schemaVersion == schema.version) {
-                    name = schema.name;
-                }
-            });
-            return name;
-        }
+        $scope.fhirVersion = schemaServices.getSandboxSchemaVersion().name;
 
         $scope.canDelete = function () {
             return (sandboxManagement.getSandbox().createdBy.ldapId.toLowerCase() === userServices.getOAuthUser().ldapId.toLowerCase());
@@ -758,7 +752,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             }
         };
     }).controller("CreateSandboxController",
-    function($rootScope, $scope, $state, sandboxManagement, tools, appsSettings, branded, docLinks){
+    function($rootScope, $scope, $state, sandboxManagement, tools, appsSettings, branded, schemaServices, docLinks){
 
         $scope.showing.navBar = true;
         $scope.showing.footer = true;
@@ -773,7 +767,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.sandboxDesc = "";
         $scope.sandboxAllowOpenAccess = false;
         $scope.schemaVersion = branded.defaultSchemaVersion;
-        $scope.sandboxSchemaVersions = branded.sandboxSchemaVersions; 
+        $scope.sandboxSchemaVersions = schemaServices.getSandboxSchemaVersions(true); 
         $scope.createEnabled = true;
         
         $scope.title.blueBarTitle = "Create Sandbox";

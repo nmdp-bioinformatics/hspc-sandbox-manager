@@ -72,7 +72,46 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('fhirApiServices', function ($q, oauth2, notification, appsSettings, $rootScope, $location, exportResources) {
+    }).factory('schemaServices' ,function(branded)  {
+        var fhirVersion;
+        var schemaVersion;
+        var sandboxSchemaVersion;
+        var sandboxSchemaVersions = branded.sandboxSchemaVersions;
+        return {
+            fhirClient: function () {
+                return fhirClient;
+            },
+            fhirVersion: function () {
+                return fhirVersion;
+            },
+            schemaVersion: function () {
+                return schemaVersion;
+            },
+            getSandboxSchemaVersions: function(canCreate) {
+                var versions = [];
+                if (canCreate !== undefined) {
+                    sandboxSchemaVersions.forEach(function (schema) {
+                        if (canCreate == schema.canCreate) {
+                            versions.push(schema);
+                        }
+                    });
+                } else {
+                    versions = sandboxSchemaVersions;
+                }
+                return versions;
+            },
+            getSandboxSchemaVersion: function() {
+                return sandboxSchemaVersion;
+            },
+            setSchemaVersion: function(fhirVersion) {
+                sandboxSchemaVersions.forEach(function(schema){
+                    if (fhirVersion == schema.fhirVersion) {
+                        sandboxSchemaVersion = schema;
+                    }
+                });
+            }
+        }
+    }).factory('fhirApiServices', function ($q, oauth2, notification, appsSettings, $rootScope, $location, exportResources, schemaServices) {
 
         /**
          *
@@ -113,6 +152,7 @@ angular.module('sandManApp.services', [])
             },
             initClient: function(){
                 var params = getQueryParams($location.url());
+                var that = this;
                 if (params.code){
                     delete sessionStorage.tokenResponse;
                     FHIR.oauth2.ready(params, function(newSmart){
@@ -121,8 +161,13 @@ angular.module('sandManApp.services', [])
                         // }
                         sessionStorage.setItem("hspcAuthorized", true);
                         fhirClient = newSmart;
-                        $rootScope.$emit('signed-in');
-                        $rootScope.$digest();
+                        that.queryFhirVersion().then(function(){
+                            $rootScope.$emit('signed-in');
+                            $rootScope.$digest();
+                        }, function () {
+                            $rootScope.$emit('signed-in');
+                            $rootScope.$digest();
+                        });
                     });
                 } else {
                     oauth2.login();
@@ -165,6 +210,15 @@ angular.module('sandManApp.services', [])
                             });
                         }
                         deferred.resolve(resources, pageResult);
+                    });
+                return deferred;
+            },
+            queryFhirVersion: function() {
+                var deferred = $.Deferred();
+                $.when(fhirClient.api.conformance({}))
+                    .done(function(statement){
+                        schemaServices.setSchemaVersion(statement.data.fhirVersion);
+                        deferred.resolve(statement.data.fhirVersion);
                     });
                 return deferred;
             },
@@ -1744,13 +1798,18 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }]).factory('patientResources', ['$http',function($http)  {
+    }]).factory('patientResources', ['$http', 'schemaServices',function($http, schemaServices)  {
     var resources;
 
     return {
         loadSettings: function(){
             var deferred = $.Deferred();
-            $http.get('static/js/config/supported-patient-resources.json').success(function(result){
+            var schemaVersion = schemaServices.getSandboxSchemaVersion().version;
+            var supportedResources = 'static/js/config/supported-patient-resources.json';
+            if (schemaVersion === "3") {
+                supportedResources = 'static/js/config/supported-patient-resources_3.json';
+            }
+            $http.get(supportedResources).success(function(result){
                 resources = result;
                 deferred.resolve(result);
             });
@@ -1769,13 +1828,18 @@ angular.module('sandManApp.services', [])
         }
     };
 
-}]).factory('exportResources', ['$http',function($http)  {
+}]).factory('exportResources', ['$http', 'schemaServices',function($http, schemaServices)  {
     var resources;
 
     return {
         loadSettings: function(){
             var deferred = $.Deferred();
-            $http.get('static/js/config/export-resources.json').success(function(result){
+            var schemaVersion = schemaServices.getSandboxSchemaVersion().version;
+            var exportResources = 'static/js/config/export-resources.json';
+            if (schemaVersion === "3") {
+                exportResources = 'static/js/config/export-resources_3.json';
+            }
+            $http.get(exportResources).success(function(result){
                 resources = result;
                 deferred.resolve(result);
             });
@@ -1794,13 +1858,18 @@ angular.module('sandManApp.services', [])
         }
     };
 
-}]).factory('dataManagerResources', ['$http',function($http)  {
+}]).factory('dataManagerResources', ['$http', 'schemaServices',function($http, schemaServices)  {
     var resources;
 
     return {
         loadSettings: function(){
             var deferred = $.Deferred();
-            $http.get('static/js/config/data-manager-resources.json').success(function(result){
+            var schemaVersion = schemaServices.getSandboxSchemaVersion().version;
+            var dataManagerResources = 'static/js/config/data-manager-resources.json';
+            if (schemaVersion === "3") {
+                dataManagerResources = 'static/js/config/data-manager-resources_3.json';   
+            }
+            $http.get(dataManagerResources).success(function(result){
                 resources = result;
                 deferred.resolve(result);
             });

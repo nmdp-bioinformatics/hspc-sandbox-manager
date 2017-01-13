@@ -16,8 +16,9 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                 loginDoc: "",
                 defaultSchemaVersion : "3",
                 sandboxSchemaVersions : [
-                    {version: "1", name: "FHIR DSTU 2 (v1.0.2)"},
-                    {version: "3", name: "FHIR STU 3 (v1.8.0)"}
+                    {version: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", canCreate: true},
+                    {version: "2", name: "FHIR DSTU 2 (v1.6.0)", fhirVersion: "1.6.0", canCreate: false},
+                    {version: "3", name: "FHIR STU 3 (v1.8.0)", fhirVersion: "1.8.0", canCreate: true}
                 ],
                 sandboxDescription: {
                     title: "What is a sandbox?",

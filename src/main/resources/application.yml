@@ -48,11 +48,11 @@ hspc:
         context: /hspc-reference-api
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version1.port}${hspc.platform.api.version1.context}
       version2:
-        port: 8081
+        port: 8083
         context: /hspc-reference-api
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version2.port}${hspc.platform.api.version2.context}
       version3:
-        port: 8082
+        port: 8083
         context: /hspc-reference-api
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version3.port}${hspc.platform.api.version3.context}
       oauth2:
