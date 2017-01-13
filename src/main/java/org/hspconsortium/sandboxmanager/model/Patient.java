@@ -5,8 +5,10 @@ import java.math.BigInteger;
 
 @Entity
 @NamedQueries({
+        // Used to retrieve a patient when a new launch scenario is being created with the patient
         @NamedQuery(name="Patient.findByFhirIdAndSandboxId",
                 query="SELECT c FROM Patient c WHERE c.fhirId = :fhirId and c.sandbox.sandboxId = :sandboxId"),
+        // Used to delete all patients when a sandbox is deleted
         @NamedQuery(name="Patient.findBySandboxId",
                 query="SELECT c FROM Patient c WHERE c.sandbox.sandboxId = :sandboxId")
 })

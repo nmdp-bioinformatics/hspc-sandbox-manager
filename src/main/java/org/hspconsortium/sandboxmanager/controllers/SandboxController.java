@@ -21,10 +21,7 @@
 package org.hspconsortium.sandboxmanager.controllers;
 
 import org.hspconsortium.sandboxmanager.model.*;
-import org.hspconsortium.sandboxmanager.services.OAuthService;
-import org.hspconsortium.sandboxmanager.services.SandboxInviteService;
-import org.hspconsortium.sandboxmanager.services.SandboxService;
-import org.hspconsortium.sandboxmanager.services.UserService;
+import org.hspconsortium.sandboxmanager.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,14 +42,17 @@ public class SandboxController extends AbstractController {
     private final SandboxService sandboxService;
     private final UserService userService;
     private final SandboxInviteService sandboxInviteService;
+    private final SandboxActivityLogService sandboxActivityLogService;
 
     @Inject
     public SandboxController(final SandboxService sandboxService, final UserService userService,
-                             final SandboxInviteService sandboxInviteService, final OAuthService oAuthService) {
+                             final SandboxInviteService sandboxInviteService, final OAuthService oAuthService,
+                             final SandboxActivityLogService sandboxActivityLogService) {
         super(oAuthService);
         this.sandboxService = sandboxService;
         this.userService = userService;
         this.sandboxInviteService = sandboxInviteService;
+        this.sandboxActivityLogService = sandboxActivityLogService;
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
@@ -71,7 +71,9 @@ public class SandboxController extends AbstractController {
         // Create User if needed or set User name
         if (user == null) {
             sandbox.getCreatedBy().setCreatedTimestamp(new Timestamp(new Date().getTime()));
+            sandbox.getCreatedBy().setName(oAuthService.getOAuthUserName(request));
             user = userService.save(sandbox.getCreatedBy());
+            sandboxActivityLogService.systemUserCreated(null, user);
         } else if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(oAuthService.getOAuthUserName(request));
             user = userService.save(user);

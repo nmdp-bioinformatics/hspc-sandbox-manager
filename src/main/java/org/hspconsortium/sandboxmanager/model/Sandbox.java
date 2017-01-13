@@ -7,8 +7,10 @@ import java.util.List;
 
 @Entity
 @NamedQueries({
+        // Used to retrieve a sandbox instance for multiple uses
         @NamedQuery(name="Sandbox.findBySandboxId",
                 query="SELECT c FROM Sandbox c WHERE c.sandboxId = :sandboxId"),
+        // Used to retrieve all sandboxes visible to a user
         @NamedQuery(name="Sandbox.findByVisibility",
                 query="SELECT c FROM Sandbox c WHERE c.visibility = :visibility")
 

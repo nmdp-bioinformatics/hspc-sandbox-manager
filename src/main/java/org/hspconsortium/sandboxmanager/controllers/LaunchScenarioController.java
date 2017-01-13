@@ -150,6 +150,7 @@ public class LaunchScenarioController extends AbstractController  {
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
         checkSandboxUserReadAuthorization(request, sandbox);
         List<LaunchScenario> launchScenarios = launchScenarioService.findBySandboxIdAndCreatedByOrVisibility(sandboxId, oauthUserId, Visibility.PUBLIC);
+        // Modify the lastLaunchSeconds field of each launch scenario to match when this user last launched each launch scenario
         return launchScenarioService.updateLastLaunchForCurrentUser(launchScenarios, userService.findByLdapId(oauthUserId));
     }
 }

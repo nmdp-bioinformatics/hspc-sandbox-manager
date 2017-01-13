@@ -140,8 +140,8 @@ public class SandboxActivityLogServiceImpl implements SandboxActivityLogService 
     }
 
     @Override
-    public SandboxActivityLog systemUserRoleChange(Sandbox sandbox, User user, SystemRole systemRole, boolean roleAdded) {
-        SandboxActivityLog sandboxActivityLog = createSandboxActivityLog(sandbox, user);
+    public SandboxActivityLog systemUserRoleChange(User user, SystemRole systemRole, boolean roleAdded) {
+        SandboxActivityLog sandboxActivityLog = createSandboxActivityLog(null, user);
         sandboxActivityLog.setActivity(SandboxActivity.USER_SYSTEM_ROLE_CHANGE);
         sandboxActivityLog.setAdditionalInfo("Role " + systemRole.toString() + (roleAdded ? " added" : " removed"));
         return this.save(sandboxActivityLog);

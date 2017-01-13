@@ -35,7 +35,7 @@ public interface SandboxActivityLogService {
 
     SandboxActivityLog systemUserCreated(final Sandbox sandbox, final User user);
 
-    SandboxActivityLog systemUserRoleChange(final Sandbox sandbox, final User user, final SystemRole systemRole, final boolean roleAdded);
+    SandboxActivityLog systemUserRoleChange(final User user, final SystemRole systemRole, final boolean roleAdded);
 
     List<SandboxActivityLog> findBySandboxId(final String sandboxId);
 

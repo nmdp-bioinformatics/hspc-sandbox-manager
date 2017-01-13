@@ -195,6 +195,9 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
             UserLaunch userLaunch = userLaunchService.findByUserIdAndLaunchScenarioId(user.getLdapId(), launchScenario.getId());
             if (userLaunch != null) {
                 launchScenario.setLastLaunchSeconds(userLaunch.getLastLaunchSeconds());
+            } else {
+                // This user has never launched this launch scenario
+                launchScenario.setLastLaunchSeconds(0L);
             }
         }
         return launchScenarios;
