@@ -31,6 +31,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -132,7 +133,7 @@ public class SandboxController extends AbstractController {
     public @ResponseBody
     @SuppressWarnings("unchecked")
     List<Sandbox> getSandboxesByMember(HttpServletRequest request, @RequestParam(value = "userId") String userIdEncoded) throws UnsupportedEncodingException {
-        String userId = java.net.URLDecoder.decode(userIdEncoded, "UTF-8");
+        String userId = java.net.URLDecoder.decode(userIdEncoded, StandardCharsets.UTF_8.name());
         checkUserAuthorization(request, userId);
         User user = userService.findByLdapId(userId);
         return sandboxService.getAllowedSandboxes(user);
@@ -145,7 +146,7 @@ public class SandboxController extends AbstractController {
         User user = userService.findByLdapId(getSystemUserId(request));
 
         checkSystemUserCanModifySandboxAuthorization(request, sandbox, user);
-        String removeUserId = java.net.URLDecoder.decode(userIdEncoded, "UTF-8");
+        String removeUserId = java.net.URLDecoder.decode(userIdEncoded, StandardCharsets.UTF_8.name());
 
         User removedUser = userService.findByLdapId(removeUserId);
         sandboxService.removeMember(sandbox, removedUser, oAuthService.getBearerToken(request));
@@ -154,7 +155,7 @@ public class SandboxController extends AbstractController {
     @RequestMapping(value = "/{id}/login", method = RequestMethod.POST, params = {"userId"})
     @Transactional
     public void sandboxLogin(HttpServletRequest request, @PathVariable String id, @RequestParam(value = "userId") String userIdEncoded) throws UnsupportedEncodingException{
-        String userId = java.net.URLDecoder.decode(userIdEncoded, "UTF-8");
+        String userId = java.net.URLDecoder.decode(userIdEncoded, StandardCharsets.UTF_8.name());
         checkUserAuthorization(request, userId);
         sandboxService.sandboxLogin(id, userId);
     }

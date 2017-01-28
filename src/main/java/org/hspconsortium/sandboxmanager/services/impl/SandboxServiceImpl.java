@@ -30,6 +30,7 @@ import javax.net.ssl.SSLContext;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -386,7 +387,7 @@ public class SandboxServiceImpl implements SandboxService {
         try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(putRequest)) {
             if (closeableHttpResponse.getStatusLine().getStatusCode() != 200) {
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
+                String responseString = EntityUtils.toString(rEntity, StandardCharsets.UTF_8);
                 String errorMsg = String.format("There was a problem creating the sandbox.\n" +
                                 "Response Status : %s .\nResponse Detail :%s. \nUrl: :%s",
                         closeableHttpResponse.getStatusLine(),
@@ -443,7 +444,7 @@ public class SandboxServiceImpl implements SandboxService {
         try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(deleteRequest)) {
             if (closeableHttpResponse.getStatusLine().getStatusCode() != 200) {
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
+                String responseString = EntityUtils.toString(rEntity, StandardCharsets.UTF_8);
                 String errorMsg = String.format("There was a problem deleting the sandbox.\n" +
                                 "Response Status : %s .\nResponse Detail :%s. \nUrl: :%s",
                         closeableHttpResponse.getStatusLine(),

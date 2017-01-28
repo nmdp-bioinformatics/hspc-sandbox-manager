@@ -34,6 +34,7 @@ import javax.net.ssl.SSLContext;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -126,7 +127,7 @@ public class EmailServiceImpl implements EmailService {
         try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(postRequest)) {
             if (closeableHttpResponse.getStatusLine().getStatusCode() != 200) {
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
+                String responseString = EntityUtils.toString(rEntity, StandardCharsets.UTF_8);
                 String errorMsg = String.format("There was a problem sending the email.\n" +
                                 "Response Status : %s .\nResponse Detail :%s. \nUrl: :%s",
                         closeableHttpResponse.getStatusLine(),

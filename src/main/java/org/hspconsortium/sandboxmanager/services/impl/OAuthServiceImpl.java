@@ -22,9 +22,10 @@ package org.hspconsortium.sandboxmanager.services.impl;
 
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.*;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.*;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.HttpClientConnectionManager;
@@ -33,13 +34,9 @@ import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.hspconsortium.sandboxmanager.controllers.UnauthorizedException;
 import org.hspconsortium.sandboxmanager.services.OAuthService;
@@ -52,14 +49,11 @@ import org.springframework.stereotype.Service;
 
 import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class OAuthServiceImpl implements OAuthService {
@@ -140,7 +134,7 @@ public class OAuthServiceImpl implements OAuthService {
                             , HttpStatus.SC_UNAUTHORIZED));
                 }
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
+                String responseString = EntityUtils.toString(rEntity, StandardCharsets.UTF_8);
                 throw new RuntimeException(String.format("Response Status : %s .\nResponse Detail :%s."
                         , closeableHttpResponse.getStatusLine()
                         , responseString));
