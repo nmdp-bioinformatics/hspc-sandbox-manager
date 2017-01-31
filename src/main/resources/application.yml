@@ -41,16 +41,16 @@ hspc:
       baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.authorization.port}${hspc.platform.authorization.context}
     api:
       version1:
-        port: 7080
-        context: /hspc-reference-api
+        port: 8080
+        context: /hspc-reference-api-v1
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version1.port}${hspc.platform.api.version1.context}
       version2:
         port: 8080
-        context: /hspc-reference-api
+        context: /hspc-reference-api-v2
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version2.port}${hspc.platform.api.version2.context}
       version3:
         port: 8080
-        context: /hspc-reference-api
+        context: /hspc-reference-api-v3
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version3.port}${hspc.platform.api.version3.context}
       oauth2:
         clientId: hspc_resource_server
