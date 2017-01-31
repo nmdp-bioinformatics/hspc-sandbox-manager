@@ -1,6 +1,3 @@
-server:
-  port: ${port:9003}
-
 endpoints:
   jmx:
     enabled: false
@@ -44,15 +41,15 @@ hspc:
       baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.authorization.port}${hspc.platform.authorization.context}
     api:
       version1:
-        port: 8080
+        port: 7080
         context: /hspc-reference-api
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version1.port}${hspc.platform.api.version1.context}
       version2:
-        port: 8083
+        port: 8080
         context: /hspc-reference-api
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version2.port}${hspc.platform.api.version2.context}
       version3:
-        port: 8083
+        port: 8080
         context: /hspc-reference-api
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version3.port}${hspc.platform.api.version3.context}
       oauth2:
