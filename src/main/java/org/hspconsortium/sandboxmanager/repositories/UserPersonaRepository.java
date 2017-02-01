@@ -10,7 +10,7 @@ import java.util.List;
 public interface UserPersonaRepository extends CrudRepository<UserPersona, Integer> {
     public UserPersona findByLdapId(@Param("ldapId") String ldapId);
 
-    public UserPersona findByFhirIdAndSandboxId(@Param("fhirId") String fhirId,
+    public UserPersona findByLdapIdAndSandboxId(@Param("ldapId") String ldapId,
                                                 @Param("sandboxId") String sandboxId);
 
     public List<UserPersona> findBySandboxId(@Param("sandboxId") String sandboxId);

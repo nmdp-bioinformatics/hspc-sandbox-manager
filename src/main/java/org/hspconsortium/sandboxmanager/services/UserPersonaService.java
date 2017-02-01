@@ -14,15 +14,15 @@ public interface UserPersonaService {
 
     UserPersona getById(final int id);
 
-    UserPersona findByLdapId(final String ldapId);
-
-    UserPersona findByFhirIdAndSandboxId(final String fhirId, final String sandboxId);
-
-    List<UserPersona> findBySandboxId(final String sandboxId);
-
     void delete(final int id);
 
     void delete(final UserPersona userPersona, final String bearerToken);
+
+    UserPersona findByLdapId(final String ldapId);
+
+    UserPersona findByLdapIdAndSandboxId(final String ldapId, final String sandboxId);
+
+    List<UserPersona> findBySandboxId(final String sandboxId);
 
     UserPersona create(final UserPersona userPersona, final String bearerToken) throws UnsupportedEncodingException;
 

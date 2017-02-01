@@ -27,7 +27,7 @@
             <div class="col-md-12 result">
                 <div id="practitioner-results-list" ng-cloak when-scrolling="loadMoreIfNeeded()">
                     <table class="table table-striped table-hover">
-                        <tr class="practitioner-row" ng-click="select($index)" ng-repeat="practitioner in practitioners" ng-class="{selected : practitioner === selected.selectedPractitioner}">
+                        <tr class="practitioner-row item-selectable" ng-click="select($index)" ng-repeat="practitioner in practitioners" ng-class="{selected : practitioner === selected.selectedPractitioner}">
                             <td class="name">
                                 <span ng-bind="practitioner | nameGivenFamily"></span>
                             </td>

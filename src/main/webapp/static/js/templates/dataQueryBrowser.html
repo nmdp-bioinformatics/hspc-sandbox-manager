@@ -25,7 +25,7 @@
             <div class="slim-page-header" style="padding:0 0 5px 0" >Summary</div>
             <div class="summaryBox" resize ng-style="scrollScreen(size.screenH, size.screenW) ? {'min-height': '380px', 'margin-bottom': '10px'} : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+170)">
                 <div ng-repeat="resource in settings.resourceList" ng-click="selectResource(resource)" ng-class="{selected : resource === settings.selected.resource}">
-                    <div class="row summaryRow" style="border-bottom: 1px solid #ccc">
+                    <div class="row summaryRow" style="border-bottom: 1px solid #ccc; cursor: pointer">
                         <div ng-repeat="attribute in settings.selectedResourceType.displayValues">
                             <div ng-show="attribute.show">
                                 <label class="query-result-label" style="width: 30%; font-weight: 600">{{attribute.label}} </label>

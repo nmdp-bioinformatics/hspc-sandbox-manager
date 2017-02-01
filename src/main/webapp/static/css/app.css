@@ -1020,6 +1020,10 @@ a.selected {
     overflow: auto;
 }
 
+.item-selectable {
+    cursor: pointer;
+}
+
 .user-management-container {
     overflow: auto;
 }
@@ -2303,12 +2307,12 @@ td {
 
 .start-form-info-box {
 /*margin-left: 30px;*/
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .start-form-info-box h1 {
     margin-top: 0;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
     line-height: 1.42857143;
 }

@@ -5,15 +5,23 @@ import java.sql.Timestamp;
 
 @Entity
 @NamedQueries({
+        // Used to:
+        // 1) make sure that a user persona cannot be used to log in to sandbox manager
+        // 2) make sure that a user persona with a given id does not exist when a user is creating one
+        // 3) make sure that a user persona cannot be used to create a sandbox
         @NamedQuery(name="UserPersona.findByLdapId",
                 query="SELECT c FROM UserPersona c WHERE c.ldapId = :ldapId"),
-        @NamedQuery(name="UserPersona.findByFhirIdAndSandboxId",
-                query="SELECT c FROM UserPersona c WHERE c.fhirId = :fhirId and c.sandbox.sandboxId = :sandboxId"),
+        // Used to retrieve a user persona instance to be used in the creation of a launch scenario
+        @NamedQuery(name="UserPersona.findByLdapIdAndSandboxId",
+                query="SELECT c FROM UserPersona c WHERE c.ldapId = :ldapId and c.sandbox.sandboxId = :sandboxId"),
+        // Used to delete all user personas when a sandbox is deleted
         @NamedQuery(name="UserPersona.findBySandboxId",
                 query="SELECT c FROM UserPersona c WHERE c.sandbox.sandboxId = :sandboxId"),
+        // Used to retrieve all user personas visible to a user of this a sandbox
         @NamedQuery(name="UserPersona.findBySandboxIdAndCreatedByOrVisibility",
                 query="SELECT c FROM UserPersona c WHERE c.sandbox.sandboxId = :sandboxId and " +
                 "(c.createdBy.ldapId = :createdBy or c.visibility = :visibility)"),
+        // Used to delete a user's PRIVATE user personas when they are removed from a sandbox
         @NamedQuery(name="UserPersona.findBySandboxIdAndCreatedBy",
                 query="SELECT c FROM UserPersona c WHERE c.sandbox.sandboxId = :sandboxId and " +
                         "c.createdBy.ldapId = :createdBy")

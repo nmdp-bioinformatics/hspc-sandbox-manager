@@ -76,8 +76,8 @@ public class UserPersonaServiceImpl implements UserPersonaService {
     }
 
     @Override
-    public UserPersona findByFhirIdAndSandboxId(final String fhirId, final String sandboxId) {
-        return  repository.findByFhirIdAndSandboxId(fhirId, sandboxId);
+    public UserPersona findByLdapIdAndSandboxId(final String ldapId, final String sandboxId) {
+        return  repository.findByLdapIdAndSandboxId(ldapId, sandboxId);
     }
 
     @Override
