@@ -12,8 +12,8 @@ import java.sql.Timestamp;
         @NamedQuery(name="UserPersona.findByLdapId",
                 query="SELECT c FROM UserPersona c WHERE c.ldapId = :ldapId"),
         // Used to retrieve a user persona instance to be used in the creation of a launch scenario
-        @NamedQuery(name="UserPersona.findByFhirIdAndSandboxId",
-                query="SELECT c FROM UserPersona c WHERE c.fhirId = :fhirId and c.sandbox.sandboxId = :sandboxId"),
+        @NamedQuery(name="UserPersona.findByLdapIdAndSandboxId",
+                query="SELECT c FROM UserPersona c WHERE c.ldapId = :ldapId and c.sandbox.sandboxId = :sandboxId"),
         // Used to delete all user personas when a sandbox is deleted
         @NamedQuery(name="UserPersona.findBySandboxId",
                 query="SELECT c FROM UserPersona c WHERE c.sandbox.sandboxId = :sandboxId"),

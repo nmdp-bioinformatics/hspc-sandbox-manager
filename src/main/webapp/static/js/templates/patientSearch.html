@@ -69,7 +69,7 @@
                             </td>
                         </tr>
                         </thead>
-                        <tr class="patient-row" ng-click="select($index)" ng-repeat="patient in patients" ng-class="{selected : patient === selected.selectedPatient}">
+                        <tr class="patient-row item-selectable" ng-click="select($index)" ng-repeat="patient in patients" ng-class="{selected : patient === selected.selectedPatient}">
                             <td ng-show="showPatientId">
                                 <span ng-bind="patient.id"></span>
                             </td>

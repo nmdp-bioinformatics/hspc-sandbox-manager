@@ -1911,10 +1911,10 @@ angular.module('sandManApp.services', [])
     var settings;
     var sandboxUrlSettings;
 
-    function getDashboardUrl(isLocal, fullBaseUrl) {
+    function getDashboardUrl(hasContextPath, fullBaseUrl) {
 
-        if (!isLocal) {
-            // In test/prod the dashboard url is the part of the URL which does not include the path
+        if (!hasContextPath) {
+            // If no context path, the dashboard url is the part of the URL which does not include the path
             var path = window.location.pathname;
             var trailingPathSlash = path.lastIndexOf("/");
             if (trailingPathSlash > -1 && trailingPathSlash === path.length - 1) {
@@ -1933,10 +1933,10 @@ angular.module('sandManApp.services', [])
             }
             var pathSegments = urlPath.split("/");
             switch (pathSegments.length) {
-                case 1:   // For localhost, the dashboard url includes the first path segment
+                case 1:   // If has context path, the dashboard url includes the first path segment
                     return fullBaseUrl;
                     break;
-                default:  // For localhost, the dashboard url includes the first path segment,
+                default:  // If has context path, the dashboard url includes the first path segment,
                           // the second path segment (if exists) is the sandboxId
                     var additionalPath = urlPath.substring(pathSegments[0].length);
                     return fullBaseUrl.substring(0, fullBaseUrl.length - additionalPath.length);
@@ -1955,7 +1955,7 @@ angular.module('sandManApp.services', [])
                 if (sandboxBaseUrlWithoutHash.endsWith("/")) {
                     sandboxBaseUrlWithoutHash = sandboxBaseUrlWithoutHash.substring(0, sandboxBaseUrlWithoutHash.length-1);
                 }
-                sandboxUrlSettings.sandboxManagerRootUrl = getDashboardUrl(envInfo.defaultServiceUrl === "null", sandboxBaseUrlWithoutHash);
+                sandboxUrlSettings.sandboxManagerRootUrl = getDashboardUrl((envInfo.sbmUrlHasContextPath === "null" || envInfo.sbmUrlHasContextPath === "true"), sandboxBaseUrlWithoutHash);
                 sandboxUrlSettings.sandboxId = sandboxBaseUrlWithoutHash.substring(sandboxUrlSettings.sandboxManagerRootUrl.length + 1);
                 var trailingSlash = sandboxUrlSettings.sandboxId.lastIndexOf("/");
                 if (trailingSlash > -1 && trailingSlash === sandboxUrlSettings.sandboxId.length - 1) {
@@ -1974,16 +1974,18 @@ angular.module('sandManApp.services', [])
             $http.get('static/js/config/sandbox-manager.json').success(function(result){
                 settings = result;
                 if (envInfo.active !== "null" && envInfo.active !== "false") {
-                    settings.defaultServiceUrl = envInfo.defaultServiceUrl;
-                    settings.baseServiceUrl_1 = envInfo.baseServiceUrl_1;
-                    settings.baseServiceUrl_2 = envInfo.baseServiceUrl_2;
-                    settings.baseServiceUrl_3 = envInfo.baseServiceUrl_3;
-                    settings.basePersonaServiceUrl_1 = envInfo.basePersonaServiceUrl_1;
-                    settings.basePersonaServiceUrl_2 = envInfo.basePersonaServiceUrl_2;
-                    settings.basePersonaServiceUrl_3 = envInfo.basePersonaServiceUrl_3;
-                    settings.oauthLogoutUrl = envInfo.oauthLogoutUrl;
-                    settings.oauthPersonaAuthenticationUrl = envInfo.oauthPersonaAuthenticationUrl;
-                    settings.userManagementUrl = envInfo.userManagementUrl;
+                    // Override only properties which were set in the environment
+                    settings.defaultServiceUrl = envInfo.defaultServiceUrl || settings.defaultServiceUrl;
+                    settings.baseServiceUrl_1 = envInfo.baseServiceUrl_1 || settings.baseServiceUrl_1;
+                    settings.baseServiceUrl_2 = envInfo.baseServiceUrl_2 || settings.baseServiceUrl_2;
+                    settings.baseServiceUrl_3 = envInfo.baseServiceUrl_3 || settings.baseServiceUrl_3;
+                    settings.basePersonaServiceUrl_1 = envInfo.basePersonaServiceUrl_1 || settings.basePersonaServiceUrl_1;
+                    settings.basePersonaServiceUrl_2 = envInfo.basePersonaServiceUrl_2 || settings.basePersonaServiceUrl_2;
+                    settings.basePersonaServiceUrl_3 = envInfo.basePersonaServiceUrl_3 || settings.basePersonaServiceUrl_3;
+                    settings.oauthLogoutUrl = envInfo.oauthLogoutUrl || settings.oauthLogoutUrl;
+                    settings.oauthPersonaAuthenticationUrl = envInfo.oauthPersonaAuthenticationUrl || settings.oauthPersonaAuthenticationUrl;
+                    settings.userManagementUrl = envInfo.userManagementUrl || settings.userManagementUrl;
+                    settings.sbmUrlHasContextPath = envInfo.sbmUrlHasContextPath || settings.sbmUrlHasContextPath;
                 }
                 deferred.resolve(settings);
                 });

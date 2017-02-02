@@ -8,6 +8,7 @@
     "basePersonaServiceUrl_3": "http://localhost:8083/hspc-reference-api/",
     "oauthLogoutUrl": "http://localhost:8080/hspc-reference-authorization/logout",
     "oauthPersonaAuthenticationUrl": "http://localhost:8080/hspc-reference-authorization/static/auth/index.html",
+    "sbmUrlHasContextPath": "true",
     "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
     "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static", "open", "data", "test", "1", "2", "3", "4", "5", "6"]
 }

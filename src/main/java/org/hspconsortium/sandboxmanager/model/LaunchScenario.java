@@ -79,10 +79,6 @@ public class LaunchScenario extends AbstractSandboxItem {
     }
 
     @OneToMany(cascade={CascadeType.ALL})
-    @JoinTable(name = "launch_scenario_context_params", joinColumns = {
-            @JoinColumn(name = "launch_scenario", nullable = false, updatable = false) },
-            inverseJoinColumns = { @JoinColumn(name = "context_params",
-                    nullable = false, updatable = false) })
     public List<ContextParams> getContextParams() {
         return contextParams;
     }

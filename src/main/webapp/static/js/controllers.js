@@ -24,7 +24,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             footer: true,
             largeSidebar: true,
             moreLinks: false,
-            start: false
+            start: false,
+            defaultLaunchScenario: true
         };
 
         $scope.title = {blueBarTitle: branded.mainTitle};
@@ -33,6 +34,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.showCert = branded.showCert;
         $scope.loginDoc = branded.loginDoc;
         $scope.mainImage = branded.mainImage;
+        $scope.showing.defaultLaunchScenario = branded.defaultLaunchScenario;
         branded.mainImage2x !== undefined ? $scope.mainImage2x = branded.mainImage2x : $scope.mainImage2x = branded.mainImage;
         $scope.whiteImage = branded.whiteImage;
         branded.whiteImage2x !== undefined ? $scope.whiteImage2x = branded.whiteImage2x : $scope.whiteImage2x = branded.whiteImage;
@@ -82,8 +84,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 //                $scope.signin();
                 event.preventDefault();
             } else if (toState.scenarioBuilderStep && sandboxManagement.getScenarioBuilder().userPersona === "") {
-                $state.go('launch-scenarios', {});
-                // $state.go('manage-apps', {});
+                if ($scope.showing.defaultLaunchScenario) {
+                    $state.go('launch-scenarios', {});
+                } else {
+                    $state.go('manage-apps', {});
+                }
                 event.preventDefault();
             }
         });
@@ -147,8 +152,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.practitionersLabel = $scope.canManageData() ? "Practitioner" : "Browse Practitioner";
             $scope.dataLabel = $scope.canManageData() ? "Data Manager" : "Data Browser";
             $rootScope.$digest();
-            // $state.go('manage-apps', {});
-            $state.go('launch-scenarios', {});
+            if ($scope.showing.defaultLaunchScenario) {
+                $state.go('launch-scenarios', {});
+            } else {
+                $state.go('manage-apps', {});
+            }
         }
 
         $rootScope.$on('hide-nav', function(){
@@ -175,8 +183,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 window.location.href = routeToUrl;
             } else if (sandboxManagement.getSandbox().sandboxId === sandbox.sandboxId && $state.current.name === "create-sandbox") {
                 $scope.showing.sideNavBar = true;
-                $state.go('launch-scenarios', {});
-                // $state.go('manage-apps', {});
+                if ($scope.showing.defaultLaunchScenario) {
+                    $state.go('launch-scenarios', {});
+                } else {
+                    $state.go('manage-apps', {});
+                }
             }
         };
 
@@ -2110,6 +2121,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.clientJSON = $scope.selected.selectedApp.clientJSON;
             $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
             $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+            $scope.clientJSON.scope = $scope.clientJSON.scope.join(" ");
 
             $rootScope.$digest();
         });
@@ -2214,11 +2226,14 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 typeof updateClientJSON.redirectUris !== 'undefined') {
             updateClientJSON.redirectUris = updateClientJSON.redirectUris.split(',');
         }
+
         if( Object.prototype.toString.call( updateClientJSON.scope ) !== '[object Array]' &&
             typeof updateClientJSON.scope !== 'undefined') {
-            updateClientJSON.scope = updateClientJSON.scope.split(',');
+            updateClientJSON.scope = updateClientJSON.scope.split(' ');
+            if (!contains(updateClientJSON.scope, "launch")) {
+                updateClientJSON.scope.push("launch");
+            }
         }
-
 
         if (!contains(updateClientJSON.scope, "offline_access")) {
             var index = updateClientJSON.grantTypes.indexOf("refresh_token");

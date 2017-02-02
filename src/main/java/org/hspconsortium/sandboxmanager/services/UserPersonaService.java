@@ -20,7 +20,7 @@ public interface UserPersonaService {
 
     UserPersona findByLdapId(final String ldapId);
 
-    UserPersona findByFhirIdAndSandboxId(final String fhirId, final String sandboxId);
+    UserPersona findByLdapIdAndSandboxId(final String ldapId, final String sandboxId);
 
     List<UserPersona> findBySandboxId(final String sandboxId);
 

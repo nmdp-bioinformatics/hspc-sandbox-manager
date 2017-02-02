@@ -13,5 +13,6 @@
                     "oauthLogoutUrl": "<%= System.getProperty("oauthLogoutUrl") %>",
                     "oauthPersonaAuthenticationUrl": "<%= System.getProperty("oauthPersonaAuthenticationUrl") %>",
                     "userManagementUrl": "<%= System.getProperty("userManagementUrl") %>",
+                    "sbmUrlHasContextPath": "<%= System.getProperty("sbmUrlHasContextPath") %>",
                     "hostOrg": "<%= System.getProperty("hostOrg") %>"
                 });

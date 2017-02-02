@@ -77,7 +77,7 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
 
         UserPersona userPersona = null;
         if (launchScenario.getUserPersona() != null) {
-            userPersona = userPersonaService.findByFhirIdAndSandboxId(launchScenario.getUserPersona().getFhirId(), sandbox.getSandboxId());
+            userPersona = userPersonaService.findByLdapIdAndSandboxId(launchScenario.getUserPersona().getLdapId(), sandbox.getSandboxId());
         }
         if (userPersona == null && launchScenario.getUserPersona() != null) {
             userPersona = launchScenario.getUserPersona();

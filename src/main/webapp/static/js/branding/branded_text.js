@@ -15,6 +15,7 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                 showCert: true,
                 loginDoc: "",
                 defaultSchemaVersion : "3",
+                defaultLaunchScenario: true,
                 sandboxSchemaVersions : [
                     {version: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", canCreate: true},
                     {version: "2", name: "FHIR DSTU 2 (v1.6.0)", fhirVersion: "1.6.0", canCreate: false},
