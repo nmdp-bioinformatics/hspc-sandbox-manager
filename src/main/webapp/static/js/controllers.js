@@ -121,14 +121,15 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                             $scope.dashboard();
                         } else {
                             sandboxManagement.getSandboxById().then(function(sandboxExists){
-                                if (sandboxExists) {
+                                if (sandboxExists === "invalid") {
+                                    $state.go('404', {});
+                                } else if (sandboxExists) {
                                     sandboxManagement.sandboxLogin($scope.oauthUser.ldapId);
                                     if (sandboxManagement.getSandbox().name !== "") {
                                         $scope.title.blueBarTitle = sandboxManagement.getSandbox().name;
                                     }
                                     sandboxSignIn();
                                 } else {
-                                    // $state.go('404', {});
                                     $scope.dashboard();
                                 }
                             });
