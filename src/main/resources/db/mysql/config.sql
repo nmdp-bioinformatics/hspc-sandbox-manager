@@ -1,3 +1,5 @@
+USE sandman;
+
 SET AUTOCOMMIT = 0;
 
 START TRANSACTION;
