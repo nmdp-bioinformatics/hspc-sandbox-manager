@@ -1,12 +1,14 @@
 {
-    "defaultServiceUrl": "http://localhost:8080/hspc-reference-api/hspc/data",
-    "baseServiceUrl_1": "http://localhost:8080/hspc-reference-api/",
-    "baseServiceUrl_2": "http://localhost:8081/hspc-reference-api/",
-    "basePersonaServiceUrl_1": "http://localhost:8081/hspc-reference-api1/",
-    "basePersonaServiceUrl_2": "http://localhost:8081/hspc-reference-api1/",
+    "defaultServiceUrl": "http://localhost:8080/hspc-reference-api-v3/hspc3/data",
+    "baseServiceUrl_1": "http://localhost:8080/hspc-reference-api-v1/",
+    "baseServiceUrl_2": "http://localhost:8080/hspc-reference-api-v2/",
+    "baseServiceUrl_3": "http://localhost:8080/hspc-reference-api-v3/",
+    "basePersonaServiceUrl_1": "http://localhost:8080/hspc-reference-api-v1/",
+    "basePersonaServiceUrl_2": "http://localhost:8080/hspc-reference-api-v2/",
+    "basePersonaServiceUrl_3": "http://localhost:8080/hspc-reference-api-v3/",
     "oauthLogoutUrl": "http://localhost:8080/hspc-reference-authorization/logout",
-    "oauthPersonaAuthenticationUrl_1": "http://localhost:8081/hspc-reference-authorization1/static/auth/index.html",
-    "oauthPersonaAuthenticationUrl_2": "http://localhost:8081/hspc-reference-authorization1/static/auth/index.html",
+    "oauthPersonaAuthenticationUrl": "http://localhost:8080/hspc-reference-authorization/static/auth/index.html",
+    "sbmUrlHasContextPath": "true",
     "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
-    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static", "open", "data", "test", "1", "2"]
+    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static", "open", "data", "test", "error", "invalid", "1", "2", "3", "4", "5", "6"]
 }

@@ -21,10 +21,7 @@
 package org.hspconsortium.sandboxmanager.controllers;
 
 import org.hspconsortium.sandboxmanager.model.*;
-import org.hspconsortium.sandboxmanager.services.OAuthService;
-import org.hspconsortium.sandboxmanager.services.SandboxInviteService;
-import org.hspconsortium.sandboxmanager.services.SandboxService;
-import org.hspconsortium.sandboxmanager.services.UserService;
+import org.hspconsortium.sandboxmanager.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +31,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -45,14 +43,17 @@ public class SandboxController extends AbstractController {
     private final SandboxService sandboxService;
     private final UserService userService;
     private final SandboxInviteService sandboxInviteService;
+    private final SandboxActivityLogService sandboxActivityLogService;
 
     @Inject
     public SandboxController(final SandboxService sandboxService, final UserService userService,
-                             final SandboxInviteService sandboxInviteService, final OAuthService oAuthService) {
+                             final SandboxInviteService sandboxInviteService, final OAuthService oAuthService,
+                             final SandboxActivityLogService sandboxActivityLogService) {
         super(oAuthService);
         this.sandboxService = sandboxService;
         this.userService = userService;
         this.sandboxInviteService = sandboxInviteService;
+        this.sandboxActivityLogService = sandboxActivityLogService;
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
@@ -71,7 +72,9 @@ public class SandboxController extends AbstractController {
         // Create User if needed or set User name
         if (user == null) {
             sandbox.getCreatedBy().setCreatedTimestamp(new Timestamp(new Date().getTime()));
+            sandbox.getCreatedBy().setName(oAuthService.getOAuthUserName(request));
             user = userService.save(sandbox.getCreatedBy());
+            sandboxActivityLogService.systemUserCreated(null, user);
         } else if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(oAuthService.getOAuthUserName(request));
             user = userService.save(user);
@@ -130,7 +133,7 @@ public class SandboxController extends AbstractController {
     public @ResponseBody
     @SuppressWarnings("unchecked")
     List<Sandbox> getSandboxesByMember(HttpServletRequest request, @RequestParam(value = "userId") String userIdEncoded) throws UnsupportedEncodingException {
-        String userId = java.net.URLDecoder.decode(userIdEncoded, "UTF-8");
+        String userId = java.net.URLDecoder.decode(userIdEncoded, StandardCharsets.UTF_8.name());
         checkUserAuthorization(request, userId);
         User user = userService.findByLdapId(userId);
         return sandboxService.getAllowedSandboxes(user);
@@ -143,7 +146,7 @@ public class SandboxController extends AbstractController {
         User user = userService.findByLdapId(getSystemUserId(request));
 
         checkSystemUserCanModifySandboxAuthorization(request, sandbox, user);
-        String removeUserId = java.net.URLDecoder.decode(userIdEncoded, "UTF-8");
+        String removeUserId = java.net.URLDecoder.decode(userIdEncoded, StandardCharsets.UTF_8.name());
 
         User removedUser = userService.findByLdapId(removeUserId);
         sandboxService.removeMember(sandbox, removedUser, oAuthService.getBearerToken(request));
@@ -152,7 +155,7 @@ public class SandboxController extends AbstractController {
     @RequestMapping(value = "/{id}/login", method = RequestMethod.POST, params = {"userId"})
     @Transactional
     public void sandboxLogin(HttpServletRequest request, @PathVariable String id, @RequestParam(value = "userId") String userIdEncoded) throws UnsupportedEncodingException{
-        String userId = java.net.URLDecoder.decode(userIdEncoded, "UTF-8");
+        String userId = java.net.URLDecoder.decode(userIdEncoded, StandardCharsets.UTF_8.name());
         checkUserAuthorization(request, userId);
         sandboxService.sandboxLogin(id, userId);
     }

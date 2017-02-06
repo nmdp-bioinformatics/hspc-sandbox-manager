@@ -24,7 +24,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             footer: true,
             largeSidebar: true,
             moreLinks: false,
-            start: false
+            start: false,
+            defaultLaunchScenario: true
         };
 
         $scope.title = {blueBarTitle: branded.mainTitle};
@@ -33,6 +34,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.showCert = branded.showCert;
         $scope.loginDoc = branded.loginDoc;
         $scope.mainImage = branded.mainImage;
+        $scope.showing.defaultLaunchScenario = branded.defaultLaunchScenario;
         branded.mainImage2x !== undefined ? $scope.mainImage2x = branded.mainImage2x : $scope.mainImage2x = branded.mainImage;
         $scope.whiteImage = branded.whiteImage;
         branded.whiteImage2x !== undefined ? $scope.whiteImage2x = branded.whiteImage2x : $scope.whiteImage2x = branded.whiteImage;
@@ -82,7 +84,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 //                $scope.signin();
                 event.preventDefault();
             } else if (toState.scenarioBuilderStep && sandboxManagement.getScenarioBuilder().userPersona === "") {
-                $state.go('manage-apps', {});
+                if ($scope.showing.defaultLaunchScenario) {
+                    $state.go('launch-scenarios', {});
+                } else {
+                    $state.go('manage-apps', {});
+                }
                 event.preventDefault();
             }
         });
@@ -115,14 +121,15 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                             $scope.dashboard();
                         } else {
                             sandboxManagement.getSandboxById().then(function(sandboxExists){
-                                if (sandboxExists) {
+                                if (sandboxExists === "invalid") {
+                                    $state.go('404', {});
+                                } else if (sandboxExists) {
                                     sandboxManagement.sandboxLogin($scope.oauthUser.ldapId);
                                     if (sandboxManagement.getSandbox().name !== "") {
                                         $scope.title.blueBarTitle = sandboxManagement.getSandbox().name;
                                     }
                                     sandboxSignIn();
                                 } else {
-                                    // $state.go('404', {});
                                     $scope.dashboard();
                                 }
                             });
@@ -145,7 +152,12 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.patientsLabel = $scope.canManageData() ? "Patients" : "Browse Patients";
             $scope.practitionersLabel = $scope.canManageData() ? "Practitioner" : "Browse Practitioner";
             $scope.dataLabel = $scope.canManageData() ? "Data Manager" : "Data Browser";
-            $state.go('manage-apps', {});
+            $rootScope.$digest();
+            if ($scope.showing.defaultLaunchScenario) {
+                $state.go('launch-scenarios', {});
+            } else {
+                $state.go('manage-apps', {});
+            }
         }
 
         $rootScope.$on('hide-nav', function(){
@@ -172,7 +184,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 window.location.href = routeToUrl;
             } else if (sandboxManagement.getSandbox().sandboxId === sandbox.sandboxId && $state.current.name === "create-sandbox") {
                 $scope.showing.sideNavBar = true;
-                $state.go('manage-apps', {});
+                if ($scope.showing.defaultLaunchScenario) {
+                    $state.go('launch-scenarios', {});
+                } else {
+                    $state.go('manage-apps', {});
+                }
             }
         };
 
@@ -437,12 +453,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         }
 
     }).controller("SettingsViewController",
-    function($scope, $rootScope, sandboxManagement, appsSettings, userServices, $uibModal, branded){
+    function($scope, $rootScope, sandboxManagement, appsSettings, userServices, $uibModal, schemaServices){
 
         $scope.sandbox = angular.copy(sandboxManagement.getSandbox());
         $scope.sandboxURL = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + $scope.sandbox.sandboxId;
         $scope.allowOpenAccess = $scope.sandbox.allowOpenAccess;
-        $scope.sandboxSchemaVersions = branded.sandboxSchemaVersions;
 
         $scope.canEdit = function (){
             return userServices.canModifySandbox(sandboxManagement.getSandbox())
@@ -452,23 +467,18 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.openFhirUrl = settings.baseServiceUrl_1 + $scope.sandbox.sandboxId + "/open";
             if ($scope.sandbox.schemaVersion === "2") {
                 $scope.openFhirUrl = settings.baseServiceUrl_2 + $scope.sandbox.sandboxId + "/open";
+            } else  if ($scope.sandbox.schemaVersion === "3") {
+                $scope.openFhirUrl = settings.baseServiceUrl_3 + $scope.sandbox.sandboxId + "/open";
             }
             $scope.secureFhirUrl = settings.baseServiceUrl_1 + $scope.sandbox.sandboxId + "/data";
             if ($scope.sandbox.schemaVersion === "2") {
                 $scope.secureFhirUrl = settings.baseServiceUrl_2 + $scope.sandbox.sandboxId + "/data";
+            } else  if ($scope.sandbox.schemaVersion === "3") {
+                $scope.secureFhirUrl = settings.baseServiceUrl_3 + $scope.sandbox.sandboxId + "/data";
             }
         });
 
-        $scope.fhirVersion = schemaVersionName ($scope.sandbox.schemaVersion);
-        function schemaVersionName (schemaVersion) {
-            var name = "";
-            $scope.sandboxSchemaVersions.forEach(function(schema){
-                if (schemaVersion == schema.version) {
-                    name = schema.name;
-                }
-            });
-            return name;
-        }
+        $scope.fhirVersion = schemaServices.getSandboxSchemaVersion().name;
 
         $scope.canDelete = function () {
             return (sandboxManagement.getSandbox().createdBy.ldapId.toLowerCase() === userServices.getOAuthUser().ldapId.toLowerCase());
@@ -754,7 +764,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             }
         };
     }).controller("CreateSandboxController",
-    function($rootScope, $scope, $state, sandboxManagement, tools, appsSettings, branded, docLinks){
+    function($rootScope, $scope, $state, sandboxManagement, tools, appsSettings, branded, schemaServices, docLinks){
 
         $scope.showing.navBar = true;
         $scope.showing.footer = true;
@@ -769,7 +779,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.sandboxDesc = "";
         $scope.sandboxAllowOpenAccess = false;
         $scope.schemaVersion = branded.defaultSchemaVersion;
-        $scope.sandboxSchemaVersions = branded.sandboxSchemaVersions; 
+        $scope.sandboxSchemaVersions = schemaServices.getSandboxSchemaVersions(true); 
         $scope.createEnabled = true;
         
         $scope.title.blueBarTitle = "Create Sandbox";
@@ -2112,6 +2122,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.clientJSON = $scope.selected.selectedApp.clientJSON;
             $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
             $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+            $scope.clientJSON.scope = $scope.clientJSON.scope.join(" ");
 
             $rootScope.$digest();
         });
@@ -2216,11 +2227,14 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 typeof updateClientJSON.redirectUris !== 'undefined') {
             updateClientJSON.redirectUris = updateClientJSON.redirectUris.split(',');
         }
+
         if( Object.prototype.toString.call( updateClientJSON.scope ) !== '[object Array]' &&
             typeof updateClientJSON.scope !== 'undefined') {
-            updateClientJSON.scope = updateClientJSON.scope.split(',');
+            updateClientJSON.scope = updateClientJSON.scope.split(' ');
+            if (!contains(updateClientJSON.scope, "launch")) {
+                updateClientJSON.scope.push("launch");
+            }
         }
-
 
         if (!contains(updateClientJSON.scope, "offline_access")) {
             var index = updateClientJSON.grantTypes.indexOf("refresh_token");

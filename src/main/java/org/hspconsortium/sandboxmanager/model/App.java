@@ -7,14 +7,18 @@ import java.sql.Timestamp;
 
 @Entity
 @NamedQueries({
+        // Used to retrieve a registered app when a new launch scenario is being created with the app
         @NamedQuery(name="App.findByLaunchUriAndClientIdAndSandboxId",
         query="SELECT c FROM App c WHERE c.launchUri = :launchUri and " +
                 "c.authClient.clientId = :clientId and c.sandbox.sandboxId = :sandboxId"),
+        // Used to delete all registered apps when a sandbox is deleted
         @NamedQuery(name="App.findBySandboxId",
         query="SELECT c FROM App c WHERE c.sandbox.sandboxId = :sandboxId and c.authClient.authDatabaseId IS NOT NULL"),
+        // Used to retrieve all registered apps visible to a user of this a sandbox
         @NamedQuery(name="App.findBySandboxIdAndCreatedByOrVisibility",
         query="SELECT c FROM App c WHERE c.sandbox.sandboxId = :sandboxId and c.authClient.authDatabaseId IS NOT NULL and " +
                 "(c.createdBy.ldapId = :createdBy or c.visibility = :visibility)"),
+        // Used to delete a user's PRIVATE registered apps when they are removed from a sandbox
         @NamedQuery(name="App.findBySandboxIdAndCreatedBy",
         query="SELECT c FROM App c WHERE c.sandbox.sandboxId = :sandboxId and c.authClient.authDatabaseId IS NOT NULL and " +
                 "c.createdBy.ldapId = :createdBy")

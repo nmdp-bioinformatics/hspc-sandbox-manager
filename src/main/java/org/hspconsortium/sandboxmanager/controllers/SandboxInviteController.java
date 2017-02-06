@@ -24,15 +24,15 @@ import org.hspconsortium.sandboxmanager.model.*;
 import org.hspconsortium.sandboxmanager.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
-import java.sql.Timestamp;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping("/REST/sandboxinvite")
@@ -91,7 +91,7 @@ public class SandboxInviteController extends AbstractController {
     @SuppressWarnings("unchecked")
     List<SandboxInvite> getSandboxInvitesByInvitee(HttpServletRequest request, @RequestParam(value = "ldapId") String ldapIdEncoded,
             @RequestParam(value = "status") InviteStatus status) throws UnsupportedEncodingException {
-        String ldapId = java.net.URLDecoder.decode(ldapIdEncoded, "UTF-8");
+        String ldapId = java.net.URLDecoder.decode(ldapIdEncoded, StandardCharsets.UTF_8.name());
         checkUserAuthorization(request, ldapId);
         if (status == null) {
             List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesByInviteeId(ldapId);

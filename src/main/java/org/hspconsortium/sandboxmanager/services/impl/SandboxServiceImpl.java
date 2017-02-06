@@ -30,6 +30,7 @@ import javax.net.ssl.SSLContext;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -59,6 +60,9 @@ public class SandboxServiceImpl implements SandboxService {
 
     @Value("${hspc.platform.api.sandboxManagementEndpointURL_2}")
     private String sandboxManagementEndpointURL_2;
+
+    @Value("${hspc.platform.api.sandboxManagementEndpointURL_3}")
+    private String sandboxManagementEndpointURL_3;
 
     @Value("${hspc.platform.api.oauthUserInfoEndpointURL}")
     private String oauthUserInfoEndpointURL;
@@ -348,6 +352,8 @@ public class SandboxServiceImpl implements SandboxService {
 
         if (sandbox.getSchemaVersion().equalsIgnoreCase("2")) {
             url = this.sandboxManagementEndpointURL_2 + "/" + sandbox.getSandboxId();
+        } else if (sandbox.getSchemaVersion().equalsIgnoreCase("3")) {
+            url = this.sandboxManagementEndpointURL_3 + "/" + sandbox.getSandboxId();
         }
 
         HttpPut putRequest = new HttpPut(url);
@@ -381,7 +387,7 @@ public class SandboxServiceImpl implements SandboxService {
         try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(putRequest)) {
             if (closeableHttpResponse.getStatusLine().getStatusCode() != 200) {
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
+                String responseString = EntityUtils.toString(rEntity, StandardCharsets.UTF_8);
                 String errorMsg = String.format("There was a problem creating the sandbox.\n" +
                                 "Response Status : %s .\nResponse Detail :%s. \nUrl: :%s",
                         closeableHttpResponse.getStatusLine(),
@@ -409,6 +415,8 @@ public class SandboxServiceImpl implements SandboxService {
 
         if (sandbox.getSchemaVersion().equalsIgnoreCase("2")) {
             url = this.sandboxManagementEndpointURL_2 + "/" + sandbox.getSandboxId();
+        } else if (sandbox.getSchemaVersion().equalsIgnoreCase("3")) {
+            url = this.sandboxManagementEndpointURL_3 + "/" + sandbox.getSandboxId();
         }
 
         HttpDelete deleteRequest = new HttpDelete(url);
@@ -436,7 +444,7 @@ public class SandboxServiceImpl implements SandboxService {
         try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(deleteRequest)) {
             if (closeableHttpResponse.getStatusLine().getStatusCode() != 200) {
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
+                String responseString = EntityUtils.toString(rEntity, StandardCharsets.UTF_8);
                 String errorMsg = String.format("There was a problem deleting the sandbox.\n" +
                                 "Response Status : %s .\nResponse Detail :%s. \nUrl: :%s",
                         closeableHttpResponse.getStatusLine(),

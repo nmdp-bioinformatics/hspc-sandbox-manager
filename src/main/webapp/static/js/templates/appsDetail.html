@@ -34,6 +34,7 @@
                 <label class="detail-form-label">App Redirect URIs</label>
                 <div class="detail-form-label-input">
                     <input ng-disabled="!canModify" ng-model="clientJSON.redirectUris" class="form-control"/>
+                    <label class="create-form-description" style="font-style: italic">Comma separated list of redirect URIs eg. 'http://myhost.com/my-app/,http://myhost.com/my-other-path/app/'</label>
                 </div>
             </div>
 
@@ -56,11 +57,11 @@
                 <label class="detail-form-label">Scopes</label>
                 <div class="detail-form-label-input with-info">
                     <input ng-disabled="!canModify" ng-model="clientJSON.scope" class="form-control"/>
+                    <label class="create-form-description" style="font-style: italic">Space separated list of scopes eg. 'launch patient/*.* openid profile'</label>
                 </div>
                 <a href='http://docs.smarthealthit.org/authorization/scopes-and-launch-context/' target="_blank" class='float-right-dark-btn'>
                     <img src="static/images/circle_info-128.png" class="info-btn">
                 </a>
-
             </div>
 
             <div class="detail-form">

@@ -5,10 +5,13 @@ import java.sql.Timestamp;
 
 @Entity
 @NamedQueries({
+        // Not currently used, available for a future dashboard
         @NamedQuery(name="SandboxActivityLog.findByUserLdapId",
                 query="SELECT c FROM SandboxActivityLog c WHERE c.user.ldapId = :ldapId"),
+        // Used to delete all activity records when a sandbox is deleted, to remove foreign keys
         @NamedQuery(name="SandboxActivityLog.findBySandboxId",
                 query="SELECT c FROM SandboxActivityLog c WHERE c.sandbox.sandboxId = :sandboxId"),
+        // Not currently used, available for a future dashboard
         @NamedQuery(name="SandboxActivityLog.findBySandboxActivity",
                 query="SELECT c FROM SandboxActivityLog c WHERE c.activity = :sandboxActivity")
 })

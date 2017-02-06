@@ -30,10 +30,4 @@ public class AuthClientServiceImpl implements AuthClientService {
         repository.delete(id);
     }
 
-    @Override
-    public AuthClient findByClientId(final String clientId) {
-        return  repository.findByClientId(clientId);
-    }
-
-
 }

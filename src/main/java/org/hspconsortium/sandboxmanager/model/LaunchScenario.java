@@ -9,15 +9,20 @@ import java.util.List;
 
 @Entity
 @NamedQueries({
+        // Used to delete all launch scenarios when a sandbox is deleted
         @NamedQuery(name="LaunchScenario.findBySandboxId",
                 query="SELECT c FROM LaunchScenario c WHERE c.sandbox.sandboxId = :sandboxId"),
+        // Used to determine if a registered app is being used in a launch scenarios and cannot be deleted
         @NamedQuery(name="LaunchScenario.findByAppIdAndSandboxId",
                 query="SELECT c FROM LaunchScenario c WHERE c.app.id = :appId and c.sandbox.sandboxId = :sandboxId"),
+        // Used to determine if a persona is being used in a launch scenarios and cannot be deleted
         @NamedQuery(name="LaunchScenario.findByUserPersonaIdAndSandboxId",
                 query="SELECT c FROM LaunchScenario c WHERE c.userPersona.id = :userPersonaId and c.sandbox.sandboxId = :sandboxId"),
+        // Used to retrieve all launch scenarios visible to a user of this a sandbox
         @NamedQuery(name="LaunchScenario.findBySandboxIdAndCreatedByOrVisibility",
                 query="SELECT c FROM LaunchScenario c WHERE c.sandbox.sandboxId = :sandboxId and " +
                 "(c.createdBy.ldapId = :createdBy or c.visibility = :visibility)"),
+        // Used to delete a user's PRIVATE launch scenarios when they are removed from a sandbox
         @NamedQuery(name="LaunchScenario.findBySandboxIdAndCreatedBy",
         query="SELECT c FROM LaunchScenario c WHERE c.sandbox.sandboxId = :sandboxId and " +
                 "c.createdBy.ldapId = :createdBy")

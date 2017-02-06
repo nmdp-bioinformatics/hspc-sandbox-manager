@@ -11,6 +11,7 @@ import java.util.Set;
 
 @Entity
 @NamedQueries({
+        // Used to retrieve a user instance for multiple uses
         @NamedQuery(name="User.findByLdapId",
                 query="SELECT c FROM User c WHERE c.ldapId = :ldapId")
 })

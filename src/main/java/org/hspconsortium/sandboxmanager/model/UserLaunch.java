@@ -7,13 +7,18 @@ import java.sql.Timestamp;
 
 @Entity
 @NamedQueries({
+        // Used to retrieve a UserLaunch to update it with a launch or to apply lastLaunchSeconds to a launch scenario
         @NamedQuery(name="UserLaunch.findByUserIdAndLaunchScenarioId",
                 query="SELECT c FROM UserLaunch c WHERE c.user.ldapId = :ldapId and c.launchScenario.id = :launchScenarioId"),
+        // Used to delete a user's UserLaunch's when they are removed from a sandbox
         @NamedQuery(name="UserLaunch.findByUserId",
                 query="SELECT c FROM UserLaunch c WHERE c.user.ldapId = :ldapId"),
+        // Used to delete a user's UserLaunch's when a launch scenario is deleted
         @NamedQuery(name="UserLaunch.findByLaunchScenarioId",
                 query="SELECT c FROM UserLaunch c WHERE c.launchScenario.id = :launchScenarioId")
 })
+// UserLaunch is used to track the time a given user launched a given launch scenario
+// for the purpose of showing recent launch scerarios in sandbox manager
 public class UserLaunch {
     private Integer id;
     private User user;

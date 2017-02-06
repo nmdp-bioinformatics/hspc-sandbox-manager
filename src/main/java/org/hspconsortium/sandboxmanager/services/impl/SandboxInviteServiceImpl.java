@@ -66,6 +66,7 @@ public class SandboxInviteServiceImpl implements SandboxInviteService {
             // Invitee may not exist, create if needed
             User invitee = userService.findByLdapId(sandboxInvite.getInvitee().getLdapId());
             if (invitee == null) {
+                sandboxInvite.getInvitee().setCreatedTimestamp(new Timestamp(new Date().getTime()));
                 invitee = userService.save(sandboxInvite.getInvitee());
             }
             sandboxInvite.setInvitee(invitee);

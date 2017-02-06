@@ -3,11 +3,6 @@ package org.hspconsortium.sandboxmanager.model;
 import javax.persistence.*;
 
 @Entity
-@NamedQueries({
-        @NamedQuery(name="AuthClient.findByClientId",
-        query="SELECT c FROM AuthClient c WHERE c.clientId = :clientId")
-
-})
 public class AuthClient {
     private Integer id;
     private String clientName;

@@ -53,6 +53,7 @@ import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -98,7 +99,7 @@ public class OAuthClientServiceImpl implements OAuthClientService  {
                             , HttpStatus.SC_UNAUTHORIZED));
                 }
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
+                String responseString = EntityUtils.toString(rEntity, StandardCharsets.UTF_8);
                 throw new RuntimeException(String.format("There was a problem registering the oauth client.\n" +
                                 "Response Status : %s .\nResponse Detail :%s."
                         , closeableHttpResponse.getStatusLine()
@@ -141,7 +142,7 @@ public class OAuthClientServiceImpl implements OAuthClientService  {
                             , HttpStatus.SC_UNAUTHORIZED));
                 }
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
+                String responseString = EntityUtils.toString(rEntity, StandardCharsets.UTF_8);
                 throw new RuntimeException(String.format("There was a problem updating the client.\n" +
                                 "Response Status : %s .\nResponse Detail :%s."
                         , closeableHttpResponse.getStatusLine()
@@ -174,7 +175,7 @@ public class OAuthClientServiceImpl implements OAuthClientService  {
                             , HttpStatus.SC_UNAUTHORIZED));
                 }
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
+                String responseString = EntityUtils.toString(rEntity, StandardCharsets.UTF_8);
                 throw new RuntimeException(String.format("There was a problem registering the client.\n" +
                                 "Response Status : %s .\nResponse Detail :%s."
                         , closeableHttpResponse.getStatusLine()
@@ -207,7 +208,7 @@ public class OAuthClientServiceImpl implements OAuthClientService  {
                             , HttpStatus.SC_UNAUTHORIZED));
                 }
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
+                String responseString = EntityUtils.toString(rEntity, StandardCharsets.UTF_8);
                 throw new RuntimeException(String.format("There was a problem deleting the client.\n" +
                                 "Response Status : %s .\nResponse Detail :%s."
                         , closeableHttpResponse.getStatusLine()
@@ -286,7 +287,7 @@ public class OAuthClientServiceImpl implements OAuthClientService  {
                             , HttpStatus.SC_UNAUTHORIZED));
                 }
                 HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, "UTF-8");
+                String responseString = EntityUtils.toString(rEntity, StandardCharsets.UTF_8);
                 throw new RuntimeException(String.format("Invalid Credentials\n" +
                                 "Response Status : %s .\nResponse Detail :%s."
                         , closeableHttpResponse.getStatusLine()

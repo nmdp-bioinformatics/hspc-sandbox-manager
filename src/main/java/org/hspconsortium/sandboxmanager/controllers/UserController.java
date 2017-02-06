@@ -88,9 +88,13 @@ public class UserController extends AbstractController {
             for (String roleName : defaultSystemRoles) {
                 SystemRole role = SystemRole.valueOf(roleName);
                 systemRoles.add(role);
-                sandboxActivityLogService.systemUserRoleChange(null, user, role, true);
+                sandboxActivityLogService.systemUserRoleChange(user, role, true);
             }
             user.setSystemRoles(systemRoles);
+            userService.save(user);
+        } else if (user.getName() == null || user.getName().isEmpty() || !user.getName().equalsIgnoreCase(oAuthService.getOAuthUserName(request))) {
+            // Set or Update Name
+            user.setName(oAuthService.getOAuthUserName(request));
             userService.save(user);
         }
 
