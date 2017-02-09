@@ -40,21 +40,6 @@ abstract class AbstractController {
         this.oAuthService = oAuthService;
     }
 
-
-    @ExceptionHandler(UnauthorizedException.class)
-    @ResponseBody
-    @ResponseStatus(code = org.springframework.http.HttpStatus.UNAUTHORIZED)
-    public void handleAuthorizationException(HttpServletResponse response, Exception e) throws IOException {
-        response.getWriter().write(e.getMessage());
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
-    @ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
-    public void handleException(final HttpServletResponse response, Exception e) throws IOException {
-        response.getWriter().write(e.getMessage());
-    }
-
     // Check that the userId matches the authorized user in the request
     void checkUserAuthorization(final HttpServletRequest request, String userId) {
         String oauthUserId = oAuthService.getOAuthUserId(request);
