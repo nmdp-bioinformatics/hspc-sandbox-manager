@@ -63,7 +63,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $rootScope.$on("$stateChangeStart", function(event, toState, toParams, fromState, fromParams){
             if (toState.authenticate && typeof fhirApiServices.fhirClient() === "undefined"){
                 // User isn’t authenticated
-                if (!window.location.hash.startsWith("#/after-auth")) {
+                if (window.location.hash.indexOf("#/after-auth") !== 0 ) {
                     $scope.signin();
                 }
                 event.preventDefault();
@@ -209,7 +209,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.dashboard = function() {
-            window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/#/dashboard-view";
+            if (appsSettings.getSandboxUrlSettings().sandboxId === undefined) {
+                $state.go('dashboard-view', {});
+            } else {
+                window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/#/dashboard-view";
+            }
         };
 
         $scope.manageUserAccount = function() {
@@ -240,7 +244,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             // $rootScope.$emit('signed-in');
         } else if (sessionStorage.tokenResponse) {
             fhirApiServices.initClient();
-        } else if (sessionStorage.hspcAuthorized && !window.location.hash.startsWith("#/after-auth")) {
+        } else if (sessionStorage.hspcAuthorized && window.location.hash.indexOf("#/after-auth") !== 0 ) {
             oauth2.login();
         }
         // });
@@ -1996,7 +2000,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 // For now the query should only be a Patient query.
                 // In the future this query maybe more complex ex. Observations with high blood pressure, where
                 // we would display the Patient who are references in the Observations
-                if (queryString.startsWith("Patient?")) {
+                if (queryString.indexOf("Patient?") === 0) {
                     queryString = queryString.substr("Patient?".length);
                     var queryItems = queryString.split("&");
                     angular.forEach(queryItems, function (item) {
@@ -2186,7 +2190,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
     function openPatientPicker (app) {
         var patientQuery = app.samplePatients;
-        if (patientQuery !== null && patientQuery !== undefined && patientQuery.startsWith("Patient?")) {
+        if (patientQuery !== null && patientQuery !== undefined && patientQuery.indexOf("Patient?") === 0) {
             patientQuery = patientQuery.substring("Patient?".length);
         }
 
