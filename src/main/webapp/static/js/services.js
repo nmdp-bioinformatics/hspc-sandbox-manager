@@ -945,7 +945,7 @@ angular.module('sandManApp.services', [])
                             suggestions.push(item.value);
                         });
                         results.forEach(function(item){
-                            if (item.keyName.startsWith("Default")) {
+                            if (item.keyName.indexOf("Default") === 0) {
                                 defaultSuggestions.push(item.value);
                             }
                         });
@@ -1952,7 +1952,7 @@ angular.module('sandManApp.services', [])
             } else {
                 sandboxUrlSettings = {};
                 var sandboxBaseUrlWithoutHash = window.location.href.split("#")[0].substring(0, window.location.href.split("#")[0].length);
-                if (sandboxBaseUrlWithoutHash.endsWith("/")) {
+                if (sandboxBaseUrlWithoutHash.lastIndexOf("/") === sandboxBaseUrlWithoutHash.length-1) {
                     sandboxBaseUrlWithoutHash = sandboxBaseUrlWithoutHash.substring(0, sandboxBaseUrlWithoutHash.length-1);
                 }
                 sandboxUrlSettings.sandboxManagerRootUrl = getDashboardUrl((envInfo.sbmUrlHasContextPath === "null" || envInfo.sbmUrlHasContextPath === "true"), sandboxBaseUrlWithoutHash);
