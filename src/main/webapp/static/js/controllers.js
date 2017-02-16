@@ -735,8 +735,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.save = function (filename) {
 
-            if (!$scope.settings.bundleResults) {
-                console.error('No data');
+            if (!$scope.settings.exportResults) {
+                console.log('No data');
                 return;
             }
 
@@ -744,11 +744,11 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 filename = 'sandbox-export.json';
             }
 
-            if (typeof $scope.settings.bundleResults === 'object') {
-                $scope.settings.bundleResults = JSON.stringify($scope.settings.bundleResults, undefined, 2);
+            if (typeof $scope.settings.exportResults === 'object') {
+                $scope.settings.exportResults = JSON.stringify($scope.settings.exportResults, undefined, 2);
             }
 
-            var blob = new Blob([$scope.settings.bundleResults], {type: 'text/json'});
+            var blob = new Blob([$scope.settings.exportResults], {type: 'text/json'});
 
             // FOR IE:
 
@@ -1123,6 +1123,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         
         $scope.loadMore = function (direction) {
             $scope.showing.searchloading = true;
+            $scope.shouldBeOpen = false;
+            $rootScope.$emit('patient-search-start');
             var modalProgress = openModalProgressDialog("Searching...");
 
             fhirApiServices.getNextOrPrevPage(direction, lastQueryResult).then(function (p, queryResult) {
@@ -1133,6 +1135,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $rootScope.$digest();
 
                 modalProgress.dismiss();
+                $rootScope.$emit('patient-search-complete');
+                $scope.shouldBeOpen = true;
             });
         };
 
@@ -1179,6 +1183,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 }
             }
 
+            $rootScope.$emit('patient-search-start');
+            $scope.shouldBeOpen = false;
             var modalProgress = openModalProgressDialog("Searching...");
 
             fhirApiServices.queryResourceInstances("Patient", $scope.patientQuery, $scope.tokens, sortValues, $scope.resultCount !== undefined ? $scope.resultCount : 50)
@@ -1193,6 +1199,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     $scope.count = fhirApiServices.calculateResultSet(queryResult);
 
                     modalProgress.dismiss();
+                    $rootScope.$emit('patient-search-complete');
+                    $scope.shouldBeOpen = true;
                 });
         }, 600);
 
@@ -1321,6 +1329,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.loadMore = function(direction) {
             $scope.showing.searchloading = true;
+            $scope.shouldBeOpen = false;
             var modalProgress = openModalProgressDialog("Searching...");
             fhirApiServices.getNextOrPrevPage(direction, lastQueryResult).then(function(p, queryResult){
                 lastQueryResult = queryResult;
@@ -1329,6 +1338,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.showing.searchloading = false;
                 $rootScope.$digest();
                 modalProgress.dismiss();
+                $scope.shouldBeOpen = true;
             });
         };
 
@@ -1357,6 +1367,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         var loadCount = 0;
         var search = _.debounce(function(thisLoad){
+            $scope.shouldBeOpen = false;
             var modalProgress = openModalProgressDialog("Searching...");
             fhirApiServices.queryResourceInstances("Practitioner", undefined, $scope.tokens, [['family','asc'],['given','asc']])
                 .then(function(p, queryResult){
@@ -1368,6 +1379,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     $scope.showing.searchloading = false;
                     $scope.count = fhirApiServices.calculateResultSet(queryResult);
                     modalProgress.dismiss();
+                    $scope.shouldBeOpen = true;
                     $rootScope.$digest();
                 });
         }, 600);
@@ -2501,7 +2513,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             callback(result);
         };
     }]).controller('PatientPickerModalCtrl',
-    function ($scope, $uibModalInstance, getSettings) {
+    function ($scope, $rootScope, $uibModalInstance, getSettings) {
+
+        $scope.shouldBeOpen = false;
 
         $scope.showing = {
             noPatientContext: true,
@@ -2537,6 +2551,14 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.selected.selectedPatient.fhirId = $scope.selected.selectedPatient.id;
                 $uibModalInstance.close($scope.selected.selectedPatient);
             }
+        });
+
+        $rootScope.$on('patient-search-start', function(){
+            $scope.shouldBeOpen = false;
+        });
+
+        $rootScope.$on('patient-search-complete', function(){
+            $scope.shouldBeOpen = true;
         });
 
         $scope.cancel = function () {
