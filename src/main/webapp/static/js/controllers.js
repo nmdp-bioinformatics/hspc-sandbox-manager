@@ -874,12 +874,16 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.docLink = docLinks.docLink;
 
-        var sideBarStates = ['launch-scenarios','users', 'patients', 'practitioners', 'manage-apps'];
+        var sideBarStates = ['launch-scenarios','users', 'personas', 'patients', 'practitioners', 'manage-apps'];
 
         $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams){
             if ( sideBarStates.indexOf(toState.name) > -1) {
                 $scope.selected = toState.name;
             }
+        });
+
+        $rootScope.$on('persona-create', function(){
+            $scope.selected = 'persona';
         });
 
         $scope.selected = "";
@@ -1509,6 +1513,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.selectForScenario = true;
         }
 
+        $scope.goToPersona = function(){
+            $rootScope.$emit('persona-create');
+            $state.go('personas');
+        };
 
         $scope.updatePassword = function(persona){
             persona.password = $scope.editPassword.new;
