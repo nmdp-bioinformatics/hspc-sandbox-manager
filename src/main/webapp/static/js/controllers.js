@@ -150,7 +150,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.slimBlueBar = true;
             $scope.size.sandboxBarHeight = 50;
             $scope.patientsLabel = $scope.canManageData() ? "Patients" : "Browse Patients";
-            $scope.practitionersLabel = $scope.canManageData() ? "Practitioner" : "Browse Practitioner";
+            $scope.practitionersLabel = $scope.canManageData() ? "Practitioners" : "Browse Practitioner";
             $scope.dataLabel = $scope.canManageData() ? "Data Manager" : "Data Browser";
             $rootScope.$digest();
             if ($scope.showing.defaultLaunchScenario) {
