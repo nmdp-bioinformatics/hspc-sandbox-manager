@@ -2086,6 +2086,16 @@ td {
     font-weight: 300;
 }
 
+.btn-image {
+    color: #10759D;
+    margin-right:2px;
+    outline: none;
+}
+
+.btn-image:hover {
+    color: #4593B2;
+}
+
 .image-btn {
     display: block;
     height: 24px;
