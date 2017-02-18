@@ -363,11 +363,13 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.showDelete = function (ldapId) {
+            // Only Sandbox creater can delete users
             if (sandboxManagement.getSandbox().createdBy !== undefined && userServices.getOAuthUser() !== undefined &&
                 sandboxManagement.getSandbox().createdBy.ldapId.toLowerCase() === userServices.getOAuthUser().ldapId.toLowerCase()) {
+                // Don't allow deleting self
                 return sandboxManagement.getSandbox().createdBy.ldapId.toLowerCase() !== ldapId.toLowerCase();
             }
-            return false
+            return false;
         };
 
         $scope.removeUser = function (ldapId) {
@@ -1000,6 +1002,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.noPatientContext =  false;
             $scope.showing.createPatient =  true;
         }
+        $scope.shouldBeOpen = true;
 
         $scope.count = {start: 0, end: 0, total: 0};
 
@@ -1127,7 +1130,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         
         $scope.loadMore = function (direction) {
             $scope.showing.searchloading = true;
-            $scope.shouldBeOpen = false;
             $rootScope.$emit('patient-search-start');
             var modalProgress = openModalProgressDialog("Searching...");
 
@@ -1140,7 +1142,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
                 modalProgress.dismiss();
                 $rootScope.$emit('patient-search-complete');
-                $scope.shouldBeOpen = true;
             });
         };
 
@@ -1320,6 +1321,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         if ($state.current.name === 'practitioners') {
             $scope.showing.createPractitioner =  true;
         }
+        $scope.shouldBeOpen = true;
 
         $scope.count = {start: 0, end: 0, total: 0};
 
@@ -1333,7 +1335,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.loadMore = function(direction) {
             $scope.showing.searchloading = true;
-            $scope.shouldBeOpen = false;
             var modalProgress = openModalProgressDialog("Searching...");
             fhirApiServices.getNextOrPrevPage(direction, lastQueryResult).then(function(p, queryResult){
                 lastQueryResult = queryResult;
@@ -1342,7 +1343,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 $scope.showing.searchloading = false;
                 $rootScope.$digest();
                 modalProgress.dismiss();
-                $scope.shouldBeOpen = true;
             });
         };
 
@@ -1371,7 +1371,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         var loadCount = 0;
         var search = _.debounce(function(thisLoad){
-            $scope.shouldBeOpen = false;
             var modalProgress = openModalProgressDialog("Searching...");
             fhirApiServices.queryResourceInstances("Practitioner", undefined, $scope.tokens, [['family','asc'],['given','asc']])
                 .then(function(p, queryResult){
@@ -1383,7 +1382,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                     $scope.showing.searchloading = false;
                     $scope.count = fhirApiServices.calculateResultSet(queryResult);
                     modalProgress.dismiss();
-                    $scope.shouldBeOpen = true;
                     $rootScope.$digest();
                 });
         }, 600);
@@ -2053,9 +2051,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                         });
                 }
             };
-    }).controller("AppsController", function($scope, $rootScope, $state, appRegistrationServices, sandboxManagement, userServices, fhirApiServices, launchApp, $uibModal, docLinks) {
+    }).controller("AppsController", function($scope, $rootScope, $state, appRegistrationServices, sandboxManagement, userServices, fhirApiServices, appsService, launchApp, $uibModal, docLinks) {
 
     $scope.all_user_apps = [];
+    $scope.default_apps = [];
     $scope.galleryOffset = 246;
     $scope.canDelete = false;
     $scope.canModify = false;
@@ -2071,9 +2070,17 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
     appRegistrationServices.getSandboxApps();
 
+    appsService.getSampleApps().done(function(patientApps){
+        for (var i=0; i < patientApps.length; i++) {
+            if (patientApps[i]["isDefault"] !== undefined) {
+                $scope.default_apps.push(angular.copy(patientApps[i]));
+            }
+        }
+    });
+
     $rootScope.$on('app-list-update', function () {
-        $scope.all_user_apps = appRegistrationServices.getAppList();
-        $rootScope.$digest();
+        $scope.all_user_apps = angular.copy(appRegistrationServices.getAppList());
+        // $scope.all_user_apps = $scope.all_user_apps.concat($scope.default_apps);
     });
 
     $scope.registration = function () {
@@ -2140,16 +2147,23 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         } else {
             delete $scope.clientJSON.logoUri;
         }
-        appRegistrationServices.getSandboxApp(app.id).then(function (resultApp) {
-            $scope.galleryOffset = 80;
-            $scope.selected.selectedApp.clientJSON = JSON.parse(resultApp.clientJSON);
-            $scope.clientJSON = $scope.selected.selectedApp.clientJSON;
+        if (app.isDefault === true) {
+            $scope.clientJSON.clientName = $scope.selected.selectedApp.authClient.clientName;
+            $scope.clientJSON.redirectUri = $scope.selected.selectedApp.authClient.redirectUri;
             $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
             $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
-            $scope.clientJSON.scope = $scope.clientJSON.scope.join(" ");
-
+            $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri;
+        }else {
+            appRegistrationServices.getSandboxApp(app.id).then(function (resultApp) {
+                $scope.galleryOffset = 80;
+                $scope.selected.selectedApp.clientJSON = JSON.parse(resultApp.clientJSON);
+                $scope.clientJSON = $scope.selected.selectedApp.clientJSON;
+                $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
+                $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+                $scope.clientJSON.scope = $scope.clientJSON.scope.join(" ");
             $rootScope.$digest();
-        });
+            });
+        }
     };
 
     function canDeleteApp(app){
@@ -2164,9 +2178,12 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     }
 
     $scope.canModifyApp = function(app) {
-        return userServices.canModify(app, sandboxManagement.getSandbox());
+        if (app.isDefault === true) {
+            return false;
+        } else {
+            return userServices.canModify(app, sandboxManagement.getSandbox());
+        }
     };
-
 
     $scope.updateFile = function(files) {
 
