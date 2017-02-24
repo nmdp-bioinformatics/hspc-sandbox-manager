@@ -7,6 +7,15 @@ pipelines:
   default:
     - step:
         script:
-          - openssl aes-256-cbc -pass pass:$OPENSSL_PWD -in private-key.gpg.enc -out private-key.gpg -d
-          - gpg --import private-key.gpg
-          - mvn -V -B -s settings.xml deploy -P DEPLOY
+          - echo "This script runs on all branches that don't have any specific pipeline assigned in 'branches'."
+  branches:
+    master:
+      - step:
+          script:
+            - openssl aes-256-cbc -pass pass:$OPENSSL_PWD -in private-key.gpg.enc -out private-key.gpg -d
+            - gpg --import private-key.gpg
+            - mvn -V -B -s settings.xml deploy -P DEPLOY
+    develop:
+      - step:
+          script:
+            - echo "Run on develop branch"
