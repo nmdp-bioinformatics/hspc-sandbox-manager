@@ -413,7 +413,9 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.sendInvite = function () {
-            sandboxInviteServices.createSandboxInvite($scope.newUserEmail).then(function () {
+            var inviteUser = angular.copy($scope.newUserEmail);
+            $scope.newUserEmail = "";
+            sandboxInviteServices.createSandboxInvite(inviteUser).then(function () {
                 getSandboxInvites();
             });
         };
@@ -2080,6 +2082,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
     $rootScope.$on('app-list-update', function () {
         $scope.all_user_apps = angular.copy(appRegistrationServices.getAppList());
+        $rootScope.$digest();
         // $scope.all_user_apps = $scope.all_user_apps.concat($scope.default_apps);
     });
 

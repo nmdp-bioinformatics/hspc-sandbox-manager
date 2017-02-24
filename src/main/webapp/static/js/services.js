@@ -1419,7 +1419,7 @@ angular.module('sandManApp.services', [])
                     xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
                 }
             }).done(function(){
-                // notification.message("Invite Sent");
+                notification.message("Invite Sent");
                 deferred.resolve();
             }).fail(function(error){
                 // notification.message({ type:"error", text: "Failed to Send Invite" });
