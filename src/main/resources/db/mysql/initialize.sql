@@ -18,9 +18,17 @@ INSERT INTO `user_role`(`id`,`role`,`user_id`) VALUES (1,0,1),(2,3,1),(3,4,1);
 
 INSERT INTO `sandbox_user_roles` (`sandbox`,`user_roles`) VALUES (1,1),(1,2),(1,3);
 
-INSERT INTO `auth_client` (`id`,`auth_database_id`,`client_id`,`client_name`,`logo_uri` ) VALUES(1, 4,'bp_centiles','BP Centiles','http://localhost:8080/hspc-reference-apps/static/images/apps/bpc.png'),(2, 5,'cardiac_risk','Cardiac Risk','http://localhost:8080/hspc-reference-apps/static/images/apps/cardio.png'),(3, 6,'growth_chart','Growth Chart','http://localhost:8080/hspc-reference-apps/static/images/apps/pgc.png');
+INSERT INTO `auth_client` (`id`,`auth_database_id`,`client_id`,`client_name`,`logo_uri` )
+VALUES
+  (1, 4,'bp_centiles','BP Centiles','http://localhost:8080/hspc-reference-apps/static/images/apps/bpc.png'),
+  (2, 5,'cardiac_risk','Cardiac Risk','http://localhost:8080/hspc-reference-apps/static/images/apps/cardio.png'),
+  (3, 6,'growth_chart','Growth Chart','http://localhost:8080/hspc-reference-apps/static/images/apps/pgc.png');
 
-INSERT INTO `app`(`id`,`created_timestamp`,`launch_uri`,`logo_uri`,`visibility`,`auth_client_id`,`created_by_id`,`logo_id`,`sandbox_id`) VALUES (1,now(),'http://localhost:8080/hspc-reference-apps/static/apps/bp-centiles/launch.html','http://hspc-reference-apps/static/images/apps/bpc.png',0,1,1,NULL,1),(2,now(),'http://hspc-reference-apps/static/apps/cardiac-risk/launch.html','http://hspc-reference-apps/static/images/apps/cardio.png',0,2,1,NULL,1), (3,now(),'http://hspc-reference-apps/static/apps/growth-chart/launch.html','http://hspc-reference-apps/static/images/apps/pgc.png',0,3,1,NULL,1);
+INSERT INTO `app`(`id`,`created_timestamp`,`launch_uri`,`logo_uri`,`visibility`,`auth_client_id`,`created_by_id`,`logo_id`,`sandbox_id`)
+VALUES
+  (1,now(),'http://localhost:8080/hspc-reference-apps/static/apps/bp-centiles/launch.html','http://localhost:8080/hspc-reference-apps/static/images/apps/bpc.png',0,1,1,NULL,1),
+  (2,now(),'http://localhost:8080/hspc-reference-apps/static/apps/cardiac-risk/launch.html','http://localhost:8080/hspc-reference-apps/static/images/apps/cardio.png',0,2,1,NULL,1),
+  (3,now(),'http://localhost:8080/hspc-reference-apps/static/apps/growth-chart/launch.html','http://localhost:8080/hspc-reference-apps/static/images/apps/pgc.png',0,3,1,NULL,1);
 
 COMMIT;
 
