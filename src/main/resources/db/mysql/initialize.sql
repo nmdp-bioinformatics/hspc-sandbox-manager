@@ -4,7 +4,7 @@ SET AUTOCOMMIT = 0;
 
 START TRANSACTION;
 
-INSERT INTO 'config' ('id', 'config_type', 'key_name', 'value')
+INSERT INTO config (id, config_type, key_name, value)
 VALUES
   (1, 0, 'Patient_1', 'Patient'),
   (2, 0, 'Patient_2', 'Patient?name=s'),
@@ -20,46 +20,43 @@ VALUES
   (12, 0, 'AllergyIntolerance_1', 'AllergyIntolerance'),
   (13, 0, 'Default_AllergyIntolerance_2', 'AllergyIntolerance?date=>1999-01-01&date=<2011-12-31');
 
-INSERT INTO 'user' ('id', 'created_timestamp', 'ldap_id', 'name')
+INSERT INTO user (id, created_timestamp, ldap_id, name)
 VALUES (1, now(), 'admin', 'Admin');
 
-INSERT INTO 'system_role' ('user_id', 'role')
+INSERT INTO system_role (user_id, role)
 VALUES (1, 0), (1, 2);
 
-INSERT INTO 'sandbox' ('id', 'allow_open_access', 'created_timestamp', 'description', 'name', 'sandbox_id', 'schema_version', 'created_by_id', 'fhir_server_end_point', 'visibility')
+INSERT INTO sandbox (id, allow_open_access, created_timestamp, description, name, sandbox_id, schema_version, created_by_id, fhir_server_end_point, visibility)
 VALUES
   (1, 0x00, now(), 'HSPC Development Sandbox v1', 'HSPC Sandbox v1', 'hspc1', '1', 1, NULL, 0),
   (2, 0x00, now(), 'HSPC Development Sandbox v2', 'HSPC Sandbox v2', 'hspc2', '2', 1, NULL, 0),
   (3, 0x00, now(), 'HSPC Development Sandbox v3', 'HSPC Sandbox v3', 'hspc3', '3', 1, NULL, 0);
 
-INSERT INTO 'user_sandbox' ('user_id', 'sandbox_id')
+INSERT INTO user_sandbox (user_id, sandbox_id)
 VALUES
   (1, 1),
   (1, 2),
   (1, 3);
 
-INSERT INTO 'user_role' ('id', 'role', 'user_id')
-VALUES (1, 0, 1), (2, 3, 1), (3, 4, 1);
-
-INSERT INTO 'sandbox_user_roles' ('sandbox', 'user_roles')
+INSERT INTO user_role (id, role, user_id)
 VALUES
-  (1, 1),
-  (1, 2),
-  (1, 3),
-  (2, 1),
-  (2, 2),
-  (2, 3),
+  (1, 0, 1),
+  (2, 3, 1),
+  (3, 4, 1);
+
+INSERT INTO sandbox_user_roles (sandbox, user_roles)
+VALUES
   (3, 1),
   (3, 2),
   (3, 3);
 
-INSERT INTO 'auth_client' ('id', 'auth_database_id', 'client_id', 'client_name', 'logo_uri')
+INSERT INTO auth_client (id, auth_database_id, client_id, client_name, logo_uri)
 VALUES
   (1, 4, 'bp_centiles', 'BP Centiles', 'http://localhost:8080/hspc-reference-apps/static/images/apps/bpc.png'),
   (2, 5, 'cardiac_risk', 'Cardiac Risk', 'http://localhost:8080/hspc-reference-apps/static/images/apps/cardio.png'),
   (3, 6, 'growth_chart', 'Growth Chart', 'http://localhost:8080/hspc-reference-apps/static/images/apps/pgc.png');
 
-INSERT INTO 'app' ('id', 'created_timestamp', 'launch_uri', 'logo_uri', 'visibility', 'auth_client_id', 'created_by_id', 'logo_id', 'sandbox_id')
+INSERT INTO app (id, created_timestamp, launch_uri, logo_uri, visibility, auth_client_id, created_by_id, logo_id, sandbox_id)
 VALUES
   (1, now(), 'http://localhost:8080/hspc-reference-apps/static/apps/bp-centiles/launch.html',
    'http://localhost:8080/hspc-reference-apps/static/images/apps/bpc.png', 0, 1, 1, NULL, 3),
