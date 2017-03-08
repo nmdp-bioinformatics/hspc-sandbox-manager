@@ -53,7 +53,10 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
 
         if (launchScenario.getApp().getAuthClient().getAuthDatabaseId() == null) {
             // This is an anonymous App created for a custom launch
-            appService.delete(launchScenario.getApp());
+            App app = launchScenario.getApp();
+            launchScenario.setApp(null);
+            save(launchScenario);
+            appService.delete(app);
         }
 
         List<ContextParams> contextParamsList = launchScenario.getContextParams();

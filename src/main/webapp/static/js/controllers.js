@@ -354,6 +354,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.sandboxInvites = [];
         $scope.newUserEmail = "";
         $scope.validEmail = false;
+        $scope.isSending = false;
 
         getSandboxInvites();
         getUsers();
@@ -413,10 +414,14 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.sendInvite = function () {
+            $scope.isSending = true;
             var inviteUser = angular.copy($scope.newUserEmail);
             $scope.newUserEmail = "";
             sandboxInviteServices.createSandboxInvite(inviteUser).then(function () {
                 getSandboxInvites();
+                $scope.isSending = false;
+            }, function(results) {
+                $scope.isSending = false;
             });
         };
 
