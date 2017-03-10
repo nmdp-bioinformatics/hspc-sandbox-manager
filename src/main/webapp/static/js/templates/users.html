@@ -28,7 +28,8 @@
                 <div ng-show="canInvite()" class="invite-form">
                     <label>Invite A User</label>
                     <input ng-model="newUserEmail" placeholder="User's Email Address"/>
-                    <button ng-click="sendInvite()" ng-disabled="!validEmail" class="btn btn-accept"><i class="fa fa-share"></i> Send Invite</button>
+                    <button ng-show="!isSending" ng-click="sendInvite()" ng-disabled="!validEmail" class="btn btn-accept"><i class="fa fa-share"></i> Send Invite</button>
+                    <button ng-show="isSending" ng-disabled="true" class="btn btn-cancel"><i class="fa fa-spinner fa-pulse"></i> Sending...</button>
                 </div>
             </div>
             <div class="col-lg-12" ng-show="canInvite()">

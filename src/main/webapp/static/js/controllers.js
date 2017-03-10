@@ -354,6 +354,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.sandboxInvites = [];
         $scope.newUserEmail = "";
         $scope.validEmail = false;
+        $scope.isSending = false;
 
         getSandboxInvites();
         getUsers();
@@ -413,10 +414,14 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
         $scope.sendInvite = function () {
+            $scope.isSending = true;
             var inviteUser = angular.copy($scope.newUserEmail);
             $scope.newUserEmail = "";
             sandboxInviteServices.createSandboxInvite(inviteUser).then(function () {
                 getSandboxInvites();
+                $scope.isSending = false;
+            }, function(results) {
+                $scope.isSending = false;
             });
         };
 
@@ -1191,7 +1196,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             }
 
             $rootScope.$emit('patient-search-start');
-            $scope.shouldBeOpen = false;
             var modalProgress = openModalProgressDialog("Searching...");
 
             fhirApiServices.queryResourceInstances("Patient", $scope.patientQuery, $scope.tokens, sortValues, $scope.resultCount !== undefined ? $scope.resultCount : 50)
@@ -1207,7 +1211,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
                     modalProgress.dismiss();
                     $rootScope.$emit('patient-search-complete');
-                    $scope.shouldBeOpen = true;
                 });
         }, 600);
 
