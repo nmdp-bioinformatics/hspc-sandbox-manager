@@ -328,11 +328,11 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
         link: function(scope, element, attrs) {
             var model = $parse(attrs.focusMe);
             scope.$watch(model, function(value) {
-                if(value === true) {
+                // if(value === true) {
                     $timeout(function() {
                         element[0].focus();
                     });
-                }
+                // }
             });
         }
     };
