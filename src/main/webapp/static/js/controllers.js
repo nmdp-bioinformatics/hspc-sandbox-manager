@@ -1196,7 +1196,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             }
 
             $rootScope.$emit('patient-search-start');
-            $scope.shouldBeOpen = false;
             var modalProgress = openModalProgressDialog("Searching...");
 
             fhirApiServices.queryResourceInstances("Patient", $scope.patientQuery, $scope.tokens, sortValues, $scope.resultCount !== undefined ? $scope.resultCount : 50)
@@ -1212,7 +1211,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
                     modalProgress.dismiss();
                     $rootScope.$emit('patient-search-complete');
-                    $scope.shouldBeOpen = true;
                 });
         }, 600);
 
