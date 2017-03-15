@@ -334,7 +334,7 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
                     });
                     $timeout(function() {
                         element[0].focus();
-                    },100);
+                    },500);
                 // }
             });
         }
