@@ -56,9 +56,6 @@ hspc:
       oauth2:
         clientId: hspc_resource_server
         clientSecret: secret
-      sandboxManagementEndpointURL_1: ${hspc.platform.api.version1.baseUrl}/management/sandbox
-      sandboxManagementEndpointURL_2: ${hspc.platform.api.version2.baseUrl}/management/sandbox
-      sandboxManagementEndpointURL_3: ${hspc.platform.api.version3.baseUrl}/management/sandbox
       oauthUserInfoEndpointURL: ${hspc.platform.authorization.baseUrl}/userinfo
       oauthClientEndpointURL: ${hspc.platform.authorization.baseUrl}/api/clients
       oauthUserLoginEndpointURL: ${hspc.platform.authorization.baseUrl}/j_spring_security_check

@@ -55,18 +55,17 @@ public class SandboxServiceImpl implements SandboxService {
     private static Logger LOGGER = LoggerFactory.getLogger(SandboxServiceImpl.class.getName());
     private final SandboxRepository repository;
 
-    @Value("${hspc.platform.api.sandboxManagementEndpointURL_1}")
-    private String sandboxManagementEndpointURL_1;
+    @Value("${hspc.platform.api.version1.baseUrl}")
+    private String apiBaseURL_1;
 
-    @Value("${hspc.platform.api.sandboxManagementEndpointURL_2}")
-    private String sandboxManagementEndpointURL_2;
+    @Value("${hspc.platform.api.version2.baseUrl}")
+    private String apiBaseURL_2;
 
-    @Value("${hspc.platform.api.sandboxManagementEndpointURL_3}")
-    private String sandboxManagementEndpointURL_3;
+    @Value("${hspc.platform.api.version3.baseUrl}")
+    private String apiBaseURL_3;
 
     @Value("${hspc.platform.api.oauthUserInfoEndpointURL}")
     private String oauthUserInfoEndpointURL;
-
 
     private final UserService userService;
     private final UserRoleService userRoleService;
@@ -348,12 +347,11 @@ public class SandboxServiceImpl implements SandboxService {
     }
 
     private boolean callCreateOrUpdateSandboxAPI(final Sandbox sandbox, final String bearerToken ) throws UnsupportedEncodingException{
-        String url = this.sandboxManagementEndpointURL_1 + "/" + sandbox.getSandboxId();
-
+        String url = apiBaseURL_1 + "/" + sandbox.getSandboxId() + "/sandbox";
         if (sandbox.getSchemaVersion().equalsIgnoreCase("2")) {
-            url = this.sandboxManagementEndpointURL_2 + "/" + sandbox.getSandboxId();
+            url = apiBaseURL_2 + "/" + sandbox.getSandboxId() + "/sandbox";
         } else if (sandbox.getSchemaVersion().equalsIgnoreCase("3")) {
-            url = this.sandboxManagementEndpointURL_3 + "/" + sandbox.getSandboxId();
+            url = apiBaseURL_3 + "/" + sandbox.getSandboxId() + "/sandbox";
         }
 
         HttpPut putRequest = new HttpPut(url);
@@ -411,12 +409,11 @@ public class SandboxServiceImpl implements SandboxService {
     }
 
     private boolean callDeleteSandboxAPI(final Sandbox sandbox, final String bearerToken ) {
-        String url = this.sandboxManagementEndpointURL_1 + "/" + sandbox.getSandboxId();
-
+        String url = apiBaseURL_1 + "/" + sandbox.getSandboxId() + "/sandbox";
         if (sandbox.getSchemaVersion().equalsIgnoreCase("2")) {
-            url = this.sandboxManagementEndpointURL_2 + "/" + sandbox.getSandboxId();
+            url = apiBaseURL_2 + "/" + sandbox.getSandboxId() + "/sandbox";
         } else if (sandbox.getSchemaVersion().equalsIgnoreCase("3")) {
-            url = this.sandboxManagementEndpointURL_3 + "/" + sandbox.getSandboxId();
+            url = apiBaseURL_3 + "/" + sandbox.getSandboxId() + "/sandbox";
         }
 
         HttpDelete deleteRequest = new HttpDelete(url);
