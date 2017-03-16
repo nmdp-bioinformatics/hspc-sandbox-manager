@@ -2,7 +2,7 @@ package org.hspconsortium.sandboxmanager.services;
 
 import org.hspconsortium.sandboxmanager.model.*;
 
-import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
 import java.util.List;
 
 public interface SandboxActivityLogService {
@@ -42,4 +42,6 @@ public interface SandboxActivityLogService {
     List<SandboxActivityLog> findByUserLdapId(final String ldapId);
 
     List<SandboxActivityLog> findBySandboxActivity(final SandboxActivity sandboxActivity);
+
+    String intervalActive(final Timestamp intervalTime);
 }

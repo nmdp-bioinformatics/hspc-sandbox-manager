@@ -200,6 +200,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             return userServices.sandboxManagerUser() !== undefined && (userServices.hasSystemRole("CREATE_SANDBOX") || userServices.hasSystemRole("ADMIN"));
         };
 
+        $scope.isSystemAdmin = function (){
+            return userServices.sandboxManagerUser() !== undefined && (userServices.hasSystemRole("ADMIN"));
+        };
+
         $scope.canManageUsers = function (){
             return sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "MANAGE_USERS");
         };
@@ -528,6 +532,15 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             });
         };
         
+    }).controller("AdminDashboardViewController",
+    function($scope, $rootScope, sandboxManagement){
+        $scope.statistics = {};
+
+        sandboxManagement.sandboxManagerStatistics().then(function (result) {
+            $scope.statistics = result;
+            $rootScope.$digest();
+        });
+
     }).controller("FutureController",
     function(){
 
@@ -702,21 +715,27 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             });
         };
 
-        $scope.export = function (){
+        $scope.export = function (query){
             $scope.settings.bundle = "";
-            var modalProgress = openModalProgressDialog("Exporting...");
-            $scope.saveFileName = 'sandbox-export.json';
-            fhirApiServices.exportAllData().then(function (results) {
-                $scope.settings.exportResults = $filter('json')(results);
-                $scope.resultsTitle = "Export Results";
-                $scope.settings.showing.export.results = true;
-                modalProgress.dismiss();
-            }, function(results) {
-                $scope.settings.exportResults = results;
-                $scope.resultsTitle = "Export Results";
-                $scope.settings.showing.export.results = true;
-                modalProgress.dismiss();
-            });
+            if (query === "" || query === 'clear') {
+                $scope.settings.exportResults = "";
+                $scope.settings.showing.export.results = false;
+            } else {
+                var modalProgress = openModalProgressDialog("Exporting...");
+                $scope.saveFileName = 'sandbox-export.json';
+                fhirApiServices.exportData(query).then(function (results) {
+                    $scope.settings.exportJsonResults = results;
+                    $scope.settings.exportResults = $filter('json')($scope.settings.exportJsonResults);
+                    $scope.resultsTitle = "Export Results";
+                    $scope.settings.showing.export.results = true;
+                    modalProgress.dismiss();
+                }, function (results) {
+                    $scope.settings.exportResults = $filter('json')(results);
+                    $scope.resultsTitle = "Export Results";
+                    $scope.settings.showing.export.results = true;
+                    modalProgress.dismiss();
+                });
+            }
         };
 
         $scope.uploadFile = function(files) {
@@ -1864,7 +1883,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
             modalInstance.result.then(function (modalPatient) {
                 // capture the date only for the birthDate value
-                modalPatient.birthDate = modalPatient.birthDateTime.toISOString().substring(0, 10);
+               // modalPatient.birthDate = new Date(modalPatient.birthDateTime).toISOString().substring(0, 10);
                 // todo support storing the birthDateTime in the extention when FHIR supports it
                 fhirApiServices.createResourceInstance(modalPatient);
                 $rootScope.$emit('patient-created');

@@ -228,6 +228,7 @@
     padding: 4px 0 4px 5px;
     position: relative;
     margin: 1px 0;
+    min-height: 35px;
     width: 100%;
 }
 
