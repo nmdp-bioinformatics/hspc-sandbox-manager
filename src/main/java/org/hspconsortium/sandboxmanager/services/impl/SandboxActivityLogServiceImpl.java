@@ -162,6 +162,11 @@ public class SandboxActivityLogServiceImpl implements SandboxActivityLogService 
         return repository.findBySandboxActivity(sandboxActivity);
     }
 
+    @Override
+    public String intervalActive(final Timestamp intervalTime) {
+        return repository.intervalActive(intervalTime);
+    }
+
     private SandboxActivityLog createSandboxActivityLog(Sandbox sandbox, User user) {
         SandboxActivityLog sandboxActivityLog = new SandboxActivityLog();
         sandboxActivityLog.setSandbox(sandbox);

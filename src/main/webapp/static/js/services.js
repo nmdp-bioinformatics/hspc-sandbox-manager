@@ -1060,6 +1060,23 @@ angular.module('sandManApp.services', [])
                     deferred.reject();
                 });
                 return deferred;
+            },
+            sandboxManagerStatistics: function() {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/admin?interval=30",
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(results){
+                    deferred.resolve(results);
+                }).fail(function(){
+                    deferred.reject();
+                });
+                return deferred;
             }
         }
 

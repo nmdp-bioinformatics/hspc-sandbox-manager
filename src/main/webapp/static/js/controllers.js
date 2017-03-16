@@ -200,6 +200,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             return userServices.sandboxManagerUser() !== undefined && (userServices.hasSystemRole("CREATE_SANDBOX") || userServices.hasSystemRole("ADMIN"));
         };
 
+        $scope.isSystemAdmin = function (){
+            return userServices.sandboxManagerUser() !== undefined && (userServices.hasSystemRole("ADMIN"));
+        };
+
         $scope.canManageUsers = function (){
             return sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "MANAGE_USERS");
         };
@@ -528,6 +532,15 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             });
         };
         
+    }).controller("AdminDashboardViewController",
+    function($scope, $rootScope, sandboxManagement){
+        $scope.statistics = {};
+
+        sandboxManagement.sandboxManagerStatistics().then(function (result) {
+            $scope.statistics = result;
+            $rootScope.$digest();
+        });
+
     }).controller("FutureController",
     function(){
 

@@ -3,6 +3,7 @@ package org.hspconsortium.sandboxmanager.services;
 import org.hspconsortium.sandboxmanager.model.*;
 
 import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
 import java.util.List;
 
 public interface SandboxService {
@@ -36,4 +37,10 @@ public interface SandboxService {
     Sandbox findBySandboxId(final String sandboxId);
 
     List<Sandbox> findByVisibility(final Visibility visibility);
+
+    String fullCount();
+
+    String schemaCount(final String schemaVersion);
+
+    String intervalCount(final Timestamp intervalTime);
 }

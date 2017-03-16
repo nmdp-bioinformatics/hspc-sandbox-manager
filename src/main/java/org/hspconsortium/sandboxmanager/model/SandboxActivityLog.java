@@ -13,7 +13,10 @@ import java.sql.Timestamp;
                 query="SELECT c FROM SandboxActivityLog c WHERE c.sandbox.sandboxId = :sandboxId"),
         // Not currently used, available for a future dashboard
         @NamedQuery(name="SandboxActivityLog.findBySandboxActivity",
-                query="SELECT c FROM SandboxActivityLog c WHERE c.activity = :sandboxActivity")
+                query="SELECT c FROM SandboxActivityLog c WHERE c.activity = :sandboxActivity"),
+        // Used for statistics
+        @NamedQuery(name="SandboxActivityLog.intervalActive",
+                query="SELECT COUNT(DISTINCT c.user) FROM SandboxActivityLog c WHERE c.timestamp  >= :intervalTime")
 })
 public class SandboxActivityLog {
     private Integer id;

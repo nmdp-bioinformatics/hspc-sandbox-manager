@@ -13,7 +13,14 @@ import java.util.Set;
 @NamedQueries({
         // Used to retrieve a user instance for multiple uses
         @NamedQuery(name="User.findByLdapId",
-                query="SELECT c FROM User c WHERE c.ldapId = :ldapId")
+                query="SELECT c FROM User c WHERE c.ldapId = :ldapId"),
+        // Used for statistics
+        @NamedQuery(name="User.fullCount",
+                query="SELECT COUNT(*) FROM User c"),
+        // Used for statistics
+        @NamedQuery(name="User.intervalCount",
+                query="SELECT COUNT(*) FROM User c WHERE c.createdTimestamp  >= :intervalTime")
+
 })
 public class User {
     private Integer id;

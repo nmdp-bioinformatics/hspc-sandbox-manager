@@ -335,6 +335,21 @@ public class SandboxServiceImpl implements SandboxService {
         return repository.findByVisibility(visibility);
     }
 
+    @Override
+    public String fullCount() {
+        return repository.fullCount();
+    }
+
+    @Override
+    public String schemaCount(String schemaVersion) {
+        return repository.schemaCount(schemaVersion);
+    }
+
+    @Override
+    public String intervalCount(Timestamp intervalTime) {
+        return repository.intervalCount(intervalTime);
+    }
+
     private void removeAllMembers(final Sandbox sandbox) {
 
         List<UserRole> userRoles = sandbox.getUserRoles();
