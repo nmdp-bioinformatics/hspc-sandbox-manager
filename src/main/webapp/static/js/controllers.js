@@ -1870,7 +1870,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
             modalInstance.result.then(function (modalPatient) {
                 // capture the date only for the birthDate value
-                modalPatient.birthDate = modalPatient.birthDateTime.toISOString().substring(0, 10);
+               // modalPatient.birthDate = new Date(modalPatient.birthDateTime).toISOString().substring(0, 10);
                 // todo support storing the birthDateTime in the extention when FHIR supports it
                 fhirApiServices.createResourceInstance(modalPatient);
                 $rootScope.$emit('patient-created');
