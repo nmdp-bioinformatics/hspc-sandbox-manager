@@ -702,21 +702,27 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             });
         };
 
-        $scope.export = function (){
+        $scope.export = function (query){
             $scope.settings.bundle = "";
-            var modalProgress = openModalProgressDialog("Exporting...");
-            $scope.saveFileName = 'sandbox-export.json';
-            fhirApiServices.exportAllData().then(function (results) {
-                $scope.settings.exportResults = $filter('json')(results);
-                $scope.resultsTitle = "Export Results";
-                $scope.settings.showing.export.results = true;
-                modalProgress.dismiss();
-            }, function(results) {
-                $scope.settings.exportResults = results;
-                $scope.resultsTitle = "Export Results";
-                $scope.settings.showing.export.results = true;
-                modalProgress.dismiss();
-            });
+            if (query === "" || query === 'clear') {
+                $scope.settings.exportResults = "";
+                $scope.settings.showing.export.results = false;
+            } else {
+                var modalProgress = openModalProgressDialog("Exporting...");
+                $scope.saveFileName = 'sandbox-export.json';
+                fhirApiServices.exportData(query).then(function (results) {
+                    $scope.settings.exportJsonResults = results;
+                    $scope.settings.exportResults = $filter('json')($scope.settings.exportJsonResults);
+                    $scope.resultsTitle = "Export Results";
+                    $scope.settings.showing.export.results = true;
+                    modalProgress.dismiss();
+                }, function (results) {
+                    $scope.settings.exportResults = $filter('json')(results);
+                    $scope.resultsTitle = "Export Results";
+                    $scope.settings.showing.export.results = true;
+                    modalProgress.dismiss();
+                });
+            }
         };
 
         $scope.uploadFile = function(files) {
