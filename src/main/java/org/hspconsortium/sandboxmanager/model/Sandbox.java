@@ -12,7 +12,16 @@ import java.util.List;
                 query="SELECT c FROM Sandbox c WHERE c.sandboxId = :sandboxId"),
         // Used to retrieve all sandboxes visible to a user
         @NamedQuery(name="Sandbox.findByVisibility",
-                query="SELECT c FROM Sandbox c WHERE c.visibility = :visibility")
+                query="SELECT c FROM Sandbox c WHERE c.visibility = :visibility"),
+        // Used for statistics
+        @NamedQuery(name="Sandbox.fullCount",
+                query="SELECT COUNT(*) FROM Sandbox"),
+        // Used for statistics
+        @NamedQuery(name="Sandbox.schemaCount",
+                query="SELECT COUNT(*) FROM Sandbox c WHERE c.schemaVersion = :schemaVersion"),
+        // Used for statistics
+        @NamedQuery(name="Sandbox.intervalCount",
+                query="SELECT COUNT(*) FROM Sandbox c WHERE c.createdTimestamp  >= :intervalTime")
 
 })
 public class Sandbox extends AbstractItem {
