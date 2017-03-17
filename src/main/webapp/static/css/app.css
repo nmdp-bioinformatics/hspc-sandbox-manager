@@ -251,6 +251,7 @@
     text-align: left;
     padding: 4px 25px 4px 5px;
     border: 1px solid #F4F4F4;
+    min-height: 30px;
     border-radius: 3px;
     width: 67%;
     font-size: 14px;
