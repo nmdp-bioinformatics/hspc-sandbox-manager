@@ -32,6 +32,8 @@ public interface SandboxService {
 
     boolean isSandboxMember(final Sandbox sandbox, final User user);
 
+    String getSandboxApiURL(final Sandbox sandbox);
+
     List<Sandbox> getAllowedSandboxes(final User user);
 
     Sandbox findBySandboxId(final String sandboxId);

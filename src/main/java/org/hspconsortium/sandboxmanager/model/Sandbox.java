@@ -32,6 +32,7 @@ public class Sandbox extends AbstractItem {
     private String schemaVersion;
     private String fhirServerEndPoint;
     private boolean allowOpenAccess;
+    private List<String> snapshotIds = new ArrayList<>();
     private List<UserRole> userRoles = new ArrayList<>();
 
     /******************* Sandbox Property Getter/Setters ************************/
@@ -82,6 +83,15 @@ public class Sandbox extends AbstractItem {
 
     public void setAllowOpenAccess(boolean allowOpenAccess) {
         this.allowOpenAccess = allowOpenAccess;
+    }
+
+    @ElementCollection
+    public List<String> getSnapshotIds() {
+        return snapshotIds;
+    }
+
+    public void setSnapshotIds(List<String> snapshotIds) {
+        this.snapshotIds = snapshotIds;
     }
 
     @OneToMany(cascade={CascadeType.ALL})
