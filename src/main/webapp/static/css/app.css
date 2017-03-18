@@ -47,6 +47,7 @@
     line-height: 1.42857143;
     color: #58585A;
     overflow: hidden;
+    min-width: 730px
 }
 
 .full-screen-scroll {
@@ -56,6 +57,7 @@
     color: #58585A;
     overflow-x: hidden;
     overflow-y: auto;
+    min-width: 730px
 }
 
 .create-form {
@@ -665,7 +667,10 @@ span.title,
 
 .blue-bar .blue-bar-img {
     text-align: center;
-    padding-top: 5px;
+}
+
+.blue-bar .blue-bar-img img {
+    height: 50px;
 }
 
 .popover-btn:hover {
