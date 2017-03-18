@@ -119,11 +119,12 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
             authenticate: true
         })
 
-        .state('admin-dashboard', {
-            url: '/admin-dashboard',
-            templateUrl: 'static/js/templates/adminDashboard.html',
-            authenticate: true
-        })
+        // Future Sandbox Admin Dashboard
+        // .state('admin-dashboard', {
+        //     url: '/admin-dashboard',
+        //     templateUrl: 'static/js/templates/adminDashboard.html',
+        //     authenticate: true
+        // })
 
         .state('after-auth', {
             url: '/after-auth',
