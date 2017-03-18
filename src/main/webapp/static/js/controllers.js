@@ -543,7 +543,16 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         
     }).controller("AdminDashboardViewController",
     function($scope, $rootScope, sandboxManagement){
-        // Future Sandbox Admin Dashboard
+        $scope.title.blueBarTitle = "Admin Dashboard";
+        $scope.statistics = {};
+
+        if ($scope.isSystemAdmin()) {
+            sandboxManagement.sandboxManagerStatistics().then(function (result) {
+                $scope.statistics = result;
+                $rootScope.$digest();
+            });
+        }
+
     }).controller("FutureController",
     function(){
 
