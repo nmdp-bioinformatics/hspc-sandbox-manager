@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Sandbox Manager</title>
     <!--<base href="/hspc-sandbox-manager/index.html">-->
     <!--<base href="/">-->
@@ -56,8 +57,9 @@
 <!-- NAVIGATION -->
 <nav class="navbar" role="navigation" ng-show="showing.navBar">
     <div class="navbar-bars" ng-show="showing.moreLinks"><a tabindex="0" href="#" uib-popover-template="'static/js/templates/barsPopover.html'" popover-trigger="'focus'" popover-placement="bottom"><i class="fa fa-bars fa-lg"></i></a></div>
-    <div class="navbar-img" style="cursor: pointer" ng-click="dashboard()" ng-cloak><img ng-style="imgStyle()" ng-src="{{mainImage}}" ng-srcset="{{mainImage2x}}" ng-cloak /><div ng-style="imgTextStyle()" ng-cloak> {{sandboxText}}</div></div>
-    <div class="navbar-sandboxes" ng-show="showing.signout && dashboard.sandboxes.length > 0"><a tabindex="1" style="cursor: pointer"  href="#" uib-popover-template="'static/js/templates/sandboxPopover.html'" popover-trigger="'focus'" popover-placement="bottom">Sandboxes <i class="fa fa-sort-desc fa-lg"></i></a></div>
+    <div class="navbar-img" style="cursor: pointer" ng-click="goToDashboard()" ng-cloak><img ng-style="imgStyle()" ng-src="{{mainImage}}" ng-srcset="{{mainImage2x}}" ng-cloak /><div ng-style="imgTextStyle()" ng-cloak> {{sandboxText}}</div></div>
+    <div class="navbar-sandboxes" ng-show="showing.signout && dashboard.sandboxes.length > 0" ng-cloak><a tabindex="1" style="cursor: pointer"  href="#" uib-popover-template="'static/js/templates/sandboxPopover.html'" popover-trigger="'focus'" popover-placement="bottom">Sandboxes <i class="fa fa-sort-desc fa-lg"></i></a></div>
+    <div class="navbar-admin-dashboard" ng-show="showing.signout && isSystemAdmin()"ui-sref="admin-dashboard" ng-cloak><a tabindex="2" style="cursor: pointer" href="#">Admin Dashboard<i class="fa fa-tachometer fa-lg"></i></a></div>
     <div class="navbar-stack-name" ng-show="showing.signout" ng-cloak>
     Welcome <a id="welcome" tabindex="2" href="#" uib-popover-template="'static/js/templates/settingsPopover.html'" popover-trigger="'focus'" popover-placement="bottom" ><span style="font-weight: bold">{{oauthUser.name}}</span></a></div>
     <div class="navbar-stack-sign-in" ng-show="showing.signin" ng-cloak>
@@ -109,13 +111,13 @@
 <script src="static/highcharts/highcharts.js"></script>
 <script src="static/highcharts/highcharts-more.js"></script>
 <script src="static/highcharts/highcharts-ng.min.js"></script>
-<script src="static/js/app.js"></script>
-<script src="static/js/controllers.js"></script>
-<script src="static/js/services.js"></script>
+<script src="static/js/app.js?r=2"></script>
+<script src="static/js/controllers.js?r=2>"></script>
+<script src="static/js/services.js?r=2>"></script>
 <script src="static/js/config/env-info.jsp" type="application/javascript"></script>
-<script src="static/js/filters.js"></script>
-<script src="static/js/directives.js"></script>
-<script src="static/js/branding/branded_text.js"></script>
+<script src="static/js/filters.js?r=2"></script>
+<script src="static/js/directives.js?r=2"></script>
+<script src="static/js/branding/branded_text.js?r=2"></script>
 
 </body>
 </html>

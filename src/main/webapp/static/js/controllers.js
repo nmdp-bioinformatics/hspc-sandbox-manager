@@ -7,15 +7,14 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.size = {
             navBarHeight: 60,
             footerHeight: 60,
-            sandboxBarHeight: 0,
-            screenH: 670,
+            sandboxBarHeight: 50,
+            screenH: 740,
             screenW: 1200
         };
 
         $scope.showing = {
             signout: false,
             signin: true,
-            slimBlueBar: false,
             progress: false,
             loading: false,
             searchloading: false,
@@ -70,7 +69,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             } else if (toState.needsSandbox && !sandboxManagement.hasSandbox()){
                 appsSettings.getSettings().then(function(settings){
                     if (fhirApiServices.fhirClient().server.serviceUrl === settings.defaultServiceUrl) {
-                        $scope.dashboard();
+                        $scope.goToDashboard();
                     } else {
                         // User can't go to a page which requires a sandbox without a sandbox
                         $scope.showing.navBar = false;
@@ -112,13 +111,13 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                 getSandboxes();
 
                 if (canceledSandboxCreate) {
-                    $scope.dashboard();
+                    $scope.goToDashboard();
                 } else {
                     appsSettings.getSettings().then(function(settings){
                         
                         //Initial sign in with no sandbox specified
                         if (appsSettings.getSandboxUrlSettings().sandboxId === undefined && fhirApiServices.fhirClient().server.serviceUrl === settings.defaultServiceUrl) {
-                            $scope.dashboard();
+                            $scope.goToDashboard();
                         } else {
                             sandboxManagement.getSandboxById().then(function(sandboxExists){
                                 if (sandboxExists === "invalid") {
@@ -130,7 +129,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
                                     }
                                     sandboxSignIn();
                                 } else {
-                                    $scope.dashboard();
+                                    $scope.goToDashboard();
                                 }
                             });
                         }
@@ -147,8 +146,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.showing.navBar = true;
             $scope.showing.footer = true;
             $scope.showing.sideNavBar = true;
-            $scope.showing.slimBlueBar = true;
-            $scope.size.sandboxBarHeight = 50;
+            // $scope.size.sandboxBarHeight = 50;
             $scope.patientsLabel = $scope.canManageData() ? "Patients" : "Browse Patients";
             $scope.practitionersLabel = $scope.canManageData() ? "Practitioners" : "Browse Practitioner";
             $scope.dataLabel = $scope.canManageData() ? "Data Manager" : "Data Browser";
@@ -212,7 +210,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             return sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "MANAGE_DATA");
         };
 
-        $scope.dashboard = function() {
+        $scope.goToDashboard = function() {
             if (appsSettings.getSandboxUrlSettings().sandboxId === undefined) {
                 $state.go('dashboard-view', {});
             } else {
@@ -321,10 +319,21 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.showing.navBar = true;
         $scope.showing.footer = true;
         $scope.showing.sideNavBar = false;
-        $scope.showing.slimBlueBar = false;
-        $scope.size.sandboxBarHeight = 0;
+        // $scope.size.sandboxBarHeight = 50;
         $scope.sandboxInvites = [];
         $scope.title.blueBarTitle = branded.dashboardTitle;
+        $scope.statistics = {};
+
+        userServices.getSandboxManagerUser($scope.oauthUser.ldapId).then(function(sandboxManagerUser){
+            if (sandboxManagerUser !== undefined && sandboxManagerUser !== ""){
+                if ($scope.isSystemAdmin()) {
+                    sandboxManagement.sandboxManagerStatistics().then(function (result) {
+                        $scope.statistics = result;
+                        $rootScope.$digest();
+                    });
+                }
+            }
+        });
 
         getSandboxInvites();
 
@@ -534,12 +543,15 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         
     }).controller("AdminDashboardViewController",
     function($scope, $rootScope, sandboxManagement){
+        $scope.title.blueBarTitle = "Admin Dashboard";
         $scope.statistics = {};
 
-        sandboxManagement.sandboxManagerStatistics().then(function (result) {
-            $scope.statistics = result;
-            $rootScope.$digest();
-        });
+        if ($scope.isSystemAdmin()) {
+            sandboxManagement.sandboxManagerStatistics().then(function (result) {
+                $scope.statistics = result;
+                $rootScope.$digest();
+            });
+        }
 
     }).controller("FutureController",
     function(){
@@ -801,7 +813,6 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.showing.navBar = true;
         $scope.showing.footer = true;
         $scope.showing.sideNavBar = false;
-        $scope.showing.slimBlueBar = false;
         $scope.isIdValid = false;
         $scope.showError = false;
         $scope.isNameValid = true;
