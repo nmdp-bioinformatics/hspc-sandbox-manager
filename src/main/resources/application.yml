@@ -7,7 +7,8 @@ multipart:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/sandman
+    base_url: jdbc:mysql://localhost:3306
+    url: ${spring.datasource.base_url}/sandman
     username: root
     password: password
     driverClassName: com.mysql.jdbc.Driver
@@ -55,14 +56,11 @@ hspc:
       oauth2:
         clientId: hspc_resource_server
         clientSecret: secret
-      sandboxManagementEndpointURL_1: ${hspc.platform.api.version1.baseUrl}/management/sandbox
-      sandboxManagementEndpointURL_2: ${hspc.platform.api.version2.baseUrl}/management/sandbox
-      sandboxManagementEndpointURL_3: ${hspc.platform.api.version3.baseUrl}/management/sandbox
       oauthUserInfoEndpointURL: ${hspc.platform.authorization.baseUrl}/userinfo
       oauthClientEndpointURL: ${hspc.platform.authorization.baseUrl}/api/clients
       oauthUserLoginEndpointURL: ${hspc.platform.authorization.baseUrl}/j_spring_security_check
       oauthUser: admin
-      oauthUserPassword: password
+      oauthUserPassword: FH!R4a11
     messaging:
       port: 8080
       context: /hspc-reference-messaging/
@@ -70,4 +68,8 @@ hspc:
       baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.messaging.port}${hspc.platform.messaging.context}
       emailSenderEndpointURL: ${hspc.platform.messaging.baseUrl}mailsender
       sandboxUserEndpointURL: ${hspc.platform.messaging.baseUrl}sandboxuser
+    syntheticData:
+#      fhirServerUrl: https://syntheticmass.mitre.org/fhir
+       fhirServerUrl: http://localhost:8080/hspc-reference-api-v3/synthea2/open
+       fhirIdPrefix: SYNTHEA-
 

@@ -47,6 +47,7 @@
     line-height: 1.42857143;
     color: #58585A;
     overflow: hidden;
+    min-width: 730px
 }
 
 .full-screen-scroll {
@@ -56,6 +57,7 @@
     color: #58585A;
     overflow-x: hidden;
     overflow-y: auto;
+    min-width: 730px
 }
 
 .create-form {
@@ -206,10 +208,8 @@
 }
 
 .settings-container {
-    width: 600px;
-    margin: 0 auto 0 auto;
     overflow: auto;
-    padding: 5px 0 10px 0;
+    padding: 5px 5px 10px 0;
 }
 
 .settings-container .box {
@@ -252,6 +252,7 @@
     text-align: left;
     padding: 4px 25px 4px 5px;
     border: 1px solid #F4F4F4;
+    min-height: 30px;
     border-radius: 3px;
     width: 67%;
     font-size: 14px;
@@ -664,7 +665,10 @@ span.title,
 
 .blue-bar .blue-bar-img {
     text-align: center;
-    padding-top: 5px;
+}
+
+.blue-bar .blue-bar-img img {
+    height: 50px;
 }
 
 .popover-btn:hover {
@@ -723,7 +727,7 @@ span.title,
     position: absolute;
     top: 23px;
     left: 290px;
-    height: 60px;
+    /*height: 60px;*/
 }
 
 .navbar-sandboxes .navbar-button {
@@ -732,7 +736,8 @@ span.title,
     left: 265px;
 }
 
-.navbar-sandboxes > a{
+.navbar-sandboxes > a,
+.navbar-admin-dashboard >a{
     font-size: 18px;
     text-decoration: none;
     color: #58585A;
@@ -748,13 +753,17 @@ span.title,
 }
 
 .navbar-sandboxes > a:focus,
-.navbar-sandboxes > a>i:focus {
+.navbar-sandboxes > a>i:focus,
+.navbar-admin-dashboard > a:focus,
+.navbar-admin-dashboard > a>i:focus{
     outline: none;
     text-decoration: none;
 }
 
 .navbar-sandboxes > a:hover,
-.navbar-sandboxes > a>i:hover {
+.navbar-sandboxes > a>i:hover,
+.navbar-admin-dashboard > a:hover,
+.navbar-admin-dashboard > a>i:hover{
     text-decoration: none;
     color: #10759D;
 }
@@ -776,6 +785,22 @@ span.title,
 {
     padding: 0;
     border-radius: 0;
+}
+
+.navbar-admin-dashboard {
+    position: absolute;
+    top: 23px;
+    left: 400px;
+    /*height: 60px;*/
+}
+
+.navbar-admin-dashboard > a>i{
+    font-size: 14px;
+    position: absolute;
+    top: 7px;
+    right: -17px;
+    text-decoration: none;
+    color: #58585A;
 }
 
 .sandboxes-content .sandbox-item {

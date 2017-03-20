@@ -31,8 +31,11 @@ public class Sandbox extends AbstractItem {
     private String description;
     private String schemaVersion;
     private String fhirServerEndPoint;
+    private String lastImportCount;
     private boolean allowOpenAccess;
+//    private List<String> snapshotIds = new ArrayList<>();
     private List<UserRole> userRoles = new ArrayList<>();
+    private List<SandboxImport> imports = new ArrayList<>();
 
     /******************* Sandbox Property Getter/Setters ************************/
 
@@ -76,6 +79,14 @@ public class Sandbox extends AbstractItem {
         this.fhirServerEndPoint = fhirServerEndPoint;
     }
 
+    public String getLastImportCount() {
+        return lastImportCount;
+    }
+
+    public void setLastImportCount(String lastImportCount) {
+        this.lastImportCount = lastImportCount;
+    }
+
     public boolean isAllowOpenAccess() {
         return allowOpenAccess;
     }
@@ -83,6 +94,15 @@ public class Sandbox extends AbstractItem {
     public void setAllowOpenAccess(boolean allowOpenAccess) {
         this.allowOpenAccess = allowOpenAccess;
     }
+
+//    @ElementCollection
+//    public List<String> getSnapshotIds() {
+//        return snapshotIds;
+//    }
+//
+//    public void setSnapshotIds(List<String> snapshotIds) {
+//        this.snapshotIds = snapshotIds;
+//    }
 
     @OneToMany(cascade={CascadeType.ALL})
     @JoinTable(name = "sandbox_user_roles", joinColumns = {
@@ -95,6 +115,15 @@ public class Sandbox extends AbstractItem {
 
     public void setUserRoles(List<UserRole> userRoles) {
         this.userRoles = userRoles;
+    }
+
+    @OneToMany(cascade={CascadeType.ALL})
+    public List<SandboxImport> getImports() {
+        return imports;
+    }
+
+    public void setImports(List<SandboxImport> imports) {
+        this.imports = imports;
     }
 
     /******************* Inherited Property Getter/Setters ************************/

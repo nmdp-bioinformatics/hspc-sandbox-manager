@@ -933,6 +933,68 @@ angular.module('sandManApp.services', [])
                 });
                 return deferred;
             },
+            resetSandbox: function() {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/fhirdata/reset?sandboxId=" + sandbox.sandboxId,
+                    type: 'POST',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(){
+                    deferred.resolve(true);
+                }).fail(function(){
+                });
+                return deferred;
+            },
+            querySynthea: function(query) {
+                var deferred = $.Deferred();
+                var that = this;
+
+                $.ajax({
+                    url: "http://localhost:8080/hspc-reference-api-v3/synthea2/open/" + query,
+                    type: 'GET'
+                }).done(function(results){
+                    deferred.resolve(results);
+                }).fail(function(){
+                    deferred.reject();
+                });
+                return deferred;
+            },
+            importSyntheaFhirData: function(query) {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/fhirdata/import?sandboxId=" + sandbox.sandboxId + "&count=50&query=" + encodeURIComponent(query + "&_count=50"),
+                    type: 'POST',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(result){
+                    deferred.resolve(result);
+                }).fail(function(){
+                });
+                return deferred;
+            },
+            getSandboxImports: function() {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/fhirdata/import?sandboxId=" + sandbox.sandboxId,
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(result){
+                    deferred.resolve(result);
+                }).fail(function(){
+                });
+                return deferred;
+            },
             getUserSandboxesByUserId: function() {
                 var that = this;
                 var deferred = $.Deferred();
@@ -1767,12 +1829,13 @@ angular.module('sandManApp.services', [])
         };
     }).factory('dataManagerService', function() {
         var settings = {
-            showing: {import: {results: false}, export: {results: false}},
+            showing: {import: {results: false}, export: {results: false}, synthea: {results: false}},
             bundleResults: "",
             resourceList: [],
             fhirQuery: "",
+            syntheaFhirQuery: "",
+            syntheaResults: "",
             exportQuery: "",
-            exportFormat: "JSON",
             exportJsonResults: "",
             selected: {selectedResource: undefined},
             allQuerySuggestions: [],
@@ -1793,7 +1856,7 @@ angular.module('sandManApp.services', [])
                 var deferred = $.Deferred();
 
                 if (appsSettings.getSandboxUrlSettings().sandboxId !== undefined) {
-                    this.checkForSandboxById(appsSettings.getSandboxUrlSettings().sandboxId).then(function(sandbox){
+                    this.getSandboxById(appsSettings.getSandboxUrlSettings().sandboxId).then(function(sandbox){
                         if (sandbox !== undefined && sandbox !== "") {
                             deferred.resolve(appsSettings.getSandboxUrlSettings().sandboxId, sandbox.schemaVersion);
                         } else {
@@ -1828,6 +1891,28 @@ angular.module('sandManApp.services', [])
                             $rootScope.$digest();
                         });
                     }
+                });
+                return deferred;
+            },
+            getSandboxById: function(sandboxId) {
+                var deferred = $.Deferred();
+                appsSettings.getSettings().then(function(settings){
+                    $.ajax({
+                        url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox?sandboxId=" + sandboxId,
+                        type: 'GET'
+                    }).done(function(sandbox){
+                        if (sandbox !== undefined && sandbox !== "") {
+                            deferred.resolve(sandbox);
+                        } else {
+                            deferred.resolve(undefined);
+                        }
+
+                        $rootScope.$digest();
+
+                    }).fail(function(error){
+                        deferred.resolve(undefined);
+                        $rootScope.$digest();
+                    });
                 });
                 return deferred;
             },

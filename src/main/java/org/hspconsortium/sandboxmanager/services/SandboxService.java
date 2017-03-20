@@ -28,9 +28,17 @@ public interface SandboxService {
 
     boolean hasMemberRole(final Sandbox sandbox, final User user, final Role role);
 
+    boolean sandboxIdAvailable(final String sandboxId);
+
+    void addSandboxImport(final Sandbox sandbox, final SandboxImport sandboxImport);
+
+    void reset(final Sandbox sandboxId, final String bearerToken);
+
     void sandboxLogin(final String sandboxId, final String userId);
 
     boolean isSandboxMember(final Sandbox sandbox, final User user);
+
+    String getSandboxApiURL(final Sandbox sandbox);
 
     List<Sandbox> getAllowedSandboxes(final User user);
 

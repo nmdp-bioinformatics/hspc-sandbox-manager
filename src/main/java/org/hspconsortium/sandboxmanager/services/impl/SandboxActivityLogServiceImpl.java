@@ -132,6 +132,20 @@ public class SandboxActivityLogServiceImpl implements SandboxActivityLogService 
     }
 
     @Override
+    public SandboxActivityLog sandboxImport(Sandbox sandbox, User user) {
+        SandboxActivityLog sandboxActivityLog = createSandboxActivityLog(sandbox, user);
+        sandboxActivityLog.setActivity(SandboxActivity.SANDBOX_DATA_IMPORT);
+        return this.save(sandboxActivityLog);
+    }
+
+    @Override
+    public SandboxActivityLog sandboxReset(Sandbox sandbox, User user) {
+        SandboxActivityLog sandboxActivityLog = createSandboxActivityLog(sandbox, user);
+        sandboxActivityLog.setActivity(SandboxActivity.SANDBOX_RESET);
+        return this.save(sandboxActivityLog);
+    }
+
+    @Override
     public SandboxActivityLog systemUserCreated(Sandbox sandbox, User user) {
         SandboxActivityLog sandboxActivityLog = createSandboxActivityLog(sandbox, user);
         sandboxActivityLog.setActivity(SandboxActivity.USER_CREATED);

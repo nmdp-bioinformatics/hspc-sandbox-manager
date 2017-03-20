@@ -1,8 +1,10 @@
 package org.hspconsortium.sandboxmanager.services.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -55,18 +57,17 @@ public class SandboxServiceImpl implements SandboxService {
     private static Logger LOGGER = LoggerFactory.getLogger(SandboxServiceImpl.class.getName());
     private final SandboxRepository repository;
 
-    @Value("${hspc.platform.api.sandboxManagementEndpointURL_1}")
-    private String sandboxManagementEndpointURL_1;
+    @Value("${hspc.platform.api.version1.baseUrl}")
+    private String apiBaseURL_1;
 
-    @Value("${hspc.platform.api.sandboxManagementEndpointURL_2}")
-    private String sandboxManagementEndpointURL_2;
+    @Value("${hspc.platform.api.version2.baseUrl}")
+    private String apiBaseURL_2;
 
-    @Value("${hspc.platform.api.sandboxManagementEndpointURL_3}")
-    private String sandboxManagementEndpointURL_3;
+    @Value("${hspc.platform.api.version3.baseUrl}")
+    private String apiBaseURL_3;
 
     @Value("${hspc.platform.api.oauthUserInfoEndpointURL}")
     private String oauthUserInfoEndpointURL;
-
 
     private final UserService userService;
     private final UserRoleService userRoleService;
@@ -75,6 +76,7 @@ public class SandboxServiceImpl implements SandboxService {
     private final AppService appService;
     private final LaunchScenarioService launchScenarioService;
     private final PatientService patientService;
+    private final SandboxImportService sandboxImportService;
     private final SandboxActivityLogService sandboxActivityLogService;
 
     @Inject
@@ -84,6 +86,7 @@ public class SandboxServiceImpl implements SandboxService {
                               final UserLaunchService userLaunchService,
                               final LaunchScenarioService launchScenarioService,
                               final PatientService patientService,
+                              final SandboxImportService sandboxImportService,
                               final SandboxActivityLogService sandboxActivityLogService) {
         this.repository = repository;
         this.userService = userService;
@@ -93,6 +96,7 @@ public class SandboxServiceImpl implements SandboxService {
         this.appService = appService;
         this.launchScenarioService = launchScenarioService;
         this.patientService = patientService;
+        this.sandboxImportService = sandboxImportService;
         this.sandboxActivityLogService = sandboxActivityLogService;
     }
 
@@ -106,37 +110,59 @@ public class SandboxServiceImpl implements SandboxService {
     public void delete(final Sandbox sandbox, final String bearerToken) {
 
         if (callDeleteSandboxAPI(sandbox, bearerToken) ) {
-            callDeleteSandboxAPI(sandbox, bearerToken);
 
-            //delete launch scenarios, context params
-            List<LaunchScenario> launchScenarios = launchScenarioService.findBySandboxId(sandbox.getSandboxId());
-            for (LaunchScenario launchScenario : launchScenarios) {
-                launchScenarioService.delete(launchScenario);
+            deleteAllSandboxItems(sandbox, bearerToken);
+
+            List<SandboxImport> imports = sandbox.getImports();
+            for (SandboxImport sandboxImport : imports) {
+                sandboxImportService.delete(sandboxImport);
             }
-
-            //delete all registered app, authClients, images
-            List<App> apps = appService.findBySandboxId(sandbox.getSandboxId());
-            for (App app : apps) {
-                appService.delete(app);
-            }
-
-            //delete patient/personas for sandbox
-            List<Patient> patients = patientService.findBySandboxId(sandbox.getSandboxId());
-            for (Patient patient : patients) {
-                patientService.delete(patient);
-            }
-
-
-            List<UserPersona> userPersonas = userPersonaService.findBySandboxId(sandbox.getSandboxId());
-            for (UserPersona userPersona : userPersonas) {
-                userPersonaService.delete(userPersona, bearerToken);
-            }
+            sandbox.setImports(null);
+            save(sandbox);
 
             //remove user memberships
             removeAllMembers(sandbox);
 
             sandboxActivityLogService.sandboxDelete(sandbox, sandbox.getCreatedBy());
             delete(sandbox.getId());
+        }
+    }
+
+    private void deleteAllSandboxItems(final Sandbox sandbox, final String bearerToken) {
+
+        deleteSandboxItemsExceptApps(sandbox, bearerToken);
+
+        //delete all registered app, authClients, images
+        List<App> apps = appService.findBySandboxId(sandbox.getSandboxId());
+        for (App app : apps) {
+            appService.delete(app);
+        }
+    }
+
+    private void deleteSandboxItemsExceptApps(final Sandbox sandbox, final String bearerToken) {
+
+        //delete launch scenarios, context params
+        List<LaunchScenario> launchScenarios = launchScenarioService.findBySandboxId(sandbox.getSandboxId());
+        for (LaunchScenario launchScenario : launchScenarios) {
+            launchScenarioService.delete(launchScenario);
+        }
+
+        //delete patient/personas for sandbox
+        List<Patient> patients = patientService.findBySandboxId(sandbox.getSandboxId());
+        for (Patient patient : patients) {
+            patientService.delete(patient);
+        }
+
+        List<UserPersona> userPersonas = userPersonaService.findBySandboxId(sandbox.getSandboxId());
+        for (UserPersona userPersona : userPersonas) {
+            userPersonaService.delete(userPersona, bearerToken);
+        }
+
+        //remove sample patients from all apps
+        List<App> apps = appService.findBySandboxId(sandbox.getSandboxId());
+        for (App app : apps) {
+            app.setSamplePatients(null);
+            appService.save(app);
         }
     }
 
@@ -285,6 +311,44 @@ public class SandboxServiceImpl implements SandboxService {
     }
 
     @Override
+    public boolean sandboxIdAvailable(final String sandboxId) {
+        Set<String> unavailable = new HashSet<>();
+
+        unavailable.addAll(getUnavailableSandboxIDs("1"));
+        unavailable.addAll(getUnavailableSandboxIDs("2"));
+        unavailable.addAll(getUnavailableSandboxIDs("3"));
+
+        return !unavailable.contains(sandboxId);
+    }
+
+    private Set<String> getUnavailableSandboxIDs(final String schemaVersion) {
+        Set<String> unavailable = new HashSet<>();
+        ObjectMapper mapper = new ObjectMapper();
+
+        String url = getApiSchemaURL(schemaVersion) + "/system/sandbox/unavailable";
+        try {
+            unavailable = mapper.readValue(getFhirApiServer(url), Set.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return unavailable;
+    }
+
+    @Override
+    public void addSandboxImport(final Sandbox sandbox, final SandboxImport sandboxImport) {
+        List<SandboxImport> imports = sandbox.getImports();
+        imports.add(sandboxImport);
+        sandbox.setImports(imports);
+        save(sandbox);
+    }
+
+    @Override
+    public void reset(final Sandbox sandbox, final String bearerToken) {
+        deleteSandboxItemsExceptApps(sandbox, bearerToken);
+    }
+
+    @Override
     public boolean isSandboxMember(final Sandbox sandbox, final User user) {
         for(UserRole userRole : sandbox.getUserRoles()) {
             if (userRole.getUser().getLdapId().equalsIgnoreCase(user.getLdapId())) {
@@ -362,14 +426,27 @@ public class SandboxServiceImpl implements SandboxService {
         }
     }
 
-    private boolean callCreateOrUpdateSandboxAPI(final Sandbox sandbox, final String bearerToken ) throws UnsupportedEncodingException{
-        String url = this.sandboxManagementEndpointURL_1 + "/" + sandbox.getSandboxId();
+    public String getSandboxApiURL(final Sandbox sandbox) {
+        return getApiSchemaURL(sandbox.getSchemaVersion()) + "/" + sandbox.getSandboxId();
+    }
 
-        if (sandbox.getSchemaVersion().equalsIgnoreCase("2")) {
-            url = this.sandboxManagementEndpointURL_2 + "/" + sandbox.getSandboxId();
-        } else if (sandbox.getSchemaVersion().equalsIgnoreCase("3")) {
-            url = this.sandboxManagementEndpointURL_3 + "/" + sandbox.getSandboxId();
+    private String getApiSchemaURL(final String schemaVersion) {
+        String url;
+        switch (schemaVersion){
+            case "1":
+                url = apiBaseURL_1;
+                break;
+            case "2":
+                url = apiBaseURL_2;
+                break;
+            default:
+                url = apiBaseURL_3;
         }
+        return url;
+    }
+
+    private boolean callCreateOrUpdateSandboxAPI(final Sandbox sandbox, final String bearerToken ) throws UnsupportedEncodingException{
+        String url = getSandboxApiURL(sandbox) + "/sandbox";
 
         HttpPut putRequest = new HttpPut(url);
         putRequest.addHeader("Content-Type", "application/json");
@@ -426,13 +503,7 @@ public class SandboxServiceImpl implements SandboxService {
     }
 
     private boolean callDeleteSandboxAPI(final Sandbox sandbox, final String bearerToken ) {
-        String url = this.sandboxManagementEndpointURL_1 + "/" + sandbox.getSandboxId();
-
-        if (sandbox.getSchemaVersion().equalsIgnoreCase("2")) {
-            url = this.sandboxManagementEndpointURL_2 + "/" + sandbox.getSandboxId();
-        } else if (sandbox.getSchemaVersion().equalsIgnoreCase("3")) {
-            url = this.sandboxManagementEndpointURL_3 + "/" + sandbox.getSandboxId();
-        }
+        String url = getSandboxApiURL(sandbox) + "/sandbox";
 
         HttpDelete deleteRequest = new HttpDelete(url);
         deleteRequest.addHeader("Authorization", "BEARER " + bearerToken);
@@ -481,6 +552,58 @@ public class SandboxServiceImpl implements SandboxService {
             }
         }
     }
+
+    private String getFhirApiServer(final String url)  {
+
+        HttpGet getRequest = new HttpGet(url);
+        getRequest.setHeader("Accept", "application/json");
+
+        SSLContext sslContext = null;
+        try {
+            sslContext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).useSSL().build();
+        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
+            LOGGER.error("Error loading ssl context", e);
+            throw new RuntimeException(e);
+        }
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        SSLConnectionSocketFactory sslConnectionFactory = new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        builder.setSSLSocketFactory(sslConnectionFactory);
+        Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
+                .register("https", sslConnectionFactory)
+                .register("http", new PlainConnectionSocketFactory())
+                .build();
+        HttpClientConnectionManager ccm = new BasicHttpClientConnectionManager(registry);
+        builder.setConnectionManager(ccm);
+
+        CloseableHttpClient httpClient = builder.build();
+
+        try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(getRequest)) {
+            if (closeableHttpResponse.getStatusLine().getStatusCode() != 200) {
+                HttpEntity rEntity = closeableHttpResponse.getEntity();
+                String responseString = EntityUtils.toString(rEntity, StandardCharsets.UTF_8);
+                String errorMsg = String.format("There was a problem calling the FHIR server.\n" +
+                                "Response Status : %s .\nResponse Detail :%s. \nUrl: :%s",
+                        closeableHttpResponse.getStatusLine(),
+                        responseString,
+                        url);
+                LOGGER.error(errorMsg);
+                throw new RuntimeException(errorMsg);
+            }
+
+            HttpEntity httpEntity = closeableHttpResponse.getEntity();
+            return EntityUtils.toString(httpEntity);
+        } catch (IOException e) {
+            LOGGER.error("Error posting to " + url, e);
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                httpClient.close();
+            }catch (IOException e) {
+                LOGGER.error("Error closing HttpClient");
+            }
+        }
+    }
+
 }
 
 

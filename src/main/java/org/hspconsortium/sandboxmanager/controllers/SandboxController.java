@@ -84,9 +84,19 @@ public class SandboxController extends AbstractController {
         return sandboxService.create(sandbox, user, oAuthService.getBearerToken(request));
     }
 
-    //TODO check all usages
     @RequestMapping(method = RequestMethod.GET, params = {"lookUpId"}, produces ="application/json")
     public @ResponseBody String checkForSandboxById(@RequestParam(value = "lookUpId")  String id) {
+        Sandbox sandbox = sandboxService.findBySandboxId(id);
+        if (sandbox != null) {
+            return  "{\"sandboxId\": \"" + sandbox.getSandboxId() + "\"}";
+        } else if (!sandboxService.sandboxIdAvailable(id)) {
+            return  "{\"reservedId\": \"" + id + "\"}";
+        }
+        return null;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, params = {"sandboxId"}, produces ="application/json")
+    public @ResponseBody String getSandboxById(@RequestParam(value = "sandboxId")  String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
         if (sandbox != null) {
             return  "{\"sandboxId\": \"" + sandbox.getSandboxId() + "\",\"schemaVersion\": \"" + sandbox.getSchemaVersion() + "\",\"allowOpenAccess\": \"" + sandbox.isAllowOpenAccess() + "\"}";
