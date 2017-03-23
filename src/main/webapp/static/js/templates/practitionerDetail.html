@@ -1,4 +1,9 @@
 <div class="col-md-12 horizontal-scroll" ng-controller="PractitionerDetailController" ng-style="scrollScreen(size.screenH, size.screenW) ? '' : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+40)" resize>
+    <div class="row" ng-show="showing.selectForScenario">
+        <div class="col-md-12 content-column">
+            <div class="btn btn-basic btn-md" ng-click="setPractitioner(selected.selectedPractitioner)" ng-disabled="!selected.practitionerSelected">Select this Practitioner <i class="fa fa-chevron-right"></i></div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-12 content-column">
             <div class="title-box">
@@ -18,11 +23,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="row" ng-show="showing.selectForScenario">
-        <div class="col-md-12 content-column">
-            <div class="btn btn-basic btn-md" ng-click="setPractitioner(selected.selectedPractitioner)" ng-disabled="!selected.practitionerSelected">Select this Practitioner <i class="fa fa-chevron-right"></i></div>
         </div>
     </div>
 </div>
