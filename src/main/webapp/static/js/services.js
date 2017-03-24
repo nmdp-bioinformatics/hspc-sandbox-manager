@@ -34,6 +34,8 @@ angular.module('sandManApp.services', [])
                         serviceUrl = s.baseServiceUrl_2 + sandboxId + "/data";
                     } else if (sandboxVersion !== undefined && sandboxVersion !== "" && sandboxVersion === "3") {
                         serviceUrl = s.baseServiceUrl_3 + sandboxId + "/data";
+                    } else if (sandboxVersion !== undefined && sandboxVersion !== "" && sandboxVersion === "4") {
+                        serviceUrl = s.baseServiceUrl_4 + sandboxId + "/data";
                     }
                 }
                 FHIR.oauth2.authorize({
@@ -60,7 +62,7 @@ angular.module('sandManApp.services', [])
                 });
             },
             login: function(sandboxId){
-                
+
                 var that = this;
                 appsSettings.getSettings().then(function(settings){
                     tools.validateSandboxIdFromUrl().then(function (resultSandboxId, schemaVersion) {
@@ -913,7 +915,7 @@ angular.module('sandManApp.services', [])
             sandboxLogin: function(ldapId) {
                 var that = this;
                 var deferred = $.Deferred();
-                // Record the sandbox login 
+                // Record the sandbox login
                 $.ajax({
                     url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "/login" + "?userId=" + encodeURIComponent(ldapId),
                     type: 'POST',
@@ -1399,7 +1401,7 @@ angular.module('sandManApp.services', [])
     return {
         createSandboxInvite: function(ldapId){
             var deferred = $.Deferred();
-            
+
             var sandboxInvite = {
                 invitedBy: {
                     ldapId: userServices.getOAuthUser().ldapId
@@ -1466,7 +1468,7 @@ angular.module('sandManApp.services', [])
         updateSandboxInvite: function(sandboxInvite, status){
             var deferred = $.Deferred();
             var that = this;
-            $.ajax({                                                                                                 
+            $.ajax({
                 url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite/" + sandboxInvite.id + "?status=" + status,
                 type: 'PUT',
                 beforeSend : function( xhr ) {
@@ -1517,6 +1519,8 @@ angular.module('sandManApp.services', [])
                         issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_2, settings.basePersonaServiceUrl_2);
                     } else if (appToLaunch.sandbox.schemaVersion === "3") {
                         issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_3, settings.basePersonaServiceUrl_3);
+                    } else if (appToLaunch.sandbox.schemaVersion === "4") {
+                        issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_4, settings.basePersonaServiceUrl_4);
                     }
                     callRegisterContext(appToLaunch, params, issuer, key);
                 });
@@ -1541,7 +1545,7 @@ angular.module('sandManApp.services', [])
                 $rootScope.$emit('error', 'Could not register launch context (see console)');
                 $rootScope.$digest();
             });
-        
+
         }
 
         function getPatientDataManagerApp() {
@@ -1655,7 +1659,7 @@ angular.module('sandManApp.services', [])
             querySuggestions: [],
             selectedResourceType: {}
         };
-    
+
         return {
             getSettings: function () {
                 return settings;
@@ -1867,7 +1871,7 @@ angular.module('sandManApp.services', [])
             var schemaVersion = schemaServices.getSandboxSchemaVersion().version;
             var dataManagerResources = 'static/js/config/data-manager-resources.json';
             if (schemaVersion === "3") {
-                dataManagerResources = 'static/js/config/data-manager-resources_3.json';   
+                dataManagerResources = 'static/js/config/data-manager-resources_3.json';
             }
             $http.get(dataManagerResources).success(function(result){
                 resources = result;
@@ -1965,9 +1969,9 @@ angular.module('sandManApp.services', [])
                     sandboxUrlSettings.sandboxId = undefined;
                 }
                 sandboxUrlSettings.baseRestUrl = sandboxUrlSettings.sandboxManagerRootUrl + "/REST";
-                
+
             }
-            return sandboxUrlSettings;    
+            return sandboxUrlSettings;
         },
         loadSettings: function(){
             var deferred = $.Deferred();
@@ -1979,9 +1983,11 @@ angular.module('sandManApp.services', [])
                     settings.baseServiceUrl_1 = envInfo.baseServiceUrl_1 || settings.baseServiceUrl_1;
                     settings.baseServiceUrl_2 = envInfo.baseServiceUrl_2 || settings.baseServiceUrl_2;
                     settings.baseServiceUrl_3 = envInfo.baseServiceUrl_3 || settings.baseServiceUrl_3;
+                    settings.baseServiceUrl_4 = envInfo.baseServiceUrl_4 || settings.baseServiceUrl_4;
                     settings.basePersonaServiceUrl_1 = envInfo.basePersonaServiceUrl_1 || settings.basePersonaServiceUrl_1;
                     settings.basePersonaServiceUrl_2 = envInfo.basePersonaServiceUrl_2 || settings.basePersonaServiceUrl_2;
                     settings.basePersonaServiceUrl_3 = envInfo.basePersonaServiceUrl_3 || settings.basePersonaServiceUrl_3;
+                    settings.basePersonaServiceUrl_4 = envInfo.basePersonaServiceUrl_5 || settings.basePersonaServiceUrl_4;
                     settings.oauthLogoutUrl = envInfo.oauthLogoutUrl || settings.oauthLogoutUrl;
                     settings.oauthPersonaAuthenticationUrl = envInfo.oauthPersonaAuthenticationUrl || settings.oauthPersonaAuthenticationUrl;
                     settings.userManagementUrl = envInfo.userManagementUrl || settings.userManagementUrl;

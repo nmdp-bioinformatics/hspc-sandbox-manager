@@ -64,6 +64,9 @@ public class SandboxServiceImpl implements SandboxService {
     @Value("${hspc.platform.api.version3.baseUrl}")
     private String apiBaseURL_3;
 
+    @Value("${hspc.platform.api.version4.baseUrl}")
+    private String apiBaseURL_4;
+
     @Value("${hspc.platform.api.oauthUserInfoEndpointURL}")
     private String oauthUserInfoEndpointURL;
 
@@ -352,6 +355,8 @@ public class SandboxServiceImpl implements SandboxService {
             url = apiBaseURL_2 + "/" + sandbox.getSandboxId() + "/sandbox";
         } else if (sandbox.getSchemaVersion().equalsIgnoreCase("3")) {
             url = apiBaseURL_3 + "/" + sandbox.getSandboxId() + "/sandbox";
+        } else if (sandbox.getSchemaVersion().equalsIgnoreCase("4")) {
+            url = apiBaseURL_4 + "/" + sandbox.getSandboxId() + "/sandbox";
         }
 
         HttpPut putRequest = new HttpPut(url);
@@ -414,6 +419,8 @@ public class SandboxServiceImpl implements SandboxService {
             url = apiBaseURL_2 + "/" + sandbox.getSandboxId() + "/sandbox";
         } else if (sandbox.getSchemaVersion().equalsIgnoreCase("3")) {
             url = apiBaseURL_3 + "/" + sandbox.getSandboxId() + "/sandbox";
+        } else if (sandbox.getSchemaVersion().equalsIgnoreCase("4")) {
+            url = apiBaseURL_4 + "/" + sandbox.getSandboxId() + "/sandbox";
         }
 
         HttpDelete deleteRequest = new HttpDelete(url);

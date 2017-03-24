@@ -53,6 +53,10 @@ hspc:
         port: 8080
         context: /hspc-reference-api-v3
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version3.port}${hspc.platform.api.version3.context}
+      version4:
+        port: 8080
+        context: /hspc-reference-api-v4
+        baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version4.port}${hspc.platform.api.version4.context}
       oauth2:
         clientId: hspc_resource_server
         clientSecret: secret
