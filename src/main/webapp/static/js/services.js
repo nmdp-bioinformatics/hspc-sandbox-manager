@@ -253,8 +253,8 @@ angular.module('sandManApp.services', [])
                             });
                         }
                         deferred.resolve(resourceResults, resourceSearchResult);
-                    }).fail(function(error){
-                    var test = error;
+                    }).fail(function(result){
+                        deferred.reject(result.error.responseJSON);
                     });
                 return deferred;
             },
@@ -413,6 +413,57 @@ angular.module('sandManApp.services', [])
                 });
                 return deferred;
             },
+            queryAllPages: function(queryString) {
+                var that = this;
+                var deferred = $.Deferred();
+
+                var parsedQuery = {};
+                var resourceType;
+                if (queryString) {
+                    if (queryString.indexOf("?") !== -1) {
+                        resourceType = queryString.substr(0, queryString.indexOf("?"));
+                        queryString = queryString.substr(queryString.indexOf("?")+1);
+                        var queryItems = queryString.split("&");
+                        angular.forEach(queryItems, function (item) {
+                            var parts = item.split("=");
+                            parsedQuery[parts[0]] = parts[1];
+                        });
+                    } else if (queryString.indexOf("/") !== -1) {
+                        resourceType = queryString.substr(0, queryString.indexOf("/"));
+                        queryString = queryString.substr(queryString.indexOf("/")+1);
+                        parsedQuery["_id"] = queryString;
+                    } else {
+                        resourceType = queryString;
+                        parsedQuery = undefined;
+                    }
+                }
+
+                this.queryResourceInstances(resourceType, parsedQuery, undefined, undefined, 50)
+                    .then(function(resources, resourceSearchResult){
+                        var resourceResults = [];
+                        if (resourceSearchResult.data.entry) {
+                            resourceSearchResult.data.entry.forEach(function(entry){
+                                resourceResults.push(entry.resource);
+                            });
+                        }
+
+                        if (resourceSearchResult.data.entry !== undefined && resourceSearchResult.data.total > resourceSearchResult.data.entry.length) {
+
+                            that.getAllPages(resourceSearchResult).then(function (resourceList) {
+                                resourceList.forEach(function (resource) {
+                                    resourceResults.push(resource);
+                                });
+                                deferred.resolve(resourceResults);
+                            });
+                        }  else {
+                            deferred.resolve(resourceResults);
+                        }
+
+                    }, function(results) {
+                        deferred.reject(results);
+                    });
+                return deferred;
+            },
             readResourceInstance: function(resource, id) {
                 var deferred = $.Deferred();
 
@@ -458,7 +509,7 @@ angular.module('sandManApp.services', [])
                         deferred.reject(error.data.responseText);
                     });
                 return deferred;
-           },
+            },
             exportAllData: function (){
                 var that = this;
                 var deferred = $.Deferred();
@@ -492,6 +543,60 @@ angular.module('sandManApp.services', [])
                         deferred.resolve(transactionBundle );
                     });
                 });
+                return deferred;
+            },
+            exportQueryData: function (query, format){
+                var that = this;
+                var deferred = $.Deferred();
+                if (!format || format === "JSON") {
+                    var transactionBundle = {
+                        resourceType: "Bundle",
+                        type: "transaction",
+                        entry: []
+                    };
+
+                    var promises = [];
+                    promises.push(that.queryAllPages(query));
+                    $q.all(promises).then(function (resourceTypeList) {
+                        angular.forEach(resourceTypeList, function (resourceList) {
+                            angular.forEach(resourceList, function (resource) {
+                                var resourceObject = angular.copy(resource);
+                                delete resourceObject.meta;
+                                delete resourceObject.fullUrl;
+                                var transactionEntry = {
+                                    resource: resourceObject,
+                                    request: {
+                                        method: "PUT",
+                                        url: resource.resourceType + "/" + resource.id
+                                    }
+                                };
+                                transactionBundle.entry.push(transactionEntry);
+                            });
+                        });
+                        deferred.resolve(transactionBundle);
+                    }, function (results) {
+                        deferred.reject(results);
+                    });
+                }
+                return deferred;
+            },
+            exportData: function (query, format){
+                var deferred = $.Deferred();
+                if (query) {
+                    this.exportQueryData(query, format).then(function (results) {
+                        deferred.resolve(results );
+                    }, function(results) {
+                        deferred.reject(results);
+                    });
+
+                } else {
+                    this.exportAllData(format).then(function (results) {
+                        deferred.resolve(results );
+                    }, function(results) {
+                        deferred.reject(results);
+                    });
+                    
+                }
                 return deferred;
             },
             registerContext: function(app, params, issuer){
@@ -953,6 +1058,23 @@ angular.module('sandManApp.services', [])
                         });
                     }
                     deferred.resolve(suggestions, defaultSuggestions);
+                }).fail(function(){
+                    deferred.reject();
+                });
+                return deferred;
+            },
+            sandboxManagerStatistics: function() {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/admin?interval=30",
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(results){
+                    deferred.resolve(results);
                 }).fail(function(){
                     deferred.reject();
                 });
@@ -1653,6 +1775,9 @@ angular.module('sandManApp.services', [])
             bundleResults: "",
             resourceList: [],
             fhirQuery: "",
+            exportQuery: "",
+            exportFormat: "JSON",
+            exportJsonResults: "",
             selected: {selectedResource: undefined},
             allQuerySuggestions: [],
             dataManagerService: [],

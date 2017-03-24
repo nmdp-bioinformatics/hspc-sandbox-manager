@@ -12,5 +12,5 @@
     "oauthPersonaAuthenticationUrl": "http://localhost:8080/hspc-reference-authorization/static/auth/index.html",
     "sbmUrlHasContextPath": "true",
     "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
-    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static", "open", "data", "test", "error", "invalid", "1", "2", "3", "4", "5", "6"]
+    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static", "open", "stu3", "data", "test", "error", "invalid", "1", "2", "3", "4", "5", "6"]
 }

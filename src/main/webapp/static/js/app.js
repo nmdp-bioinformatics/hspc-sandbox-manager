@@ -15,7 +15,7 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
             templateUrl: 'static/js/templates/dashboardView.html',
             authenticate: true
         })
-        
+
         .state('create-sandbox', {
             url: '/create-sandbox',
             templateUrl: 'static/js/templates/createSandbox.html',
@@ -116,6 +116,12 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
             url: '/settings',
             templateUrl: 'static/js/templates/settings.html',
             needsSandbox: true,
+            authenticate: true
+        })
+
+        .state('admin-dashboard', {
+            url: '/admin-dashboard',
+            templateUrl: 'static/js/templates/adminDashboard.html',
             authenticate: true
         })
 

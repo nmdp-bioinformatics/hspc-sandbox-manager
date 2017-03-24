@@ -337,6 +337,21 @@ public class SandboxServiceImpl implements SandboxService {
         return repository.findByVisibility(visibility);
     }
 
+    @Override
+    public String fullCount() {
+        return repository.fullCount();
+    }
+
+    @Override
+    public String schemaCount(String schemaVersion) {
+        return repository.schemaCount(schemaVersion);
+    }
+
+    @Override
+    public String intervalCount(Timestamp intervalTime) {
+        return repository.intervalCount(intervalTime);
+    }
+
     private void removeAllMembers(final Sandbox sandbox) {
 
         List<UserRole> userRoles = sandbox.getUserRoles();
@@ -349,15 +364,20 @@ public class SandboxServiceImpl implements SandboxService {
         }
     }
 
-    private boolean callCreateOrUpdateSandboxAPI(final Sandbox sandbox, final String bearerToken ) throws UnsupportedEncodingException{
-        String url = apiBaseURL_1 + "/" + sandbox.getSandboxId() + "/sandbox";
+    public String getSandboxApiURL(final Sandbox sandbox) {
+        String url = apiBaseURL_1 + "/" + sandbox.getSandboxId();
         if (sandbox.getSchemaVersion().equalsIgnoreCase("2")) {
-            url = apiBaseURL_2 + "/" + sandbox.getSandboxId() + "/sandbox";
+            url = apiBaseURL_2 + "/" + sandbox.getSandboxId();
         } else if (sandbox.getSchemaVersion().equalsIgnoreCase("3")) {
-            url = apiBaseURL_3 + "/" + sandbox.getSandboxId() + "/sandbox";
+            url = apiBaseURL_3 + "/" + sandbox.getSandboxId();
         } else if (sandbox.getSchemaVersion().equalsIgnoreCase("4")) {
-            url = apiBaseURL_4 + "/" + sandbox.getSandboxId() + "/sandbox";
+            url = apiBaseURL_4 + "/" + sandbox.getSandboxId();
         }
+        return url;
+    }
+
+    private boolean callCreateOrUpdateSandboxAPI(final Sandbox sandbox, final String bearerToken ) throws UnsupportedEncodingException{
+        String url = getSandboxApiURL(sandbox) + "/sandbox";
 
         HttpPut putRequest = new HttpPut(url);
         putRequest.addHeader("Content-Type", "application/json");

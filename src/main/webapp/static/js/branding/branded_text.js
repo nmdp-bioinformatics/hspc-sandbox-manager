@@ -5,7 +5,7 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                 mainImage: "static/branding/hspc/images/hspc-sndbx-logo.png",
                 mainImage2x: "static/branding/hspc/images/hspc-sndbx-logo@2x.png 2x",
                 whiteImage: "static/branding/hspc/images/hspc-sndbx-logo-wh.png",
-                whiteImage2x: "static/branding/hspc/images/hspc-sndbx-logo-wh.png 2x",
+                whiteImage2x: "static/branding/hspc/images/hspc-sndbx-logo-wh@2x.png 2x",
                 mainTitle: "The Healthcare Innovation Ecosystem",
                 sandboxText: "",
                 moreLinks: true,

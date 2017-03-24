@@ -1,6 +1,13 @@
 <div class="col-md-12 horizontal-scroll" ng-style="scrollScreen(size.screenH, size.screenW) ? '' : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+40)" resize>
     <div class="row">
         <div class="col-md-12 content-column">
+            <div class="btn btn-basic btn-md" ng-click="quickLaunch(selected.selectedApp, clientJSON.samplePatients)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
+            <div class="btn btn-basic btn-md" ng-show="canModify" ng-click="save()"><i class="fa fa-save fa-lg"></i> Save</div>
+            <div class="btn btn-delete btn-md" ng-show="canModify" ng-disabled="!canDelete" ng-click="delete()"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 content-column">
             <div class="detail-form">
                 <label class="detail-form-label">App Name</label>
                 <div class="detail-form-label-input">
@@ -74,12 +81,4 @@
 
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-12 content-column">
-            <div class="btn btn-basic btn-md" ng-click="quickLaunch(selected.selectedApp, clientJSON.samplePatients)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
-            <div class="btn btn-basic btn-md" ng-show="canModify" ng-click="save()"><i class="fa fa-save fa-lg"></i> Save</div>
-            <div class="btn btn-delete btn-md" ng-show="canModify" ng-disabled="!canDelete" ng-click="delete()"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
-        </div>
-    </div>
-
 </div>

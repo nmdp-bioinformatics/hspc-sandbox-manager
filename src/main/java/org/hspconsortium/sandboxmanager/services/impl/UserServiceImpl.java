@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -28,6 +29,14 @@ public class UserServiceImpl implements UserService {
 
     public User findByLdapId(final String ldapId) {
         return repository.findByLdapId(ldapId);
+    }
+
+    public String fullCount() {
+        return repository.fullCount();
+    }
+
+    public String intervalCount(final Timestamp intervalTime) {
+        return repository.intervalCount(intervalTime);
     }
 
     @Override

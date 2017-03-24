@@ -1,6 +1,12 @@
 <div class="col-md-12 horizontal-scroll" ng-style="scrollScreen(size.screenH, size.screenW) ? '' : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+40)" resize >
     <div class="row">
         <div class="col-md-12 content-column">
+            <div class="btn btn-basic btn-md" ng-click="launch(selectedScenario)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
+            <div class="btn btn-delete btn-md" ng-show="canDelete" ng-click="delete(selectedScenario)"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 content-column">
             <div class="detail-description">{{desc.title}}</div>
 
             <div class="detail-form-line-inline">
@@ -94,14 +100,6 @@
                     </div>
                 </div>
             </div>
-
-
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12 content-column">
-            <div class="btn btn-basic btn-md" ng-click="launch(selectedScenario)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
-            <div class="btn btn-delete btn-md" ng-show="canDelete" ng-click="delete(selectedScenario)"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
         </div>
     </div>
 </div>

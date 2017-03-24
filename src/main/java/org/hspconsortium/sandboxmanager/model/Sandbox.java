@@ -12,7 +12,16 @@ import java.util.List;
                 query="SELECT c FROM Sandbox c WHERE c.sandboxId = :sandboxId"),
         // Used to retrieve all sandboxes visible to a user
         @NamedQuery(name="Sandbox.findByVisibility",
-                query="SELECT c FROM Sandbox c WHERE c.visibility = :visibility")
+                query="SELECT c FROM Sandbox c WHERE c.visibility = :visibility"),
+        // Used for statistics
+        @NamedQuery(name="Sandbox.fullCount",
+                query="SELECT COUNT(*) FROM Sandbox"),
+        // Used for statistics
+        @NamedQuery(name="Sandbox.schemaCount",
+                query="SELECT COUNT(*) FROM Sandbox c WHERE c.schemaVersion = :schemaVersion"),
+        // Used for statistics
+        @NamedQuery(name="Sandbox.intervalCount",
+                query="SELECT COUNT(*) FROM Sandbox c WHERE c.createdTimestamp  >= :intervalTime")
 
 })
 public class Sandbox extends AbstractItem {
@@ -23,6 +32,7 @@ public class Sandbox extends AbstractItem {
     private String schemaVersion;
     private String fhirServerEndPoint;
     private boolean allowOpenAccess;
+    private List<String> snapshotIds = new ArrayList<>();
     private List<UserRole> userRoles = new ArrayList<>();
 
     /******************* Sandbox Property Getter/Setters ************************/
@@ -73,6 +83,15 @@ public class Sandbox extends AbstractItem {
 
     public void setAllowOpenAccess(boolean allowOpenAccess) {
         this.allowOpenAccess = allowOpenAccess;
+    }
+
+    @ElementCollection
+    public List<String> getSnapshotIds() {
+        return snapshotIds;
+    }
+
+    public void setSnapshotIds(List<String> snapshotIds) {
+        this.snapshotIds = snapshotIds;
     }
 
     @OneToMany(cascade={CascadeType.ALL})
