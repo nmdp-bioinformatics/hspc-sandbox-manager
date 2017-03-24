@@ -60,7 +60,7 @@ hspc:
       oauthClientEndpointURL: ${hspc.platform.authorization.baseUrl}/api/clients
       oauthUserLoginEndpointURL: ${hspc.platform.authorization.baseUrl}/j_spring_security_check
       oauthUser: admin
-      oauthUserPassword: FH!R4a11
+      oauthUserPassword: password
     messaging:
       port: 8080
       context: /hspc-reference-messaging/
