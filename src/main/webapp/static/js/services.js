@@ -2112,7 +2112,7 @@ angular.module('sandManApp.services', [])
                     settings.basePersonaServiceUrl_1 = envInfo.basePersonaServiceUrl_1 || settings.basePersonaServiceUrl_1;
                     settings.basePersonaServiceUrl_2 = envInfo.basePersonaServiceUrl_2 || settings.basePersonaServiceUrl_2;
                     settings.basePersonaServiceUrl_3 = envInfo.basePersonaServiceUrl_3 || settings.basePersonaServiceUrl_3;
-                    settings.basePersonaServiceUrl_4 = envInfo.basePersonaServiceUrl_5 || settings.basePersonaServiceUrl_4;
+                    settings.basePersonaServiceUrl_4 = envInfo.basePersonaServiceUrl_4 || settings.basePersonaServiceUrl_4;
                     settings.oauthLogoutUrl = envInfo.oauthLogoutUrl || settings.oauthLogoutUrl;
                     settings.oauthPersonaAuthenticationUrl = envInfo.oauthPersonaAuthenticationUrl || settings.oauthPersonaAuthenticationUrl;
                     settings.userManagementUrl = envInfo.userManagementUrl || settings.userManagementUrl;
