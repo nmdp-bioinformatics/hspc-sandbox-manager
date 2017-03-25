@@ -1935,7 +1935,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var schemaVersion = schemaServices.getSandboxSchemaVersion().version;
             var supportedResources = 'static/js/config/supported-patient-resources.json';
-            if (schemaVersion === "3") {
+            if (schemaVersion === "3" || schemaVersion === "4") {
                 supportedResources = 'static/js/config/supported-patient-resources_3.json';
             }
             $http.get(supportedResources).success(function(result){
@@ -1965,7 +1965,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var schemaVersion = schemaServices.getSandboxSchemaVersion().version;
             var exportResources = 'static/js/config/export-resources.json';
-            if (schemaVersion === "3") {
+            if (schemaVersion === "3" || schemaVersion === "4") {
                 exportResources = 'static/js/config/export-resources_3.json';
             }
             $http.get(exportResources).success(function(result){

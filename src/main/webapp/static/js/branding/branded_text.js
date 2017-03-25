@@ -14,13 +14,13 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                 copyright: "© 2017 by Healthcare Services Platform Consortium",
                 showCert: true,
                 loginDoc: "",
-                defaultSchemaVersion : "4",
+                defaultSchemaVersion : "3",
                 defaultLaunchScenario: true,
                 sandboxSchemaVersions : [
                     {version: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", canCreate: true},
                     {version: "2", name: "FHIR DSTU 2 (v1.6.0)", fhirVersion: "1.6.0", canCreate: false},
-                    {version: "3", name: "FHIR STU 3 (v1.8.0)", fhirVersion: "1.8.0", canCreate: false},
-                    {version: "4", name: "FHIR STU 3 (v1.9.0)", fhirVersion: "1.9.0", canCreate: true}
+                    {version: "3", name: "FHIR STU 3 (v1.8.0)", fhirVersion: "1.8.0", canCreate: true},
+                    {version: "4", name: "FHIR STU 3 (v1.9.0)", fhirVersion: "1.9.0", canCreate: false}
                 ],
                 sandboxDescription: {
                     title: "What is a sandbox?",

@@ -58,43 +58,29 @@ public class DataManagerController extends AbstractController {
         this.dataManagerService = dataManagerService;
     }
 
-    @RequestMapping(value = "/import", method = RequestMethod.POST, params = {"sandboxId", "count"})
-    @Transactional
-    public @ResponseBody String importDataSet(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId,
-                                              @RequestParam(value = "count") String count)  throws UnsupportedEncodingException {
-
-        User user = userService.findByLdapId(getSystemUserId(request));
-        checkUserAuthorization(request, user.getLdapId());
-        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-        checkUserSandboxRole(request, sandbox, Role.MANAGE_DATA);
-
-        return dataManagerService.importData(sandbox, oAuthService.getBearerToken(request), count);
-    }
-
-
-    @RequestMapping(value = "/snapshot/{snapshotId}", method = RequestMethod.POST, params = {"sandboxId", "action"})
-    @Transactional
-    public @ResponseBody String snapshot(final HttpServletRequest request, @PathVariable String snapshotId,
-                                         @RequestParam(value = "sandboxId") String sandboxId, @RequestParam(value = "action") final SnapshotAction action)  throws UnsupportedEncodingException {
-
-        User user = userService.findByLdapId(getSystemUserId(request));
-        checkUserAuthorization(request, user.getLdapId());
-        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-        checkUserSandboxRole(request, sandbox, Role.MANAGE_DATA);
-
-        return dataManagerService.snapshot(sandbox, snapshotId, action, oAuthService.getBearerToken(request));
-    }
-
-    @RequestMapping(value = "/reset", method = RequestMethod.POST, params = {"sandboxId"})
-    @Transactional
-    public @ResponseBody String reset(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId)  throws UnsupportedEncodingException {
-
-        User user = userService.findByLdapId(getSystemUserId(request));
-        checkUserAuthorization(request, user.getLdapId());
-        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-        checkUserSandboxRole(request, sandbox, Role.MANAGE_DATA);
-
-        return dataManagerService.reset(sandbox, oAuthService.getBearerToken(request));
-    }
+//    @RequestMapping(value = "/import", method = RequestMethod.POST, params = {"sandboxId", "count"})
+//    @Transactional
+//    public @ResponseBody String importDataSet(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId,
+//                                              @RequestParam(value = "count") String count)  throws UnsupportedEncodingException {
+//
+//        User user = userService.findByLdapId(getSystemUserId(request));
+//        checkUserAuthorization(request, user.getLdapId());
+//        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
+//        checkUserSandboxRole(request, sandbox, Role.MANAGE_DATA);
+//
+//        return dataManagerService.importData(sandbox, oAuthService.getBearerToken(request), count);
+//    }
+//
+//    @RequestMapping(value = "/reset", method = RequestMethod.POST, params = {"sandboxId"})
+//    @Transactional
+//    public @ResponseBody String reset(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId)  throws UnsupportedEncodingException {
+//
+//        User user = userService.findByLdapId(getSystemUserId(request));
+//        checkUserAuthorization(request, user.getLdapId());
+//        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
+//        checkUserSandboxRole(request, sandbox, Role.MANAGE_DATA);
+//
+//        return dataManagerService.reset(sandbox, oAuthService.getBearerToken(request));
+//    }
 
 }

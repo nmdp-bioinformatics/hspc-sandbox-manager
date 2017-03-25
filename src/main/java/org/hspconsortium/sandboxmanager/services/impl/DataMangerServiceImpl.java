@@ -70,42 +70,6 @@ public class DataMangerServiceImpl implements DataManagerService {
     }
 
     @Override
-    public String snapshot(final Sandbox sandbox, final String snapshotId, final SnapshotAction action, final String bearerToken) throws UnsupportedEncodingException {
-
-        if (!snapshotId.matches("^[a-zA-Z0-9]+$")) {
-            return "Snapshot ID must only contain alphanumeric characters";
-        }
-        if (!(snapshotId.length() < 20)) {
-            return "Snapshot ID must be less than 20 characters";
-        }
-
-        if (snapshotSandboxFhirData(sandbox, snapshotId, action, bearerToken )) {
-            List<String> ids = sandbox.getSnapshotIds();
-
-            switch (action) {
-                case Take:
-                    ids.add(snapshotId);
-                    sandbox.setSnapshotIds(ids);
-                    sandboxService.save(sandbox);
-                    break;
-                case Restore:
-                    break;
-                case Delete:
-                    ids.remove(snapshotId);
-                    sandbox.setSnapshotIds(ids);
-                    sandboxService.save(sandbox);
-                    break;
-                default:
-                    throw new RuntimeException("Unknown sandbox command action: " + action);
-            }
-
-            return "SUCCESS";
-        } else {
-            return "FAILED";
-        }
-    }
-
-    @Override
     public String reset(final Sandbox sandbox, final String bearerToken) throws UnsupportedEncodingException {
 
         return resetSandboxFhirData(sandbox, bearerToken ) ? "SUCCESS" : "FAILED";
