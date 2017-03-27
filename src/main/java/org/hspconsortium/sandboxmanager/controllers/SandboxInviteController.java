@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -59,7 +60,7 @@ public class SandboxInviteController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.PUT, consumes = "application/json")
     @Transactional
-    public @ResponseBody void createOrUpdateSandboxInvite(HttpServletRequest request, @RequestBody final SandboxInvite sandboxInvite) throws UnsupportedEncodingException{
+    public @ResponseBody void createOrUpdateSandboxInvite(HttpServletRequest request, @RequestBody final SandboxInvite sandboxInvite) throws IOException {
 
         // Make sure the inviter has rights to this sandbox
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxInvite.getSandbox().getSandboxId());
