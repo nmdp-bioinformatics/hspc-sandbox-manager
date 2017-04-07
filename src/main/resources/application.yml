@@ -9,8 +9,8 @@ spring:
   datasource:
     base_url: jdbc:mysql://localhost:3306
     url: ${spring.datasource.base_url}/sandman
-    username: root
-    password: password
+    username: ${mysql.username:root}
+    password: ${mysql.password:password}
     driverClassName: com.mysql.jdbc.Driver
     validation-query: SELECT 1
     test-on-borrow: true
@@ -24,6 +24,7 @@ spring:
 hspc:
   platform:
     hostUrl: http://localhost
+    port: 8080
     # When a user is added to a PUBLIC sandbox, these are their default Sandbox Roles
     defaultPublicSandboxRoles: USER
     # When a user is added to a PRIVATE sandbox, these are their default Sandbox Roles
@@ -37,24 +38,24 @@ hspc:
     #    defaultSandboxVisibility: PUBLIC
     defaultSandboxVisibility: PRIVATE
     authorization:
-      port: 8080
+      port: ${hspc.platform.port}
       context: /hspc-reference-authorization
       baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.authorization.port}${hspc.platform.authorization.context}
     api:
       version1:
-        port: 8080
+        port: ${hspc.platform.port}
         context: /hspc-reference-api-v1
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version1.port}${hspc.platform.api.version1.context}
       version2:
-        port: 8080
+        port: ${hspc.platform.port}
         context: /hspc-reference-api-v2
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version2.port}${hspc.platform.api.version2.context}
       version3:
-        port: 8080
+        port: ${hspc.platform.port}
         context: /hspc-reference-api-v3
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version3.port}${hspc.platform.api.version3.context}
       version4:
-        port: 8080
+        port: ${hspc.platform.port}
         context: /hspc-reference-api-v4
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version4.port}${hspc.platform.api.version4.context}
       oauth2:
@@ -66,7 +67,7 @@ hspc:
       oauthUser: admin
       oauthUserPassword: password
     messaging:
-      port: 8080
+      port: ${hspc.platform.port}
       context: /hspc-reference-messaging/
       sendEmail: false
       baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.messaging.port}${hspc.platform.messaging.context}
@@ -74,5 +75,5 @@ hspc:
       sandboxUserEndpointURL: ${hspc.platform.messaging.baseUrl}sandboxuser
     syntheticData:
 #      fhirServerUrl: https://syntheticmass.mitre.org/fhir
-       fhirServerUrl: http://localhost:8080/hspc-reference-api-v3/synthea2/open
+       fhirServerUrl: ${hspc.platform.api.version3.baseUrl}/synthea2/open
 
