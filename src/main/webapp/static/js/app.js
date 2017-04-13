@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootstrap', 'highcharts-ng', 'sandManApp.filters', 'sandManApp.services',
-    'sandManApp.controllers', 'sandManApp.directives', "sandManApp.branding"],
+    'sandManApp.controllers', 'sandManApp.directives', "sandManApp.branding", "ngCookies"],
     function($stateProvider, $urlRouterProvider, $locationProvider ){
 
 //   $locationProvider.html5Mode(true);

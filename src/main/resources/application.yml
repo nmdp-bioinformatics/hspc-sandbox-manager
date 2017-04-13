@@ -76,4 +76,6 @@ hspc:
     syntheticData:
 #      fhirServerUrl: https://syntheticmass.mitre.org/fhir
        fhirServerUrl: ${hspc.platform.api.version3.baseUrl}/synthea2/open
-
+    jwt:
+      key: devKeyDoNotUseInProductionShouldBeOverwrittenInProdConfiguration
+      signatureAlgorithm: HS256

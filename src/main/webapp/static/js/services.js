@@ -1618,7 +1618,7 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('launchApp', function($rootScope, fhirApiServices, personaServices, appsService, appsSettings, random) {
+    }).factory('launchApp', function($rootScope, fhirApiServices, personaServices, appsService, appsSettings, random, $cookies, $http, $log) {
 
         var patientDataManagerApp;
         var settings;
@@ -1707,16 +1707,20 @@ angular.module('sandManApp.services', [])
                     }
                 }
 
-                if (userPersona !== null && userPersona !== undefined && userPersona !== "" ) {
-                    appWindow = window.open('launch.html?key='+key +
-                        '&username=' + encodeURIComponent(userPersona.ldapId) +
-                        '&password=' + encodeURIComponent(userPersona.password) +
-                        '&auth=' + encodeURIComponent(settings.oauthPersonaAuthenticationUrl));
-                        registerAppContext(app, params, key, true);
-                } else {
+                $http.post("/hspc-sandbox-manager/REST/userPersona/authenticate", {
+                    username: userPersona.ldapId,
+                    password: userPersona.password
+                }).then(function(response){
+                    $cookies.put("hspc-persona-token", response.data.jwt, {
+                        path: "/",
+                        date: (new Date((new Date()).getTime() + 3*60000)) // 3 minutes
+                    });
+
                     appWindow = window.open('launch.html?'+key, '_blank');
                     registerAppContext(app, params, key, false);
-                }
+                }).catch(function(error){
+                    $log.error(error);
+                });
             },
             launchPatientDataManager: function(patient){
                 if (patient.fhirId === undefined){

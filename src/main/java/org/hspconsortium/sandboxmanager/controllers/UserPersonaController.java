@@ -20,17 +20,18 @@
 
 package org.hspconsortium.sandboxmanager.controllers;
 
+import org.hspconsortium.sandboxmanager.controllers.dto.UserPersonaCredentials;
 import org.hspconsortium.sandboxmanager.model.Sandbox;
 import org.hspconsortium.sandboxmanager.model.User;
 import org.hspconsortium.sandboxmanager.model.UserPersona;
 import org.hspconsortium.sandboxmanager.model.Visibility;
-import org.hspconsortium.sandboxmanager.services.OAuthService;
-import org.hspconsortium.sandboxmanager.services.SandboxService;
-import org.hspconsortium.sandboxmanager.services.UserPersonaService;
-import org.hspconsortium.sandboxmanager.services.UserService;
+import org.hspconsortium.sandboxmanager.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -47,14 +48,16 @@ public class UserPersonaController extends AbstractController {
     private final SandboxService sandboxService;
     private final UserService userService;
     private final UserPersonaService userPersonaService;
+    private final JwtService jwtService;
 
     @Inject
     public UserPersonaController(final SandboxService sandboxService, final UserPersonaService userPersonaService,
-                                 final UserService userService, final OAuthService oAuthService) {
+                                 final UserService userService, final OAuthService oAuthService, final JwtService jwtService) {
         super(oAuthService);
         this.sandboxService = sandboxService;
         this.userService = userService;
         this.userPersonaService = userPersonaService;
+        this.jwtService = jwtService;
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
@@ -105,4 +108,27 @@ public class UserPersonaController extends AbstractController {
         userPersonaService.delete(userPersona, oAuthService.getBearerToken(request));
     }
 
+    @RequestMapping(value="/authenticate", method = RequestMethod.POST, produces="application/json")
+    public ResponseEntity authenticateUserPersona(@RequestBody UserPersonaCredentials userPersonaCredentials){
+
+        if(userPersonaCredentials == null ||
+                userPersonaCredentials.getUsername() == null ||
+                StringUtils.isEmpty(userPersonaCredentials.getUsername())){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Username is required.\"}");
+        }
+
+        UserPersona userPersona = userPersonaService.findByLdapId(userPersonaCredentials.getUsername());
+
+        if (userPersona == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\": \"Cannot find user persona with that username.\"}");
+        }
+
+        if (userPersona.getPassword().equals(userPersonaCredentials.getPassword())) {
+            String jwt = jwtService.createSignedJwt(userPersonaCredentials.getUsername());
+            userPersonaCredentials.setJwt(jwt);
+            return ResponseEntity.ok(userPersonaCredentials);
+        }
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\"message\": \"Unauthorized.\"}");
+    }
 }
