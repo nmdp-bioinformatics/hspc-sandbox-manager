@@ -1,6 +1,7 @@
 package org.hspconsortium.sandboxmanager.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -29,6 +30,8 @@ public class User {
     private String name;
     private Set<SystemRole> systemRoles = new HashSet<>();
     private List<Sandbox> sandboxes = new ArrayList<>();
+    private Boolean hasAcceptedLatestTermsOfUse;
+    private List<TermsOfUseAcceptance> termsOfUseAcceptances = new ArrayList<>();
 
     @Id // @Id indicates that this it a unique primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -90,4 +93,24 @@ public class User {
         this.sandboxes = sandboxes;
     }
 
+    @Transient
+    public Boolean getHasAcceptedLatestTermsOfUse() {
+        return hasAcceptedLatestTermsOfUse;
+    }
+
+    public void setHasAcceptedLatestTermsOfUse(Boolean hasAcceptedLatestTermsOfUse) {
+        this.hasAcceptedLatestTermsOfUse = hasAcceptedLatestTermsOfUse;
+    }
+
+    @OneToMany(cascade={CascadeType.ALL}, fetch = FetchType.LAZY)
+    @JoinTable(name = "user_terms_of_use_acceptance",
+            joinColumns = {@JoinColumn(name = "user_id", nullable = false, updatable = false)})
+    @JsonIgnoreProperties("termsOfUse")
+    public List<TermsOfUseAcceptance> getTermsOfUseAcceptances() {
+        return termsOfUseAcceptances;
+    }
+
+    public void setTermsOfUseAcceptances(List<TermsOfUseAcceptance> termsOfUseAcceptances) {
+        this.termsOfUseAcceptances = termsOfUseAcceptances;
+    }
 }

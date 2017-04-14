@@ -17,9 +17,10 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                 defaultSchemaVersion : "3",
                 defaultLaunchScenario: true,
                 sandboxSchemaVersions : [
-                    {version: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", canCreate: true},
-                    {version: "2", name: "FHIR DSTU 2 (v1.6.0)", fhirVersion: "1.6.0", canCreate: false},
-                    {version: "3", name: "FHIR STU 3 (v1.8.0)", fhirVersion: "1.8.0", canCreate: true}
+                    {version: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", altName: "FHIR v1.0.2", canCreate: true},
+                    {version: "2", name: "FHIR DSTU 2 (v1.6.0)", fhirVersion: "1.6.0", altName: "FHIR v1.6", canCreate: false},
+                    {version: "3", name: "FHIR STU 3 (v1.8.0)", fhirVersion: "1.8.0", altName: "FHIR v1.8", canCreate: true},
+                    {version: "4", name: "FHIR STU 3 (v1.9.0)", fhirVersion: "1.9.0", altName: "FHIR v1.9", canCreate: true}
                 ],
                 sandboxDescription: {
                     title: "What is a sandbox?",
@@ -38,6 +39,7 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                 },
                 documentationLinks : [
                     {name: "registerAnApp", link: "https://healthservices.atlassian.net/wiki/display/HSPC/Sandbox+Registered+Apps"},
+                    {name: "inboundRegisterApp", link: "https://bitbucket.org/hspconsortium/registration"},
                     {name: "sandboxVersions", link: "http://hl7.org/fhir/directory.html"},
                     {name: "launchScenarios", link: "https://healthservices.atlassian.net/wiki/display/HSPC/Sandbox+Launch+Scenarios"},
                     {name: "sandboxPersona", link: "https://healthservices.atlassian.net/wiki/display/HSPC/Sandbox+Persona"},       

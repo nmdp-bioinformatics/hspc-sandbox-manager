@@ -3,6 +3,7 @@ package org.hspconsortium.sandboxmanager.services;
 import org.hspconsortium.sandboxmanager.model.InviteStatus;
 import org.hspconsortium.sandboxmanager.model.SandboxInvite;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface SandboxInviteService {
@@ -13,7 +14,7 @@ public interface SandboxInviteService {
 
     void delete(SandboxInvite sandboxInvite);
 
-    SandboxInvite create(SandboxInvite sandboxInvite);
+    SandboxInvite create(SandboxInvite sandboxInvite) throws IOException;
 
     SandboxInvite getById(final int id);
 

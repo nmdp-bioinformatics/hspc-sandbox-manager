@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -54,7 +55,7 @@ public class SandboxInviteServiceImpl implements SandboxInviteService {
 
     @Override
     @Transactional
-    public SandboxInvite create(final SandboxInvite sandboxInvite) {
+    public SandboxInvite create(final SandboxInvite sandboxInvite) throws IOException {
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxInvite.getSandbox().getSandboxId());
         User invitedBy = userService.findByLdapId(sandboxInvite.getInvitedBy().getLdapId());
         if (!sandboxService.isSandboxMember(sandbox, sandboxInvite.getInvitee())) {  // Don't invite a user already in the sandbox

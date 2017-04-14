@@ -26,6 +26,9 @@ import java.sql.Timestamp;
 public class App extends AbstractSandboxItem {
 
     private String launchUri;
+    private String appManifestUri;
+    private String softwareId;
+    private String fhirVersions;
     private String logoUri;
     private Image logo;
     private AuthClient authClient;
@@ -40,6 +43,31 @@ public class App extends AbstractSandboxItem {
 
     public String getLaunchUri() {
         return launchUri;
+    }
+
+
+    public String getAppManifestUri() {
+        return appManifestUri;
+    }
+
+    public void setAppManifestUri(String appManifestUri) {
+        this.appManifestUri = appManifestUri;
+    }
+
+    public String getSoftwareId() {
+        return softwareId;
+    }
+
+    public void setSoftwareId(String softwareId) {
+        this.softwareId = softwareId;
+    }
+
+    public String getFhirVersions() {
+        return fhirVersions;
+    }
+
+    public void setFhirVersions(String fhirVersions) {
+        this.fhirVersions = fhirVersions;
     }
 
     public String getLogoUri() {

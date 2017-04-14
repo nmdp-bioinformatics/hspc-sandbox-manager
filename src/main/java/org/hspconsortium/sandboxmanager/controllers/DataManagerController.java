@@ -73,47 +73,26 @@ public class DataManagerController extends AbstractController {
         return sandbox.getImports();
     }
 
-    @RequestMapping(value = "/import", method = RequestMethod.POST, params = {"sandboxId", "count"})
+    @RequestMapping(value = "/import", method = RequestMethod.POST, params = {"sandboxId", "patientId", "endpoint", "fhirIdPrefix"})
     @Transactional
-    public @ResponseBody String importDataSet(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId,
-                                              @RequestParam(value = "count") String count)  throws UnsupportedEncodingException {
+    public @ResponseBody String importAllPatientData(final HttpServletRequest request,
+                                                     @RequestParam(value = "sandboxId") String sandboxId,
+                                                     @RequestParam(value = "patientId") String patientId,
+                                                     @RequestParam(value = "fhirIdPrefix") String fhirIdPrefix,
+                                                     @RequestParam(value = "endpoint") String encodedEndpoint)  throws UnsupportedEncodingException {
 
         User user = userService.findByLdapId(getSystemUserId(request));
         checkUserAuthorization(request, user.getLdapId());
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
         checkUserSandboxRole(request, sandbox, Role.MANAGE_DATA);
         sandboxActivityLogService.sandboxImport(sandbox, user);
+        String endpoint = null;
+        if (encodedEndpoint != null) {
+            endpoint = java.net.URLDecoder.decode(encodedEndpoint, StandardCharsets.UTF_8.name());
+        }
 
-        return dataManagerService.importPatientData(sandbox, oAuthService.getBearerToken(request), count);
+        return dataManagerService.importPatientData(sandbox, oAuthService.getBearerToken(request), endpoint, patientId, fhirIdPrefix);
     }
-
-    @RequestMapping(value = "/import", method = RequestMethod.POST, params = {"sandboxId", "count", "query"})
-    @Transactional
-    public @ResponseBody String importPatientDataForQuery(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId,
-                                                          @RequestParam(value = "count") String count, @RequestParam(value = "query") String encodedQuery)  throws UnsupportedEncodingException {
-
-        User user = userService.findByLdapId(getSystemUserId(request));
-        checkUserAuthorization(request, user.getLdapId());
-        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-        checkUserSandboxRole(request, sandbox, Role.MANAGE_DATA);
-        sandboxActivityLogService.sandboxImport(sandbox, user);
-        String query = java.net.URLDecoder.decode(encodedQuery, StandardCharsets.UTF_8.name());
-
-        return dataManagerService.importPatientDataForQuery(sandbox, oAuthService.getBearerToken(request), query);
-    }
-
-//    @RequestMapping(value = "/snapshot/{snapshotId}", method = RequestMethod.POST, params = {"sandboxId", "action"})
-//    @Transactional
-//    public @ResponseBody String snapshot(final HttpServletRequest request, @PathVariable String snapshotId,
-//                                         @RequestParam(value = "sandboxId") String sandboxId, @RequestParam(value = "action") final SnapshotAction action)  throws UnsupportedEncodingException {
-//
-//        User user = userService.findByLdapId(getSystemUserId(request));
-//        checkUserAuthorization(request, user.getLdapId());
-//        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-//        checkUserSandboxRole(request, sandbox, Role.MANAGE_DATA);
-//
-//        return dataManagerService.snapshot(sandbox, snapshotId, action, oAuthService.getBearerToken(request));
-//    }
 
     @RequestMapping(value = "/reset", method = RequestMethod.POST, params = {"sandboxId"})
     @Transactional

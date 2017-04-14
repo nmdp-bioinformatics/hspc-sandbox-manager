@@ -41,6 +41,7 @@ public class AdminServiceImpl implements AdminService {
         statistics.setSchema1Sandboxes(sandboxService.schemaCount("1"));
         statistics.setSchema2Sandboxes(sandboxService.schemaCount("2"));
         statistics.setSchema3Sandboxes(sandboxService.schemaCount("3"));
+        statistics.setSchema4Sandboxes(sandboxService.schemaCount("4"));
         statistics.setSandboxesInInterval(sandboxService.intervalCount(timestamp));
 
         statistics.setFullUserCount(userService.fullCount());
@@ -62,6 +63,7 @@ public class AdminServiceImpl implements AdminService {
         private String schema1Sandboxes;
         private String schema2Sandboxes;
         private String schema3Sandboxes;
+        private String schema4Sandboxes;
         private String sandboxesInInterval;
 
         private String fullUserCount;
@@ -99,6 +101,14 @@ public class AdminServiceImpl implements AdminService {
 
         void setSchema3Sandboxes(String schema3Sandboxes) {
             this.schema3Sandboxes = schema3Sandboxes;
+        }
+
+        public String getSchema4Sandboxes() {
+            return schema4Sandboxes;
+        }
+
+        void setSchema4Sandboxes(String schema4Sandboxes) {
+            this.schema4Sandboxes = schema4Sandboxes;
         }
 
         public String getSandboxesInInterval() {

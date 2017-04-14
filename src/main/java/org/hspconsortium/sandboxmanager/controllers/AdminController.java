@@ -20,18 +20,20 @@
 
 package org.hspconsortium.sandboxmanager.controllers;
 
+import org.hspconsortium.sandboxmanager.model.Sandbox;
+import org.hspconsortium.sandboxmanager.model.SandboxInvite;
 import org.hspconsortium.sandboxmanager.model.SystemRole;
 import org.hspconsortium.sandboxmanager.model.User;
-import org.hspconsortium.sandboxmanager.services.AdminService;
-import org.hspconsortium.sandboxmanager.services.OAuthService;
-import org.hspconsortium.sandboxmanager.services.UserService;
+import org.hspconsortium.sandboxmanager.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/REST/admin")
@@ -39,13 +41,18 @@ public class AdminController extends AbstractController {
     private static Logger LOGGER = LoggerFactory.getLogger(AdminController.class.getName());
 
     private final UserService userService;
+    private final SandboxService sandboxService;
     private final AdminService adminService;
+    private final SandboxInviteService sandboxInviteService;
 
     @Inject
     public AdminController(final UserService userService, final OAuthService oAuthService,
-                           final AdminService adminService) {
+                           final AdminService adminService, final SandboxService sandboxService,
+                           final SandboxInviteService sandboxInviteService) {
         super(oAuthService);
         this.userService = userService;
+        this.sandboxService = sandboxService;
+        this.sandboxInviteService = sandboxInviteService;
         this.adminService = adminService;
     }
 
@@ -54,6 +61,23 @@ public class AdminController extends AbstractController {
         User user = userService.findByLdapId(getSystemUserId(request));
         checkUserSystemRole(user, SystemRole.ADMIN);
         return adminService.getSandboxStatistics(intervalDays);
+    }
+
+    // Admin Level Sandbox Delete (originally for cleaning up orphaned sandboxes
+    @RequestMapping(value = "/sandbox/{id}", method = RequestMethod.DELETE, produces ="application/json")
+    @Transactional
+    public void deleteSandboxById(HttpServletRequest request, @PathVariable String id) {
+        Sandbox sandbox = sandboxService.findBySandboxId(id);
+        User user = userService.findByLdapId(getSystemUserId(request));
+        checkUserSystemRole(user, SystemRole.ADMIN);
+
+        //delete sandbox invites
+        List<SandboxInvite> invites = sandboxInviteService.findInvitesBySandboxId(sandbox.getSandboxId());
+        for (SandboxInvite invite : invites) {
+            sandboxInviteService.delete(invite);
+        }
+
+        sandboxService.delete(sandbox, oAuthService.getBearerToken(request), user);
     }
 
 }

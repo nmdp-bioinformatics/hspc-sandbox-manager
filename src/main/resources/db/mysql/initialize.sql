@@ -26,7 +26,7 @@ VALUES (1, 0), (1, 2);
 INSERT INTO sandbox (id, allow_open_access, created_timestamp, description, name, sandbox_id, schema_version, created_by_id, fhir_server_end_point, visibility)
 VALUES
   (1, '', '2017-03-15 16:46:06', 'HSPC Development Sandbox v1', 'HSPC Sandbox v1', 'hspc1', '1', 1, null, 1),
-  (2, '', '2017-03-15 16:46:50', 'HSPC Development Sandbox v3', 'HSPC Sandbox v3', 'hspc3', '3', 1, null, 1);
+  (2, '', '2017-03-15 16:46:50', 'HSPC Development Sandbox v4', 'HSPC Sandbox v4', 'hspc4', '4', 1, null, 1);
 
 INSERT INTO user_sandbox (user_id, sandbox_id)
 VALUES (1, 1), (1, 2);

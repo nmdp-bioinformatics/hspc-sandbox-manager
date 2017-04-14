@@ -66,6 +66,9 @@ public class SandboxServiceImpl implements SandboxService {
     @Value("${hspc.platform.api.version3.baseUrl}")
     private String apiBaseURL_3;
 
+    @Value("${hspc.platform.api.version4.baseUrl}")
+    private String apiBaseURL_4;
+
     @Value("${hspc.platform.api.oauthUserInfoEndpointURL}")
     private String oauthUserInfoEndpointURL;
 
@@ -107,25 +110,38 @@ public class SandboxServiceImpl implements SandboxService {
 
     @Override
     @Transactional
-    public void delete(final Sandbox sandbox, final String bearerToken) {
+    public void delete(final Sandbox sandbox, final String bearerToken, final User admin) {
 
-        if (callDeleteSandboxAPI(sandbox, bearerToken) ) {
+        deleteAllSandboxItems(sandbox, bearerToken);
 
-            deleteAllSandboxItems(sandbox, bearerToken);
-
-            List<SandboxImport> imports = sandbox.getImports();
-            for (SandboxImport sandboxImport : imports) {
-                sandboxImportService.delete(sandboxImport);
-            }
-            sandbox.setImports(null);
-            save(sandbox);
-
-            //remove user memberships
-            removeAllMembers(sandbox);
-
-            sandboxActivityLogService.sandboxDelete(sandbox, sandbox.getCreatedBy());
-            delete(sandbox.getId());
+        List<SandboxImport> imports = sandbox.getImports();
+        for (SandboxImport sandboxImport : imports) {
+            sandboxImportService.delete(sandboxImport);
         }
+        sandbox.setImports(null);
+        save(sandbox);
+
+        //remove user memberships
+        removeAllMembers(sandbox);
+
+        if (admin != null) {
+            sandboxActivityLogService.sandboxDelete(sandbox, admin);
+        } else {
+            sandboxActivityLogService.sandboxDelete(sandbox, sandbox.getCreatedBy());
+        }
+        delete(sandbox.getId());
+
+        try {
+            callDeleteSandboxAPI(sandbox, bearerToken);
+        } catch (Exception ex) {
+            throw new SandboxDeleteFailedException("Failed to delete sandbox: " + sandbox.getSandboxId() + ". \n" + ex.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public void delete(final Sandbox sandbox, final String bearerToken) {
+        delete(sandbox, bearerToken, null);
     }
 
     private void deleteAllSandboxItems(final Sandbox sandbox, final String bearerToken) {
@@ -439,8 +455,11 @@ public class SandboxServiceImpl implements SandboxService {
             case "2":
                 url = apiBaseURL_2;
                 break;
-            default:
+            case "3":
                 url = apiBaseURL_3;
+                break;
+            default:
+                url = apiBaseURL_4;
         }
         return url;
     }

@@ -1,5 +1,7 @@
 package org.hspconsortium.sandboxmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 
 @Entity
@@ -27,6 +29,7 @@ public class UserRole {
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name="user_id")
+    @JsonIgnoreProperties("termsOfUseAcceptances")
     public User getUser() {
         return user;
     }

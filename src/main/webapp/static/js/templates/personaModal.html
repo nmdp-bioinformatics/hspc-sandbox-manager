@@ -17,7 +17,7 @@
             <div class="detail-form-input-with-validation">
                 <!--<input type="text" ng-model="persona.userId" id="userid" class="form-control red-popover" popover-is-open="showError" popover-trigger="none" popover-placement="right" uib-popover="{{invalidMessage}}" required/>-->
                 <!--<input type="text" id="sandboxid" value="@{{sandboxId}}" disabled/>-->
-                <input ng-model="user.ldapId" class="form-control red-popover" popover-is-open="showError" popover-trigger="none" popover-placement="right" uib-popover="{{invalidMessage}}" required/>
+                <input ng-model="user.ldapId" class="form-control red-popover" popover-enable="showError" popover-is-open="showError" popover-trigger="none" popover-placement="right" uib-popover="{{invalidMessage}}" required/>
                 <i ng-show="!isIdValid" class='detail-form-input-icon fa fa-close fa-lg'></i>
                 <label class="detail-form-description" style="font-size: 14px">Your persona userId will be <strong>{{tempUserId}}@{{sandboxId}}</strong></label>
             </div>

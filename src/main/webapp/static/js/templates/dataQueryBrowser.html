@@ -1,4 +1,4 @@
-<div class="col-md-12">
+<div class="col-md-12" ng-controller="DataQueryBrowserController">
     <div class="row">
         <div class="search-bar">
             <div class="search-label"><label>FHIR Query</label></div>
@@ -14,7 +14,7 @@
     </div>
     <div class="row">
         <div class="query-input">
-            <label class="query-result-label" style="width: 40px">Total </label>
+            <label class="query-result-label" style="width: 40px; margin-left: 123px;">Total </label>
             <label ng-show="settings.showing.results" class="query-result-label" style="width: 60px; font-weight: 600">{{settings.resultTotal}}</label>
             <label class="query-result-label" style="width: 80px">Current Set </label>
             <label ng-show="settings.showing.results" class="query-result-label" style="width: 40px; font-weight: 600">{{settings.resultSet}}</label>

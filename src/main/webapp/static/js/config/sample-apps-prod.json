@@ -6,6 +6,7 @@
             "clientId": "bilirubin_chart",
             "redirectUri" : "https://apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/"
         },
+        "appUri" : "https://apps.hspconsortium.org/hspc-bilirubin-risk-chart/",
         "launchUri" : "https://apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/launch.html",
         "logoUri" : "https://apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/images/bilirubin.png"
     },
@@ -15,6 +16,7 @@
             "clientId": "patient_data_manager",
             "redirectUri" : "https://apps.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/redirect.html"
         },
+        "appUri" : "https://apps.hspconsortium.org/hspc-patient-data-manager/",
         "launchUri" : "https://apps.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/launch.html",
         "logoUri" : "https://apps.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png"
     },

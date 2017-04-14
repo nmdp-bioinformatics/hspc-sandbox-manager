@@ -50,10 +50,10 @@
     {
         "resourceType" : "AllergyIntolerance",
         "displayValues" : [
-            {"label": "Substance", "path":"substance.coding.0.display"},
-            {"label": "Onset", "path": "onset"},
-            {"label": "Recorded Date", "path": "recordedDate"},
-            {"label": "Category", "path":"category.coding.0.display"}
+            {"label": "Code", "path":"code.coding.0.display"},
+            {"label": "Asserted", "path": "assertedDate"},
+            {"label": "Category", "path":"category.0"},
+            {"label": "Criticality", "path":"criticality"}
         ],
         "patient": "patient.reference"
 

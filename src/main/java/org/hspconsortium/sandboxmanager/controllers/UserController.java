@@ -112,4 +112,14 @@ public class UserController extends AbstractController {
         return userService.findByLdapId(ldapId);
     }
 
+    @RequestMapping(value = "/acceptterms", method = RequestMethod.POST, params = {"ldapId", "termsId"})
+    @Transactional
+    public void acceptTermsOfUse(final HttpServletRequest request, @RequestParam(value = "ldapId") String ldapId,
+                            @RequestParam(value = "termsId") String termsId) {
+
+        checkUserAuthorization(request, ldapId);
+        User user = userService.findByLdapId(ldapId);
+        userService.acceptTermsOfUse(user, termsId);
+    }
+
 }

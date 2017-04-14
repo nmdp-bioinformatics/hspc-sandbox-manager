@@ -57,7 +57,7 @@ public class EmailServiceImpl implements EmailService {
     private boolean sendEmail;
 
     @Override
-    public void sendEmail(User inviter, User invitee, Sandbox sandbox) {
+    public void sendEmail(User inviter, User invitee, Sandbox sandbox) throws IOException {
         if (sendEmail) {
 
             Message message = new Message(true, Message.ENCODING);
@@ -87,11 +87,7 @@ public class EmailServiceImpl implements EmailService {
 
             // Add the inline images, referenced from the HTML code as "cid:image-name"
             message.addResource("hspc-logo", PNG_MIME, getImageFile(HSPC_LOGO_IMAGE, "png"));
-            try {
-                sendEmailToMessaging(message);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            sendEmailToMessaging(message);
         }
     }
 
@@ -156,45 +152,23 @@ public class EmailServiceImpl implements EmailService {
         return gson.toJson(message, type);
     }
 
-    private byte[] getImageFile(String pathName, String imageType) {
+    private byte[] getImageFile(String pathName, String imageType) throws IOException {
         BufferedImage img;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        try {
-            ClassPathResource cpr = new ClassPathResource(pathName);
-            final File tempFile = File.createTempFile(UUID.randomUUID().toString(), ".tmp");
-            try (FileOutputStream out = new FileOutputStream(tempFile)) {
-                IOUtils.copy(cpr.getInputStream(), out);
-            }
-            img = ImageIO.read(tempFile);
-            ImageIO.write(img, imageType, baos);
-            baos.flush();
-            byte[] imageInByte = baos.toByteArray();
-            baos.close();
-            return imageInByte;
-        } catch (IOException e) {
-        }
-        return null;
+        ClassPathResource cpr = new ClassPathResource(pathName);
+        ImageIO.setUseCache(false);
+        img = ImageIO.read(cpr.getInputStream());
+        ImageIO.write(img, imageType, baos);
+        baos.flush();
+        byte[] imageInByte = baos.toByteArray();
+        baos.close();
+        return imageInByte;
     }
 
-    private byte[] getFile(String pathName) {
-        FileInputStream fileInputStream = null;
-        byte[] bFile = new byte[0];
-        try {
-            ClassPathResource cpr = new ClassPathResource(pathName);
-            final File file = File.createTempFile(UUID.randomUUID().toString(), ".tmp");
-            try (FileOutputStream out = new FileOutputStream(file)) {
-                IOUtils.copy(cpr.getInputStream(), out);
-            }
-            bFile = new byte[(int) file.length()];
-            //convert file into array of bytes
-            fileInputStream = new FileInputStream(file);
-            fileInputStream.read(bFile);
-            fileInputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return bFile;
+    private byte[] getFile(String pathName) throws IOException {
+        ClassPathResource cpr = new ClassPathResource(pathName);
+        return IOUtils.toByteArray(cpr.getInputStream());
     }
 
 }
