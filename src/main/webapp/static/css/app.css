@@ -208,10 +208,8 @@
 }
 
 .settings-container {
-    width: 600px;
-    margin: 0 auto 0 auto;
     overflow: auto;
-    padding: 5px 0 10px 0;
+    padding: 5px 5px 10px 0;
 }
 
 .settings-container .box {
@@ -822,7 +820,9 @@ span.title,
 
 .sandbox-nav-tabs .nav-tabs>li {
     margin-bottom: 0;
+    border-right: 2px solid #F4F4F4;
 }
+
 .sandbox-nav-tabs .nav-tabs>li.active>a,
 .sandbox-nav-tabs .nav-tabs>li.active>a:hover,
 .sandbox-nav-tabs .nav-tabs>li.active>a:focus {
@@ -853,6 +853,149 @@ span.title,
     line-height: 1.42857143;
     border-radius: 0;
 }
+
+.details-header .sandbox-nav-tabs .nav-tabs>li>a {
+    font-weight: 300;
+    font-size: 16px;
+    color: #58585A;
+    background-color: #FAFAFA;
+    padding: 0 0;
+    border: none;
+}
+
+.details-header .sandbox-nav-tabs .nav-tabs>li {
+    margin-bottom: 0;
+    padding: 4px 10px;
+}
+
+.info-form-label {
+    width: 100%;
+    float: left;
+    position: relative;
+    /*text-align: right;*/
+    min-height: 1px;
+    padding: 5px 15px 1px 15px;
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 500;
+}
+
+.info-form-hyperlink,
+.info-form-label-input,
+.info-form-value {
+    width: 100%;
+    float: left;
+    font-size: 12px;
+    font-weight: 400;
+    position: relative;
+    display: inline-block;
+    min-height: 1px;
+    padding: 0 15px 5px 15px;
+}
+
+.info-box .title-box .title {
+    font-size: 14px;
+    font-weight: 600;
+}
+.title-box .content .info-form {
+    height: 44px;
+}
+
+.title-box .content .info-form-label {
+    margin: 0;
+    padding: 5px 0 0 5px;
+    min-height: 20px;
+}
+
+/*.title-box .content .info-form-value {*/
+    /*border: none;*/
+    /*margin: 0;*/
+    /*padding: 5px 0 0 5px;*/
+    /*min-height: 20px;*/
+    /*font-weight: bold;*/
+/*}*/
+
+.detail1-form-header {
+    height: 28px;
+    width: 100%;
+    background: #fafafa;
+    padding-top: 4px;
+    margin-bottom: 4px;
+    border-bottom: 2px solid #f4f4f4;
+}
+
+.detail1-form-header .float-right-dark-btn {
+    padding-right: 8px;
+    outline: none;
+}
+
+.detail1-form-section-label {
+    width: 100%;
+    float: left;
+    position: relative;
+    /*text-align: right;*/
+    min-height: 1px;
+    padding: 5px 5px 5px;
+    display: inline-block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.detail1-form-label {
+    width: 100%;
+    float: left;
+    position: relative;
+    /*text-align: right;*/
+    min-height: 1px;
+    padding: 5px 15px 1px 15px;
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+.detail1-form-label.short {
+    width: 35%;
+    padding: 10px 5px 5px 15px;
+}
+
+.detail1-form-hyperlink,
+.detail1-form-label-input,
+.detail1-form-value {
+    width: 100%;
+    float: left;
+    position: relative;
+    display: inline-block;
+    min-height: 1px;
+    padding: 0 15px 5px 15px;
+}
+
+.detail1-form-hyperlink.short,
+.detail1-form-label-input.short,
+.detail1-form-value.short {
+    width: 55%;
+    padding: 5px 15px 5px 0;
+}
+
+.detail1-form-hyperlink,
+.detail1-form-hyperlink.short {
+    text-decoration: none;
+    outline: none;
+    padding-top: 12px;
+    font-weight: 400;
+}
+
+.detail1-form-edit {
+    width: 10%;
+    padding: 5px 0 0 0;
+}
+
+.detail1-form-value {
+    border: 1px solid #ebebeb;
+    border-radius: 4px;
+    padding-right: 4px;
+    min-height: 30px;
+}
+
 
 .data-tab-content .slim-page-header {
     font-size: 16px;
@@ -2184,6 +2327,60 @@ td {
     border-bottom: 1px solid #CCC;
 }
 
+.fhir-endpoint-bar {
+    min-width:220px;
+    padding-top: 6px;
+    position:relative;
+    height: 50px;
+}
+
+.fhir-endpoint-bar .fhir-endpoint-label {
+    float: left;
+    width: 120px;
+}
+
+/*.fhir-endpoint-bar #apiSourceDropdown {*/
+    /*!*margin-left:120px;*!*/
+    /*margin-right:0;*/
+    /*width: 20px;*/
+    /*position: relative;*/
+/*}*/
+
+#apiSourceDropdown {
+    vertical-align: top;
+    float: left;
+}
+
+#apiSourceDropdown button {
+    width: 30px;
+}
+
+.fhir-endpoint-bar .fhir-endpoint-field {
+    margin-left:140px;
+    margin-right:0;
+    max-width: 500px;
+    position: relative;
+}
+
+.fhir-endpoint-bar .fhir-endpoint-field #apiSourceInput {
+    float: left;
+    width: 100%;
+    background-color:transparent;
+}
+
+#apiSourceInput .help-block {
+    margin-top: 3px;
+    font-size: 80%;
+}
+
+#apiSourceInput {
+    margin-left: 153px;
+}
+
+#apiSourceInput input {
+    width: 100%;
+}
+
 .search-bar {
     /*border-bottom: 2px solid #F4F4F4;*/
     min-width:220px;
@@ -2231,6 +2428,91 @@ td {
     width: 30px;
     display: block;
     padding-top: 3px;
+}
+
+.search-bar .externalQuery .search-label {
+    width: 120px;
+}
+
+.search-bar .search-field {
+    margin-left:120px;
+    max-width: 533px;
+}
+
+#dataImportContent {
+    padding: 20px;
+}
+
+#jsonImportButton {
+    margin-top: 10px;
+}
+
+#importResultsWrapper {
+    padding-top: 10px;
+}
+
+#importResultsWrapper .btn {
+    margin-bottom: 16px;
+}
+
+.query-wrapper {
+    position: relative;
+}
+
+.query-wrapper .input-icons{
+    position:absolute;
+    z-index: 2;
+    right:10px;
+    top:0;
+    display: block;
+}
+
+.query-wrapper .input-icons a {
+    display: inline-block;
+}
+
+
+#queryBrowserContent {
+    padding: 20px;
+}
+
+#queryBrowserContent .slim-page-header {
+    margin-bottom: 16px;
+}
+
+#queryBrowserResults {
+    margin-top: 40px;
+}
+
+#queryBrowserResultsSummary div {
+    margin-bottom: 10px;
+}
+
+#queryBrowserResultsSummary .control-label {
+    font-weight: 200;
+    margin-bottom: 0;
+}
+
+#queryBrowserGoButton {
+    margin-top: 22px;
+    width: 100%;
+}
+
+.secondary-tabs .nav-tabs {
+    border: none;
+}
+
+.secondary-tabs .nav-tabs li a {
+    background-color: transparent;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+.secondary-tabs .nav-tabs li a:focus {
+    background-color: transparent;
+}
+
+.secondary-tabs .nav-tabs li.active a {
 }
 
 .message_area {
@@ -2401,6 +2683,24 @@ td {
     width: 80px !important;
 }
 
+.terms-of-use {
+    white-space: normal;
+}
+
+.terms-of-use h1 {
+    font-size: 18px;
+    text-align: center;
+}
+
+.terms-of-use a {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.terms-modal-window .modal-dialog {
+    width: 90%;
+    margin: 30px auto;
+}
 
 footer .container {
     /*margin-top: 3px;*/
@@ -2414,6 +2714,18 @@ footer .copyright {
     color: #58585A;
     font-size: 14px;
     padding-top: 15px;
+}
+
+footer .copyright>a {
+    color: #10759D;
+    font-weight: 400;
+    font-size: 14px;
+}
+
+footer .copyright>a:hover {
+    color: #4593B2;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 footer {

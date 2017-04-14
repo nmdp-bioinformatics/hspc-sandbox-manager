@@ -73,6 +73,8 @@ public class SandboxActivityLog {
         this.sandbox = sandbox;
     }
 
+    @Lob
+    @Column( length = 1000 )
     public String getAdditionalInfo() {
         return additionalInfo;
     }

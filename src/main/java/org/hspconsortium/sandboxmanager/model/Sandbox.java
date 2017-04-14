@@ -33,6 +33,7 @@ public class Sandbox extends AbstractItem {
     private String fhirServerEndPoint;
     private boolean allowOpenAccess;
     private List<UserRole> userRoles = new ArrayList<>();
+    private List<SandboxImport> imports = new ArrayList<>();
 
     /******************* Sandbox Property Getter/Setters ************************/
 
@@ -95,6 +96,15 @@ public class Sandbox extends AbstractItem {
 
     public void setUserRoles(List<UserRole> userRoles) {
         this.userRoles = userRoles;
+    }
+
+    @OneToMany(cascade={CascadeType.ALL})
+    public List<SandboxImport> getImports() {
+        return imports;
+    }
+
+    public void setImports(List<SandboxImport> imports) {
+        this.imports = imports;
     }
 
     /******************* Inherited Property Getter/Setters ************************/

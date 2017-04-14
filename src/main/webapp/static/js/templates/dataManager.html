@@ -1,14 +1,13 @@
-<div ng-controller="DataManagerController">
-
+<div>
     <div class="row">
         <uib-tabset class="sandbox-nav-tabs">
             <uib-tab index="0" heading="Query Browser">
                 <div class="data-tab-content" ng-include="'static/js/templates/dataQueryBrowser.html'"></div>
             </uib-tab>
-            <!--<uib-tab ng-show="canManageData()" index="1" heading="Generate">-->
-                <!--<div class="data-tab-content" ng-include="'static/js/templates/dataGenerator.html'"></div>-->
-            <!--</uib-tab>-->
-            <uib-tab ng-show="canManageData()" index="1" heading="Import">
+            <uib-tab ng-show="canManageData()" index="1" heading="External FHIR Data">
+                <div class="data-tab-content" ng-include="'static/js/templates/dataAcquire.html'"></div>
+            </uib-tab>
+            <uib-tab ng-show="canManageData()" index="2" heading="Import">
                 <div class="data-tab-content" ng-include="'static/js/templates/dataImport.html'"></div>
             </uib-tab>
             <uib-tab ng-show="canManageData()" index="2" heading="Export">

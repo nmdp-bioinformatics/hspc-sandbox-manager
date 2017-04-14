@@ -73,7 +73,3 @@ hspc:
       baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.messaging.port}${hspc.platform.messaging.context}
       emailSenderEndpointURL: ${hspc.platform.messaging.baseUrl}mailsender
       sandboxUserEndpointURL: ${hspc.platform.messaging.baseUrl}sandboxuser
-    syntheticData:
-#      fhirServerUrl: https://syntheticmass.mitre.org/fhir
-       fhirServerUrl: ${hspc.platform.api.version3.baseUrl}/synthea2/open
-

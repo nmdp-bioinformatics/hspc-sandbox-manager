@@ -24,7 +24,6 @@ import org.hspconsortium.sandboxmanager.model.*;
 import org.hspconsortium.sandboxmanager.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -33,7 +32,8 @@ import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/REST/sandbox")
@@ -84,9 +84,19 @@ public class SandboxController extends AbstractController {
         return sandboxService.create(sandbox, user, oAuthService.getBearerToken(request));
     }
 
-    //TODO check all usages
     @RequestMapping(method = RequestMethod.GET, params = {"lookUpId"}, produces ="application/json")
     public @ResponseBody String checkForSandboxById(@RequestParam(value = "lookUpId")  String id) {
+        Sandbox sandbox = sandboxService.findBySandboxId(id);
+        if (sandbox != null) {
+            return  "{\"sandboxId\": \"" + sandbox.getSandboxId() + "\"}";
+        } else if (!sandboxService.sandboxIdAvailable(id)) {
+            return  "{\"reservedId\": \"" + id + "\"}";
+        }
+        return null;
+    }
+
+    @RequestMapping(method = RequestMethod.GET, params = {"sandboxId"}, produces ="application/json")
+    public @ResponseBody String getSandboxById(@RequestParam(value = "sandboxId")  String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
         if (sandbox != null) {
             return  "{\"sandboxId\": \"" + sandbox.getSandboxId() + "\",\"schemaVersion\": \"" + sandbox.getSchemaVersion() + "\",\"allowOpenAccess\": \"" + sandbox.isAllowOpenAccess() + "\"}";

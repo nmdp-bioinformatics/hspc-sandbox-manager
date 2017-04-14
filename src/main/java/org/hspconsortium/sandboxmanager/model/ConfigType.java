@@ -1,7 +1,7 @@
 package org.hspconsortium.sandboxmanager.model;
 
 public enum ConfigType {
-    FHIR_QUERY(0), PROPERTY(1);
+    FHIR_QUERY(0), PROPERTY(1), IMPORT_ENDPOINT(2);
 
     private int numVal;
 

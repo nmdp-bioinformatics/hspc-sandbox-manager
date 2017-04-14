@@ -20,21 +20,21 @@
 
 package org.hspconsortium.sandboxmanager.controllers;
 
-import org.hspconsortium.sandboxmanager.model.*;
+import org.hspconsortium.sandboxmanager.model.Role;
+import org.hspconsortium.sandboxmanager.model.Sandbox;
+import org.hspconsortium.sandboxmanager.model.SandboxImport;
+import org.hspconsortium.sandboxmanager.model.User;
 import org.hspconsortium.sandboxmanager.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @RestController
 @RequestMapping({"/REST/fhirdata"})
@@ -58,29 +58,49 @@ public class DataManagerController extends AbstractController {
         this.dataManagerService = dataManagerService;
     }
 
-//    @RequestMapping(value = "/import", method = RequestMethod.POST, params = {"sandboxId", "count"})
-//    @Transactional
-//    public @ResponseBody String importDataSet(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId,
-//                                              @RequestParam(value = "count") String count)  throws UnsupportedEncodingException {
-//
-//        User user = userService.findByLdapId(getSystemUserId(request));
-//        checkUserAuthorization(request, user.getLdapId());
-//        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-//        checkUserSandboxRole(request, sandbox, Role.MANAGE_DATA);
-//
-//        return dataManagerService.importData(sandbox, oAuthService.getBearerToken(request), count);
-//    }
-//
-//    @RequestMapping(value = "/reset", method = RequestMethod.POST, params = {"sandboxId"})
-//    @Transactional
-//    public @ResponseBody String reset(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId)  throws UnsupportedEncodingException {
-//
-//        User user = userService.findByLdapId(getSystemUserId(request));
-//        checkUserAuthorization(request, user.getLdapId());
-//        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-//        checkUserSandboxRole(request, sandbox, Role.MANAGE_DATA);
-//
-//        return dataManagerService.reset(sandbox, oAuthService.getBearerToken(request));
-//    }
+    @RequestMapping(value = "/import", method = RequestMethod.GET, params = {"sandboxId"})
+    @Transactional
+    public @ResponseBody
+    List<SandboxImport> getSandboxImports(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId)  throws UnsupportedEncodingException {
 
+        User user = userService.findByLdapId(getSystemUserId(request));
+        checkUserAuthorization(request, user.getLdapId());
+        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
+        checkSandboxUserReadAuthorization(request, sandbox);
+
+        return sandbox.getImports();
+    }
+
+    @RequestMapping(value = "/import", method = RequestMethod.POST, params = {"sandboxId", "patientId", "endpoint", "fhirIdPrefix"})
+    @Transactional
+    public @ResponseBody String importAllPatientData(final HttpServletRequest request,
+                                                     @RequestParam(value = "sandboxId") String sandboxId,
+                                                     @RequestParam(value = "patientId") String patientId,
+                                                     @RequestParam(value = "fhirIdPrefix") String fhirIdPrefix,
+                                                     @RequestParam(value = "endpoint") String encodedEndpoint)  throws UnsupportedEncodingException {
+
+        User user = userService.findByLdapId(getSystemUserId(request));
+        checkUserAuthorization(request, user.getLdapId());
+        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
+        checkUserSandboxRole(request, sandbox, Role.MANAGE_DATA);
+        sandboxActivityLogService.sandboxImport(sandbox, user);
+        String endpoint = null;
+        if (encodedEndpoint != null) {
+            endpoint = java.net.URLDecoder.decode(encodedEndpoint, StandardCharsets.UTF_8.name());
+        }
+
+        return dataManagerService.importPatientData(sandbox, oAuthService.getBearerToken(request), endpoint, patientId, fhirIdPrefix);
+    }
+
+    @RequestMapping(value = "/reset", method = RequestMethod.POST, params = {"sandboxId"})
+    @Transactional
+    public @ResponseBody String reset(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId)  throws UnsupportedEncodingException {
+
+        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
+        User user = userService.findByLdapId(getSystemUserId(request));
+        checkSystemUserCanModifySandboxAuthorization(request, sandbox, user);
+
+        sandboxActivityLogService.sandboxReset(sandbox, user);
+        return dataManagerService.reset(sandbox, oAuthService.getBearerToken(request));
+    }
 }

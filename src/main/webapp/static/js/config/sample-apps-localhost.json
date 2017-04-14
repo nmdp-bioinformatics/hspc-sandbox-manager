@@ -6,6 +6,7 @@
             "clientId": "bilirubin_chart",
             "redirectUri" : "http://localhost:8080/hspc-bilirubin-app/static/bilirubin-chart/"
         },
+        "appUri" : "http://localhost:8080/hspc-bilirubin-app/",
         "launchUri" : "http://localhost:8080/hspc-bilirubin-app/static/bilirubin-chart/launch.html",
         "logoUri" : "http://localhost:8080/hspc-bilirubin-app/static/bilirubin-chart/images/bilirubin.png"
     },
@@ -15,6 +16,7 @@
             "clientId": "patient_data_manager",
             "redirectUri": "http://localhost:8080/hspc-patient-data-manager/static/patient-data-manager/"
         },
+        "appUri" : "http://localhost:8080/hspc-patient-data-manager/",
         "launchUri": "http://localhost:8080/hspc-patient-data-manager/static/patient-data-manager/launch.html",
         "logoUri": "http://localhost:8080/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png"
     },

@@ -32,13 +32,13 @@ import org.springframework.stereotype.Service;
 import javax.imageio.ImageIO;
 import javax.net.ssl.SSLContext;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -157,6 +157,7 @@ public class EmailServiceImpl implements EmailService {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         ClassPathResource cpr = new ClassPathResource(pathName);
+        ImageIO.setUseCache(false);
         img = ImageIO.read(cpr.getInputStream());
         ImageIO.write(img, imageType, baos);
         baos.flush();
