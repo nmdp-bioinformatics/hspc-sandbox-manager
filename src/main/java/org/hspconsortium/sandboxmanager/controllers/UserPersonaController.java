@@ -21,6 +21,7 @@
 package org.hspconsortium.sandboxmanager.controllers;
 
 import org.hspconsortium.sandboxmanager.controllers.dto.UserPersonaCredentials;
+import org.hspconsortium.sandboxmanager.controllers.dto.UserPersonaDto;
 import org.hspconsortium.sandboxmanager.model.Sandbox;
 import org.hspconsortium.sandboxmanager.model.User;
 import org.hspconsortium.sandboxmanager.model.UserPersona;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
@@ -108,6 +110,21 @@ public class UserPersonaController extends AbstractController {
         userPersonaService.delete(userPersona, oAuthService.getBearerToken(request));
     }
 
+    @RequestMapping(value = "/{username}", method = RequestMethod.GET, produces ="application/json")
+    public @ResponseBody UserPersonaDto readUserPersona(HttpServletResponse response, @PathVariable String username) {
+        UserPersona userPersona = userPersonaService.findByLdapId(username);
+        if(userPersona == null) {
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            return null;
+        }
+
+        // sanitize so we're just sending back partial info
+        UserPersonaDto userPersonaDto = new UserPersonaDto();
+        userPersonaDto.setName(userPersona.getFhirName());
+        userPersonaDto.setUsername(userPersona.getLdapId());
+        return userPersonaDto;
+    }
+
     @RequestMapping(value="/authenticate", method = RequestMethod.POST, produces="application/json")
     public ResponseEntity authenticateUserPersona(@RequestBody UserPersonaCredentials userPersonaCredentials){
 
@@ -129,6 +146,6 @@ public class UserPersonaController extends AbstractController {
             return ResponseEntity.ok(userPersonaCredentials);
         }
 
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\"message\": \"Unauthorized.\"}");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("{\"message\": \"Authentication failed, bad username/password.\"}");
     }
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('sandManApp.services', [])
-    .factory('oauth2', function($rootScope, $location, appsSettings, tools) {
+    .factory('oauth2', function($rootScope, $location, appsSettings, tools, personaCookieService) {
 
         var authorizing = false;
 
@@ -10,6 +10,11 @@ angular.module('sandManApp.services', [])
                 return authorizing;
             },
             authorize: function(s, sandboxId, sandboxVersion){
+                // If the persona auth was cut short, it's possible that the persona cookie remains in the browser. Since
+                // the sandbox manager should never be accessed as persona user, we can use this as a fail-safe to
+                // delete any errant persona auth cookies.
+                personaCookieService.removePersonaCookieIfExists(s);
+
                 // window.location.origin does not exist in some non-webkit browsers
                 if (!window.location.origin) {
                     window.location.origin = window.location.protocol + "//"
@@ -595,7 +600,7 @@ angular.module('sandManApp.services', [])
                     }, function(results) {
                         deferred.reject(results);
                     });
-                    
+
                 }
                 return deferred;
             },
@@ -1618,7 +1623,7 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('launchApp', function($rootScope, fhirApiServices, personaServices, appsService, appsSettings, random, $cookies, $http, $log) {
+    }).factory('launchApp', function($rootScope, fhirApiServices, personaServices, appsService, appsSettings, random, $http, $log, personaCookieService) {
 
         var patientDataManagerApp;
         var settings;
@@ -1707,20 +1712,21 @@ angular.module('sandManApp.services', [])
                     }
                 }
 
-                $http.post("/hspc-sandbox-manager/REST/userPersona/authenticate", {
-                    username: userPersona.ldapId,
-                    password: userPersona.password
-                }).then(function(response){
-                    $cookies.put("hspc-persona-token", response.data.jwt, {
-                        path: "/",
-                        date: (new Date((new Date()).getTime() + 3*60000)) // 3 minutes
+                if(userPersona !== null && userPersona !== undefined && userPersona) {
+                    $http.post(appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona/authenticate", {
+                        username: userPersona.ldapId,
+                        password: userPersona.password
+                    }).then(function(response){
+                        personaCookieService.addPersonaCookie(response.data.jwt);
+                        appWindow = window.open('launch.html?'+key, '_blank');
+                        registerAppContext(app, params, key, false);
+                    }).catch(function(error){
+                        $log.error(error);
                     });
-
+                } else {
                     appWindow = window.open('launch.html?'+key, '_blank');
                     registerAppContext(app, params, key, false);
-                }).catch(function(error){
-                    $log.error(error);
-                });
+                }
             },
             launchPatientDataManager: function(patient){
                 if (patient.fhirId === undefined){
@@ -2141,5 +2147,22 @@ angular.module('sandManApp.services', [])
             return settings;
         }
     };
-
-}]);
+}]).factory('personaCookieService', function($cookies, appsSettings, $log){
+    return {
+        addPersonaCookie: function(cookieJwtValue){
+            appsSettings.getSettings().then(function(settings){
+                $cookies.put(settings.personaCookieName, cookieJwtValue, {
+                    path: "/",
+                    date: new Date((new Date()).getTime() + settings.personaCookieTimeout)
+                });
+            });
+        },
+        removePersonaCookieIfExists: function(settings){
+            if($cookies.get(settings.personaCookieName))
+                $cookies.remove(settings.personaCookieName,
+                    {
+                        path: "/"
+                    });
+        }
+    }
+});
