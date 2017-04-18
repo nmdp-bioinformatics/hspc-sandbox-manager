@@ -1638,22 +1638,7 @@ angular.module('sandManApp.services', [])
         function registerAppContext(app, params, key, launchAsUserPersona) {
             var appToLaunch = angular.copy(app);
             delete appToLaunch.clientJSON;
-
-            if (launchAsUserPersona) {
-                appsSettings.getSettings().then(function (settings) {
-                    var issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_1, settings.basePersonaServiceUrl_1);
-                    if (appToLaunch.sandbox.schemaVersion === "2") {
-                        issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_2, settings.basePersonaServiceUrl_2);
-                    } else if (appToLaunch.sandbox.schemaVersion === "3") {
-                        issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_3, settings.basePersonaServiceUrl_3);
-                    } else if (appToLaunch.sandbox.schemaVersion === "4") {
-                        issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_4, settings.basePersonaServiceUrl_4);
-                    }
-                    callRegisterContext(appToLaunch, params, issuer, key);
-                });
-            } else {
-                callRegisterContext(appToLaunch, params, fhirApiServices.fhirClient().server.serviceUrl, key);
-            }
+            callRegisterContext(appToLaunch, params, fhirApiServices.fhirClient().server.serviceUrl, key);
         }
 
         function callRegisterContext(appToLaunch, params, issuer, key) {
@@ -2119,10 +2104,6 @@ angular.module('sandManApp.services', [])
                     settings.baseServiceUrl_2 = envInfo.baseServiceUrl_2 || settings.baseServiceUrl_2;
                     settings.baseServiceUrl_3 = envInfo.baseServiceUrl_3 || settings.baseServiceUrl_3;
                     settings.baseServiceUrl_4 = envInfo.baseServiceUrl_4 || settings.baseServiceUrl_4;
-                    settings.basePersonaServiceUrl_1 = envInfo.basePersonaServiceUrl_1 || settings.basePersonaServiceUrl_1;
-                    settings.basePersonaServiceUrl_2 = envInfo.basePersonaServiceUrl_2 || settings.basePersonaServiceUrl_2;
-                    settings.basePersonaServiceUrl_3 = envInfo.basePersonaServiceUrl_3 || settings.basePersonaServiceUrl_3;
-                    settings.basePersonaServiceUrl_4 = envInfo.basePersonaServiceUrl_4 || settings.basePersonaServiceUrl_4;
                     settings.oauthLogoutUrl = envInfo.oauthLogoutUrl || settings.oauthLogoutUrl;
                     settings.oauthPersonaAuthenticationUrl = envInfo.oauthPersonaAuthenticationUrl || settings.oauthPersonaAuthenticationUrl;
                     settings.userManagementUrl = envInfo.userManagementUrl || settings.userManagementUrl;

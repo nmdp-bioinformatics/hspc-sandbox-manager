@@ -131,7 +131,7 @@ public class SandboxServiceImpl implements SandboxService {
 
             List<UserPersona> userPersonas = userPersonaService.findBySandboxId(sandbox.getSandboxId());
             for (UserPersona userPersona : userPersonas) {
-                userPersonaService.delete(userPersona, bearerToken);
+                userPersonaService.delete(userPersona);
             }
 
             //remove user memberships
@@ -210,7 +210,7 @@ public class SandboxServiceImpl implements SandboxService {
             List<UserPersona> userPersonas = userPersonaService.findBySandboxIdAndCreatedBy(sandbox.getSandboxId(), user.getLdapId());
             for (UserPersona userPersona : userPersonas) {
                 if (userPersona.getVisibility() == Visibility.PRIVATE) {
-                    userPersonaService.delete(userPersona, bearerToken);
+                    userPersonaService.delete(userPersona);
                 }
             }
 
