@@ -18,15 +18,13 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.hspconsortium.sandboxmanager.model.Sandbox;
-import org.hspconsortium.sandboxmanager.model.SnapshotAction;
+import org.hspconsortium.sandboxmanager.model.SandboxImport;
 import org.hspconsortium.sandboxmanager.services.DataManagerService;
-import org.hspconsortium.sandboxmanager.services.SandboxActivityLogService;
 import org.hspconsortium.sandboxmanager.services.SandboxService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -37,67 +35,83 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.sql.Timestamp;
+import java.util.*;
 
 @Service
 public class DataMangerServiceImpl implements DataManagerService {
 
-    @Value("${hspc.platform.syntheticData.fhirServerUrl}")
-    private String fhirServerUrl;
-
     private static Logger LOGGER = LoggerFactory.getLogger(SandboxServiceImpl.class.getName());
 
     private final SandboxService sandboxService;
-    private final SandboxActivityLogService sandboxActivityLogService;
 
     @Inject
-    public DataMangerServiceImpl(final SandboxService sandboxService,
-                                 final SandboxActivityLogService sandboxActivityLogService) {
+    public DataMangerServiceImpl(final SandboxService sandboxService) {
         this.sandboxService = sandboxService;
-        this.sandboxActivityLogService = sandboxActivityLogService;
     }
 
     @Override
-    public String importData(final Sandbox sandbox, final String bearerToken, final String count) throws UnsupportedEncodingException {
+    public String importPatientData(final Sandbox sandbox, final String bearerToken, final String endpoint, final String patientId, final String fhirIdPrefix) throws UnsupportedEncodingException {
 
-        String patientSearchJSON = queryFHIRServer("Patient?_count=" + count);
-        JSONObject jsonObj = new JSONObject(patientSearchJSON);
-        List<JSONObject> resources = getResourcesFromSearch(jsonObj);
-        return getEverythingForResource(resources, sandbox, bearerToken);
+        SandboxImport sandboxImport = new SandboxImport();
+        Timestamp start = new Timestamp(new Date().getTime());
+        sandboxImport.setTimestamp(start);
+        sandboxImport.setSuccessCount("0");
+        sandboxImport.setFailureCount("0");
+        sandboxImport.setImportFhirUrl(endpoint + "/Patient/" + patientId + "/$everything");
+        String success = getEverythingForPatient(patientId, endpoint, fhirIdPrefix, sandbox, bearerToken, sandboxImport);
+
+        long seconds = (new Date().getTime()-start.getTime())/1000;
+        sandboxImport.setDurationSeconds("" + seconds);
+        sandboxService.addSandboxImport(sandbox, sandboxImport);
+        return success;
     }
 
     @Override
     public String reset(final Sandbox sandbox, final String bearerToken) throws UnsupportedEncodingException {
-
         return resetSandboxFhirData(sandbox, bearerToken ) ? "SUCCESS" : "FAILED";
     }
 
-    private String getEverythingForResource(List<JSONObject> resources, Sandbox sandbox, String bearerToken) throws UnsupportedEncodingException {
-        int i = 0;
-        for (JSONObject resource : resources) {
-            String resourceType = resource.getString("resourceType");
-            String resourceId = resource.getString("id");
-            String everything = queryFHIRServer(resourceType + "/" + resourceId + "/$everything");
-            JSONObject everythingJsonObj = new JSONObject(everything);
-            List<JSONObject> everythingResources = getResourcesFromSearch(everythingJsonObj);
-            String bundleString = buildTransactionBundle(everythingResources);
+    private String getEverythingForPatient(String patientId, String endpoint, String fhirIdPrefix, Sandbox sandbox, String bearerToken, SandboxImport sandboxImport) throws UnsupportedEncodingException {
+        int success = 0;
+        int failure = 0;
 
-            try {
-                postFHIRBundle(sandbox, bundleString, bearerToken);
-                i++;
-            } catch (Exception e){
-                // Continue to the next patient
+        String nextPage;
+        List<JSONObject> everythingResources = new ArrayList<>();
+        String query = "/Patient/" + patientId + "/$everything";
+        do {
+            String everything = queryFHIRServer(endpoint, query);
+            JSONObject everythingJsonObj = new JSONObject(everything);
+            everythingResources.addAll(getResourcesFromSearch(everythingJsonObj));
+            nextPage = getNextPageLink(everythingJsonObj);
+            if (nextPage != null) {
+                String[] urlAndQuery = nextPage.split("\\?");
+                query = "?" + urlAndQuery[1];
+            }
+        } while (nextPage != null);
+
+        // Hack to remove the duplicate resources in the collection
+        // TODO figure out why we have dups
+        Set<String> resourceIds = new HashSet<>();
+        Iterator iterator = everythingResources.iterator();
+        while (iterator.hasNext()) {
+            JSONObject jsonObject = (JSONObject)iterator.next();
+            String id = jsonObject.getString("id");
+            if (resourceIds.contains(id)) {
+                iterator.remove();
+            } else {
+                resourceIds.add(id);
             }
         }
-        return "Successful " + i;
+
+        String bundleString = buildTransactionBundle(everythingResources, fhirIdPrefix);
+
+        postFHIRBundle(sandbox, bundleString, bearerToken);
+        sandboxImport.setSuccessCount("" + resourceIds.size());
+        return "SUCCESS";
     }
 
-    private String buildTransactionBundle(List<JSONObject> resources) {
-        Set<String> fixupIDs = new HashSet<>();
-
+    private String buildTransactionBundle(List<JSONObject> resources, String fhirIdPrefix) {
         JSONObject transactionBundle = new JSONObject();
         JSONArray resourcesArray = new JSONArray();
         transactionBundle.put("resourceType", "Bundle");
@@ -108,31 +122,46 @@ public class DataMangerServiceImpl implements DataManagerService {
 
             String resourceType = resource.getString("resourceType");
             String resourceId = resource.getString("id");
-            fixupIDs.add(resourceId);
-//            resource.put("id","/SYNTHEA-" + resourceId);
+            resource.put("id","/" + fhirIdPrefix + resourceId);
             entry.put("resource", resource);
 
             JSONObject request = new JSONObject();
-            request.put("method", "POST");
-//            request.put("url", resourceType + "/SYNTHEA-" + resourceId);
-            request.put("url", resourceType + "/" + resourceId);
+            request.put("method", "PUT");
+            request.put("url", resourceType + "/" + fhirIdPrefix + resourceId);
             entry.put("request", request);
             resourcesArray.put(entry);
         }
 
         transactionBundle.put("entry", resourcesArray);
-//        return fixupIDs(fixupIDs, transactionBundle.toString());
+        fixupIDs(transactionBundle, fhirIdPrefix);
         return transactionBundle.toString();
     }
 
-    private String fixupIDs(Set<String> fixupIDs, String bundle) {
+    // Prefix resource ids - used for the transaction bundle
+    private void fixupIDs(Object json, String fhirIdPrefix) {
 
-//        StringBuilder sb = new StringBuilder();
-        for (String id : fixupIDs) {
-            bundle = bundle.replace(id, "SYNTHEA-" + id);
+        if (json instanceof JSONObject) {
+            JSONObject jsonObject = (JSONObject) json;
+            if (jsonObject.has("reference")) {
+                String ref = jsonObject.getString("reference");
+                String[] resourceAndId = ref.split("/");
+                if (resourceAndId.length == 2) {
+                    ref = resourceAndId[0] + "/" + fhirIdPrefix + resourceAndId[1];
+                    jsonObject.put("reference", ref);
+                }
+            } else {
+                for (Object object : jsonObject.keySet()) {
+                    if (object instanceof String) {
+                        fixupIDs(jsonObject.get((String) object), fhirIdPrefix);
+                    }
+                }
+            }
+        } else if (json instanceof JSONArray){
+            JSONArray jsonArray = (JSONArray) json;
+            for (int i = 0; i < jsonArray.length(); i++) {
+                fixupIDs(jsonArray.get(i), fhirIdPrefix);
+            }
         }
-
-        return bundle;
     }
 
     private List<JSONObject> getResourcesFromSearch(JSONObject jsonObject) {
@@ -150,8 +179,22 @@ public class DataMangerServiceImpl implements DataManagerService {
         return resources;
     }
 
-    private String queryFHIRServer(final String query)  {
-        String url = this.fhirServerUrl + "/" + query;
+    private String getNextPageLink(JSONObject jsonObject) {
+        JSONArray links = jsonObject.getJSONArray("link");
+
+        for (int i = 0; i < links.length(); i++) {
+            JSONObject link = links.getJSONObject(i);
+
+            if (link.getString("relation").equalsIgnoreCase("next")) {
+                return link.getString("url");
+            }
+        }
+
+        return null;
+    }
+
+    private String queryFHIRServer(final String endpoint, final String query)  {
+        String url = endpoint + query;
 
         HttpGet getRequest = new HttpGet(url);
         getRequest.setHeader("Accept", "application/json");
@@ -202,12 +245,12 @@ public class DataMangerServiceImpl implements DataManagerService {
         }
     }
 
-    private boolean snapshotSandboxFhirData(final Sandbox sandbox, final String snapshotId, final SnapshotAction action, final String bearerToken ) throws UnsupportedEncodingException {
-        return postToSandbox(sandbox, "{\"action\": \"" + action.toString() +"\"}", "/sandbox/snapshot/" + snapshotId, bearerToken );
-    }
-
     private boolean resetSandboxFhirData(final Sandbox sandbox, final String bearerToken ) throws UnsupportedEncodingException {
-        return postToSandbox(sandbox, "{}", "/sandbox/reset", bearerToken );
+        if (postToSandbox(sandbox, "{}", "/sandbox/reset", bearerToken )) {
+            sandboxService.reset(sandbox, bearerToken);
+            return true;
+        }
+        return false;
     }
 
     private boolean postFHIRBundle(final Sandbox sandbox, final String jsonString, final String bearerToken ) throws UnsupportedEncodingException {

@@ -7,7 +7,7 @@
                 <div class="single-column">
                     <div class="create-form-group">
                         <label class="create-form-label">Sandbox ID<span class="required">*</span></label>
-                        <input ng-model="sandboxId" class="create-form-input-box red-popover" popover-is-open="showError" popover-trigger="none" popover-placement="right" uib-popover="{{invalidMessage}}" required/>
+                        <input ng-model="sandboxId" class="create-form-input-box red-popover" popover-enable="showError" popover-is-open="showError" popover-trigger="none" popover-placement="right" uib-popover="{{invalidMessage}}" required/>
                         <i ng-show="!isIdValid" class='create-form-input-icon fa fa-close fa-lg'></i>
                         <label class="create-form-description">Your sandbox will be available at {{baseUrl}}/{{tempSandboxId}}</label>
                     </div>

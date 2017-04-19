@@ -14,6 +14,8 @@ public interface SandboxService {
 
     void delete(final Sandbox sandbox, final String bearerToken);
 
+    void delete(final Sandbox sandbox, final String bearerToken, final User isAdmin);
+
     Sandbox create(final Sandbox sandbox, final User user, final String bearerToken) throws UnsupportedEncodingException;
 
     Sandbox update(final Sandbox sandbox, final User user, final String bearerToken) throws UnsupportedEncodingException;
@@ -27,6 +29,12 @@ public interface SandboxService {
     void addMemberRole(final Sandbox sandbox, final User user, final Role role);
 
     boolean hasMemberRole(final Sandbox sandbox, final User user, final Role role);
+
+    boolean sandboxIdAvailable(final String sandboxId);
+
+    void addSandboxImport(final Sandbox sandbox, final SandboxImport sandboxImport);
+
+    void reset(final Sandbox sandboxId, final String bearerToken);
 
     void sandboxLogin(final String sandboxId, final String userId);
 

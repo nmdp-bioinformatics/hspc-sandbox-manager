@@ -1,12 +1,17 @@
-<div class="col-md-12 horizontal-scroll" ng-controller="PatientDetailController" ng-style="scrollScreen(size.screenH, size.screenW)? '' : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+40)" resize >
+<div class="col-md-12 horizontal-scroll" ng-controller="PatientDetailController"
+     ng-style="scrollScreen(size.screenH, size.screenW)? '' : showing.importExternalPatient ? resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+83) : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+40)" resize >
     <div class="row">
         <div class="col-md-12 content-column" ng-show="showing.selectForScenario">
             <div class="btn btn-basic btn-md" ng-click="setPatient(selected.selectedPatient)" ng-disabled="!selected.patientSelected">Select this Patient <i class="fa fa-chevron-right"></i></div>
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12 content-column" ng-show="showing.patientDataManager">
+        <div class="col-md-12 content-column" ng-show="showing.patientDataManager && !showing.importExternalPatient">
             <div class="btn btn-basic btn-md" ng-click="launchPatientDataManager(selected.selectedPatient)" ng-disabled="!selected.patientSelected">Open Patient Data Manager</div>
+        </div>
+        <div class="col-md-12 content-column" ng-show="showing.patientDataManager && showing.importExternalPatient">
+            <div class="btn btn-basic btn-md" ng-show="showing.importExternalPatient && !settings.externalImportRunning" ng-click="importPatient(selected.selectedPatient)" ng-disabled="!selected.patientSelected">Import Patient</div>
+            <button ng-show="settings.externalImportRunning" ng-disabled="true" class="btn btn-cancel"><i class="fa fa-spinner fa-pulse"></i> Importing...</button>
         </div>
     </div>
     <div class="row">
@@ -16,9 +21,8 @@
                 <div class="content">
                     <div class="detail-form">
                         <label class="detail-form-label">Name:</label>
-                        <label class="detail-form-value"><a ng-click="launchPatientDataManager(selected.selectedPatient)">{{selected.selectedPatient | nameGivenFamily}}</a></label>
-                        <!--<label class="detail-form-value" ng-show="showing.patientDataManager"><a ng-click="launchPatientDataManager(selected.selectedPatient)">{{selected.selectedPatient | nameGivenFamily}}</a></label>-->
-                        <!--<label class="detail-form-value" ng-show="!showing.patientDataManager">{{selected.selectedPatient | nameGivenFamily}}</label>-->
+                        <label class="detail-form-value" ng-show="canManageData() && showing.patientDataManager && !showing.importExternalPatient"><a ng-click="launchPatientDataManager(selected.selectedPatient)">{{selected.selectedPatient | nameGivenFamily}}</a></label>
+                        <label class="detail-form-value" ng-show="!canManageData() || !showing.patientDataManager || showing.importExternalPatient">{{selected.selectedPatient | nameGivenFamily}}</label>
                     </div>
                     <div class="detail-form">
                         <label class="detail-form-label">Gender:</label>

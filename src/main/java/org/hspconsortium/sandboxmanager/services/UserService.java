@@ -21,4 +21,6 @@ public interface UserService {
 
     boolean hasSandbox(final Sandbox sandbox, final User user);
 
+    void acceptTermsOfUse(final User user, final String termsOfUseId);
+
 }

@@ -33,6 +33,10 @@ public interface SandboxActivityLogService {
 
     SandboxActivityLog sandboxUserRoleChange(final Sandbox sandbox, final User user, final Role role, final boolean roleAdded);
 
+    SandboxActivityLog sandboxImport(final Sandbox sandbox, final User user);
+
+    SandboxActivityLog sandboxReset(final Sandbox sandbox, final User user);
+
     SandboxActivityLog systemUserCreated(final Sandbox sandbox, final User user);
 
     SandboxActivityLog systemUserRoleChange(final User user, final SystemRole systemRole, final boolean roleAdded);

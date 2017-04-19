@@ -59,7 +59,12 @@ public class AppServiceImpl implements AppService {
 
         Integer authDatabaseId = app.getAuthClient().getAuthDatabaseId();
         if (authDatabaseId != null) {
-            oAuthClientService.deleteOAuthClient(authDatabaseId);
+            try {
+                oAuthClientService.deleteOAuthClient(authDatabaseId);
+            } catch (Exception ex) {
+                // Ignoring this error. Failure to delete client from Auth server
+                // shouldn't fail a sandbox delete.
+            }
         }
 
         if (app.getLogo() != null) {

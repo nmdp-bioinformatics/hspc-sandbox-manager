@@ -90,7 +90,7 @@
 <footer ng-show="showing.footer" ng-cloak>
     <div class="container">
         <div class="copyright" ng-cloak resize ng-style="{textAlign: scrollWidth(750) ? 'left' : 'center', marginLeft: showCert ? '100px' : '0px'}">
-            {{copyright}}
+            {{copyright}} • <a ng-click="showTerms()">Terms of Use & Privacy Statement</a>
             <div ng-show="showCert"  class="site-seal" ng-include src="'static/js/templates/certificate.html'"></div>
         </div>
     </div>
@@ -104,7 +104,7 @@
 <script src="static/libs/angular-ui-router/0.3.1/angular-ui-router.min.js"></script>
 <script src="static/libs/angularjs/angular-cookies.js"></script>
 <script src="static/libs/moment/moment.min.js"></script>
-<script src="static/libs/bootstrap/2.2/ui-bootstrap-tpls-2.2.0.min.js"></script>
+<script src="static/libs/bootstrap/2.5/ui-bootstrap-tpls-2.5.0.min.js"></script>
 <script src="static/css/bootstrap/bootstrap-filestyle.min.js"></script>
 
 <script src="static/fhir-client/underscore-min.js"></script>
@@ -112,13 +112,13 @@
 <script src="static/highcharts/highcharts.js"></script>
 <script src="static/highcharts/highcharts-more.js"></script>
 <script src="static/highcharts/highcharts-ng.min.js"></script>
-<script src="static/js/app.js?r=5"></script>
-<script src="static/js/controllers.js?r=5>"></script>
-<script src="static/js/services.js?r=5>"></script>
+<script src="static/js/app.js?r=8"></script>
+<script src="static/js/controllers.js?r=8>"></script>
+<script src="static/js/services.js?r=8>"></script>
 <script src="static/js/config/env-info.jsp" type="application/javascript"></script>
-<script src="static/js/filters.js?r=5"></script>
-<script src="static/js/directives.js?r=5"></script>
-<script src="static/js/branding/branded_text.js?r=5"></script>
+<script src="static/js/filters.js?r=8"></script>
+<script src="static/js/directives.js?r=8"></script>
+<script src="static/js/branding/branded_text.js?r=8"></script>
 
 </body>
 </html>
