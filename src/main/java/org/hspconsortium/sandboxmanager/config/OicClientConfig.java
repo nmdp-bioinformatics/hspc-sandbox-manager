@@ -12,9 +12,6 @@ import org.springframework.security.oauth2.client.token.DefaultAccessTokenReques
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 
-/**
- * Created by mike on 4/18/17.
- */
 @EnableOAuth2Client
 @Configuration
 public class OicClientConfig {

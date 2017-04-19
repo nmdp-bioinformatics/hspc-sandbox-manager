@@ -2,9 +2,6 @@ package org.hspconsortium.sandboxmanager.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/**
- * Created by mike on 4/13/17.
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserPersonaCredentials {
     private String username;
