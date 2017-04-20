@@ -12,5 +12,6 @@
             "oauthPersonaAuthenticationUrl": "<%= System.getProperty("oauthPersonaAuthenticationUrl") %>",
             "userManagementUrl": "<%= System.getProperty("userManagementUrl") %>",
             "sbmUrlHasContextPath": "<%= System.getProperty("sbmUrlHasContextPath") %>",
-            "hostOrg": "<%= System.getProperty("hostOrg") %>"
+            "hostOrg": "<%= System.getProperty("hostOrg") %>",
+            "personaCookieDomain": "<%= System.getProperty("personaCookieDomain") %>"
         });

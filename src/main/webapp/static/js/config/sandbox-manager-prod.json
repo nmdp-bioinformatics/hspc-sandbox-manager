@@ -6,5 +6,6 @@
     "userManagementUrl": "https://pwm.hspconsortium.org",
     "defaultPersonaId": "COREPRACTITIONER1",
     "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin"],
-    "defaultLaunchScenarios": ["bilirubin_chart", "Growth Chart", "BP Centiles", "Cardiac Risk"]
+    "defaultLaunchScenarios": ["bilirubin_chart", "Growth Chart", "BP Centiles", "Cardiac Risk"],
+    "personaCookieDomain": "hspconsortium.org"
 }

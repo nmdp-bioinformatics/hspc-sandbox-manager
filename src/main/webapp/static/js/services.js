@@ -2320,6 +2320,7 @@ angular.module('sandManApp.services', [])
                     settings.oauthPersonaAuthenticationUrl = envInfo.oauthPersonaAuthenticationUrl || settings.oauthPersonaAuthenticationUrl;
                     settings.userManagementUrl = envInfo.userManagementUrl || settings.userManagementUrl;
                     settings.sbmUrlHasContextPath = envInfo.sbmUrlHasContextPath || settings.sbmUrlHasContextPath;
+                    settings.personaCookieDomain = envInfo.personaCookieDomain || settings.personaCookieDomain;
                 }
                 deferred.resolve(settings);
                 });
@@ -2346,7 +2347,8 @@ angular.module('sandManApp.services', [])
             appsSettings.getSettings().then(function(settings){
                 $cookies.put(settings.personaCookieName, cookieJwtValue, {
                     path: "/",
-                    date: new Date((new Date()).getTime() + settings.personaCookieTimeout)
+                    domain: settings.personaCookieDomain,
+                    expires: new Date((new Date()).getTime() + settings.personaCookieTimeout)
                 });
             });
         },
@@ -2354,7 +2356,8 @@ angular.module('sandManApp.services', [])
             if($cookies.get(settings.personaCookieName))
                 $cookies.remove(settings.personaCookieName,
                     {
-                        path: "/"
+                        path: "/",
+                        domain: settings.personaCookieDomain
                     });
         }
     }
