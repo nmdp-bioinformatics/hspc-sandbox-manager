@@ -41,6 +41,9 @@ public class UserServiceImpl implements UserService {
     public User findByLdapId(final String ldapId) {
         User user = repository.findByLdapId(ldapId);
 
+        if(user == null)
+            return null;
+
         if (termsOfUseService.orderByCreatedTimestamp().size() > 0) {
             TermsOfUse latestTermsOfUse = termsOfUseService.orderByCreatedTimestamp().get(0);
             user.setHasAcceptedLatestTermsOfUse(false);
