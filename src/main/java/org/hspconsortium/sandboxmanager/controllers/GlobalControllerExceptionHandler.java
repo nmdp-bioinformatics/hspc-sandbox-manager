@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @ControllerAdvice
 public class GlobalControllerExceptionHandler {
@@ -15,14 +16,30 @@ public class GlobalControllerExceptionHandler {
     @ResponseBody
     @ResponseStatus(code = org.springframework.http.HttpStatus.UNAUTHORIZED)
     public void handleAuthorizationException(HttpServletResponse response, Exception e) throws IOException {
-        response.getWriter().write(e.getMessage());
+        writeMessage(response, e);
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseBody
     @ResponseStatus(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
     public void handleException(final HttpServletResponse response, Exception e) throws IOException {
-        response.getWriter().write(e.getMessage());
+        writeMessage(response, e);
     }
 
+    private void writeMessage(final HttpServletResponse response, Exception e) throws IOException {
+        PrintWriter writer = response.getWriter();
+        if (writer != null) {
+            if (e != null) {
+                String message = e.getMessage();
+                if (message != null) {
+                    writer.write(message);
+                } else {
+                    writer.write("Exception has no message: " + e.toString());
+                }
+            } else {
+                writer.write("Exception is null");
+            }
+
+        }
+    }
 }
