@@ -4,13 +4,11 @@
     "baseServiceUrl_2": "http://localhost:8080/hspc-reference-api-v2/",
     "baseServiceUrl_3": "http://localhost:8080/hspc-reference-api-v3/",
     "baseServiceUrl_4": "http://localhost:8080/hspc-reference-api-v4/",
-    "basePersonaServiceUrl_1": "http://localhost:8080/hspc-reference-api-v1/",
-    "basePersonaServiceUrl_2": "http://localhost:8080/hspc-reference-api-v2/",
-    "basePersonaServiceUrl_3": "http://localhost:8080/hspc-reference-api-v3/",
-    "basePersonaServiceUrl_4": "http://localhost:8080/hspc-reference-api-v4/",
     "oauthLogoutUrl": "http://localhost:8080/hspc-reference-authorization/logout",
     "oauthPersonaAuthenticationUrl": "http://localhost:8080/hspc-reference-authorization/static/auth/index.html",
     "sbmUrlHasContextPath": "true",
     "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
-    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static", "open", "stu3", "data", "test", "error", "invalid", "1", "2", "3", "4", "5", "6"]
+    "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static", "open", "stu3", "data", "test", "error", "invalid", "1", "2", "3", "4", "5", "6"],
+    "personaCookieName": "hspc-persona-token",
+    "personaCookieTimeout": 180000
 }

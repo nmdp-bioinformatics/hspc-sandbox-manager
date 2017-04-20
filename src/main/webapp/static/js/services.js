@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('sandManApp.services', [])
-    .factory('oauth2', function($rootScope, $location, appsSettings, tools) {
+    .factory('oauth2', function($rootScope, $location, appsSettings, tools, personaCookieService) {
 
         var authorizing = false;
 
@@ -10,6 +10,11 @@ angular.module('sandManApp.services', [])
                 return authorizing;
             },
             authorize: function(s, sandboxId, sandboxVersion){
+                // If the persona auth was cut short, it's possible that the persona cookie remains in the browser. Since
+                // the sandbox manager should never be accessed as persona user, we can use this as a fail-safe to
+                // delete any errant persona auth cookies.
+                personaCookieService.removePersonaCookieIfExists(s);
+
                 // window.location.origin does not exist in some non-webkit browsers
                 if (!window.location.origin) {
                     window.location.origin = window.location.protocol + "//"
@@ -596,7 +601,7 @@ angular.module('sandManApp.services', [])
                     }, function(results) {
                         deferred.reject(results);
                     });
-                    
+
                 }
                 return deferred;
             },
@@ -1770,7 +1775,7 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('launchApp', function($rootScope, fhirApiServices, pdmService, appsService, appsSettings, random) {
+    }).factory('launchApp', function($rootScope, fhirApiServices, pdmService, appsService, appsSettings, random, $http, $log, personaCookieService) {
 
         var settings;
         var appWindow;
@@ -1782,22 +1787,7 @@ angular.module('sandManApp.services', [])
         function registerAppContext(app, params, key, launchAsUserPersona) {
             var appToLaunch = angular.copy(app);
             delete appToLaunch.clientJSON;
-
-            if (launchAsUserPersona) {
-                appsSettings.getSettings().then(function (settings) {
-                    var issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_1, settings.basePersonaServiceUrl_1);
-                    if (appToLaunch.sandbox.schemaVersion === "2") {
-                        issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_2, settings.basePersonaServiceUrl_2);
-                    } else if (appToLaunch.sandbox.schemaVersion === "3") {
-                        issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_3, settings.basePersonaServiceUrl_3);
-                    } else if (appToLaunch.sandbox.schemaVersion === "4") {
-                        issuer = fhirApiServices.fhirClient().server.serviceUrl.replace(settings.baseServiceUrl_4, settings.basePersonaServiceUrl_4);
-                    }
-                    callRegisterContext(appToLaunch, params, issuer, key);
-                });
-            } else {
-                callRegisterContext(appToLaunch, params, fhirApiServices.fhirClient().server.serviceUrl, key);
-            }
+            callRegisterContext(appToLaunch, params, fhirApiServices.fhirClient().server.serviceUrl, key);
         }
 
         function callRegisterContext(appToLaunch, params, issuer, key) {
@@ -1844,12 +1834,17 @@ angular.module('sandManApp.services', [])
                     }
                 }
 
-                if (userPersona !== null && userPersona !== undefined && userPersona !== "" ) {
-                    appWindow = window.open('launch.html?key='+key +
-                        '&username=' + encodeURIComponent(userPersona.ldapId) +
-                        '&password=' + encodeURIComponent(userPersona.password) +
-                        '&auth=' + encodeURIComponent(settings.oauthPersonaAuthenticationUrl));
-                        registerAppContext(app, params, key, true);
+                if(userPersona !== null && userPersona !== undefined && userPersona) {
+                    $http.post(appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona/authenticate", {
+                        username: userPersona.ldapId,
+                        password: userPersona.password
+                    }).then(function(response){
+                        personaCookieService.addPersonaCookie(response.data.jwt);
+                        appWindow = window.open('launch.html?'+key, '_blank');
+                        registerAppContext(app, params, key, false);
+                    }).catch(function(error){
+                        $log.error(error);
+                    });
                 } else {
                     appWindow = window.open('launch.html?'+key, '_blank');
                     registerAppContext(app, params, key, false);
@@ -2208,7 +2203,7 @@ angular.module('sandManApp.services', [])
             var schemaVersion = schemaServices.getSandboxSchemaVersion().version;
             var dataManagerResources = 'static/js/config/data-manager-resources.json';
             if (schemaVersion === "3" || schemaVersion === "4") {
-                dataManagerResources = 'static/js/config/data-manager-resources_3.json';   
+                dataManagerResources = 'static/js/config/data-manager-resources_3.json';
             }
             $http.get(dataManagerResources).success(function(result){
                 resources = result;
@@ -2321,10 +2316,6 @@ angular.module('sandManApp.services', [])
                     settings.baseServiceUrl_2 = envInfo.baseServiceUrl_2 || settings.baseServiceUrl_2;
                     settings.baseServiceUrl_3 = envInfo.baseServiceUrl_3 || settings.baseServiceUrl_3;
                     settings.baseServiceUrl_4 = envInfo.baseServiceUrl_4 || settings.baseServiceUrl_4;
-                    settings.basePersonaServiceUrl_1 = envInfo.basePersonaServiceUrl_1 || settings.basePersonaServiceUrl_1;
-                    settings.basePersonaServiceUrl_2 = envInfo.basePersonaServiceUrl_2 || settings.basePersonaServiceUrl_2;
-                    settings.basePersonaServiceUrl_3 = envInfo.basePersonaServiceUrl_3 || settings.basePersonaServiceUrl_3;
-                    settings.basePersonaServiceUrl_4 = envInfo.basePersonaServiceUrl_4 || settings.basePersonaServiceUrl_4;
                     settings.oauthLogoutUrl = envInfo.oauthLogoutUrl || settings.oauthLogoutUrl;
                     settings.oauthPersonaAuthenticationUrl = envInfo.oauthPersonaAuthenticationUrl || settings.oauthPersonaAuthenticationUrl;
                     settings.userManagementUrl = envInfo.userManagementUrl || settings.userManagementUrl;
@@ -2349,5 +2340,22 @@ angular.module('sandManApp.services', [])
             return settings;
         }
     };
-
-}]);
+}]).factory('personaCookieService', function($cookies, appsSettings, $log){
+    return {
+        addPersonaCookie: function(cookieJwtValue){
+            appsSettings.getSettings().then(function(settings){
+                $cookies.put(settings.personaCookieName, cookieJwtValue, {
+                    path: "/",
+                    date: new Date((new Date()).getTime() + settings.personaCookieTimeout)
+                });
+            });
+        },
+        removePersonaCookieIfExists: function(settings){
+            if($cookies.get(settings.personaCookieName))
+                $cookies.remove(settings.personaCookieName,
+                    {
+                        path: "/"
+                    });
+        }
+    }
+});

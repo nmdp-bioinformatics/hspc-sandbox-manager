@@ -41,6 +41,11 @@ hspc:
       port: ${hspc.platform.port}
       context: /hspc-reference-authorization
       baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.authorization.port}${hspc.platform.authorization.context}
+      tokenEndpoint: ${hspc.platform.authorization.baseUrl}/token
+      authorizeEndpoint: ${hspc.platform.authorization.baseUrl}/authorize
+      adminAccess:
+        clientId: sandman_admin
+        clientSecret: secret
     api:
       version1:
         port: ${hspc.platform.port}
@@ -58,18 +63,17 @@ hspc:
         port: ${hspc.platform.port}
         context: /hspc-reference-api-v4
         baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version4.port}${hspc.platform.api.version4.context}
-      oauth2:
-        clientId: hspc_resource_server
-        clientSecret: secret
       oauthUserInfoEndpointURL: ${hspc.platform.authorization.baseUrl}/userinfo
       oauthClientEndpointURL: ${hspc.platform.authorization.baseUrl}/api/clients
-      oauthUserLoginEndpointURL: ${hspc.platform.authorization.baseUrl}/j_spring_security_check
-      oauthUser: admin
-      oauthUserPassword: password
     messaging:
       port: ${hspc.platform.port}
       context: /hspc-reference-messaging/
       sendEmail: false
       baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.messaging.port}${hspc.platform.messaging.context}
       emailSenderEndpointURL: ${hspc.platform.messaging.baseUrl}mailsender
-      sandboxUserEndpointURL: ${hspc.platform.messaging.baseUrl}sandboxuser
+    syntheticData:
+#      fhirServerUrl: https://syntheticmass.mitre.org/fhir
+       fhirServerUrl: ${hspc.platform.api.version3.baseUrl}/synthea2/open
+    jwt:
+      key: devKeyDoNotUseInProductionShouldBeOverwrittenInProdConfiguration
+      signatureAlgorithm: HS256

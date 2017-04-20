@@ -1,11 +1,8 @@
 package org.hspconsortium.sandboxmanager.services;
 
-import org.hspconsortium.sandboxmanager.model.LaunchScenario;
 import org.hspconsortium.sandboxmanager.model.UserPersona;
 import org.hspconsortium.sandboxmanager.model.Visibility;
-import org.springframework.data.repository.query.Param;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 public interface UserPersonaService {
@@ -16,7 +13,7 @@ public interface UserPersonaService {
 
     void delete(final int id);
 
-    void delete(final UserPersona userPersona, final String bearerToken);
+    void delete(final UserPersona userPersona);
 
     UserPersona findByLdapId(final String ldapId);
 
@@ -24,9 +21,9 @@ public interface UserPersonaService {
 
     List<UserPersona> findBySandboxId(final String sandboxId);
 
-    UserPersona create(final UserPersona userPersona, final String bearerToken) throws UnsupportedEncodingException;
+    UserPersona create(final UserPersona userPersona);
 
-    UserPersona update(final UserPersona userPersona, final String bearerToken) throws UnsupportedEncodingException;
+    UserPersona update(final UserPersona userPersona);
 
     List<UserPersona> findBySandboxIdAndCreatedByOrVisibility(String sandboxId, String createdBy, Visibility visibility);
 
