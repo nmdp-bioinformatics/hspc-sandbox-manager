@@ -122,6 +122,8 @@ public class UserPersonaController extends AbstractController {
         UserPersonaDto userPersonaDto = new UserPersonaDto();
         userPersonaDto.setName(userPersona.getFhirName());
         userPersonaDto.setUsername(userPersona.getLdapId());
+        userPersonaDto.setResourceUrl(userPersona.getResourceUrl());
+
         return userPersonaDto;
     }
 

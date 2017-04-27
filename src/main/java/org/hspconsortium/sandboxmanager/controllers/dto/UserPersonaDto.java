@@ -6,6 +6,7 @@ package org.hspconsortium.sandboxmanager.controllers.dto;
 public class UserPersonaDto {
     private String username;
     private String name;
+    private String resourceUrl;
 
 
     public String getUsername() {
@@ -22,5 +23,13 @@ public class UserPersonaDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getResourceUrl() {
+        return resourceUrl;
+    }
+
+    public void setResourceUrl(String resourceUrl) {
+        this.resourceUrl = resourceUrl;
     }
 }
