@@ -127,6 +127,7 @@ public class UserPersonaController extends AbstractController {
         return userPersonaDto;
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(value="/authenticate", method = RequestMethod.POST, produces="application/json")
     public ResponseEntity authenticateUserPersona(@RequestBody UserPersonaCredentials userPersonaCredentials){
 
