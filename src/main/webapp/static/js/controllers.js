@@ -1422,7 +1422,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $scope.showing.footer = false;
         if (fhirApiServices.clientInitialized()) {
-            $rootScope.$emit('signed-in');
+            // $rootScope.$emit('signed-in');
         } else {
             oauth2.login();
         }
@@ -3134,6 +3134,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.isUpdate = (getSettings.isUpdate !== undefined) ? getSettings.isUpdate : false;
 
         var callback = (getSettings.callback !== undefined) ? getSettings.callback : null;
+
+        $scope.openPDF = function () {
+            window.open('https://content.hspconsortium.org/docs/hspc/privacyterms.pdf', '_blank');
+        };
 
         $scope.confirm = function (result) {
             $uibModalInstance.close(result);

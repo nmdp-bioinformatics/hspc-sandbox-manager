@@ -1784,7 +1784,7 @@ angular.module('sandManApp.services', [])
             settings = results;
         });
 
-        function registerAppContext(app, params, key, launchAsUserPersona) {
+        function registerAppContext(app, params, key) {
             var appToLaunch = angular.copy(app);
             delete appToLaunch.clientJSON;
             callRegisterContext(appToLaunch, params, fhirApiServices.fhirClient().server.serviceUrl, key);
@@ -1834,20 +1834,18 @@ angular.module('sandManApp.services', [])
                     }
                 }
 
+                appWindow = window.open('launch.html?'+key, '_blank');
+                registerAppContext(app, params, key);
                 if(userPersona !== null && userPersona !== undefined && userPersona) {
                     $http.post(appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona/authenticate", {
                         username: userPersona.ldapId,
                         password: userPersona.password
                     }).then(function(response){
                         personaCookieService.addPersonaCookie(response.data.jwt);
-                        appWindow = window.open('launch.html?'+key, '_blank');
-                        registerAppContext(app, params, key, false);
                     }).catch(function(error){
                         $log.error(error);
+                        appWindow.close();
                     });
-                } else {
-                    appWindow = window.open('launch.html?'+key, '_blank');
-                    registerAppContext(app, params, key, false);
                 }
             },
             launchPatientDataManager: function(patient){

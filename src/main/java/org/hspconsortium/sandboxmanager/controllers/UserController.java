@@ -68,6 +68,7 @@ public class UserController extends AbstractController {
         this.sandboxActivityLogService = sandboxActivityLogService;
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(method = RequestMethod.GET, params = {"ldapId"})
     @Transactional
     public @ResponseBody
@@ -90,6 +91,7 @@ public class UserController extends AbstractController {
         return userService.findByLdapId(ldapId);
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/acceptterms", method = RequestMethod.POST, params = {"ldapId", "termsId"})
     @Transactional
     public void acceptTermsOfUse(final HttpServletRequest request, @RequestParam(value = "ldapId") String ldapId,

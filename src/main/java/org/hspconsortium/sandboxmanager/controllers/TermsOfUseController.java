@@ -28,10 +28,7 @@ import org.hspconsortium.sandboxmanager.services.TermsOfUseService;
 import org.hspconsortium.sandboxmanager.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -54,6 +51,7 @@ public class TermsOfUseController extends AbstractController  {
         this.userService = userService;
     }
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(method = RequestMethod.GET, produces ="application/json")
     public TermsOfUse getLatestTermsOfUse() {
         return termsOfUseService.orderByCreatedTimestamp().get(0);
