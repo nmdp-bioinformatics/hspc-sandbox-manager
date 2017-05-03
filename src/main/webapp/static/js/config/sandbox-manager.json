@@ -7,7 +7,7 @@
     "oauthLogoutUrl": "http://localhost:8080/hspc-reference-authorization/logout",
     "oauthPersonaAuthenticationUrl": "http://localhost:8080/hspc-reference-authorization/static/auth/index.html",
     "sbmUrlHasContextPath": "true",
-    "userManagementUrl": "https://sandbox.hspconsortium.org/pwm",
+    "userManagementUrl": "https://account.hspconsortium.org",
     "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static", "open", "stu3", "data", "test", "error", "invalid", "1", "2", "3", "4", "5", "6"],
     "personaCookieName": "hspc-persona-token",
     "personaCookieTimeout": 180000,

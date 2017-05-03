@@ -3,7 +3,7 @@
     "baseServiceUrl": "https://api.hspconsortium.org/hspc/",
     "oauthLogoutUrl": "https://auth.hspconsortium.org/logout",
     "oauthAuthenticationUrl": "https://persona-auth.hspconsortium.org/static/auth/index.html",
-    "userManagementUrl": "https://pwm.hspconsortium.org",
+    "userManagementUrl": "https://account.hspconsortium.org",
     "defaultPersonaId": "COREPRACTITIONER1",
     "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin"],
     "defaultLaunchScenarios": ["bilirubin_chart", "Growth Chart", "BP Centiles", "Cardiac Risk"],
