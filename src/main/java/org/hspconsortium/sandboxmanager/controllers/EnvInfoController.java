@@ -33,16 +33,13 @@ public class EnvInfoController {
     @Value("${oauthLogoutUrl:}")
     String oauthLogoutUrl;
 
-    @Value("${oauthPersonaAuthenticationUrl:}")
-    String oauthPersonaAuthenticationUrl;
-
     @Value("${userManagementUrl:}")
     String userManagementUrl;
 
     @Value("${sbmUrlHasContextPath:}")
     String sbmUrlHasContextPath;
 
-    @Value("${hostOrg:}")
+    @Value("${hostOrg:hspc}")
     String hostOrg;
 
     @Value("${personaCookieDomain:}")
@@ -77,9 +74,6 @@ public class EnvInfoController {
         stringBuffer.append("\",");
         stringBuffer.append("\"oauthLogoutUrl\": \"");
         stringBuffer.append(oauthLogoutUrl);
-        stringBuffer.append("\",");
-        stringBuffer.append("\"oauthPersonaAuthenticationUrl\": \"");
-        stringBuffer.append(oauthPersonaAuthenticationUrl);
         stringBuffer.append("\",");
         stringBuffer.append("\"userManagementUrl\": \"");
         stringBuffer.append(userManagementUrl);
