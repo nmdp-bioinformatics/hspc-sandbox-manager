@@ -69,16 +69,17 @@ public class UserController extends AbstractController {
     }
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(method = RequestMethod.GET, params = {"ldapId"})
+    @RequestMapping(method = RequestMethod.GET, params = {"sbmUserId"})
     @Transactional
     public @ResponseBody
-    User getUser(final HttpServletRequest request, @RequestParam(value = "ldapId") String ldapId) {
-        checkUserAuthorization(request, ldapId);
+    User getUser(final HttpServletRequest request, @RequestParam(value = "sbmUserId") String sbmUserId) {
+        checkUserAuthorization(request, sbmUserId);
         String oauthUsername = oAuthService.getOAuthUserName(request);
+        String oauthUserEmail = oAuthService.getOAuthUserEmail(request);
 
         try {
             semaphore.acquire();
-            createUserIfNotExists(ldapId, oauthUsername);
+            createUserIfNotExists(sbmUserId, oauthUsername, oauthUserEmail);
         } catch (InterruptedException e) {
             LOGGER.error("User create thread interrupted.", e);
         } catch(Throwable e) {
@@ -88,26 +89,28 @@ public class UserController extends AbstractController {
             semaphore.release();
         }
 
-        return userService.findByLdapId(ldapId);
+        return userService.findBySbmUserId(sbmUserId);
     }
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/acceptterms", method = RequestMethod.POST, params = {"ldapId", "termsId"})
+    @RequestMapping(value = "/acceptterms", method = RequestMethod.POST, params = {"sbmUserId", "termsId"})
     @Transactional
-    public void acceptTermsOfUse(final HttpServletRequest request, @RequestParam(value = "ldapId") String ldapId,
+    public void acceptTermsOfUse(final HttpServletRequest request, @RequestParam(value = "sbmUserId") String sbmUserId,
                                  @RequestParam(value = "termsId") String termsId) {
 
-        checkUserAuthorization(request, ldapId);
-        User user = userService.findByLdapId(ldapId);
+        checkUserAuthorization(request, sbmUserId);
+        User user = userService.findBySbmUserId(sbmUserId);
         userService.acceptTermsOfUse(user, termsId);
     }
 
-    private void createUserIfNotExists(String ldapId, String oauthUsername) {
-        User user = userService.findByLdapId(ldapId);
-
+    private void createUserIfNotExists(String sbmUserId, String oauthUsername, String oauthUserEmail) {
+        User user = userService.findBySbmUserId(sbmUserId);
+        if (user == null) {
+            user = userService.findByUserEmail(oauthUserEmail);
+        }
         // Create User if needed (if it's the first login to the system)
         if (user == null) {
-            UserPersona userPersona = userPersonaService.findByLdapId(ldapId);
+            UserPersona userPersona = userPersonaService.findByPersonaUserId(sbmUserId);
             if (userPersona != null) {
                 //This is a user persona. A user persona cannot be a sandbox user also
                 return;
@@ -115,8 +118,9 @@ public class UserController extends AbstractController {
 
             user = new User();
             user.setCreatedTimestamp(new Timestamp(new Date().getTime()));
-            user.setLdapId(ldapId);
+            user.setSbmUserId(sbmUserId);
             user.setName(oauthUsername);
+            user.setEmail(oauthUserEmail);
             user.setHasAcceptedLatestTermsOfUse(false);
             sandboxActivityLogService.systemUserCreated(null, user);
 
@@ -142,6 +146,7 @@ public class UserController extends AbstractController {
             }
             // Set or Update Name
             user.setName(oauthUsername);
+            user.setEmail(oauthUserEmail);
             userService.save(user);
         }
     }

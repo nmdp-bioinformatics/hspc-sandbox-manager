@@ -188,7 +188,7 @@ public class SandboxServiceImpl implements SandboxService {
     @Transactional
     public Sandbox create(final Sandbox sandbox, final User user, final String bearerToken) throws UnsupportedEncodingException {
 
-        UserPersona userPersona = userPersonaService.findByLdapId(user.getLdapId());
+        UserPersona userPersona = userPersonaService.findByPersonaUserId(user.getSbmUserId());
 
         if (userPersona == null && callCreateOrUpdateSandboxAPI(sandbox, bearerToken)) {
             sandbox.setCreatedBy(user);
@@ -226,7 +226,7 @@ public class SandboxServiceImpl implements SandboxService {
             userService.removeSandbox(sandbox, user);
 
             //delete launch scenarios, context params
-            List<LaunchScenario> launchScenarios = launchScenarioService.findBySandboxIdAndCreatedBy(sandbox.getSandboxId(), user.getLdapId());
+            List<LaunchScenario> launchScenarios = launchScenarioService.findBySandboxIdAndCreatedBy(sandbox.getSandboxId(), user.getSbmUserId());
             for (LaunchScenario launchScenario : launchScenarios) {
                 if (launchScenario.getVisibility() == Visibility.PRIVATE) {
                     launchScenarioService.delete(launchScenario);
@@ -234,7 +234,7 @@ public class SandboxServiceImpl implements SandboxService {
             }
 
             //delete user launches for public launch scenarios in this sandbox
-            List<UserLaunch> userLaunches = userLaunchService.findByUserId(user.getLdapId());
+            List<UserLaunch> userLaunches = userLaunchService.findByUserId(user.getSbmUserId());
             for (UserLaunch userLaunch : userLaunches) {
                 if (userLaunch.getLaunchScenario().getSandbox().getSandboxId().equalsIgnoreCase(sandbox.getSandboxId())) {
                     userLaunchService.delete(userLaunch);
@@ -242,14 +242,14 @@ public class SandboxServiceImpl implements SandboxService {
             }
 
             //delete all registered app, authClients, images
-            List<App> apps = appService.findBySandboxIdAndCreatedBy(sandbox.getSandboxId(), user.getLdapId());
+            List<App> apps = appService.findBySandboxIdAndCreatedBy(sandbox.getSandboxId(), user.getSbmUserId());
             for (App app : apps) {
                 if (app.getVisibility() == Visibility.PRIVATE) {
                     appService.delete(app);
                 }
             }
 
-            List<UserPersona> userPersonas = userPersonaService.findBySandboxIdAndCreatedBy(sandbox.getSandboxId(), user.getLdapId());
+            List<UserPersona> userPersonas = userPersonaService.findBySandboxIdAndCreatedBy(sandbox.getSandboxId(), user.getSbmUserId());
             for (UserPersona userPersona : userPersonas) {
                 if (userPersona.getVisibility() == Visibility.PRIVATE) {
                     userPersonaService.delete(userPersona);
@@ -321,7 +321,7 @@ public class SandboxServiceImpl implements SandboxService {
     public boolean hasMemberRole(final Sandbox sandbox, final User user, final Role role) {
         List<UserRole> userRoles = sandbox.getUserRoles();
         for(UserRole userRole : userRoles) {
-            if (userRole.getUser().getLdapId().equalsIgnoreCase(user.getLdapId()) && userRole.getRole() == role) {
+            if (userRole.getUser().getSbmUserId().equalsIgnoreCase(user.getSbmUserId()) && userRole.getRole() == role) {
                 return true;
             }
         }
@@ -369,7 +369,7 @@ public class SandboxServiceImpl implements SandboxService {
     @Override
     public boolean isSandboxMember(final Sandbox sandbox, final User user) {
         for(UserRole userRole : sandbox.getUserRoles()) {
-            if (userRole.getUser().getLdapId().equalsIgnoreCase(user.getLdapId())) {
+            if (userRole.getUser().getSbmUserId().equalsIgnoreCase(user.getSbmUserId())) {
                 return true;
             }
         }
@@ -380,7 +380,7 @@ public class SandboxServiceImpl implements SandboxService {
     @Transactional
     public void sandboxLogin(final String sandboxId, final String userId) {
         Sandbox sandbox = findBySandboxId(sandboxId);
-        User user = userService.findByLdapId(userId);
+        User user = userService.findBySbmUserId(userId);
         if (isSandboxMember(sandbox, user)) {
             sandboxActivityLogService.sandboxLogin(sandbox, user);
         }

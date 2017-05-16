@@ -37,13 +37,13 @@ public class UserPersonaServiceImpl implements UserPersonaService {
     }
 
     @Override
-    public UserPersona findByLdapId(String ldapId) {
-        return repository.findByLdapId(ldapId);
+    public UserPersona findByPersonaUserId(String personaUserId) {
+        return repository.findByPersonaUserId(personaUserId);
     }
 
     @Override
-    public UserPersona findByLdapIdAndSandboxId(final String ldapId, final String sandboxId) {
-        return  repository.findByLdapIdAndSandboxId(ldapId, sandboxId);
+    public UserPersona findByPersonaUserIdAndSandboxId(final String personaUserId, final String sandboxId) {
+        return  repository.findByPersonaUserIdAndSandboxId(personaUserId, sandboxId);
     }
 
     @Override

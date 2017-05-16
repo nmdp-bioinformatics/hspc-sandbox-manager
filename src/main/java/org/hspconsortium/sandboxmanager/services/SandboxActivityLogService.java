@@ -43,7 +43,7 @@ public interface SandboxActivityLogService {
 
     List<SandboxActivityLog> findBySandboxId(final String sandboxId);
 
-    List<SandboxActivityLog> findByUserLdapId(final String ldapId);
+    List<SandboxActivityLog> findByUserSbmUserId(final String sbmUserId);
 
     List<SandboxActivityLog> findBySandboxActivity(final SandboxActivity sandboxActivity);
 

@@ -56,8 +56,8 @@ abstract class AbstractController {
         return oAuthService.getOAuthUserId(request);
     }
 
-    void checkCreatedByIsCurrentUserAuthorization(final HttpServletRequest request, String createdByLdapId) {
-        checkUserAuthorization(request, createdByLdapId);
+    void checkCreatedByIsCurrentUserAuthorization(final HttpServletRequest request, String createdBySbmUserId) {
+        checkUserAuthorization(request, createdBySbmUserId);
     }
 
     String checkSandboxUserReadAuthorization(final HttpServletRequest request, final Sandbox sandbox) {
@@ -74,7 +74,7 @@ abstract class AbstractController {
         String oauthUserId = checkSandboxUserReadAuthorization(request, sandbox);
 
         if (abstractSandboxItem.getVisibility() == Visibility.PRIVATE) {
-            if (abstractSandboxItem.getCreatedBy().getLdapId().equalsIgnoreCase(oauthUserId)) {
+            if (abstractSandboxItem.getCreatedBy().getSbmUserId().equalsIgnoreCase(oauthUserId)) {
                 return oauthUserId;
             }
         } else { // Item is PUBLIC
@@ -95,8 +95,8 @@ abstract class AbstractController {
         String oauthUserId = oAuthService.getOAuthUserId(request);
 
         // If the sandbox is PRIVATE, only the creator can modify (currently). If the sandbox is PUBLIC, a system sandbox creator can modify.
-        if ((sandbox.getVisibility() == Visibility.PRIVATE && sandbox.getCreatedBy().getLdapId().equalsIgnoreCase(oauthUserId)) ||
-                (user.getLdapId().equalsIgnoreCase(oauthUserId) && checkUserHasSystemRole(user, SystemRole.CREATE_SANDBOX))) {
+        if ((sandbox.getVisibility() == Visibility.PRIVATE && sandbox.getCreatedBy().getSbmUserId().equalsIgnoreCase(oauthUserId)) ||
+                (user.getSbmUserId().equalsIgnoreCase(oauthUserId) && checkUserHasSystemRole(user, SystemRole.CREATE_SANDBOX))) {
             return oauthUserId;
         }
         throw new UnauthorizedException(String.format("Response Status : %s.\n" +
@@ -126,8 +126,8 @@ abstract class AbstractController {
 
         // For a PRIVATE sandbox, non-readonly user's default visibility is PUBLIC.
         // For a PUBLIC sandbox, only ADMIN's have default visibility of PUBLIC.
-        if ((sandbox.getVisibility() == Visibility.PRIVATE && !checkUserHasSandboxRole(user.getLdapId(), sandbox, Role.READONLY)) ||
-            checkUserHasSandboxRole(user.getLdapId(), sandbox, Role.ADMIN)) {
+        if ((sandbox.getVisibility() == Visibility.PRIVATE && !checkUserHasSandboxRole(user.getSbmUserId(), sandbox, Role.READONLY)) ||
+            checkUserHasSandboxRole(user.getSbmUserId(), sandbox, Role.ADMIN)) {
             return Visibility.PUBLIC;
         }
         return Visibility.PRIVATE;
@@ -145,10 +145,10 @@ abstract class AbstractController {
                 , HttpStatus.SC_UNAUTHORIZED));
     }
 
-    private String checkSandboxMember(final Sandbox sandbox, final String ldapId) {
+    private String checkSandboxMember(final Sandbox sandbox, final String sbmUserId) {
         for(UserRole userRole : sandbox.getUserRoles()) {
-            if (userRole.getUser().getLdapId().equalsIgnoreCase(ldapId)) {
-                return ldapId;
+            if (userRole.getUser().getSbmUserId().equalsIgnoreCase(sbmUserId)) {
+                return sbmUserId;
             }
         }
         throw new UnauthorizedException(String.format("Response Status : %s.\n" +
@@ -172,7 +172,7 @@ abstract class AbstractController {
 
     private boolean checkUserHasSandboxRole(final String oauthUserId, final Sandbox sandbox, final Role role) {
         for(UserRole userRole : sandbox.getUserRoles()) {
-            if (userRole.getUser().getLdapId().equalsIgnoreCase(oauthUserId) && userRole.getRole() == role) {
+            if (userRole.getUser().getSbmUserId().equalsIgnoreCase(oauthUserId) && userRole.getRole() == role) {
                 return true;
             }
         }

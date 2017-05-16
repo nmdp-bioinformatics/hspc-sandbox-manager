@@ -66,19 +66,22 @@ public class SandboxController extends AbstractController {
         }
 
         LOGGER.info("Creating sandbox: " + sandbox.getName());
-        checkCreatedByIsCurrentUserAuthorization(request, sandbox.getCreatedBy().getLdapId());
-        User user = userService.findByLdapId(sandbox.getCreatedBy().getLdapId());
+        checkCreatedByIsCurrentUserAuthorization(request, sandbox.getCreatedBy().getSbmUserId());
+        User user = userService.findBySbmUserId(sandbox.getCreatedBy().getSbmUserId());
 
         // Create User if needed or set User name
-        if (user == null) {
-            sandbox.getCreatedBy().setCreatedTimestamp(new Timestamp(new Date().getTime()));
-            sandbox.getCreatedBy().setName(oAuthService.getOAuthUserName(request));
-            user = userService.save(sandbox.getCreatedBy());
-            sandboxActivityLogService.systemUserCreated(null, user);
-        } else if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(oAuthService.getOAuthUserName(request));
-            user = userService.save(user);
-        }
+//        if (user == null) {
+//            sandbox.getCreatedBy().setCreatedTimestamp(new Timestamp(new Date().getTime()));
+//            sandbox.getCreatedBy().setName(oAuthService.getOAuthUserName(request));
+//            sandbox.getCreatedBy().setName(oAuthService.getOAuthUserEmail(request));
+//            user = userService.save(sandbox.getCreatedBy());
+//            sandboxActivityLogService.systemUserCreated(null, user);
+//        } else if (user.getName() == null || user.getName().isEmpty() || !user.getName().equalsIgnoreCase(oAuthService.getOAuthUserName(request)) ||
+//                user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().equalsIgnoreCase(oAuthService.getOAuthUserEmail(request))) {
+//            user.setName(oAuthService.getOAuthUserName(request));
+//            user.setName(oAuthService.getOAuthUserEmail(request));
+//            user = userService.save(user);
+//        }
 
         checkUserSystemRole(user, SystemRole.CREATE_SANDBOX);
         return sandboxService.create(sandbox, user, oAuthService.getBearerToken(request));
@@ -107,7 +110,7 @@ public class SandboxController extends AbstractController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces ="application/json")
     public @ResponseBody Sandbox getSandboxById(HttpServletRequest request, @PathVariable String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
-        User user = userService.findByLdapId(getSystemUserId(request));
+        User user = userService.findBySbmUserId(getSystemUserId(request));
         if (!sandboxService.isSandboxMember(sandbox, user) && sandbox.getVisibility() == Visibility.PUBLIC ) {
             sandboxService.addMember(sandbox, user);
         }
@@ -119,7 +122,7 @@ public class SandboxController extends AbstractController {
     @Transactional
     public void deleteSandboxById(HttpServletRequest request, @PathVariable String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
-        User user = userService.findByLdapId(getSystemUserId(request));
+        User user = userService.findBySbmUserId(getSystemUserId(request));
         checkSystemUserCanModifySandboxAuthorization(request, sandbox, user);
 
         //delete sandbox invites
@@ -134,7 +137,7 @@ public class SandboxController extends AbstractController {
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT, produces ="application/json")
     @Transactional
     public void updateSandboxById(HttpServletRequest request, @PathVariable String id, @RequestBody final Sandbox sandbox) throws UnsupportedEncodingException {
-        User user = userService.findByLdapId(getSystemUserId(request));
+        User user = userService.findBySbmUserId(getSystemUserId(request));
         checkSystemUserCanModifySandboxAuthorization(request, sandbox, user);
         sandboxService.update(sandbox, user, oAuthService.getBearerToken(request));
     }
@@ -145,7 +148,7 @@ public class SandboxController extends AbstractController {
     List<Sandbox> getSandboxesByMember(HttpServletRequest request, @RequestParam(value = "userId") String userIdEncoded) throws UnsupportedEncodingException {
         String userId = java.net.URLDecoder.decode(userIdEncoded, StandardCharsets.UTF_8.name());
         checkUserAuthorization(request, userId);
-        User user = userService.findByLdapId(userId);
+        User user = userService.findBySbmUserId(userId);
         return sandboxService.getAllowedSandboxes(user);
     }
 
@@ -153,12 +156,12 @@ public class SandboxController extends AbstractController {
     @Transactional
     public void removeSandboxMember(HttpServletRequest request, @PathVariable String id, @RequestParam(value = "removeUserId") String userIdEncoded) throws UnsupportedEncodingException {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
-        User user = userService.findByLdapId(getSystemUserId(request));
+        User user = userService.findBySbmUserId(getSystemUserId(request));
 
         checkSystemUserCanModifySandboxAuthorization(request, sandbox, user);
         String removeUserId = java.net.URLDecoder.decode(userIdEncoded, StandardCharsets.UTF_8.name());
 
-        User removedUser = userService.findByLdapId(removeUserId);
+        User removedUser = userService.findBySbmUserId(removeUserId);
         sandboxService.removeMember(sandbox, removedUser, oAuthService.getBearerToken(request));
     }
 

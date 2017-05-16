@@ -7,9 +7,9 @@
     <div class="modal-form">
         <div class="form-group">
             <label class="detail-form-label">Display Name</label>
-            <label class="detail-form-value" style="width: 85%; border: none">{{user.ldapName}}</label>
+            <label class="detail-form-value" style="width: 85%; border: none">{{user.personaName}}</label>
             <!--<div class="detail-form-label-input">-->
-                <!--<input ng-model="user.ldapName" class="form-control"/>-->
+                <!--<input ng-model="user.personaName" class="form-control"/>-->
             <!--</div>-->
         </div>
         <div class="form-group">
@@ -17,7 +17,7 @@
             <div class="detail-form-input-with-validation">
                 <!--<input type="text" ng-model="persona.userId" id="userid" class="form-control red-popover" popover-is-open="showError" popover-trigger="none" popover-placement="right" uib-popover="{{invalidMessage}}" required/>-->
                 <!--<input type="text" id="sandboxid" value="@{{sandboxId}}" disabled/>-->
-                <input ng-model="user.ldapId" class="form-control red-popover" popover-enable="showError" popover-is-open="showError" popover-trigger="none" popover-placement="right" uib-popover="{{invalidMessage}}" required/>
+                <input ng-model="user.personaUserId" class="form-control red-popover" popover-enable="showError" popover-is-open="showError" popover-trigger="none" popover-placement="right" uib-popover="{{invalidMessage}}" required/>
                 <i ng-show="!isIdValid" class='detail-form-input-icon fa fa-close fa-lg'></i>
                 <label class="detail-form-description" style="font-size: 14px">Your persona userId will be <strong>{{tempUserId}}@{{sandboxId}}</strong></label>
             </div>

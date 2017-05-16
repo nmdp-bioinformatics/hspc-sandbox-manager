@@ -14,7 +14,7 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                 copyright: "© 2017 by Healthcare Services Platform Consortium",
                 showCert: true,
                 loginDoc: "",
-                defaultSchemaVersion : "3",
+                defaultSchemaVersion : "4",
                 defaultLaunchScenario: true,
                 sandboxSchemaVersions : [
                     {version: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", altName: "FHIR v1.0.2", canCreate: true},

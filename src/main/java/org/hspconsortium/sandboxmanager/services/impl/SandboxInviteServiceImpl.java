@@ -57,15 +57,25 @@ public class SandboxInviteServiceImpl implements SandboxInviteService {
     @Transactional
     public SandboxInvite create(final SandboxInvite sandboxInvite) throws IOException {
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxInvite.getSandbox().getSandboxId());
-        User invitedBy = userService.findByLdapId(sandboxInvite.getInvitedBy().getLdapId());
-        if (!sandboxService.isSandboxMember(sandbox, sandboxInvite.getInvitee())) {  // Don't invite a user already in the sandbox
+        User invitedBy = userService.findBySbmUserId(sandboxInvite.getInvitedBy().getSbmUserId());
+        User checkInvitee = null;
+        if (sandboxInvite.getInvitee().getSbmUserId() != null) {
+            checkInvitee = userService.findBySbmUserId(sandboxInvite.getInvitee().getSbmUserId());
+        }
+        if (checkInvitee != null && !sandboxService.isSandboxMember(sandbox, checkInvitee)) {  // Don't invite a user already in the sandbox
             sandboxInvite.setSandbox(sandbox);
             sandboxInvite.setInvitedBy(invitedBy);
             sandboxInvite.setInviteTimestamp(new Timestamp(new Date().getTime()));
             sandboxInvite.setStatus(InviteStatus.PENDING);
 
             // Invitee may not exist, create if needed
-            User invitee = userService.findByLdapId(sandboxInvite.getInvitee().getLdapId());
+            User invitee;
+            if (sandboxInvite.getInvitee().getSbmUserId() != null) {
+                invitee = userService.findBySbmUserId(sandboxInvite.getInvitee().getSbmUserId());
+            } else {
+                invitee = userService.findByUserEmail(sandboxInvite.getInvitee().getEmail());
+            }
+
             if (invitee == null) {
                 sandboxInvite.getInvitee().setCreatedTimestamp(new Timestamp(new Date().getTime()));
                 invitee = userService.save(sandboxInvite.getInvitee());

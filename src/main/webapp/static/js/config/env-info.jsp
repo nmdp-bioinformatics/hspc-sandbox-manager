@@ -9,7 +9,7 @@
             "baseServiceUrl_3": "<%= System.getProperty("baseServiceUrl_3") %>",
             "baseServiceUrl_4": "<%= System.getProperty("baseServiceUrl_4") %>",
             "oauthLogoutUrl": "<%= System.getProperty("oauthLogoutUrl") %>",
-            "oauthPersonaAuthenticationUrl": "<%= System.getProperty("oauthPersonaAuthenticationUrl") %>",
+            "oauthUserInfoUrl": "<%= System.getProperty("oauthUserInfoUrl") %>",
             "userManagementUrl": "<%= System.getProperty("userManagementUrl") %>",
             "sbmUrlHasContextPath": "<%= System.getProperty("sbmUrlHasContextPath") %>",
             "hostOrg": "<%= System.getProperty("hostOrg") %>",

@@ -63,8 +63,8 @@ public class DataManagerController extends AbstractController {
     public @ResponseBody
     List<SandboxImport> getSandboxImports(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId)  throws UnsupportedEncodingException {
 
-        User user = userService.findByLdapId(getSystemUserId(request));
-        checkUserAuthorization(request, user.getLdapId());
+        User user = userService.findBySbmUserId(getSystemUserId(request));
+        checkUserAuthorization(request, user.getSbmUserId());
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
         checkSandboxUserReadAuthorization(request, sandbox);
 
@@ -79,8 +79,8 @@ public class DataManagerController extends AbstractController {
                                                      @RequestParam(value = "fhirIdPrefix") String fhirIdPrefix,
                                                      @RequestParam(value = "endpoint") String encodedEndpoint)  throws UnsupportedEncodingException {
 
-        User user = userService.findByLdapId(getSystemUserId(request));
-        checkUserAuthorization(request, user.getLdapId());
+        User user = userService.findBySbmUserId(getSystemUserId(request));
+        checkUserAuthorization(request, user.getSbmUserId());
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
         checkUserSandboxRole(request, sandbox, Role.MANAGE_DATA);
         sandboxActivityLogService.sandboxImport(sandbox, user);
@@ -97,7 +97,7 @@ public class DataManagerController extends AbstractController {
     public @ResponseBody String reset(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId)  throws UnsupportedEncodingException {
 
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-        User user = userService.findByLdapId(getSystemUserId(request));
+        User user = userService.findBySbmUserId(getSystemUserId(request));
         checkSystemUserCanModifySandboxAuthorization(request, sandbox, user);
 
         sandboxActivityLogService.sandboxReset(sandbox, user);

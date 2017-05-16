@@ -12,4 +12,6 @@ public interface OAuthService {
 
     String getOAuthUserName(HttpServletRequest request);
 
+    String getOAuthUserEmail(HttpServletRequest request);
+
 }

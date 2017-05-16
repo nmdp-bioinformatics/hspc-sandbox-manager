@@ -95,7 +95,7 @@ public class SandboxActivityLogServiceImpl implements SandboxActivityLogService 
     public SandboxActivityLog sandboxUserRemoved(Sandbox sandbox, User user, User removedUser) {
         SandboxActivityLog sandboxActivityLog = createSandboxActivityLog(sandbox, user);
         sandboxActivityLog.setActivity(SandboxActivity.USER_REMOVED);
-        sandboxActivityLog.setAdditionalInfo(removedUser.getLdapId());
+        sandboxActivityLog.setAdditionalInfo(removedUser.getSbmUserId());
         return this.save(sandboxActivityLog);
     }
 
@@ -104,7 +104,7 @@ public class SandboxActivityLogServiceImpl implements SandboxActivityLogService 
     public SandboxActivityLog sandboxUserInvited(Sandbox sandbox, User user, User invitedUser) {
         SandboxActivityLog sandboxActivityLog = createSandboxActivityLog(sandbox, user);
         sandboxActivityLog.setActivity(SandboxActivity.USER_INVITED);
-        sandboxActivityLog.setAdditionalInfo(invitedUser.getLdapId());
+        sandboxActivityLog.setAdditionalInfo("User Email: " + invitedUser.getEmail());
         return this.save(sandboxActivityLog);
     }
 
@@ -149,7 +149,7 @@ public class SandboxActivityLogServiceImpl implements SandboxActivityLogService 
     public SandboxActivityLog systemUserCreated(Sandbox sandbox, User user) {
         SandboxActivityLog sandboxActivityLog = createSandboxActivityLog(sandbox, user);
         sandboxActivityLog.setActivity(SandboxActivity.USER_CREATED);
-        sandboxActivityLog.setAdditionalInfo("Ldap Id " + user.getLdapId());
+        sandboxActivityLog.setAdditionalInfo("SBM User Id " + user.getSbmUserId());
         return this.save(sandboxActivityLog);
     }
 
@@ -167,8 +167,8 @@ public class SandboxActivityLogServiceImpl implements SandboxActivityLogService 
     }
 
     @Override
-    public List<SandboxActivityLog> findByUserLdapId(String ldapId) {
-        return repository.findByUserLdapId(ldapId);
+    public List<SandboxActivityLog> findByUserSbmUserId(String sbmUserId) {
+        return repository.findByUserSbmUserId(sbmUserId);
     }
 
     @Override

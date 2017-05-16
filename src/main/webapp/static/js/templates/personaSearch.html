@@ -10,17 +10,21 @@
                             <th><div class="th-inner" table-header-inner>Display Name</div></th>
                             <th><div class="th-inner" table-header-inner>User Id</div></th>
                             <th><div class="th-inner" table-header-inner>FHIR Resource</div></th>
-                            <th><div class="th-inner" table-header-inner></div></th>
                         </tr>
                         </thead>
                         <tbody class="scrollContent">
-                        <tr ng-click="personaSelected(persona)"
+                        <tr ng-show="personaList.length > 0"
+                            ng-click="personaSelected(persona)"
                             ng-repeat="persona in personaList"
                             ng-class="{selected: selectedPersona === persona}" style="cursor: pointer;">
-                            <td><i class='fa' ng-class="persona.resource == 'Patient' ? 'fa-bed' : 'fa-user-md'"></i> {{persona.ldapName}}</td>
-                            <td>{{persona.ldapId}}</td>
+                            <td><i class='fa' ng-class="persona.resource == 'Patient' ? 'fa-bed' : 'fa-user-md'"></i> {{persona.personaName}}</td>
+                            <td>{{persona.personaUserId}}</td>
                             <td>{{persona.resourceUrl}}</td>
+                        <tr ng-show="personaList.length === 0">
+                            <td>No personas have been created yet</td>
                             <td></td>
+                            <td></td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>

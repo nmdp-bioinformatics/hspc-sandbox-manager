@@ -21,12 +21,13 @@
         "logoUri" : "https://apps.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png"
     },
     {
+        "isDefault" : true,
         "authClient": {
             "clientName" : "My Web App",
             "clientId": "my_web_app",
             "redirectUri" : "http://localhost:8000/fhir-app/"
         },
         "launchUri" : "http://localhost:8000/fhir-app/launch.html",
-        "logoUri" : "https://fhir.smarthealthit.org/images/apps/my.png"
+        "logoUri" : "https://sandbox.hspconsortium.org/static/images/my.png"
     }
 ]

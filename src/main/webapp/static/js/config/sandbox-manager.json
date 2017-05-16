@@ -5,10 +5,11 @@
     "baseServiceUrl_3": "http://localhost:8080/hspc-reference-api-v3/",
     "baseServiceUrl_4": "http://localhost:8080/hspc-reference-api-v4/",
     "oauthLogoutUrl": "http://localhost:8080/hspc-reference-authorization/logout",
-    "oauthPersonaAuthenticationUrl": "http://localhost:8080/hspc-reference-authorization/static/auth/index.html",
+    "oauthUserInfoUrl": "http://localhost:8080/hspc-reference-authorization/userinfo",
     "sbmUrlHasContextPath": "true",
     "userManagementUrl": "https://account.hspconsortium.org",
     "reservedEndpoints": ["hspc", "manage", "health", "dashboard", "admin", "rest", "static", "open", "stu3", "data", "test", "error", "invalid", "1", "2", "3", "4", "5", "6"],
+    "hspcAccountCookieName": "hspc-token",
     "personaCookieName": "hspc-persona-token",
     "personaCookieTimeout": 180000,
     "personaCookieDomain": "localhost"
