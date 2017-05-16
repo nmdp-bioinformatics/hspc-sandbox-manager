@@ -2028,7 +2028,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
             $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
-                $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart");
+                $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
+                $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
         });
@@ -2040,7 +2041,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
             $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
-                $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart");
+                $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
+                $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
         });

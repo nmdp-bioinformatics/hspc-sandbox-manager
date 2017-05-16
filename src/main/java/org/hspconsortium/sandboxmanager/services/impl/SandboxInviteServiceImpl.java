@@ -62,7 +62,7 @@ public class SandboxInviteServiceImpl implements SandboxInviteService {
         if (sandboxInvite.getInvitee().getSbmUserId() != null) {
             checkInvitee = userService.findBySbmUserId(sandboxInvite.getInvitee().getSbmUserId());
         }
-        if (checkInvitee != null && !sandboxService.isSandboxMember(sandbox, checkInvitee)) {  // Don't invite a user already in the sandbox
+        if (checkInvitee == null || !sandboxService.isSandboxMember(sandbox, checkInvitee)) {  // Don't invite a user already in the sandbox
             sandboxInvite.setSandbox(sandbox);
             sandboxInvite.setInvitedBy(invitedBy);
             sandboxInvite.setInviteTimestamp(new Timestamp(new Date().getTime()));
@@ -108,6 +108,11 @@ public class SandboxInviteServiceImpl implements SandboxInviteService {
     @Override
     public List<SandboxInvite> findInvitesByInviteeIdAndSandboxId(final String inviteeId, final String sandboxId) {
         return repository.findInvitesByInviteeIdAndSandboxId(inviteeId, sandboxId);
+    }
+
+    @Override
+    public List<SandboxInvite> findInvitesByInviteeEmailAndSandboxId(final String email, final String sandboxId) {
+        return repository.findInvitesByInviteeIdAndSandboxId(email, sandboxId);
     }
 
     @Override

@@ -24,6 +24,8 @@ public interface SandboxInviteService {
 
     List<SandboxInvite> findInvitesByInviteeIdAndSandboxId(final String inviteeId, final String sandboxId);
 
+    List<SandboxInvite> findInvitesByInviteeEmailAndSandboxId(final String email, final String sandboxId);
+
     List<SandboxInvite> findInvitesByInviteeIdAndStatus(final String inviteeId, final InviteStatus status);
 
     List<SandboxInvite> findInvitesBySandboxIdAndStatus(final String sandboxId, final InviteStatus status);

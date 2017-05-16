@@ -132,7 +132,8 @@ public class UserController extends AbstractController {
             }
             user.setSystemRoles(systemRoles);
             userService.save(user);
-        } else if (user.getName() == null || user.getName().isEmpty() || !user.getName().equalsIgnoreCase(oauthUsername)) {
+        } else if (user.getName() == null || user.getName().isEmpty() || !user.getName().equalsIgnoreCase(oauthUsername) ||
+                user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().equalsIgnoreCase(oauthUserEmail)) {
 
             Set<SystemRole> curSystemRoles = user.getSystemRoles();
             if (curSystemRoles.size() == 0) {

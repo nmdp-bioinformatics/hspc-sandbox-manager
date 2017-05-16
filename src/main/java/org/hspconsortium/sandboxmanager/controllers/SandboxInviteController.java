@@ -68,6 +68,9 @@ public class SandboxInviteController extends AbstractController {
 
         // Check for an existing invite for this invitee
         List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesByInviteeIdAndSandboxId(sandboxInvite.getInvitee().getSbmUserId(), sandboxInvite.getSandbox().getSandboxId());
+        if (sandboxInvites.size() == 0) {
+            sandboxInvites = sandboxInviteService.findInvitesByInviteeEmailAndSandboxId(sandboxInvite.getInvitee().getEmail(), sandboxInvite.getSandbox().getSandboxId());
+        }
 
         // Resend
         if (sandboxInvites.size() > 0 && !sandboxService.isSandboxMember(sandbox, sandboxInvite.getInvitee())) {
@@ -149,13 +152,6 @@ public class SandboxInviteController extends AbstractController {
             User invitee = userService.findBySbmUserId(sandboxInvite.getInvitee().getSbmUserId());
             checkUserAuthorization(request, invitee.getSbmUserId());
 
-            if (invitee.getName() == null || invitee.getName().isEmpty() || invitee.getName().equalsIgnoreCase(oAuthService.getOAuthUserName(request)) ||
-                    invitee.getEmail() == null || invitee.getEmail().isEmpty() || invitee.getEmail().equalsIgnoreCase(oAuthService.getOAuthUserEmail(request))) {
-                invitee.setName(oAuthService.getOAuthUserName(request));
-                invitee.setName(oAuthService.getOAuthUserEmail(request));
-                userService.save(invitee);
-            }
-
             if (status == InviteStatus.REJECTED) {
                 sandboxActivityLogService.sandboxUserInviteRejected(sandboxInvite.getSandbox(), sandboxInvite.getInvitee());
                 sandboxInvite.setStatus(InviteStatus.REJECTED);
@@ -164,7 +160,6 @@ public class SandboxInviteController extends AbstractController {
             }
 
             Sandbox sandbox = sandboxService.findBySandboxId(sandboxInvite.getSandbox().getSandboxId());
-
             sandboxService.addMember(sandbox, invitee);
             sandboxActivityLogService.sandboxUserInviteAccepted(sandbox, invitee);
 

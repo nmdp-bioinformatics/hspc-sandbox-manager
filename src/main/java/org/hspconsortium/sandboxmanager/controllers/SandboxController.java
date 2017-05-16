@@ -21,7 +21,10 @@
 package org.hspconsortium.sandboxmanager.controllers;
 
 import org.hspconsortium.sandboxmanager.model.*;
-import org.hspconsortium.sandboxmanager.services.*;
+import org.hspconsortium.sandboxmanager.services.OAuthService;
+import org.hspconsortium.sandboxmanager.services.SandboxInviteService;
+import org.hspconsortium.sandboxmanager.services.SandboxService;
+import org.hspconsortium.sandboxmanager.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -43,17 +44,14 @@ public class SandboxController extends AbstractController {
     private final SandboxService sandboxService;
     private final UserService userService;
     private final SandboxInviteService sandboxInviteService;
-    private final SandboxActivityLogService sandboxActivityLogService;
 
     @Inject
     public SandboxController(final SandboxService sandboxService, final UserService userService,
-                             final SandboxInviteService sandboxInviteService, final OAuthService oAuthService,
-                             final SandboxActivityLogService sandboxActivityLogService) {
+                             final SandboxInviteService sandboxInviteService, final OAuthService oAuthService) {
         super(oAuthService);
         this.sandboxService = sandboxService;
         this.userService = userService;
         this.sandboxInviteService = sandboxInviteService;
-        this.sandboxActivityLogService = sandboxActivityLogService;
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces ="application/json")
@@ -68,21 +66,6 @@ public class SandboxController extends AbstractController {
         LOGGER.info("Creating sandbox: " + sandbox.getName());
         checkCreatedByIsCurrentUserAuthorization(request, sandbox.getCreatedBy().getSbmUserId());
         User user = userService.findBySbmUserId(sandbox.getCreatedBy().getSbmUserId());
-
-        // Create User if needed or set User name
-//        if (user == null) {
-//            sandbox.getCreatedBy().setCreatedTimestamp(new Timestamp(new Date().getTime()));
-//            sandbox.getCreatedBy().setName(oAuthService.getOAuthUserName(request));
-//            sandbox.getCreatedBy().setName(oAuthService.getOAuthUserEmail(request));
-//            user = userService.save(sandbox.getCreatedBy());
-//            sandboxActivityLogService.systemUserCreated(null, user);
-//        } else if (user.getName() == null || user.getName().isEmpty() || !user.getName().equalsIgnoreCase(oAuthService.getOAuthUserName(request)) ||
-//                user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().equalsIgnoreCase(oAuthService.getOAuthUserEmail(request))) {
-//            user.setName(oAuthService.getOAuthUserName(request));
-//            user.setName(oAuthService.getOAuthUserEmail(request));
-//            user = userService.save(user);
-//        }
-
         checkUserSystemRole(user, SystemRole.CREATE_SANDBOX);
         return sandboxService.create(sandbox, user, oAuthService.getBearerToken(request));
     }
