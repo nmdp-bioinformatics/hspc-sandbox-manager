@@ -19,7 +19,7 @@ import java.sql.Timestamp;
                 query="SELECT c FROM SandboxInvite c WHERE c.invitee.sbmUserId = :inviteeId and c.sandbox.sandboxId = :sandboxId"),
         // Used to retrieve an existing sandbox invite to change it's status ex. PENDING to REVOKED
         @NamedQuery(name="SandboxInvite.findInvitesByInviteeEmailAndSandboxId",
-                query="SELECT c FROM SandboxInvite c WHERE c.invitee.email = :inviteeId and c.sandbox.sandboxId = :sandboxId"),
+                query="SELECT c FROM SandboxInvite c WHERE c.invitee.email = :inviteeEmail and c.sandbox.sandboxId = :sandboxId"),
         // Used to retrieve all sandbox invites for an invitee to show a user their PENDING (or other status) sandbox invites
         @NamedQuery(name="SandboxInvite.findInvitesByInviteeIdAndStatus",
                 query="SELECT c FROM SandboxInvite c WHERE c.invitee.sbmUserId = :inviteeId and c.status = :status"),

@@ -11,7 +11,7 @@ public interface SandboxInviteRepository extends CrudRepository<SandboxInvite, I
     public List<SandboxInvite> findInvitesByInviteeId(@Param("inviteeId") String inviteeId);
     public List<SandboxInvite> findInvitesBySandboxId(@Param("sandboxId") String sandboxId);
     public List<SandboxInvite> findInvitesByInviteeIdAndSandboxId(@Param("inviteeId") String inviteeId, @Param("sandboxId") String sandboxId);
-    public List<SandboxInvite> findInvitesByInviteeEmailAndSandboxId(@Param("email") String email, @Param("sandboxId") String sandboxId);
+    public List<SandboxInvite> findInvitesByInviteeEmailAndSandboxId(@Param("inviteeEmail") String inviteeEmail, @Param("sandboxId") String sandboxId);
     public List<SandboxInvite> findInvitesByInviteeIdAndStatus(@Param("inviteeId") String inviteeId, @Param("status") InviteStatus status);
     public List<SandboxInvite> findInvitesBySandboxIdAndStatus(@Param("sandboxId") String sandboxId, @Param("status") InviteStatus status);
 }

@@ -1060,6 +1060,7 @@ span.title,
 }
 
 .settings-content {
+    overflow: hidden;
     width:200px;
 }
 

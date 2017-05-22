@@ -75,6 +75,7 @@
                                 <span ng-bind="patient.id"></span>
                             </td>
                             <td class="name">
+                                <i ng-show="showing.noPatientContext" ng-click="setPatient(patient)" class="btn-image fa fa-chevron-right fa-lg"></i>
                                 <span ng-bind="patient | nameFamilyGiven"></span>
                             </td>
                             <td class="gender" ng-bind-html="patient.gender | capFilter">

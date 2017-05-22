@@ -17,7 +17,8 @@
                             ng-click="personaSelected(persona)"
                             ng-repeat="persona in personaList"
                             ng-class="{selected: selectedPersona === persona}" style="cursor: pointer;">
-                            <td><i class='fa' ng-class="persona.resource == 'Patient' ? 'fa-bed' : 'fa-user-md'"></i> {{persona.personaName}}</td>
+                            <td><i ng-show="showing.selectForScenario" ng-click="setPersona(persona)" class="btn-image fa fa-chevron-right fa-lg"></i>
+                            <i class='fa' ng-class="persona.resource == 'Patient' ? 'fa-bed' : 'fa-user-md'"></i> {{persona.personaName}}</td>
                             <td>{{persona.personaUserId}}</td>
                             <td>{{persona.resourceUrl}}</td>
                         <tr ng-show="personaList.length === 0">

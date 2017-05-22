@@ -387,13 +387,12 @@ angular.module('sandManApp.controllers', []).controller('navController',[
 
         $rootScope.$on('user-loaded', function(){
             if (userServices.sandboxManagerUser() !== undefined && userServices.sandboxManagerUser() !== ""){
+                getSandboxInvites();
                 if ($scope.isSystemAdmin()) {
                     $rootScope.$digest();
                 }
             }
         });
-
-        getSandboxInvites();
 
         $scope.showInvitations = function (){
             return branded.showEmptyInviteList || $scope.sandboxInvites.length > 0;
@@ -1459,7 +1458,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         };
 
     }).controller("PatientViewController",
-    function($scope){
+    function($scope, $rootScope){
 
         $scope.showing = {patientDetail: false,
             noPatientContext: true,
@@ -1480,6 +1479,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             chartConfig: {}
         };
 
+        $scope.setPatient = function( patient){
+            $rootScope.$emit('set-patient', patient);
+        };
+        
     }).controller("PatientDetailController",
     function($scope, $rootScope, $uibModal, $state, $stateParams, sandboxManagement, pdmService, personaServices, $filter, launchApp){
 
@@ -1492,6 +1495,10 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         if ($state.current.name === 'patient-view') {
             $scope.showing.selectForScenario = true;
         }
+
+        $rootScope.$on('set-patient', function(e, p){
+            $scope.setPatient(p);
+        });
 
         $scope.setPatient = function(p){
 

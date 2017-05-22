@@ -107,6 +107,9 @@ public class UserController extends AbstractController {
         User user = userService.findBySbmUserId(sbmUserId);
         if (user == null) {
             user = userService.findByUserEmail(oauthUserEmail);
+            if (user != null) {
+                user.setSbmUserId(sbmUserId);
+            }
         }
         // Create User if needed (if it's the first login to the system)
         if (user == null) {
