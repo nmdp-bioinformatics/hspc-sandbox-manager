@@ -42,6 +42,9 @@ public class EnvInfoController {
     @Value("${hostOrg:hspc}")
     String hostOrg;
 
+    @Value("${oauthUserInfoUrl:}")
+    String oauthUserInfoUrl;
+
     @Value("${personaCookieDomain:}")
     String personaCookieDomain;
 
@@ -83,6 +86,9 @@ public class EnvInfoController {
         stringBuffer.append("\",");
         stringBuffer.append("\"hostOrg\": \"");
         stringBuffer.append(hostOrg);
+        stringBuffer.append("\",");
+        stringBuffer.append("\"oauthUserInfoUrl\": \"");
+        stringBuffer.append(oauthUserInfoUrl);
         stringBuffer.append("\",");
         stringBuffer.append("\"personaCookieDomain\": \"");
         stringBuffer.append(personaCookieDomain);
