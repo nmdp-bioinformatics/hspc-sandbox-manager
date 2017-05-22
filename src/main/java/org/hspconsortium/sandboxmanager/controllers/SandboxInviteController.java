@@ -167,6 +167,7 @@ public class SandboxInviteController extends AbstractController {
             sandboxInviteService.save(sandboxInvite);
         } else if ((sandboxInvite.getStatus() == InviteStatus.PENDING || sandboxInvite.getStatus() == InviteStatus.REJECTED) && status == InviteStatus.REVOKED ) {
 
+            // Revoking Invite
             checkUserSandboxRole(request, sandboxInvite.getSandbox(), Role.MANAGE_USERS);
             User user = userService.findBySbmUserId(getSystemUserId(request));
             sandboxActivityLogService.sandboxUserInviteRevoked(sandboxInvite.getSandbox(), user);

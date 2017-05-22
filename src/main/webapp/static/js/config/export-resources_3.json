@@ -6,7 +6,6 @@
     "CarePlan",
     "CareTeam",
     "Condition",
-    "DiagnosticRequest",
     "DocumentReference",
     "Encounter",
     "FamilyMemberHistory",

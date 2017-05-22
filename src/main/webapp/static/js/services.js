@@ -1254,10 +1254,10 @@ angular.module('sandManApp.services', [])
                             xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
                         }
                     }).done(function(result){
-                        //TODO change to work with FireBase ID and email
+                        //TODO change to work with FireBase email
                             oauthUser = {
-                                sbmUserId: result.sub.toLowerCase(),
-                                email: result.sub.toLowerCase(),
+                                sbmUserId: result.sub,
+                                email: result.preferred_username,
                                 name: result.name
                             };
                         deferred.resolve(oauthUser);
@@ -1687,8 +1687,6 @@ angular.module('sandManApp.services', [])
                     sbmUserId: userServices.getOAuthUser().sbmUserId
                 },
                 invitee: {
-                    //TODO: change sbmUserId to FireBase ID
-                    sbmUserId: userEmail,
                     email: userEmail
                 },
                 sandbox: sandboxManagement.getSandbox()

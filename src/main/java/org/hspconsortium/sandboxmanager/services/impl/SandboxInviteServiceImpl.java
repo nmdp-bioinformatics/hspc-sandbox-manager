@@ -111,8 +111,8 @@ public class SandboxInviteServiceImpl implements SandboxInviteService {
     }
 
     @Override
-    public List<SandboxInvite> findInvitesByInviteeEmailAndSandboxId(final String email, final String sandboxId) {
-        return repository.findInvitesByInviteeIdAndSandboxId(email, sandboxId);
+    public List<SandboxInvite> findInvitesByInviteeEmailAndSandboxId(final String inviteeEmail, final String sandboxId) {
+        return repository.findInvitesByInviteeEmailAndSandboxId(inviteeEmail, sandboxId);
     }
 
     @Override
