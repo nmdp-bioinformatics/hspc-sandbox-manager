@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('sandManApp.services', [])
-    .factory('oauth2', function($rootScope, $location, appsSettings, tools, personaCookieService) {
+    .factory('oauth2', function($rootScope, $location, appsSettings, tools, cookieService) {
 
         var authorizing = false;
 
@@ -13,7 +13,7 @@ angular.module('sandManApp.services', [])
                 // If the persona auth was cut short, it's possible that the persona cookie remains in the browser. Since
                 // the sandbox manager should never be accessed as persona user, we can use this as a fail-safe to
                 // delete any errant persona auth cookies.
-                personaCookieService.removePersonaCookieIfExists(s);
+                cookieService.removePersonaCookieIfExists(s);
 
                 // window.location.origin does not exist in some non-webkit browsers
                 if (!window.location.origin) {
@@ -164,10 +164,6 @@ angular.module('sandManApp.services', [])
                 if (params.code){
                     delete sessionStorage.tokenResponse;
                     FHIR.oauth2.ready(params, function(newSmart){
-                        // if (newSmart.state && newSmart.state.from !== undefined){
-                        //     $location.url(newSmart.state.from);
-                        // }
-                        sessionStorage.setItem("hspcAuthorized", true);
                         fhirClient = newSmart;
                         that.queryFhirVersion().then(function(){
                             $rootScope.$emit('signed-in');
@@ -977,7 +973,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox?userId=" + encodeURIComponent(userServices.getOAuthUser().ldapId),
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox?userId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId),
                     type: 'GET',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -998,11 +994,11 @@ angular.module('sandManApp.services', [])
                 });
                 return deferred;
             },
-            removeUserFromSandboxByUserId: function(ldapId) {
+            removeUserFromSandboxByUserId: function(sbmUserId) {
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "?removeUserId=" + encodeURIComponent(ldapId),
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "?removeUserId=" + encodeURIComponent(sbmUserId),
                     type: 'PUT',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -1055,12 +1051,12 @@ angular.module('sandManApp.services', [])
                 });
                 return deferred;
             },
-            sandboxLogin: function(ldapId) {
+            sandboxLogin: function(sbmUserId) {
                 var that = this;
                 var deferred = $.Deferred();
                 // Record the sandbox login
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "/login" + "?userId=" + encodeURIComponent(ldapId),
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "/login" + "?userId=" + encodeURIComponent(sbmUserId),
                     type: 'POST',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -1085,11 +1081,11 @@ angular.module('sandManApp.services', [])
                 });
                 return deferred;
             },
-            acceptTermsOfUse: function(ldapId, termsId) {
+            acceptTermsOfUse: function(sbmUserId, termsId) {
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/user/acceptterms?ldapId=" + encodeURIComponent(ldapId) + "&termsId=" + termsId,
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/user/acceptterms?sbmUserId=" + encodeURIComponent(sbmUserId) + "&termsId=" + termsId,
                     type: 'POST',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -1249,32 +1245,35 @@ angular.module('sandManApp.services', [])
                 if (oauthUser !== undefined) {
                     deferred.resolve(oauthUser);
                 } else {
-                    var userInfoEndpoint = fhirApiServices.fhirClient().state.provider.oauth2.authorize_uri.replace("authorize", "userinfo");
+                    appsSettings.getSettings().then(function(settings){
                     $.ajax({
-                        url: userInfoEndpoint,
+                        url: settings.oauthUserInfoUrl,
                         type: 'GET',
                         contentType: "application/json",
                         beforeSend : function( xhr ) {
                             xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
                         }
                     }).done(function(result){
+                        //TODO change to work with FireBase ID and email
                             oauthUser = {
-                                ldapId: result.sub.toLowerCase(),
+                                sbmUserId: result.sub.toLowerCase(),
+                                email: result.sub.toLowerCase(),
                                 name: result.name
                             };
-                            deferred.resolve(oauthUser);
+                        deferred.resolve(oauthUser);
                         }).fail(function(){
                         });
+                    });
                 }
                 return deferred;
             },
-            getSandboxManagerUser: function(ldapId) {
+            getSandboxManagerUser: function(sbmUserId) {
                 var deferred = $.Deferred();
                 if (sandboxManagerUser !== undefined) {
                     deferred.resolve(sandboxManagerUser);
                 } else {
                     $.ajax({
-                        url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/user?ldapId=" + ldapId,
+                        url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/user?sbmUserId=" + encodeURIComponent(sbmUserId),
                         type: 'GET',
                         contentType: "application/json",
                         beforeSend: function (xhr) {
@@ -1282,6 +1281,7 @@ angular.module('sandManApp.services', [])
                         }
                     }).done(function (userResult) {
                         sandboxManagerUser = userResult;
+                        $rootScope.$emit('user-loaded');
                         deferred.resolve(userResult);
                     }).fail(function (error) {
                         deferred.reject(error);
@@ -1289,6 +1289,7 @@ angular.module('sandManApp.services', [])
                 }
                 return deferred;
             },
+            //TODO: start using this again and point to FireBase
             userSettings: function() {
                 var that = this;
                 appsSettings.getSettings().then(function(settings){
@@ -1296,7 +1297,7 @@ angular.module('sandManApp.services', [])
                         url: settings.userManagementUrl,
                         type: 'GET',
                         beforeSend : function( xhr ) {
-                            xhr.setRequestHeader( 'c8381465-a7f8-4ecc-958d-ec296d6e8671', that.getOAuthUser().ldapId);
+                            xhr.setRequestHeader( 'c8381465-a7f8-4ecc-958d-ec296d6e8671', that.getOAuthUser().sbmUserId);
                             xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
                         }
 
@@ -1318,7 +1319,7 @@ angular.module('sandManApp.services', [])
             hasSandboxRole: function(roles, role) {
                 var hasRole = false;
                 roles.forEach(function(userRole){
-                    if (sandboxManagerUser != undefined && userRole.user.ldapId.toLocaleLowerCase() === sandboxManagerUser.ldapId.toLocaleLowerCase()
+                    if (sandboxManagerUser != undefined && userRole.user.sbmUserId.toLocaleLowerCase() === sandboxManagerUser.sbmUserId.toLocaleLowerCase()
                         && userRole.role === role) {
                         hasRole = true;
                     }
@@ -1327,7 +1328,7 @@ angular.module('sandManApp.services', [])
             },
             canModify: function(item, sandbox) {
                 if (item.visibility === "PRIVATE") {
-                    return item.createdBy.ldapId.toLocaleLowerCase() === this.sandboxManagerUser().ldapId.toLocaleLowerCase();
+                    return item.createdBy.sbmUserId.toLocaleLowerCase() === this.sandboxManagerUser().sbmUserId.toLocaleLowerCase();
                 } else { // PUBLIC Item
                     if (sandbox.visibility === "PRIVATE") {
                         return !this.hasSandboxRole(item.sandbox.userRoles, "READ_ONLY");
@@ -1360,8 +1361,8 @@ angular.module('sandManApp.services', [])
     var personaBuilder = {
         fhirId: '',
         fhirName: '',
-        ldapId: '',
-        ldapName: '',
+        personaUserId: '',
+        personaName: '',
         resource: '',
         resourceUrl: '',
         password: '',
@@ -1379,8 +1380,8 @@ angular.module('sandManApp.services', [])
             return personaBuilder = {
                 fhirId: '',
                 fhirName: '',
-                ldapId: '',
-                ldapName: '',
+                personaUserId: '',
+                personaName: '',
                 resource: '',
                 resourceUrl: '',
                 password: '',
@@ -1678,15 +1679,17 @@ angular.module('sandManApp.services', [])
                                              appsSettings, sandboxManagement, notification, errorService) {
 
     return {
-        createSandboxInvite: function(ldapId){
+        createSandboxInvite: function(userEmail){
             var deferred = $.Deferred();
 
             var sandboxInvite = {
                 invitedBy: {
-                    ldapId: userServices.getOAuthUser().ldapId
+                    sbmUserId: userServices.getOAuthUser().sbmUserId
                 },
                 invitee: {
-                    ldapId: ldapId
+                    //TODO: change sbmUserId to FireBase ID
+                    sbmUserId: userEmail,
+                    email: userEmail
                 },
                 sandbox: sandboxManagement.getSandbox()
             };
@@ -1708,11 +1711,11 @@ angular.module('sandManApp.services', [])
             });
             return deferred;
         },
-        getSandboxInvitesByLdapId: function(status){
+        getSandboxInvitesBySbmUserId: function(status){
             var deferred = $.Deferred();
             var that = this;
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite?ldapId=" + encodeURIComponent(userServices.getOAuthUser().ldapId) +
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite?sbmUserId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId) +
                     "&status=" + status,
                 type: 'GET',
                 beforeSend : function( xhr ) {
@@ -1775,7 +1778,7 @@ angular.module('sandManApp.services', [])
             }
         };
 
-    }).factory('launchApp', function($rootScope, fhirApiServices, pdmService, appsService, appsSettings, random, $http, $log, personaCookieService) {
+    }).factory('launchApp', function($rootScope, fhirApiServices, pdmService, appsService, appsSettings, random, $http, $log, cookieService) {
 
         var settings;
         var appWindow;
@@ -1819,7 +1822,7 @@ angular.module('sandManApp.services', [])
                 window.localStorage[key] = "requested-launch";
                 // var appWindow;
                     // = window.open('launch.html' + "" +
-                    // '?username=' + encodeURIComponent(userPersona.ldapId) +
+                    // '?username=' + encodeURIComponent(userPersona.sbmUserId) +
                     // '&password=' + encodeURIComponent(userPersona.password) +
                     // '&redirect=' + encodeURIComponent(window.location.href + '/launch.html?key='+key ), '_blank');
 
@@ -1838,10 +1841,10 @@ angular.module('sandManApp.services', [])
                 registerAppContext(app, params, key);
                 if(userPersona !== null && userPersona !== undefined && userPersona) {
                     $http.post(appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona/authenticate", {
-                        username: userPersona.ldapId,
+                        username: userPersona.personaUserId,
                         password: userPersona.password
                     }).then(function(response){
-                        personaCookieService.addPersonaCookie(response.data.jwt);
+                        cookieService.addPersonaCookie(response.data.jwt);
                     }).catch(function(error){
                         $log.error(error);
                         appWindow.close();
@@ -2315,7 +2318,7 @@ angular.module('sandManApp.services', [])
                     settings.baseServiceUrl_3 = envInfo.baseServiceUrl_3 || settings.baseServiceUrl_3;
                     settings.baseServiceUrl_4 = envInfo.baseServiceUrl_4 || settings.baseServiceUrl_4;
                     settings.oauthLogoutUrl = envInfo.oauthLogoutUrl || settings.oauthLogoutUrl;
-                    settings.oauthPersonaAuthenticationUrl = envInfo.oauthPersonaAuthenticationUrl || settings.oauthPersonaAuthenticationUrl;
+                    settings.oauthUserInfoUrl = envInfo.oauthUserInfoUrl || settings.oauthUserInfoUrl;
                     settings.userManagementUrl = envInfo.userManagementUrl || settings.userManagementUrl;
                     settings.sbmUrlHasContextPath = envInfo.sbmUrlHasContextPath || settings.sbmUrlHasContextPath;
                     settings.personaCookieDomain = envInfo.personaCookieDomain || settings.personaCookieDomain;
@@ -2339,7 +2342,7 @@ angular.module('sandManApp.services', [])
             return settings;
         }
     };
-}]).factory('personaCookieService', function($cookies, appsSettings, $log){
+}]).factory('cookieService', function($cookies, appsSettings, $log){
     return {
         addPersonaCookie: function(cookieJwtValue){
             appsSettings.getSettings().then(function(settings){
@@ -2357,6 +2360,9 @@ angular.module('sandManApp.services', [])
                         path: "/",
                         domain: settings.personaCookieDomain
                     });
+        },
+        getHSPCAccountCookie: function(settings){
+            return $cookies.get(settings.hspcAccountCookieName);
         }
     }
 });

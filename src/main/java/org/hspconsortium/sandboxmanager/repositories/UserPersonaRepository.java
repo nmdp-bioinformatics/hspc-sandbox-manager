@@ -8,9 +8,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface UserPersonaRepository extends CrudRepository<UserPersona, Integer> {
-    public UserPersona findByLdapId(@Param("ldapId") String ldapId);
+    public UserPersona findByPersonaUserId(@Param("personaUserId") String personaUserId);
 
-    public UserPersona findByLdapIdAndSandboxId(@Param("ldapId") String ldapId,
+    public UserPersona findByPersonaUserIdAndSandboxId(@Param("personaUserId") String personaUserId,
                                                 @Param("sandboxId") String sandboxId);
 
     public List<UserPersona> findBySandboxId(@Param("sandboxId") String sandboxId);

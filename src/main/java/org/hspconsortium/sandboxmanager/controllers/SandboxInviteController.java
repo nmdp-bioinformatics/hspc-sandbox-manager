@@ -67,7 +67,10 @@ public class SandboxInviteController extends AbstractController {
         checkUserSandboxRole(request, sandbox, Role.MANAGE_USERS);
 
         // Check for an existing invite for this invitee
-        List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesByInviteeIdAndSandboxId(sandboxInvite.getInvitee().getLdapId(), sandboxInvite.getSandbox().getSandboxId());
+        List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesByInviteeIdAndSandboxId(sandboxInvite.getInvitee().getSbmUserId(), sandboxInvite.getSandbox().getSandboxId());
+        if (sandboxInvites.size() == 0) {
+            sandboxInvites = sandboxInviteService.findInvitesByInviteeEmailAndSandboxId(sandboxInvite.getInvitee().getEmail(), sandboxInvite.getSandbox().getSandboxId());
+        }
 
         // Resend
         if (sandboxInvites.size() > 0 && !sandboxService.isSandboxMember(sandbox, sandboxInvite.getInvitee())) {
@@ -76,31 +79,36 @@ public class SandboxInviteController extends AbstractController {
             sandboxInviteService.save(existingSandboxInvite);
 
             // Send an Email
-            User inviter = userService.findByLdapId(sandboxInvite.getInvitedBy().getLdapId());
-            User invitee = userService.findByLdapId(sandboxInvite.getInvitee().getLdapId());
+            User inviter = userService.findBySbmUserId(sandboxInvite.getInvitedBy().getSbmUserId());
+            User invitee;
+            if (sandboxInvite.getInvitee().getSbmUserId() != null) {
+                invitee = userService.findBySbmUserId(sandboxInvite.getInvitee().getSbmUserId());
+            } else {
+                invitee = userService.findByUserEmail(sandboxInvite.getInvitee().getEmail());
+            }
             emailService.sendEmail(inviter, invitee, sandboxInvite.getSandbox());
         } else if (sandboxInvites.size() == 0) { // Create
             // Make sure the inviter is the authenticated user
-            User invitedBy = userService.findByLdapId(sandboxInvite.getInvitedBy().getLdapId());
-            checkUserAuthorization(request, invitedBy.getLdapId());
+            User invitedBy = userService.findBySbmUserId(sandboxInvite.getInvitedBy().getSbmUserId());
+            checkUserAuthorization(request, invitedBy.getSbmUserId());
             sandboxInviteService.create(sandboxInvite);
         }
     }
 
-    @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"ldapId", "status"})
+    @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"sbmUserId", "status"})
     public @ResponseBody
     @SuppressWarnings("unchecked")
-    List<SandboxInvite> getSandboxInvitesByInvitee(HttpServletRequest request, @RequestParam(value = "ldapId") String ldapIdEncoded,
+    List<SandboxInvite> getSandboxInvitesByInvitee(HttpServletRequest request, @RequestParam(value = "sbmUserId") String sbmUserIdEncoded,
             @RequestParam(value = "status") InviteStatus status) throws UnsupportedEncodingException {
-        String ldapId = java.net.URLDecoder.decode(ldapIdEncoded, StandardCharsets.UTF_8.name());
-        checkUserAuthorization(request, ldapId);
+        String sbmUserId = java.net.URLDecoder.decode(sbmUserIdEncoded, StandardCharsets.UTF_8.name());
+        checkUserAuthorization(request, sbmUserId);
         if (status == null) {
-            List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesByInviteeId(ldapId);
+            List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesByInviteeId(sbmUserId);
             if (sandboxInvites != null) {
                 return sandboxInvites;
             }
         } else {
-            List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesByInviteeIdAndStatus(ldapId, status);
+            List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesByInviteeIdAndStatus(sbmUserId, status);
             if (sandboxInvites != null) {
                 return sandboxInvites;
             }
@@ -141,13 +149,8 @@ public class SandboxInviteController extends AbstractController {
         if (sandboxInvite.getStatus() == InviteStatus.PENDING && (status == InviteStatus.ACCEPTED || status == InviteStatus.REJECTED)) {
 
             // Only invitee can accept or reject
-            User invitee = userService.findByLdapId(sandboxInvite.getInvitee().getLdapId());
-            checkUserAuthorization(request, invitee.getLdapId());
-
-            if (invitee.getName() == null || invitee.getName().isEmpty()) {
-                invitee.setName(oAuthService.getOAuthUserName(request));
-                userService.save(invitee);
-            }
+            User invitee = userService.findBySbmUserId(sandboxInvite.getInvitee().getSbmUserId());
+            checkUserAuthorization(request, invitee.getSbmUserId());
 
             if (status == InviteStatus.REJECTED) {
                 sandboxActivityLogService.sandboxUserInviteRejected(sandboxInvite.getSandbox(), sandboxInvite.getInvitee());
@@ -157,7 +160,6 @@ public class SandboxInviteController extends AbstractController {
             }
 
             Sandbox sandbox = sandboxService.findBySandboxId(sandboxInvite.getSandbox().getSandboxId());
-
             sandboxService.addMember(sandbox, invitee);
             sandboxActivityLogService.sandboxUserInviteAccepted(sandbox, invitee);
 
@@ -166,7 +168,7 @@ public class SandboxInviteController extends AbstractController {
         } else if ((sandboxInvite.getStatus() == InviteStatus.PENDING || sandboxInvite.getStatus() == InviteStatus.REJECTED) && status == InviteStatus.REVOKED ) {
 
             checkUserSandboxRole(request, sandboxInvite.getSandbox(), Role.MANAGE_USERS);
-            User user = userService.findByLdapId(getSystemUserId(request));
+            User user = userService.findBySbmUserId(getSystemUserId(request));
             sandboxActivityLogService.sandboxUserInviteRevoked(sandboxInvite.getSandbox(), user);
             sandboxInvite.setStatus(status);
             sandboxInviteService.save(sandboxInvite);

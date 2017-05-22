@@ -67,7 +67,7 @@ public class EmailServiceImpl implements EmailService {
 
             message.setSenderName(inviter.getName());
             message.setSenderEmail(HSPC_EMAIL);
-            message.addRecipient(invitee.getName(), invitee.getLdapId());
+            message.addRecipient(invitee.getName(), invitee.getEmail());
 
             message.setTemplate(getFile(TEMPLATE_FILE));
             message.setTemplateFormat(Message.TemplateFormat.HTML);
@@ -75,15 +75,15 @@ public class EmailServiceImpl implements EmailService {
             if (inviter.getName() != null) {
                 message.addVariable("inviter", inviter.getName());
             } else {
-                message.addVariable("inviter", inviter.getLdapId());
+                message.addVariable("inviter", inviter.getEmail());
             }
             if (invitee.getName() != null) {
                 message.addVariable("invitee", invitee.getName());
             } else {
-                message.addVariable("invitee", invitee.getLdapId());
+                message.addVariable("invitee", invitee.getEmail());
             }
             message.addVariable("sandboxName", sandbox.getName());
-            message.addVariable("inviteeEmail", invitee.getLdapId());
+            message.addVariable("inviteeEmail", invitee.getEmail());
 
             // Add the inline images, referenced from the HTML code as "cid:image-name"
             message.addResource("hspc-logo", PNG_MIME, getImageFile(HSPC_LOGO_IMAGE, "png"));

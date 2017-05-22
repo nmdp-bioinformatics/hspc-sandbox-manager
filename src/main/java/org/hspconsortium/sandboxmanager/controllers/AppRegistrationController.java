@@ -60,11 +60,11 @@ public class AppRegistrationController extends AbstractController {
     @Transactional
     public @ResponseBody App createApp(final HttpServletRequest request, @RequestBody App app) {
         Sandbox sandbox = sandboxService.findBySandboxId(app.getSandbox().getSandboxId());
-        String ldapId = checkSandboxUserCreateAuthorization(request, sandbox);
-        checkCreatedByIsCurrentUserAuthorization(request, app.getCreatedBy().getLdapId());
+        String sbmUserId = checkSandboxUserCreateAuthorization(request, sandbox);
+        checkCreatedByIsCurrentUserAuthorization(request, app.getCreatedBy().getSbmUserId());
 
         app.setSandbox(sandbox);
-        User user = userService.findByLdapId(ldapId);
+        User user = userService.findBySbmUserId(sbmUserId);
         app.setVisibility(getDefaultVisibility(user, sandbox));
         app.setCreatedBy(user);
         return appService.create(app);
@@ -73,8 +73,8 @@ public class AppRegistrationController extends AbstractController {
     @RequestMapping(method = RequestMethod.GET, params = {"sandboxId"})
     public @ResponseBody List<App> getApps(final HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId) {
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-        String ldapId = checkSandboxUserReadAuthorization(request, sandbox);
-        return appService.findBySandboxIdAndCreatedByOrVisibility(sandboxId, ldapId, Visibility.PUBLIC);
+        String sbmUserId = checkSandboxUserReadAuthorization(request, sandbox);
+        return appService.findBySandboxIdAndCreatedByOrVisibility(sandboxId, sbmUserId, Visibility.PUBLIC);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces ="application/json")

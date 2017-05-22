@@ -15,9 +15,9 @@ public interface UserPersonaService {
 
     void delete(final UserPersona userPersona);
 
-    UserPersona findByLdapId(final String ldapId);
+    UserPersona findByPersonaUserId(final String personaUserId);
 
-    UserPersona findByLdapIdAndSandboxId(final String ldapId, final String sandboxId);
+    UserPersona findByPersonaUserIdAndSandboxId(final String personaUserId, final String sandboxId);
 
     List<UserPersona> findBySandboxId(final String sandboxId);
 

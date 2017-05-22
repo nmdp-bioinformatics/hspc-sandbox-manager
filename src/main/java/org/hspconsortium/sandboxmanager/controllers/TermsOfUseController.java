@@ -59,7 +59,7 @@ public class TermsOfUseController extends AbstractController  {
 
     @RequestMapping(method = RequestMethod.POST, produces ="application/json")
     public TermsOfUse createTermsOfUse(HttpServletRequest request, @RequestBody final TermsOfUse termsOfUse) {
-        User user = userService.findByLdapId(getSystemUserId(request));
+        User user = userService.findBySbmUserId(getSystemUserId(request));
         checkUserSystemRole(user, SystemRole.ADMIN);
 
         termsOfUse.setCreatedTimestamp(new Timestamp(new Date().getTime()));

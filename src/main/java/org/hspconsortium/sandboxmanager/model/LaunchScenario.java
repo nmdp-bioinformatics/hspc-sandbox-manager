@@ -21,11 +21,11 @@ import java.util.List;
         // Used to retrieve all launch scenarios visible to a user of this a sandbox
         @NamedQuery(name="LaunchScenario.findBySandboxIdAndCreatedByOrVisibility",
                 query="SELECT c FROM LaunchScenario c WHERE c.sandbox.sandboxId = :sandboxId and " +
-                "(c.createdBy.ldapId = :createdBy or c.visibility = :visibility)"),
+                "(c.createdBy.sbmUserId = :createdBy or c.visibility = :visibility)"),
         // Used to delete a user's PRIVATE launch scenarios when they are removed from a sandbox
         @NamedQuery(name="LaunchScenario.findBySandboxIdAndCreatedBy",
         query="SELECT c FROM LaunchScenario c WHERE c.sandbox.sandboxId = :sandboxId and " +
-                "c.createdBy.ldapId = :createdBy")
+                "c.createdBy.sbmUserId = :createdBy")
 })
 public class LaunchScenario extends AbstractSandboxItem {
 

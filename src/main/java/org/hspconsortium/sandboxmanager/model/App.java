@@ -17,11 +17,11 @@ import java.sql.Timestamp;
         // Used to retrieve all registered apps visible to a user of this a sandbox
         @NamedQuery(name="App.findBySandboxIdAndCreatedByOrVisibility",
         query="SELECT c FROM App c WHERE c.sandbox.sandboxId = :sandboxId and c.authClient.authDatabaseId IS NOT NULL and " +
-                "(c.createdBy.ldapId = :createdBy or c.visibility = :visibility)"),
+                "(c.createdBy.sbmUserId = :createdBy or c.visibility = :visibility)"),
         // Used to delete a user's PRIVATE registered apps when they are removed from a sandbox
         @NamedQuery(name="App.findBySandboxIdAndCreatedBy",
         query="SELECT c FROM App c WHERE c.sandbox.sandboxId = :sandboxId and c.authClient.authDatabaseId IS NOT NULL and " +
-                "c.createdBy.ldapId = :createdBy")
+                "c.createdBy.sbmUserId = :createdBy")
 })
 public class App extends AbstractSandboxItem {
 

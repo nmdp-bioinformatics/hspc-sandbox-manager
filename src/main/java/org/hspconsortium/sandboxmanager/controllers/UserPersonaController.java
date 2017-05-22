@@ -67,9 +67,9 @@ public class UserPersonaController extends AbstractController {
     public @ResponseBody UserPersona createUserPersona(HttpServletRequest request, @RequestBody final UserPersona userPersona) {
 
         Sandbox sandbox = sandboxService.findBySandboxId(userPersona.getSandbox().getSandboxId());
-        String ldapId = checkSandboxUserCreateAuthorization(request, sandbox);
+        String sbmUserId = checkSandboxUserCreateAuthorization(request, sandbox);
         userPersona.setSandbox(sandbox);
-        User user = userService.findByLdapId(ldapId);
+        User user = userService.findBySbmUserId(sbmUserId);
         userPersona.setVisibility(getDefaultVisibility(user, sandbox));
         userPersona.setCreatedBy(user);
         return userPersonaService.create(userPersona);
@@ -97,8 +97,8 @@ public class UserPersonaController extends AbstractController {
 
    @RequestMapping(method = RequestMethod.GET, params = {"lookUpId"})
     public @ResponseBody String checkForUserPersonaById(@RequestParam(value = "lookUpId")  String id) {
-        UserPersona userPersona = userPersonaService.findByLdapId(id);
-        return (userPersona == null) ? null : userPersona.getLdapId();
+        UserPersona userPersona = userPersonaService.findByPersonaUserId(id);
+        return (userPersona == null) ? null : userPersona.getPersonaUserId();
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces ="application/json")
@@ -112,7 +112,7 @@ public class UserPersonaController extends AbstractController {
 
     @RequestMapping(value = "/{username}", method = RequestMethod.GET, produces ="application/json")
     public @ResponseBody UserPersonaDto readUserPersona(HttpServletResponse response, @PathVariable String username) {
-        UserPersona userPersona = userPersonaService.findByLdapId(username);
+        UserPersona userPersona = userPersonaService.findByPersonaUserId(username);
         if(userPersona == null) {
             response.setStatus(HttpStatus.NOT_FOUND.value());
             return null;
@@ -121,7 +121,7 @@ public class UserPersonaController extends AbstractController {
         // sanitize so we're just sending back partial info
         UserPersonaDto userPersonaDto = new UserPersonaDto();
         userPersonaDto.setName(userPersona.getFhirName());
-        userPersonaDto.setUsername(userPersona.getLdapId());
+        userPersonaDto.setUsername(userPersona.getPersonaUserId());
         userPersonaDto.setResourceUrl(userPersona.getResourceUrl());
 
         return userPersonaDto;
@@ -137,7 +137,7 @@ public class UserPersonaController extends AbstractController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"message\": \"Username is required.\"}");
         }
 
-        UserPersona userPersona = userPersonaService.findByLdapId(userPersonaCredentials.getUsername());
+        UserPersona userPersona = userPersonaService.findByPersonaUserId(userPersonaCredentials.getUsername());
 
         if (userPersona == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\": \"Cannot find user persona with that username.\"}");

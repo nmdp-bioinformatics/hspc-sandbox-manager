@@ -9,26 +9,26 @@ import java.sql.Timestamp;
         // 1) make sure that a user persona cannot be used to log in to sandbox manager
         // 2) make sure that a user persona with a given id does not exist when a user is creating one
         // 3) make sure that a user persona cannot be used to create a sandbox
-        @NamedQuery(name="UserPersona.findByLdapId",
-                query="SELECT c FROM UserPersona c WHERE c.ldapId = :ldapId"),
+        @NamedQuery(name="UserPersona.findByPersonaUserId",
+                query="SELECT c FROM UserPersona c WHERE c.personaUserId = :personaUserId"),
         // Used to retrieve a user persona instance to be used in the creation of a launch scenario
-        @NamedQuery(name="UserPersona.findByLdapIdAndSandboxId",
-                query="SELECT c FROM UserPersona c WHERE c.ldapId = :ldapId and c.sandbox.sandboxId = :sandboxId"),
+        @NamedQuery(name="UserPersona.findByPersonaUserIdAndSandboxId",
+                query="SELECT c FROM UserPersona c WHERE c.personaUserId = :personaUserId and c.sandbox.sandboxId = :sandboxId"),
         // Used to delete all user personas when a sandbox is deleted
         @NamedQuery(name="UserPersona.findBySandboxId",
                 query="SELECT c FROM UserPersona c WHERE c.sandbox.sandboxId = :sandboxId"),
         // Used to retrieve all user personas visible to a user of this a sandbox
         @NamedQuery(name="UserPersona.findBySandboxIdAndCreatedByOrVisibility",
                 query="SELECT c FROM UserPersona c WHERE c.sandbox.sandboxId = :sandboxId and " +
-                "(c.createdBy.ldapId = :createdBy or c.visibility = :visibility)"),
+                "(c.createdBy.sbmUserId = :createdBy or c.visibility = :visibility)"),
         // Used to delete a user's PRIVATE user personas when they are removed from a sandbox
         @NamedQuery(name="UserPersona.findBySandboxIdAndCreatedBy",
                 query="SELECT c FROM UserPersona c WHERE c.sandbox.sandboxId = :sandboxId and " +
-                        "c.createdBy.ldapId = :createdBy")
+                        "c.createdBy.sbmUserId = :createdBy")
 })
 public class UserPersona extends AbstractSandboxItem {
-    private String ldapId;
-    private String ldapName;
+    private String personaUserId;
+    private String personaName;
     private String password;
     private String fhirId;
     private String fhirName;
@@ -37,21 +37,21 @@ public class UserPersona extends AbstractSandboxItem {
 
     /******************* User Persona Property Getter/Setters ************************/
 
-    public String getLdapId() {
-        return ldapId;
+    public String getPersonaUserId() {
+        return personaUserId;
     }
 
-    public void setLdapId(String ldapId) {
-        this.ldapId = ldapId;
+    public void setPersonaUserId(String personaUserId) {
+        this.personaUserId = personaUserId;
     }
 
-    public String getLdapName() {
-        return ldapName;
+    public String getPersonaName() {
+        return personaName;
     }
 
-    public void setLdapName(String ldapName) {
+    public void setPersonaName(String personaName) {
 
-        this.ldapName = ldapName;
+        this.personaName = personaName;
     }
 
     public String getPassword() {
