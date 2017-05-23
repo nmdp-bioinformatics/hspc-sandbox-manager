@@ -9,9 +9,9 @@ INSERT INTO client_details (client_id, client_name, access_token_validity_second
   ('sandman_admin', 'Sandbox Manager Admin', 86400, 'SECRET_BASIC', 'secret');
 
 INSERT INTO client_redirect_uri (owner_id, redirect_uri) VALUES
-  ((SELECT id from client_details where client_id = 'sand_man'), 'http://localhost:8080/hspc-sandbox-manager'),
+  ((SELECT id from client_details where client_id = 'sand_man'), 'http://localhost:8080'),
   ((SELECT id from client_details where client_id = 'sand_man'), 'https://sandbox.hspconsortium.org'),
-  ((SELECT id from client_details where client_id = 'sandman_admin'), 'http://localhost:8080/hspc-sandbox-manager'),
+  ((SELECT id from client_details where client_id = 'sandman_admin'), 'http://localhost:8080'),
   ((SELECT id from client_details where client_id = 'sandman_admin'), 'https://sandbox.hspconsortium.org');
 
 INSERT INTO client_scope (owner_id, scope) VALUES
