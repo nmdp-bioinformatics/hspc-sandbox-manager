@@ -28,6 +28,8 @@ import org.hspconsortium.sandboxmanager.services.TermsOfUseService;
 import org.hspconsortium.sandboxmanager.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -53,8 +55,13 @@ public class TermsOfUseController extends AbstractController  {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(method = RequestMethod.GET, produces ="application/json")
-    public TermsOfUse getLatestTermsOfUse() {
-        return termsOfUseService.orderByCreatedTimestamp().get(0);
+    public ResponseEntity<TermsOfUse> getLatestTermsOfUse() {
+        TermsOfUse mostRecent = termsOfUseService.mostRecent();
+        if (mostRecent != null) {
+            return new ResponseEntity<>(mostRecent, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @RequestMapping(method = RequestMethod.POST, produces ="application/json")
