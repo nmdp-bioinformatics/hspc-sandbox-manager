@@ -13,5 +13,7 @@
             "userManagementUrl": "<%= System.getProperty("userManagementUrl") %>",
             "sbmUrlHasContextPath": "<%= System.getProperty("sbmUrlHasContextPath") %>",
             "hostOrg": "<%= System.getProperty("hostOrg") %>",
+            "hspcAccountCookieName": "<%= System.getProperty("hspcAccountCookieName") %>",
+            "personaCookieName": "<%= System.getProperty("personaCookieName") %>",
             "personaCookieDomain": "<%= System.getProperty("personaCookieDomain") %>"
         });
