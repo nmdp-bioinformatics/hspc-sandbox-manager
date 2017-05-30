@@ -7,9 +7,6 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-
 @SpringBootApplication(exclude = {org.springframework.boot.autoconfigure.security.SecurityAutoConfiguration.class})
 @ComponentScan({"org.hspconsortium"})
 public class SandboxManagerApplication extends SpringBootServletInitializer {
