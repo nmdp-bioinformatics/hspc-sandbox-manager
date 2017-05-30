@@ -22,9 +22,4 @@ public class SandboxManagerApplication extends SpringBootServletInitializer {
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(SandboxManagerApplication.class, args);
     }
-
-    @Override
-    public void onStartup(ServletContext servletContext) throws ServletException {
-        servletContext.getSessionCookieConfig().setName("SBM_JSESSIOINID");
-    }
 }
