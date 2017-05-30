@@ -299,6 +299,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             // $rootScope.$emit('signed-in');
         } else if (sessionStorage.tokenResponse) {
             fhirApiServices.initClient();
+        } else if (sessionStorage.hspcAuthorized && window.location.hash.indexOf("#/after-auth") !== 0 ) {
+            oauth2.login();
         } else if (window.location.hash.indexOf("#/after-auth") !== 0 ) {
             appsSettings.getSettings().then(function(settings){
                 if (cookieService.getHSPCAccountCookie(settings)) {
@@ -355,8 +357,8 @@ angular.module('sandManApp.controllers', []).controller('navController',[
     function($scope, $state, $timeout, userServices, branded, appsSettings, cookieService){
         $scope.showing.navBar = true;
         $scope.showing.sideNavBar = false;
-        $scope.showing.footer = false;
-        $scope.showing.start = false;
+        $scope.showing.footer = !sessionStorage.hspcAuthorized;
+        $scope.showing.start = !sessionStorage.hspcAuthorized;
 
         $scope.title = branded.sandboxDescription.title;
         $scope.description = branded.sandboxDescription.description;
