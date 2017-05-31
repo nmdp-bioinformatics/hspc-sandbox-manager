@@ -31,8 +31,8 @@ public class TermsOfUseServiceImpl implements TermsOfUseService {
     }
 
     @Override
-    public List<TermsOfUse> orderByCreatedTimestamp() {
-        return repository.orderByCreatedTimestamp();
+    public TermsOfUse mostRecent() {
+        List<TermsOfUse> all = repository.orderByCreatedTimestamp();
+        return (all != null && all.size() > 0 ? all.get(0) : null);
     }
-
 }

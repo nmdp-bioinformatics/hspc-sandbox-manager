@@ -1484,7 +1484,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
         $scope.setPatient = function( patient){
             $rootScope.$emit('set-patient', patient);
         };
-        
+
     }).controller("PatientDetailController",
     function($scope, $rootScope, $uibModal, $state, $stateParams, sandboxManagement, pdmService, personaServices, $filter, launchApp){
 

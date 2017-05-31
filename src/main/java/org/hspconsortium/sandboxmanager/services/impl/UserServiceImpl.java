@@ -105,8 +105,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private void userHasAcceptedTermsOfUse(User user) {
-        if (termsOfUseService.orderByCreatedTimestamp().size() > 0) {
-            TermsOfUse latestTermsOfUse = termsOfUseService.orderByCreatedTimestamp().get(0);
+        TermsOfUse latestTermsOfUse = termsOfUseService.mostRecent();
+        if (latestTermsOfUse != null) {
             user.setHasAcceptedLatestTermsOfUse(false);
             for (TermsOfUseAcceptance termsOfUseAcceptance : user.getTermsOfUseAcceptances()) {
                 if (termsOfUseAcceptance.getTermsOfUse().getId().equals(latestTermsOfUse.getId())) {
@@ -114,6 +114,9 @@ public class UserServiceImpl implements UserService {
                     return;
                 }
             }
+        } else {
+            // there are no terms so by default the user has accepted the latest
+            user.setHasAcceptedLatestTermsOfUse(true);
         }
     }
 }
