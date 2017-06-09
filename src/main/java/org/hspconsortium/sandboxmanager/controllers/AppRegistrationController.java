@@ -79,10 +79,15 @@ public class AppRegistrationController extends AbstractController {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces ="application/json")
     public @ResponseBody App getApp(final HttpServletRequest request, @PathVariable Integer id) {
-
-        App app = appService.getById(id);
-        checkSandboxUserReadAuthorization(request, app.getSandbox());
-        return appService.getClientJSON(app);
+        try {
+            App app = appService.getById(id);
+            checkSandboxUserReadAuthorization(request, app.getSandbox());
+            return appService.getClientJSON(app);
+        } catch (Throwable e) {
+            // not being handled by global exception handler?
+            LOGGER.error("Error retrieving app", e);
+            throw new RuntimeException(e);
+        }
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces ="application/json")

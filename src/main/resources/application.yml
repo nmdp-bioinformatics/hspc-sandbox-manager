@@ -3,6 +3,9 @@ server:
   session:
     cookie:
       name: SBM_JSESSIONID
+  tomcat:
+    remote_ip_header: x-forwarded-for
+    protocol_header: x-forwarded-proto
 
 spring:
   application:

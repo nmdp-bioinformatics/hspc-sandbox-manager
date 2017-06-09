@@ -62,7 +62,7 @@
 
     <div class="navbar-stack-box">
         <div class="navbar-stack-name" ng-show="showing.signout" ng-cloak>
-        Welcome <a id="welcome" tabindex="2" href="#" uib-popover-template="'static/js/templates/settingsPopover.html'" popover-trigger="'focus'" popover-placement="bottom" ><span style="font-weight: bold">{{oauthUser.name}}</span></a>
+            Welcome <a id="welcome" tabindex="2" href="#" uib-popover-template="'static/js/templates/settingsPopover.html'" popover-trigger="'focus'" popover-placement="bottom" ><span style="font-weight: bold">{{oauthUser.name}}</span></a>
         </div>
         <div class="navbar-stack-sign-in" ng-show="showing.signin" ng-cloak>
             <a id="signin" ng-click="signin()"><i class="fa fa-sign-in"></i> Sign In</a>
@@ -119,8 +119,9 @@
 <script src="static/js/app.js?r=10"></script>
 <script src="static/js/controllers.js?r=10>"></script>
 <script src="static/js/services.js?r=10>"></script>
-<script src="REST/envinfo" type="application/javascript"></script>
-<!--<script src="static/js/config/envInfo.jsp" type="application/javascript"></script>-->
+<!-- todo migrate to the envinfo endpoint instead of envInfo.jsp -->
+<!--<script src="REST/envinfo" type="application/javascript"></script>-->
+<script src="static/js/config/envInfo.jsp" type="application/javascript"></script>
 <script src="static/js/filters.js?r=10"></script>
 <script src="static/js/directives.js?r=10"></script>
 <script src="static/js/branding/branded_text.js?r=10"></script>
