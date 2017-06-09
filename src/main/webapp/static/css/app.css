@@ -523,6 +523,8 @@
 .navbar-stack-sandbox,
 .navbar-stack-sign-in,
 .navbar-stack-sign-in a,
+.navbar-stack-apps,
+.navbar-stack-apps a,
 .navbar-stack-name,
 .navbar-stack-name a,
 .navbar-stack-name.disabled,
@@ -546,28 +548,50 @@
 }
 
 .navbar-stack-sign-in  a:hover,
-.navbar-stack-name a:hover {
+.navbar-stack-name a:hover,
+.navbar-stack-apps a:hover{
     color: #10759D;
     text-decoration: none;
     cursor: pointer;
 }
 
 .navbar-stack-sign-in  a:focus,
-.navbar-stack-name a:focus {
+.navbar-stack-name a:focus,
+.navbar-stack-apps a:focus{
     outline: none;
     text-decoration: none;
 }
 
 .navbar-stack-name {
+    position: relative;
+    float: right;
+    margin-left: 4px;
+    /*position: absolute;*/
+    /*right: 15px;*/
+    /*top: 20px;*/
+}
+
+.navbar-stack-apps {
+    position: relative;
+    float: right;
+    margin-right: 10px;
+    /*right: 15px;*/
+    /*top: 20px;*/
+}
+
+.navbar-stack-box {
     position: absolute;
     right: 15px;
     top: 20px;
 }
 
 .navbar-stack-sign-in {
-    position: absolute;
-    right: 15px;
-    top: 20px;
+    position: relative;
+    float: right;
+    margin-left: 4px;
+    /*position: absolute;*/
+    /*right: 15px;*/
+    /*top: 20px;*/
 }
 
 .navbar-stack-sandbox {
@@ -589,34 +613,8 @@
 .navbar-img {
     position: absolute;
     top: 15px;
-    left: 55px;
-}
-.navbar-bars {
-    position: absolute;
-    top: 20px;
+    /*left: 55px;*/
     left: 18px;
-}
-
-.navbar-bars i {
-    font-size: 18px;
-    color: #58585A;
-}
-
-.navbar-bars a:focus {
-    outline: none;
-    text-decoration: none;
-}
-
-.navbar-bars i:hover {
-    color: #10759D
-}
-
-.navbar-bars .popover {
-    left: -9px !important;
-}
-
-.navbar-bars .popover.bottom>.arrow {
-    left: 15px;
 }
 
 .navbar {
@@ -688,38 +686,36 @@ span.title,
     color: #FA5752;
 }
 
-.navbar-bars .popover,
-.navbar-bars .popover-content,
-.bars-content {
-    width: 375px;
-    max-width: 375px;
+.cube-content {
+    width: 140px;
+    max-width: 140px;
+    text-align: center;
 }
 
-.bars-content img {
-    height: 20px;
+.cube-content img {
+    height: 40px;
 }
 
-.bars-content .bar-title {
+.cube-content .cube-item {
     color: #58585A;
-    font-size: 16px;
-    padding: 4px 0 4px 8px;
+    font-size: 12px;
+    padding: 4px 0 6px 4px;
+    text-decoration: none;
 }
 
-.bars-content .bar-item {
+.cube-content .cube-item:hover {
+    background-color: #E6E6E6;
+    cursor: pointer;
+}
+
+.cube-content .cube-item>a>.cube-item-text,
+.cube-content .cube-item-text:selected{
+    text-decoration: none;
+}
+
+.cube-content .cube-item-text {
     color: #58585A;
     font-size: 14px;
-    padding: 4px 0 6px 30px;
-    text-decoration: none;
-}
-
-.bars-content .bar-item>a>.bar-item-text,
-.bars-content .bar-item-text:selected{
-    text-decoration: none;
-}
-
-.bars-content .bar-item-text {
-    color: #58585A;
-    font-size: 16px;
     font-weight: 400;
 }
 
@@ -776,8 +772,8 @@ span.title,
     left: 0 !important;
 }
 
-.navbar-bars .popover,
-.navbar-bars .popover-content,
+.navbar-stack-apps .popover,
+.navbar-stack-apps .popover-content,
 .navbar-sandboxes .popover,
 .navbar-sandboxes .popover-content,
 .navbar-stack-name .popover,

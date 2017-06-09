@@ -23,6 +23,7 @@ angular.module('sandManApp.controllers', []).controller('navController',[
             footer: true,
             largeSidebar: true,
             moreLinks: false,
+            apps: true,
             start: false,
             defaultLaunchScenario: true
         };

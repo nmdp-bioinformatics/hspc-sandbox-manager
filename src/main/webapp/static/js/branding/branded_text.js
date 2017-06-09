@@ -2,10 +2,10 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
 
     $provide.value("brandedText", {
             hspc: {
-                mainImage: "static/branding/hspc/images/hspc-sndbx-logo.png",
-                mainImage2x: "static/branding/hspc/images/hspc-sndbx-logo@2x.png 2x",
-                whiteImage: "static/branding/hspc/images/hspc-sndbx-logo-wh.png",
-                whiteImage2x: "static/branding/hspc/images/hspc-sndbx-logo-wh@2x.png 2x",
+                mainImage: "https://content.hspconsortium.org/images/hspc-sandbox/logo/hspc-sndbx-logo.png",
+                mainImage2x: "https://content.hspconsortium.org/images/hspc-sandbox/logo/hspc-sndbx-logo@2x.png 2x",
+                whiteImage: "https://content.hspconsortium.org/images/hspc-sandbox/logo/hspc-sndbx-logo-wh.png",
+                whiteImage2x: "https://content.hspconsortium.org/images/hspc-sandbox/logo/hspc-sndbx-logo-wh@2x.png 2x",
                 mainTitle: "The Healthcare Innovation Ecosystem",
                 sandboxText: "",
                 moreLinks: true,
