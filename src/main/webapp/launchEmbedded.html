@@ -1,0 +1,13 @@
+<html>
+<body>
+<h1>HSPC EHR Simulator</h1>
+<iframe id="embeddedSmartAppIframe"></iframe>
+<script type="text/javascript">
+    var loc = window.location.toString(),
+        params = loc.split('?')[1],
+        iframe = document.getElementById('embeddedSmartAppIframe');
+
+    iframe.src = "launch.html?" + params;​​​​​​​​​​​​​​​​
+</script>
+</body>
+</html>

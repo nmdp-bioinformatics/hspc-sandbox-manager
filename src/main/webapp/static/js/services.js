@@ -1819,7 +1819,7 @@ angular.module('sandManApp.services', [])
              (The window.open needs to be synchronous with the click event to
              avoid triggering  popup blockers. */
 
-            launch: function(app, patientContext, contextParams, userPersona) {
+            launch: function(app, patientContext, contextParams, userPersona, launchMode) {
                 var key = random(32);
                 window.localStorage[key] = "requested-launch";
                 // var appWindow;
@@ -1839,7 +1839,13 @@ angular.module('sandManApp.services', [])
                     }
                 }
 
-                appWindow = window.open('launch.html?'+key, '_blank');
+                // if (launchMode !== undefined && launchMode == "embedded") {
+                if (true) {
+                    appWindow = window.open('launchEmbedded.html?'+key, '_blank');
+                } else {
+                    appWindow = window.open('launch.html?'+key, '_blank');
+                }
+
                 registerAppContext(app, params, key);
                 if(userPersona !== null && userPersona !== undefined && userPersona) {
                     $http.post(appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona/authenticate", {

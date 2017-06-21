@@ -29,9 +29,16 @@
     </rule>
 
     <rule>
+        <condition type="request-uri">^/[^/\.]+/launchEmbedded.html.*$</condition>
+        <from>^(.*)/.*/launchEmbedded.html(.*)$</from>
+        <to last="true" type="passthrough">$1/launchEmbedded.html$2</to>
+    </rule>
+
+    <rule>
         <condition type="request-uri">^((?!/static/).)*$</condition>
         <condition type="request-uri">^((?!/REST/).)*$</condition>
         <condition type="request-uri">^((?!/launch.html).)*$</condition>
+        <condition type="request-uri">^((?!/launchEmbedded.html).)*$</condition>
         <condition type="request-uri">^((?!/index.html).)*$</condition>
         <condition type="request-uri">^(.*)[^/]$</condition>
         <from>^(.*)$</from>
@@ -42,6 +49,7 @@
         <condition type="request-uri">^((?!/static/).)*$</condition>
         <condition type="request-uri">^((?!/REST/).)*$</condition>
         <condition type="request-uri">^((?!/launch.html).)*$</condition>
+        <condition type="request-uri">^((?!/launchEmbedded.html).)*$</condition>
         <condition next="or" type="request-uri">^/([^/\.]+)?$</condition>
         <condition type="request-uri">^/([^/\.]+/)?$</condition>
         <from>^.*$</from>
