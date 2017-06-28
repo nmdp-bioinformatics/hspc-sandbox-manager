@@ -1,33 +1,33 @@
 [
-    {
-        "isDefault" : true,
-        "authClient": {
-            "clientName" : "Bilirubin Chart",
-            "clientId": "bilirubin_chart",
-            "redirectUri" : "https://apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/"
-        },
-        "appUri" : "https://apps.hspconsortium.org/hspc-bilirubin-risk-chart/",
-        "launchUri" : "https://apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/launch.html",
-        "logoUri" : "https://apps.hspconsortium.org/hspc-bilirubin-risk-chart/static/bilirubin-chart/images/bilirubin.png"
+  {
+    "isDefault": true,
+    "authClient": {
+      "clientName": "Bilirubin Chart",
+      "clientId": "bilirubin_chart",
+      "redirectUri": "https://bilirubin-risk-chart.hspconsortium.org/index.html"
     },
-    {
-        "authClient": {
-            "clientName" : "Patient Data Manager",
-            "clientId": "patient_data_manager",
-            "redirectUri" : "https://apps.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/redirect.html"
-        },
-        "appUri" : "https://apps.hspconsortium.org/hspc-patient-data-manager/",
-        "launchUri" : "https://apps.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/launch.html",
-        "logoUri" : "https://apps.hspconsortium.org/hspc-patient-data-manager/static/patient-data-manager/images/pdm.png"
+    "appUri": "https://bilirubin-risk-chart.hspconsortium.org/",
+    "launchUri": "https://bilirubin-risk-chart.hspconsortium.org/launch.html",
+    "logoUri": "https://content.hspconsortium.org/images/bilirubin/logo/bilirubin.png"
+  },
+  {
+    "authClient": {
+      "clientName": "Patient Data Manager",
+      "clientId": "patient_data_manager",
+      "redirectUri": "https://patient-data-manager.hspconsortium.org/index.html"
     },
-    {
-        "isDefault" : true,
-        "authClient": {
-            "clientName" : "My Web App",
-            "clientId": "my_web_app",
-            "redirectUri" : "http://localhost:8000/fhir-app/"
-        },
-        "launchUri" : "http://localhost:8000/fhir-app/launch.html",
-        "logoUri" : "https://sandbox.hspconsortium.org/static/images/my.png"
-    }
+    "appUri": "https://patient-data-manager.hspconsortium.org/",
+    "launchUri": "https://patient-data-manager.hspconsortium.org/launch.html",
+    "logoUri": "https://content.hspconsortium.org/images/hspc-patient-data-manager/logo/pdm.png"
+  },
+  {
+    "isDefault": true,
+    "authClient": {
+      "clientName": "My Web App",
+      "clientId": "my_web_app",
+      "redirectUri": "http://localhost:8000/fhir-app/"
+    },
+    "launchUri": "http://localhost:8000/fhir-app/launch.html",
+    "logoUri": "https://content.hspconsortium.org/images/my-web-app/logo/my.png"
+  }
 ]

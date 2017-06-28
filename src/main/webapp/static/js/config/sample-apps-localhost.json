@@ -1,33 +1,33 @@
 [
-    {
-        "isDefault" : true,
-        "authClient": {
-            "clientName" : "Bilirubin Chart",
-            "clientId": "bilirubin_chart",
-            "redirectUri" : "http://localhost:8086/static/bilirubin-chart/"
-        },
-        "appUri" : "http://localhost:8086/",
-        "launchUri" : "http://localhost:8086/static/bilirubin-chart/launch.html",
-        "logoUri" : "http://localhost:8086/static/bilirubin-chart/images/bilirubin.png"
+  {
+    "isDefault": true,
+    "authClient": {
+      "clientName": "Bilirubin Chart",
+      "clientId": "bilirubin_chart",
+      "redirectUri": "http://localhost:8096/index.html"
     },
-    {
-        "authClient": {
-            "clientName": "Patient Data Manager",
-            "clientId": "patient_data_manager",
-            "redirectUri": "http://localhost:8096/static/patient-data-manager/"
-        },
-        "appUri" : "http://localhost:8096/",
-        "launchUri": "http://localhost:8096/static/patient-data-manager/launch.html",
-        "logoUri": "http://localhost:8096/static/patient-data-manager/images/pdm.png"
+    "appUri": "http://localhost:8096/",
+    "launchUri": "http://localhost:8096/launch.html",
+    "logoUri": "https://content.hspconsortium.org/images/bilirubin/logo/bilirubin.png"
+  },
+  {
+    "authClient": {
+      "clientName": "Patient Data Manager",
+      "clientId": "patient_data_manager",
+      "redirectUri": "http://localhost:8096/index.html"
     },
-    {
-        "isDefault" : true,
-        "authClient": {
-            "clientName" : "My Web App",
-            "clientId": "my_web_app",
-            "redirectUri" : "http://localhost:8000/fhir-app/"
-        },
-        "launchUri" : "http://localhost:8000/fhir-app/launch.html",
-        "logoUri" : "http://localhost:8080/static/images/my.png"
-    }
+    "appUri": "http://localhost:8096/",
+    "launchUri": "http://localhost:8096/launch.html",
+    "logoUri": "https://content.hspconsortium.org/images/hspc-patient-data-manager/logo/pdm.png"
+  },
+  {
+    "isDefault": true,
+    "authClient": {
+      "clientName": "My Web App",
+      "clientId": "my_web_app",
+      "redirectUri": "http://localhost:8000/fhir-app/"
+    },
+    "launchUri": "http://localhost:8000/fhir-app/launch.html",
+    "logoUri": "https://content.hspconsortium.org/images/my-web-app/logo/my.png"
+  }
 ]
