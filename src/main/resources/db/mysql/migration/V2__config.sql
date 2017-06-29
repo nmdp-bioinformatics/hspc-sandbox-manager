@@ -1,10 +1,4 @@
-USE sandman;
-
-SET AUTOCOMMIT = 0;
-
-START TRANSACTION;
-
--- Sandbox Manager
+# initialize config table
 
 INSERT INTO config (key_name, value, config_type) VALUES
   ('Patient_1', 'Patient', 0),
@@ -22,9 +16,4 @@ INSERT INTO config (key_name, value, config_type) VALUES
   ('AllergyIntolerance_1', 'AllergyIntolerance', 0),
   ('Default_AllergyIntolerance_2', 'AllergyIntolerance?date=>1999-01-01&date=<2011-12-31', 0),
   ('HSPC with Synthea', 'https://api3.hspconsortium.org/HSPCplusSynthea/open', 2),
-  ('HSPC Test', 'https://api-stu3.hspconsortium.org/HSPCwithSynthea/open', 2)
-  ;
-
-COMMIT;
-
-SET AUTOCOMMIT = 1;
+  ('HSPC Test', 'https://api-stu3.hspconsortium.org/HSPCwithSynthea/open', 2);

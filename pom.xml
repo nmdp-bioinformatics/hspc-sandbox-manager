@@ -165,6 +165,13 @@
             <version>0.7.0</version>
         </dependency>
 
+        <!-- Flyway for database migrations -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>4.2.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
