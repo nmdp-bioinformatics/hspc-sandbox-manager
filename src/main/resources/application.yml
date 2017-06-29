@@ -65,8 +65,6 @@ hspc:
         clientId: sandman_admin
         clientSecret: secret
     api:
-      default:
-        baseUrl: http://localhost:8074/
       version1:
         baseUrl: http://localhost:8071/
       version2:
