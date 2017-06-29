@@ -1840,7 +1840,7 @@ angular.module('sandManApp.services', [])
                 }
 
                 // if (launchMode !== undefined && launchMode == "embedded") {
-                if (true) {
+                if (false) {
                     appWindow = window.open('launchEmbedded.html?'+key, '_blank');
                 } else {
                     appWindow = window.open('launch.html?'+key, '_blank');
