@@ -119,6 +119,7 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
         if (updateLaunchScenario != null) {
             updateLaunchScenario.setLastLaunchSeconds(launchScenario.getLastLaunchSeconds());
             updateLaunchScenario.setDescription(launchScenario.getDescription());
+            updateLaunchScenario.setLaunchEmbedded(launchScenario.isLaunchEmbedded());
             updateContextParams(updateLaunchScenario, launchScenario.getContextParams());
             if (launchScenario.getApp().getAuthClient().getAuthDatabaseId() == null) {
                 // Create an anonymous App for a custom launch

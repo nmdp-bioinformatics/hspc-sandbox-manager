@@ -1789,19 +1789,22 @@ angular.module('sandManApp.services', [])
             settings = results;
         });
 
-        function registerAppContext(app, params, key) {
+        function registerAppContext(app, params, launchDetails, key) {
             var appToLaunch = angular.copy(app);
             delete appToLaunch.clientJSON;
-            callRegisterContext(appToLaunch, params, fhirApiServices.fhirClient().server.serviceUrl, key);
+            delete appToLaunch.createdBy;
+            delete appToLaunch.sandbox;
+            callRegisterContext(appToLaunch, params, fhirApiServices.fhirClient().server.serviceUrl, launchDetails, key);
         }
 
-        function callRegisterContext(appToLaunch, params, issuer, key) {
+        function callRegisterContext(appToLaunch, params, issuer, launchDetails, key) {
             fhirApiServices
                 .registerContext(appToLaunch, params, issuer)
                 .done(function (c) {
                     window.localStorage[key] = JSON.stringify({
                         app: appToLaunch,
                         iss: issuer,
+                        launchDetails: launchDetails,
                         context: c
                     });
                 }).fail(function (err) {
@@ -1839,14 +1842,22 @@ angular.module('sandManApp.services', [])
                     }
                 }
 
-                // if (launchMode !== undefined && launchMode == "embedded") {
-                if (false) {
+                if (launchMode !== undefined && launchMode === true) {
                     appWindow = window.open('launchEmbedded.html?'+key, '_blank');
                 } else {
                     appWindow = window.open('launch.html?'+key, '_blank');
                 }
 
-                registerAppContext(app, params, key);
+                var userPersonaCopy = angular.copy(userPersona);
+                delete userPersonaCopy.createdBy;
+                delete userPersonaCopy.sandbox;
+
+                var launchDetails = {
+                    userPersona: userPersonaCopy,
+                    patientContext: patientContext.fhirId
+                };
+
+                registerAppContext(app, params, launchDetails, key);
                 if(userPersona !== null && userPersona !== undefined && userPersona) {
                     $http.post(appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona/authenticate", {
                         username: userPersona.personaUserId,
@@ -2300,7 +2311,7 @@ angular.module('sandManApp.services', [])
                 if (sandboxBaseUrlWithoutHash.lastIndexOf("/") === sandboxBaseUrlWithoutHash.length-1) {
                     sandboxBaseUrlWithoutHash = sandboxBaseUrlWithoutHash.substring(0, sandboxBaseUrlWithoutHash.length-1);
                 }
-                sandboxUrlSettings.sandboxManagerRootUrl = getDashboardUrl((envInfo.sbmUrlHasContextPath === "null" || envInfo.sbmUrlHasContextPath === "true"), sandboxBaseUrlWithoutHash);
+                sandboxUrlSettings.sandboxManagerRootUrl = getDashboardUrl((envInfo.sbmUrlHasContextPath !== "null" && envInfo.sbmUrlHasContextPath === "true"), sandboxBaseUrlWithoutHash);
                 sandboxUrlSettings.sandboxId = sandboxBaseUrlWithoutHash.substring(sandboxUrlSettings.sandboxManagerRootUrl.length + 1);
                 var trailingSlash = sandboxUrlSettings.sandboxId.lastIndexOf("/");
                 if (trailingSlash > -1 && trailingSlash === sandboxUrlSettings.sandboxId.length - 1) {

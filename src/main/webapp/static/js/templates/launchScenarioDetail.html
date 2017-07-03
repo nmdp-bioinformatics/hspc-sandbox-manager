@@ -9,7 +9,7 @@
         <div class="col-md-12 content-column">
             <div class="detail-description">{{desc.title}}</div>
 
-            <div class="detail-form-line-inline">
+            <div class="detail-form-line-inline short">
                 <label class="detail-form-label-inline">Description:</label>
                 <label ng-hide="editDesc.showEdit" class="detail-form-value-inline">{{selectedScenario.description}}</label>
                 <a ng-hide="editDesc.showEdit || !canDelete" ng-click="editDesc.showEdit = true" class='float-right-dark-btn'>
@@ -22,6 +22,11 @@
                 <a ng-show="editDesc.showEdit" ng-click="updateDesc(selectedScenario)" class='float-right-dark-btn'>
                     <i class='fa fa-check fa-lg'></i>
                 </a>
+            </div>
+
+            <div class="detail-form-line-inline short">
+                <label class="detail-form-label-inline">Launch Embedded</label>
+                <input style="height: 30px" type="checkbox" class="detail-form-label-input-inline" ng-model="selectedScenario.launchEmbedded"/>
             </div>
 
             <div class="title-box">

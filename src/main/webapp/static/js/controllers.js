@@ -1994,6 +1994,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.isCustom = false;
         $scope.canDelete = false;
         $scope.selectedScenario = {};
+        $scope.launchEmbedded = false;
         $scope.editDesc = {new: "", showEdit: false};
         $scope.editLaunchUri = {new: "", showEdit: false};
         sandboxManagement.getSandboxLaunchScenarios();
@@ -2001,11 +2002,17 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         sandboxManagement.getScenarioBuilder().owner = userServices.getOAuthUser();
         $scope.docLink = docLinks.docLink;
 
+        $scope.$watch('selectedScenario.launchEmbedded', function() {
+            if ($scope.selectedScenario.launchEmbedded !== undefined && $scope.selectedScenario.launchEmbedded !== $scope.launchEmbedded) {
+                $scope.launchEmbedded = $scope.selectedScenario.launchEmbedded;
+                sandboxManagement.updateLaunchScenario($scope.selectedScenario);
+            }
+        });
         $scope.launch = function (scenario) {
             scenario.lastLaunchSeconds = new Date().getTime();
             sandboxManagement.launchScenarioLaunched(scenario);
 
-            launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona);
+            launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
         };
 
         $scope.launchPatientDataManager = function (patient) {
@@ -2043,6 +2050,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $rootScope.$on('recent-selected', function (event, arg) {
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
+            $scope.launchEmbedded = arg.launchEmbedded;
             $scope.canDelete = userServices.canModify($scope.selectedScenario, sandboxManagement.getSandbox());
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
@@ -2056,6 +2064,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $rootScope.$on('full-selected', function (event, arg) {
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
+            $scope.launchEmbedded = arg.launchEmbedded;
             $scope.canDelete = userServices.canModify($scope.selectedScenario, sandboxManagement.getSandbox());
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
@@ -2311,7 +2320,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         modalInstance.result.then(function (result) {
             var scenario = result.scenario;
             if (result.launch) {
-                launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona);
+                    launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
             } else {
                 sandboxManagement.addFullLaunchScenarioList(scenario);
             }

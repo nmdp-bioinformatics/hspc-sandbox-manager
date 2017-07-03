@@ -30,6 +30,7 @@ import java.util.List;
 public class LaunchScenario extends AbstractSandboxItem {
 
     private String description;
+    private boolean launchEmbedded;
     private Patient patient;
     private UserPersona userPersona;
     private App app;
@@ -46,6 +47,14 @@ public class LaunchScenario extends AbstractSandboxItem {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isLaunchEmbedded() {
+        return launchEmbedded;
+    }
+
+    public void setLaunchEmbedded(boolean launchEmbedded) {
+        this.launchEmbedded = launchEmbedded;
     }
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
