@@ -4,10 +4,10 @@
     "authClient": {
       "clientName": "Bilirubin Chart",
       "clientId": "bilirubin_chart",
-      "redirectUri": "http://localhost:8096/index.html"
+      "redirectUri": "http://localhost:8086/index.html"
     },
-    "appUri": "http://localhost:8096/",
-    "launchUri": "http://localhost:8096/launch.html",
+    "appUri": "http://localhost:8086/",
+    "launchUri": "http://localhost:8086/launch.html",
     "logoUri": "https://content.hspconsortium.org/images/bilirubin/logo/bilirubin.png"
   },
   {
