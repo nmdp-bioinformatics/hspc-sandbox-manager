@@ -2,37 +2,31 @@ var fhirClient = null;
 var code = getParameterByName("code");
 var launched = false;
 
+$('#relaunch-message').hide();
+
 if (code === null) {
 
     var key = window.location.search.slice(1);
     if (!(key in window.localStorage)) {
         console.log('Failed to launch app -- no launch key.');
+        $('#patient-details').hide();
+        $('#relaunch-message').show();
+    } else {
+        window.localStorage['embeddedLaunchKey'] = key;
+        onStorage();
+        window.addEventListener('storage', onStorage, false);
     }
-    onStorage(key);
-    window.addEventListener('storage', onStorage, false);
 
 } else {
     // window.history.replaceState = false;
     FHIR.oauth2.ready(function(newSmart){
-
-        // window.onbeforeunload = function() {
-        //     return "Dude, are you sure you want to leave? Think of the kittens!";
-        // };
-
-        window.addEventListener("beforeunload", function (e) {
-            var confirmationMessage = "\o/";
-
-            e.returnValue = confirmationMessage;     // Gecko, Trident, Chrome 34+
-            return confirmationMessage;              // Gecko, WebKit, Chrome <34
-        });
-
         fhirClient = newSmart;
 
-        var savedKey = JSON.parse(window.localStorage['embeddedLaunch']);
-        window.localStorage.removeItem('embeddedLaunch');
+        var savedKey = window.localStorage['embeddedLaunchKey'];
+        window.localStorage.removeItem('embeddedLaunchKey');
         $('#patient-details').hide();
 
-        var details = JSON.parse(window.localStorage[savedKey.key]);
+        var details = JSON.parse(window.localStorage[savedKey]);
         getFhirUserResource(fhirClient, details.launchDetails.userPersona.resourceUrl)
             .done(function(profileResult){
                 document.getElementById("user-name").innerHTML = profileResult.name;
@@ -68,13 +62,16 @@ if (code === null) {
         }
 
         var iframe = document.getElementById('embeddedSmartAppIframe');
-        iframe.src = "launch.html?" + savedKey.key;
+        iframe.src = "launch.html?" + savedKey;
     });
 }
 
-function onStorage(key) {
+function onStorage() {
 
-    if (launched || window.localStorage[key] === 'requested-launch') {
+    var key = window.localStorage['embeddedLaunchKey'];
+    console.log("key " + key);
+
+    if (key === "" || launched || window.localStorage[key] === 'requested-launch') {
         return;
     }
 
@@ -82,10 +79,6 @@ function onStorage(key) {
     var details = JSON.parse(window.localStorage[key]);
 
     delete sessionStorage.tokenResponse;
-
-    window.localStorage['embeddedLaunch'] = JSON.stringify({
-        key: key
-    });
 
     // window.location.origin does not exist in some non-webkit browsers
     if (!window.location.origin) {

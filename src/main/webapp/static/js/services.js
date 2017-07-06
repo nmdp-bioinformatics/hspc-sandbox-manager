@@ -666,6 +666,7 @@ angular.module('sandManApp.services', [])
                 createdBy: launchScenario.owner,
                 description: launchScenario.description,
                 lastLaunchSeconds: new Date().getTime(),
+                launchEmbedded: launchScenario.launchEmbedded,
                 app: angular.copy(launchScenario.app)
             };
             delete newLaunchScenario.app.clientJSON;
