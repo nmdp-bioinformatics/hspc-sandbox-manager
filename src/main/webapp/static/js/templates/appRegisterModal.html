@@ -30,19 +30,13 @@
             </div>
         </div>
 
-
-<!--  Removed this field because it is too easy for someone to create a mismatch between their
-      app registration (this value) and the app launch flow.  For example, if you provide a value
-      here, but don't provide a value in the launch flow then you will get an
-      invalid grant "Invalid redirect" error -->
-<!--
         <div class="form-group">
             <label class="detail-form-label">App Redirect URIs</label>
             <div class="detail-form-label-input">
                 <input ng-model="clientJSON.redirectUris" class="form-control" placeholder="e.g.: http://mydomain.com/growth-chart/index.html"/>
+                <p>Note: If you provide one or more redirect URIs, your client code must send one of the provided values when performing OAuth2 authorization or you will receive an "Invalid redirect" error.</p>
             </div>
         </div>
--->
 
         <div class="form-group">
             <label class="detail-form-label">Allow Offline Access </label>
