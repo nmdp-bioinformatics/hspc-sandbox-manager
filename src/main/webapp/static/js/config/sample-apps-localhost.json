@@ -4,7 +4,7 @@
     "authClient": {
       "clientName": "Bilirubin Chart",
       "clientId": "bilirubin_chart",
-      "redirectUri": "http://localhost:8096/index.html"
+      "redirectUri": "http://localhost:8086/index.html"
     },
     "appUri": "http://localhost:8086/",
     "launchUri": "http://localhost:8086/launch.html",
