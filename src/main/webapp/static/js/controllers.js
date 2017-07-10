@@ -538,11 +538,12 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         }
 
     }).controller("SettingsViewController",
-    function ($scope, $rootScope, sandboxManagement, appsSettings, userServices, $uibModal, schemaServices) {
+    function ($scope, $rootScope, sandboxManagement, appsSettings, userServices, $uibModal, apiEndpointIndexServices) {
 
         $scope.sandbox = angular.copy(sandboxManagement.getSandbox());
         $scope.sandboxURL = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + $scope.sandbox.sandboxId;
         $scope.allowOpenAccess = $scope.sandbox.allowOpenAccess;
+        $scope.defaultDataSet = true;
 
         $scope.canEdit = function () {
             return userServices.canModifySandbox(sandboxManagement.getSandbox())
@@ -550,24 +551,25 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         appsSettings.getSettings().then(function (settings) {
             $scope.openFhirUrl = settings.baseServiceUrl_1 + $scope.sandbox.sandboxId + "/open";
-            if ($scope.sandbox.schemaVersion === "2") {
+            if ($scope.sandbox.apiEndpointIndex === "2") {
                 $scope.openFhirUrl = settings.baseServiceUrl_2 + $scope.sandbox.sandboxId + "/open";
-            } else if ($scope.sandbox.schemaVersion === "3") {
+            } else if ($scope.sandbox.apiEndpointIndex === "3") {
                 $scope.openFhirUrl = settings.baseServiceUrl_3 + $scope.sandbox.sandboxId + "/open";
-            } else if ($scope.sandbox.schemaVersion === "4") {
+            } else if ($scope.sandbox.apiEndpointIndex === "4") {
                 $scope.openFhirUrl = settings.baseServiceUrl_4 + $scope.sandbox.sandboxId + "/open";
             }
             $scope.secureFhirUrl = settings.baseServiceUrl_1 + $scope.sandbox.sandboxId + "/data";
-            if ($scope.sandbox.schemaVersion === "2") {
+            if ($scope.sandbox.apiEndpointIndex === "2") {
                 $scope.secureFhirUrl = settings.baseServiceUrl_2 + $scope.sandbox.sandboxId + "/data";
-            } else if ($scope.sandbox.schemaVersion === "3") {
+            } else if ($scope.sandbox.apiEndpointIndex === "3") {
                 $scope.secureFhirUrl = settings.baseServiceUrl_3 + $scope.sandbox.sandboxId + "/data";
-            } else if ($scope.sandbox.schemaVersion === "4") {
+            } else if ($scope.sandbox.apiEndpointIndex === "4") {
                 $scope.secureFhirUrl = settings.baseServiceUrl_4 + $scope.sandbox.sandboxId + "/data";
             }
         });
 
-        $scope.fhirVersion = schemaServices.getSandboxSchemaVersion().name;
+        $scope.fhirVersion = apiEndpointIndexServices.getSandboxApiEndpointIndex().name;
+        $scope.supportsDataSets = apiEndpointIndexServices.getSandboxApiEndpointIndex().supportsDataSets;
 
         $scope.canDelete = function () {
             return (sandboxManagement.getSandbox().createdBy.sbmUserId.toLowerCase() === userServices.getOAuthUser().sbmUserId.toLowerCase());
@@ -626,7 +628,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                             callback: function (result) { //setting callback
                                 if (result == true) {
                                     var modalProgress = openModalProgressDialog("Resetting...");
-                                    sandboxManagement.resetSandbox().then(function () {
+                                    var dataSet = $scope.supportsDataSets ? ($scope.defaultDataSet ? "DEFAULT" : "NONE") : "NA";
+                                    sandboxManagement.resetSandbox(dataSet).then(function () {
                                         modalProgress.dismiss();
                                     }, function () {
                                         //TODO display error
@@ -671,7 +674,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
     }).controller("DataAcquisitionController",
     function ($scope, $rootScope, fhirApiServices, sandboxManagement, $uibModal, $filter, dataManagerResources,
-              dataManagerService, externalFhirDataServices, schemaServices, pdmService, patientResources) {
+              dataManagerService, externalFhirDataServices, apiEndpointIndexServices, pdmService, patientResources) {
 
         $scope.hasError = false;
         $scope.showing.patientDetail = false;
@@ -698,7 +701,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         function checkFhirVersions(fhirEndpoints) {
             angular.forEach(fhirEndpoints, function (endpoint) {
                 externalFhirDataServices.queryExternalFhirVersion(endpoint.endpoint).then(function (version) {
-                    endpoint.match = (schemaServices.fhirVersion() === version);
+                    endpoint.match = (apiEndpointIndexServices.fhirVersion() === version);
                     endpoint.version = "FHIR " + version;
                     endpoint.fhirIdPrefix = "SYNTHEA-";
                     $scope.selected.fhirEndpoint = $scope.fhirEndpoints[0];
@@ -1336,7 +1339,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         }
 
     }).controller("CreateSandboxController",
-    function ($rootScope, $scope, $state, sandboxManagement, tools, appsSettings, branded, schemaServices, docLinks) {
+    function ($rootScope, $scope, $state, sandboxManagement, tools, appsSettings, branded, apiEndpointIndexServices, docLinks) {
 
         $scope.showing.navBar = true;
         $scope.showing.footer = true;
@@ -1349,8 +1352,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.sandboxId = "";
         $scope.sandboxDesc = "";
         $scope.sandboxAllowOpenAccess = false;
-        $scope.schemaVersion = branded.defaultSchemaVersion;
-        $scope.sandboxSchemaVersions = schemaServices.getSandboxSchemaVersions(true);
+        $scope.defaultDataSet = true;
+        $scope.apiEndpointIndex = branded.defaultApiEndpointIndex;
+        $scope.sandboxApiEndpointIndexes = apiEndpointIndexServices.getSandboxApiEndpointIndexes(true);
+        $scope.selectedSandboxApiEndpointIndex = apiEndpointIndexServices.getSandboxApiEndpointIndexDetails(branded.defaultApiEndpointIndex);
         $scope.createEnabled = true;
 
         $scope.title.blueBarTitle = "Create Sandbox";
@@ -1371,6 +1376,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 $rootScope.$digest();
             });
         }, 400));
+
+        $scope.$watch("apiEndpointIndex", function () {
+            $scope.selectedSandboxApiEndpointIndex = apiEndpointIndexServices.getSandboxApiEndpointIndexDetails($scope.apiEndpointIndex);
+        });
 
         $scope.validateId = function (id) {
             var deferred = $.Deferred();
@@ -1414,10 +1423,14 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 $scope.sandboxName = $scope.sandboxId;
             }
             sandboxManagement.createSandbox({
-                sandboxId: $scope.sandboxId, sandboxName: $scope.sandboxName,
-                description: $scope.sandboxDesc, schemaVersion: $scope.schemaVersion,
-                allowOpenAccess: $scope.sandboxAllowOpenAccess
-            }).then(function (sandbox) {
+                sandboxId: $scope.sandboxId,
+                sandboxName: $scope.sandboxName,
+                description: $scope.sandboxDesc,
+                apiEndpointIndex: $scope.apiEndpointIndex,
+                allowOpenAccess: $scope.sandboxAllowOpenAccess,
+                dataSet: ($scope.selectedSandboxApiEndpointIndex.supportsDataSets ? ($scope.defaultDataSet ? "DEFAULT" : "NONE") : "NA")
+
+        }).then(function (sandbox) {
                 sandboxManagement.setCreatingSandbox(false);
                 $scope.showing.progress = false;
                 $rootScope.$emit('sandbox-created', $scope.sandboxId);
@@ -2956,7 +2969,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         });
     };
 
-}).controller('AppRegistrationInboundModalCtrl', function ($scope, $rootScope, sandboxManagement, appRegistrationServices, docLinks, tools, schemaServices, $uibModalInstance) {
+}).controller('AppRegistrationInboundModalCtrl', function ($scope, $rootScope, sandboxManagement, appRegistrationServices, docLinks, tools, apiEndpointIndexServices, $uibModalInstance) {
 
     $scope.docLink = docLinks.docLink;
     $scope.clientJSON = {};
@@ -2971,8 +2984,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
             appRegistrationServices.getAppManifest($scope.manifestUrl).then(function (manifest) {
                 $scope.appManifest = manifest;
-                if (!manifest.fhir_versions || !contains(manifest.fhir_versions, schemaServices.fhirVersion())) {
-                    $scope.manifestError = "The FHIR version of this sandbox, " + schemaServices.fhirVersion() + ", is not supported by this app.";
+                if (!manifest.fhir_versions || !contains(manifest.fhir_versions, apiEndpointIndexServices.fhirVersion())) {
+                    $scope.manifestError = "The FHIR version of this sandbox, " + apiEndpointIndexServices.fhirVersion() + ", is not supported by this app.";
                     $scope.hasError = true;
                 }
                 $rootScope.$digest();

@@ -75,8 +75,6 @@ public class SandboxController extends AbstractController {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
         if (sandbox != null) {
             return  "{\"sandboxId\": \"" + sandbox.getSandboxId() + "\"}";
-        } else if (!sandboxService.sandboxIdAvailable(id)) {
-            return  "{\"reservedId\": \"" + id + "\"}";
         }
         return null;
     }
@@ -85,7 +83,7 @@ public class SandboxController extends AbstractController {
     public @ResponseBody String getSandboxById(@RequestParam(value = "sandboxId")  String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
         if (sandbox != null) {
-            return  "{\"sandboxId\": \"" + sandbox.getSandboxId() + "\",\"schemaVersion\": \"" + sandbox.getSchemaVersion() + "\",\"allowOpenAccess\": \"" + sandbox.isAllowOpenAccess() + "\"}";
+            return  "{\"sandboxId\": \"" + sandbox.getSandboxId() + "\",\"apiEndpointIndex\": \"" + sandbox.getApiEndpointIndex() + "\",\"allowOpenAccess\": \"" + sandbox.isAllowOpenAccess() + "\"}";
         }
         return null;
     }

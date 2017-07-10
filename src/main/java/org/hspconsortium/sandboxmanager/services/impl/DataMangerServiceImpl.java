@@ -17,6 +17,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
+import org.hspconsortium.sandboxmanager.model.DataSet;
 import org.hspconsortium.sandboxmanager.model.Sandbox;
 import org.hspconsortium.sandboxmanager.model.SandboxImport;
 import org.hspconsortium.sandboxmanager.services.DataManagerService;
@@ -246,7 +247,12 @@ public class DataMangerServiceImpl implements DataManagerService {
     }
 
     private boolean resetSandboxFhirData(final Sandbox sandbox, final String bearerToken ) throws UnsupportedEncodingException {
-        if (postToSandbox(sandbox, "{}", "/sandbox/reset", bearerToken )) {
+        String jsonString = "{}";
+        if (!sandbox.getDataSet().equals(DataSet.NA)) {
+            jsonString = "{\"dataSet\": \"" + sandbox.getDataSet() + "\"}";
+        }
+
+        if (postToSandbox(sandbox, jsonString, "/sandbox/reset", bearerToken )) {
             sandboxService.reset(sandbox, bearerToken);
             return true;
         }

@@ -14,13 +14,13 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                 copyright: "© 2017 by Healthcare Services Platform Consortium",
                 showCert: true,
                 loginDoc: "",
-                defaultSchemaVersion : "4",
+                defaultApiEndpointIndex : "4",
                 defaultLaunchScenario: true,
-                sandboxSchemaVersions : [
-                    {version: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", altName: "FHIR v1.0.2", canCreate: true},
-                    {version: "2", name: "FHIR DSTU 2 (v1.6.0)", fhirVersion: "1.6.0", altName: "FHIR v1.6", canCreate: false},
-                    {version: "3", name: "FHIR STU 3 (v1.8.0)", fhirVersion: "1.8.0", altName: "FHIR v1.8", canCreate: true},
-                    {version: "4", name: "FHIR STU 3 (v3.0.1)", fhirVersion: "3.0.1", altName: "FHIR v3.0.1", canCreate: true}
+                sandboxApiEndpointIndexes : [
+                    {index: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", altName: "FHIR v1.0.2", canCreate: true, supportsDataSets: false},
+                    {index: "2", name: "FHIR DSTU 2 (v1.6.0)", fhirVersion: "1.6.0", altName: "FHIR v1.6", canCreate: false, supportsDataSets: false},
+                    {index: "3", name: "FHIR STU 3 (v1.8.0)", fhirVersion: "1.8.0", altName: "FHIR v1.8", canCreate: false, supportsDataSets: false},
+                    {index: "4", name: "FHIR STU 3 (v3.0.1)", fhirVersion: "3.0.1", altName: "FHIR v3.0.1", canCreate: true, supportsDataSets: true}
                 ],
                 sandboxDescription: {
                     title: "What is a sandbox?",

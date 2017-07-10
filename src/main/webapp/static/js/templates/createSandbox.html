@@ -19,15 +19,22 @@
                     </div>
                     <div class="create-form-group">
                         <label class="create-form-label">Sandbox Version</label>
-                        <select class="create-form-select"  ng-model="schemaVersion"
-                                ng-options="version.version as version.name for version in sandboxSchemaVersions">
+                        <select class="create-form-select" ng-model="apiEndpointIndex"
+                                ng-options="index.index as index.name for index in sandboxApiEndpointIndexes">
                         </select>
                         <a href={{docLink('sandboxVersions')}} target="_blank"><i class="fa fa-question-circle-o"></i></a>
                         <label class="create-form-description">Choose a version of the FHIR Standard</label>
                     </div>
                     <div class="create-form-group">
-                        <label class="create-form-label">Allow Open FHIR Endpoint </label>
-                        <input type="checkbox" class="create-form-input-box" ng-model="sandboxAllowOpenAccess"/>
+                        <label class="create-form-label"></label>
+                        <input type="checkbox" class="create-form-checkbox-input-box" ng-model="sandboxAllowOpenAccess"/>
+                        <label class="create-form-checkbox-label">Allow Open FHIR Endpoint </label>
+                    </div>
+                    <div class="create-form-group" ng-show="selectedSandboxApiEndpointIndex.supportsDataSets">
+                        <label class="create-form-label"></label>
+                        <input type="checkbox" class="create-form-checkbox-input-box" ng-model="defaultDataSet"/>
+                        <label class="create-form-checkbox-label">Apply Default Data Set </label>
+                        <label class="create-form-description" style="margin-bottom: 3px">If not selected, the sandbox will be empty</label>
                     </div>
                     <div class="create-form-group">
                         <label class="create-form-label">Description</label>

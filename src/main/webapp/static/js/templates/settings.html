@@ -57,6 +57,11 @@
                         <li>sandbox members</li>
                     </ul>
                 </label>
+                <div class="right-form-group" ng-show="supportsDataSets">
+                    <input type="checkbox" ng-model="defaultDataSet" class="right-form-input-checkbox"/>
+                    <label class="right-form-checkbox-label">Apply Default Data Set</label>
+                    <label class="create-form-description">If not selected, the sandbox will be empty</label>
+                </div>
                 <div tooltip-placement="top" uib-tooltip="Only the sandbox creator can delete the sandbox" tooltip-trigger="!canDelete() ? 'mouseenter' : 'none'">
                     <div class="right-form-group">
                         <input ng-disabled="!canDelete()" type="checkbox" ng-model="confirmReset" class="right-form-input-checkbox"/>

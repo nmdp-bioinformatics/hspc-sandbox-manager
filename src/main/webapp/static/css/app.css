@@ -142,6 +142,32 @@
     width: 100%;
 }
 
+.create-form-checkbox-label {
+    /*float: left;*/
+    /*margin-left: -145px;*/
+    padding: 0 0 0 5px;
+    position: relative;
+    text-align: right;
+    /*width: 130px;*/
+    font-size: 14px;
+    font-weight: 400;
+    color: #58585A;
+    word-wrap: break-word;
+}
+
+.create-form-checkbox-input-box {
+    /*height: 2.14285714em;*/
+    line-height: 1.4285714285714;
+    padding: 4px 5px 4px 5px;
+    border: 1px solid #CCC;
+    border-radius: 3.01px;
+    box-sizing: border-box;
+    font-size: inherit;
+    margin: 0;
+    /*width: 10px;*/
+    vertical-align: baseline;
+}
+
 .create-form-input-icon {
     color: #F82219;
     position: absolute;

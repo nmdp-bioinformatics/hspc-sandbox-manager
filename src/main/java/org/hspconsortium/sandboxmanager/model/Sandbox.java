@@ -18,7 +18,7 @@ import java.util.List;
                 query="SELECT COUNT(*) FROM Sandbox"),
         // Used for statistics
         @NamedQuery(name="Sandbox.schemaCount",
-                query="SELECT COUNT(*) FROM Sandbox c WHERE c.schemaVersion = :schemaVersion"),
+                query="SELECT COUNT(*) FROM Sandbox c WHERE c.apiEndpointIndex = :apiEndpointIndex"),
         // Used for statistics
         @NamedQuery(name="Sandbox.intervalCount",
                 query="SELECT COUNT(*) FROM Sandbox c WHERE c.createdTimestamp  >= :intervalTime")
@@ -29,8 +29,9 @@ public class Sandbox extends AbstractItem {
     private String sandboxId;
     private String name;
     private String description;
-    private String schemaVersion;
+    private String apiEndpointIndex;
     private String fhirServerEndPoint;
+    private DataSet dataSet = DataSet.NA;
     private boolean allowOpenAccess;
     private List<UserRole> userRoles = new ArrayList<>();
     private List<SandboxImport> imports = new ArrayList<>();
@@ -61,12 +62,12 @@ public class Sandbox extends AbstractItem {
         this.description = description;
     }
 
-    public String getSchemaVersion() {
-        return schemaVersion;
+    public String getApiEndpointIndex() {
+        return apiEndpointIndex;
     }
 
-    public void setSchemaVersion(String schemaVersion) {
-        this.schemaVersion = schemaVersion;
+    public void setApiEndpointIndex(String apiEndpointIndex) {
+        this.apiEndpointIndex = apiEndpointIndex;
     }
 
     public String getFhirServerEndPoint() {
@@ -75,6 +76,15 @@ public class Sandbox extends AbstractItem {
 
     public void setFhirServerEndPoint(String fhirServerEndPoint) {
         this.fhirServerEndPoint = fhirServerEndPoint;
+    }
+
+    @Transient
+    public DataSet getDataSet() {
+        return dataSet;
+    }
+
+    public void setDataSet(DataSet dataSet) {
+        this.dataSet = dataSet;
     }
 
     public boolean isAllowOpenAccess() {

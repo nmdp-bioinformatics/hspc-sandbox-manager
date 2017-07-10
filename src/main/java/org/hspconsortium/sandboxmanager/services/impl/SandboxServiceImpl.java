@@ -1,10 +1,8 @@
 package org.hspconsortium.sandboxmanager.services.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -329,31 +327,6 @@ public class SandboxServiceImpl implements SandboxService {
     }
 
     @Override
-    public boolean sandboxIdAvailable(final String sandboxId) {
-        Set<String> unavailable = new HashSet<>();
-
-        unavailable.addAll(getUnavailableSandboxIDs("1"));
-        unavailable.addAll(getUnavailableSandboxIDs("2"));
-        unavailable.addAll(getUnavailableSandboxIDs("3"));
-
-        return !unavailable.contains(sandboxId);
-    }
-
-    private Set<String> getUnavailableSandboxIDs(final String schemaVersion) {
-        Set<String> unavailable = new HashSet<>();
-        ObjectMapper mapper = new ObjectMapper();
-
-        String url = getApiSchemaURL(schemaVersion) + "/system/sandbox/unavailable";
-        try {
-            unavailable = mapper.readValue(getFhirApiServer(url), Set.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return unavailable;
-    }
-
-    @Override
     public void addSandboxImport(final Sandbox sandbox, final SandboxImport sandboxImport) {
         List<SandboxImport> imports = sandbox.getImports();
         imports.add(sandboxImport);
@@ -423,8 +396,8 @@ public class SandboxServiceImpl implements SandboxService {
     }
 
     @Override
-    public String schemaCount(String schemaVersion) {
-        return repository.schemaCount(schemaVersion);
+    public String schemaCount(String apiEndpointIndex) {
+        return repository.schemaCount(apiEndpointIndex);
     }
 
     @Override
@@ -445,12 +418,12 @@ public class SandboxServiceImpl implements SandboxService {
     }
 
     public String getSandboxApiURL(final Sandbox sandbox) {
-        return getApiSchemaURL(sandbox.getSchemaVersion()) + "/" + sandbox.getSandboxId();
+        return getApiSchemaURL(sandbox.getApiEndpointIndex()) + "/" + sandbox.getSandboxId();
     }
 
-    private String getApiSchemaURL(final String schemaVersion) {
+    private String getApiSchemaURL(final String apiEndpointIndex) {
         String url;
-        switch (schemaVersion){
+        switch (apiEndpointIndex){
             case "1":
                 url = apiBaseURL_1;
                 break;
@@ -468,12 +441,15 @@ public class SandboxServiceImpl implements SandboxService {
 
     private boolean callCreateOrUpdateSandboxAPI(final Sandbox sandbox, final String bearerToken ) throws UnsupportedEncodingException{
         String url = getSandboxApiURL(sandbox) + "/sandbox";
+        if (!sandbox.getDataSet().equals(DataSet.NA)){
+            url = getSandboxApiURL(sandbox) + "/sandbox?dataSet=" + sandbox.getDataSet();
+        }
 
         HttpPut putRequest = new HttpPut(url);
         putRequest.addHeader("Content-Type", "application/json");
         StringEntity entity;
 
-        String jsonString = "{\"teamId\": \"" + sandbox.getSandboxId() + "\",\"schemaVersion\": \"" + sandbox.getSchemaVersion()  + "\",\"allowOpenAccess\": \"" + sandbox.isAllowOpenAccess() + "\"}";
+        String jsonString = "{\"teamId\": \"" + sandbox.getSandboxId() + "\",\"allowOpenAccess\": \"" + sandbox.isAllowOpenAccess() + "\"}";
         entity = new StringEntity(jsonString);
         putRequest.setEntity(entity);
         putRequest.setHeader("Authorization", "BEARER " + bearerToken);
@@ -573,58 +549,6 @@ public class SandboxServiceImpl implements SandboxService {
             }
         }
     }
-
-    private String getFhirApiServer(final String url)  {
-
-        HttpGet getRequest = new HttpGet(url);
-        getRequest.setHeader("Accept", "application/json");
-
-        SSLContext sslContext = null;
-        try {
-            sslContext = SSLContexts.custom().loadTrustMaterial(null, new TrustSelfSignedStrategy()).useSSL().build();
-        } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
-            LOGGER.error("Error loading ssl context", e);
-            throw new RuntimeException(e);
-        }
-        HttpClientBuilder builder = HttpClientBuilder.create();
-        SSLConnectionSocketFactory sslConnectionFactory = new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-        builder.setSSLSocketFactory(sslConnectionFactory);
-        Registry<ConnectionSocketFactory> registry = RegistryBuilder.<ConnectionSocketFactory>create()
-                .register("https", sslConnectionFactory)
-                .register("http", new PlainConnectionSocketFactory())
-                .build();
-        HttpClientConnectionManager ccm = new BasicHttpClientConnectionManager(registry);
-        builder.setConnectionManager(ccm);
-
-        CloseableHttpClient httpClient = builder.build();
-
-        try (CloseableHttpResponse closeableHttpResponse = httpClient.execute(getRequest)) {
-            if (closeableHttpResponse.getStatusLine().getStatusCode() != 200) {
-                HttpEntity rEntity = closeableHttpResponse.getEntity();
-                String responseString = EntityUtils.toString(rEntity, StandardCharsets.UTF_8);
-                String errorMsg = String.format("There was a problem calling the FHIR server.\n" +
-                                "Response Status : %s .\nResponse Detail :%s. \nUrl: :%s",
-                        closeableHttpResponse.getStatusLine(),
-                        responseString,
-                        url);
-                LOGGER.error(errorMsg);
-                throw new RuntimeException(errorMsg);
-            }
-
-            HttpEntity httpEntity = closeableHttpResponse.getEntity();
-            return EntityUtils.toString(httpEntity);
-        } catch (IOException e) {
-            LOGGER.error("Error posting to " + url, e);
-            throw new RuntimeException(e);
-        } finally {
-            try {
-                httpClient.close();
-            }catch (IOException e) {
-                LOGGER.error("Error closing HttpClient");
-            }
-        }
-    }
-
 }
 
 
