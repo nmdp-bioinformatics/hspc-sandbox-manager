@@ -1856,6 +1856,7 @@ angular.module('sandManApp.services', [])
                 }
 
                 if (launchMode !== undefined && launchMode === true) {
+                    params["need_patient_banner"] = false;
                     appWindow = window.open('launchEmbedded.html?'+key, '_blank');
                 } else {
                     appWindow = window.open('launch.html?'+key, '_blank');
