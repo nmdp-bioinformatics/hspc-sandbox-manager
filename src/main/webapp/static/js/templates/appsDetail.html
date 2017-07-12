@@ -15,6 +15,16 @@
                 </div>
             </div>
 
+            <div class="detail-form" >
+                <label class="detail-form-label">Client Type</label>
+                <div class="detail-form-label-input with-info">
+                    <select ng-disabled="!canModify" ng-model="clientJSON.clientType" ng-options="option for option in clientTypes" class="form-control" />
+                </div>
+                <a href='http://docs.smarthealthit.org/authorization/' target="_blank" class='float-right-dark-btn'>
+                    <img src="static/images/circle_info-128.png" class="info-btn">
+                </a>
+            </div>
+
             <div class="detail-form" ng-show="isInbound">
                 <label class="detail-form-label">Client Uri</label>
                 <div class="detail-form-label-input">

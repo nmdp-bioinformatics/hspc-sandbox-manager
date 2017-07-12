@@ -28,8 +28,14 @@
         // the Sandbox Manager's token credentials to the app
         delete sessionStorage.tokenResponse;
 
+        if (details.app.launchUri.lastIndexOf("?") > -1) {
+            details.app.launchUri = details.app.launchUri + "&"
+        } else {
+            details.app.launchUri = details.app.launchUri + "?"
+        }
+
         window.location = details.app.launchUri +
-        '?iss=' + encodeURIComponent(details.iss) +
+        'iss=' + encodeURIComponent(details.iss) +
         '&launch=' + encodeURIComponent(details.context.launch_id);
       }
 

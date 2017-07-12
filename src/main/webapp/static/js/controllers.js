@@ -2668,6 +2668,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     $scope.canModify = false;
     $scope.isAppsPicker = false;
     $scope.docLink = docLinks.docLink;
+    $scope.clientTypes = ["Public Client", "Confidential Client"];
+
 
     $scope.showing = {appDetail: false};
 
@@ -2789,6 +2791,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 $scope.galleryOffset = 80;
                 $scope.selected.selectedApp.clientJSON = JSON.parse(resultApp.clientJSON);
                 $scope.clientJSON = $scope.selected.selectedApp.clientJSON;
+                if ($scope.selected.selectedApp.clientJSON.tokenEndpointAuthMethod === "SECRET_BASIC") {
+                    $scope.clientJSON.clientType = "Confidential Client";
+                } else {
+                    $scope.clientJSON.clientType = "Public Client";
+                }
                 $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
                 $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
                 $scope.clientJSON.scope = $scope.clientJSON.scope.join(" ");
@@ -2895,6 +2902,13 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         }
         var updateClientJSON = angular.copy($scope.clientJSON);
         delete updateClientJSON.logo;
+
+        if ($scope.clientJSON.clientType !== "Public Client") {
+            updateClientJSON.tokenEndpointAuthMethod = "SECRET_BASIC";
+        } else {
+            updateClientJSON.tokenEndpointAuthMethod = "NONE";
+        }
+
         if (Object.prototype.toString.call(updateClientJSON.redirectUris) !== '[object Array]' &&
             typeof updateClientJSON.redirectUris !== 'undefined') {
             updateClientJSON.redirectUris = updateClientJSON.redirectUris.split(',');
@@ -2935,6 +2949,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.selected.selectedApp.samplePatients = updateClientJSON.samplePatients;
         var modalProgress = openModalProgressDialog();
         appRegistrationServices.updateSandboxApp($scope.selected.selectedApp).then(function (result) {
+            $scope.select(result);
             modalProgress.dismiss();
         }, function (err) {
             modalProgress.dismiss();
