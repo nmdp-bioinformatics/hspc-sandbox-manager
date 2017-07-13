@@ -2324,6 +2324,8 @@ angular.module('sandManApp.services', [])
                     settings.userManagementUrl = envInfo.userManagementUrl || settings.userManagementUrl;
                     settings.sbmUrlHasContextPath = envInfo.sbmUrlHasContextPath || settings.sbmUrlHasContextPath;
                     settings.personaCookieDomain = envInfo.personaCookieDomain || settings.personaCookieDomain;
+                    settings.hspcAccountCookieName = envInfo.hspcAccountCookieName || settings.hspcAccountCookieName;
+                    settings.personaCookieName = envInfo.personaCookieName || settings.personaCookieName;
                 }
                 deferred.resolve(settings);
                 });
