@@ -1864,14 +1864,17 @@ angular.module('sandManApp.services', [])
                     appWindow = window.open('launch.html?'+key, '_blank');
                 }
 
-                var userPersonaCopy = angular.copy(userPersona);
-                delete userPersonaCopy.createdBy;
-                delete userPersonaCopy.sandbox;
+                var launchDetails;
+                if (userPersona !== null && userPersona !== undefined && userPersona) {
+                    var userPersonaCopy = angular.copy(userPersona);
+                    delete userPersonaCopy.createdBy;
+                    delete userPersonaCopy.sandbox;
 
-                var launchDetails = {
-                    userPersona: userPersonaCopy,
-                    patientContext: patientContext.fhirId
-                };
+                    launchDetails = {
+                        userPersona: userPersonaCopy,
+                        patientContext: patientContext.fhirId
+                    };
+                }
 
                 registerAppContext(app, params, launchDetails, key);
                 if(userPersona !== null && userPersona !== undefined && userPersona) {
