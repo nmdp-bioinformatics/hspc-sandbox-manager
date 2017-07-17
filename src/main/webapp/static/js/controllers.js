@@ -231,6 +231,12 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             oauth2.logout();
         };
 
+        $scope.userSettings = function () {
+            appsSettings.getSettings().then(function(settings){
+                $window.open(settings.userManagementUrl, '_blank');
+            });
+        };
+
         $scope.selectSandbox = function (sandbox) {
             if (sandboxManagement.getSandbox().sandboxId !== sandbox.sandboxId) {
                 var sandboxUrlSettings = appsSettings.getSandboxUrlSettings();

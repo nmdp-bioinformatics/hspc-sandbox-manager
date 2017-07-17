@@ -1310,18 +1310,7 @@ angular.module('sandManApp.services', [])
             userSettings: function() {
                 var that = this;
                 appsSettings.getSettings().then(function(settings){
-                    $.ajax({
-                        url: settings.userManagementUrl,
-                        type: 'GET',
-                        beforeSend : function( xhr ) {
-                            xhr.setRequestHeader( 'c8381465-a7f8-4ecc-958d-ec296d6e8671', that.getOAuthUser().sbmUserId);
-                            xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
-                        }
-
-                    }).done(function(data){
-                            window.location.href = settings.userManagementUrl + "/private/"
-                        }).fail(function(){
-                        });
+                    window.location.href = settings.userManagementUrl
                 });
             },
             hasSystemRole: function(role) {
