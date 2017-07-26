@@ -34,6 +34,7 @@
             <label class="detail-form-label">App Redirect URIs</label>
             <div class="detail-form-label-input">
                 <input ng-model="clientJSON.redirectUris" class="form-control" placeholder="e.g.: http://mydomain.com/growth-chart/index.html"/>
+                <p>Note: If you provide one or more redirect URIs, your client code must send one of the provided values when performing OAuth2 authorization or you will receive an "Invalid redirect" error.</p>
             </div>
         </div>
 
