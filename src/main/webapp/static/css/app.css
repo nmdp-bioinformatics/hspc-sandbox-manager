@@ -1,9 +1,12 @@
 :root {
     /* Branding Colors */
-    --primary-blue: #10759D;
+    --primary-blue: #005778;
     --hover-blue:   #4593B2;
     --disable-blue: #66D5FF;
     --primary-gray: #58585A;
+
+    --new-primary-blue: #005778;
+    --new-hover-blue:   #4584a7;
 
     /*--link-blue:    #0095CC;*/
     /*--primary-gray: #666666;*/
@@ -42,7 +45,8 @@
 }
 
 .full-screen {
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    /*font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;*/
+    font-family: Roboto, sans-serif;
     font-size: 14px;
     line-height: 1.42857143;
     color: #58585A;
@@ -51,7 +55,8 @@
 }
 
 .full-screen-scroll {
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    /*font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;*/
+    font-family: Roboto, sans-serif;
     font-size: 14px;
     line-height: 1.42857143;
     color: #58585A;
@@ -375,7 +380,7 @@
 }
 
 .progress-bar-success {
-    background-color: #10759D;
+    background-color: #005778;
 }
 
 .progress {
@@ -478,7 +483,7 @@
 
 .nav-sidebar a:hover,
 .nav-sidebar a.selected {
-    color: #10759D;
+    color: #005778;
     text-decoration: none;
     outline: none;
     cursor: pointer;
@@ -539,12 +544,12 @@
     text-decoration: none;
 }
 
-.navbar-title {
-    /*padding-top: 25px;*/
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-}
+/*.navbar-title {*/
+    /*!*padding-top: 25px;*!*/
+    /*width: 100%;*/
+    /*margin-left: auto;*/
+    /*margin-right: auto;*/
+/*}*/
 
 .navbar-stack-sandbox,
 .navbar-stack-sign-in,
@@ -555,7 +560,8 @@
 .navbar-stack-name a,
 .navbar-stack-name.disabled,
 .navbar-stack-name a.disabled{
-    color: #58585A;
+    /*color: #58585A;*/
+    color: white;
     font-weight: normal;
     font-size: 14px;
     line-height: 20px;
@@ -563,7 +569,8 @@
 }
 
 .navbar-stack-sandboxes select{
-    color: #58585A;
+    /*color: #58585A;*/
+    color: white;
     position: absolute;
     top: 0;
     right: -185px;
@@ -576,7 +583,8 @@
 .navbar-stack-sign-in  a:hover,
 .navbar-stack-name a:hover,
 .navbar-stack-apps a:hover{
-    color: #10759D;
+    /*color: #005778;*/
+    color: #E6E6E6;
     text-decoration: none;
     cursor: pointer;
 }
@@ -608,7 +616,7 @@
 .navbar-stack-box {
     position: absolute;
     right: 15px;
-    top: 20px;
+    top: 21px;
 }
 
 .navbar-stack-sign-in {
@@ -644,25 +652,28 @@
 }
 
 .navbar {
-    background-color: #FAFAFA;
+    background-color: #005778;
+    color: white;
     border-radius: 0;
-    border-width: 0 0 2px 0;
-    border-color: #F4F4F4;
-    height: 60px;
+    /*border-width: 0 0 2px 0;*/
+    /*border-color: #F4F4F4;*/
+    height: 64px;
     margin-bottom: 0;
 }
 
 span.title,
 .navbar .navbar-brand,
 .navbar .navbar-brand a{
-    color: #58585A;
+    /*color: #58585A;*/
+    color: white;
     font-weight: normal;
     padding: 45px 15px 25px 15px;
     text-decoration: none;
 }
 
 .navbar-brand a:hover {
-    color: #10759D;
+    /*color: #005778;*/
+    color: #E6E6E6;
     text-decoration: none;
     cursor: pointer;
 }
@@ -675,7 +686,7 @@ span.title,
 }
 
 .blue-bar {
-    background-color: #10759D;
+    background-color: #005778;
     height: 50px;
 }
 
@@ -692,7 +703,15 @@ span.title,
 }
 
 .blue-bar .blue-bar-img img {
-    height: 50px;
+    height: 60px;
+}
+
+.navbar-title {
+    text-align: center;
+    padding-top: 11px;
+    color: #FFF;
+    font-size: 28px;
+    font-weight: 100;
 }
 
 .popover-btn:hover {
@@ -747,7 +766,7 @@ span.title,
 
 .navbar-sandboxes {
     position: absolute;
-    top: 23px;
+    top: 21px;
     left: 290px;
     /*height: 60px;*/
 }
@@ -762,7 +781,8 @@ span.title,
 .navbar-admin-dashboard >a{
     font-size: 18px;
     text-decoration: none;
-    color: #58585A;
+    /*color: #58585A;*/
+    color: white;
 }
 
 .navbar-sandboxes > a>i {
@@ -771,7 +791,8 @@ span.title,
     top: 4px;
     right: -11px;
     text-decoration: none;
-    color: #58585A;
+    /*color: #58585A;*/
+    color: #E6E6E6;
 }
 
 .navbar-sandboxes > a:focus,
@@ -787,7 +808,8 @@ span.title,
 .navbar-admin-dashboard > a:hover,
 .navbar-admin-dashboard > a>i:hover{
     text-decoration: none;
-    color: #10759D;
+    /*color: #005778;*/
+    color: #E6E6E6;
 }
 
 .navbar-sandboxes .popover.bottom>.arrow {
@@ -811,7 +833,7 @@ span.title,
 
 .navbar-admin-dashboard {
     position: absolute;
-    top: 23px;
+    top: 21px;
     left: 400px;
     /*height: 60px;*/
 }
@@ -822,11 +844,12 @@ span.title,
     top: 7px;
     right: -17px;
     text-decoration: none;
-    color: #58585A;
+    /*color: #58585A;*/
+    color: white;
 }
 
 .sandboxes-content .sandbox-item {
-    color: #10759D;
+    color: #005778;
     padding: 4px 0 4px 5px;
     font-size: 14px;
     text-decoration: none;
@@ -848,7 +871,7 @@ span.title,
 .sandbox-nav-tabs .nav-tabs>li.active>a,
 .sandbox-nav-tabs .nav-tabs>li.active>a:hover,
 .sandbox-nav-tabs .nav-tabs>li.active>a:focus {
-    color: #10759D;
+    color: #005778;
     background-color: #F4F4F4;
     border: none;
     border-bottom-color: transparent;
@@ -857,7 +880,7 @@ span.title,
 
 .sandbox-nav-tabs .nav-tabs>li>a:hover,
 .sandbox-nav-tabs .nav-tabs>li>a:focus {
-    color: #10759D;
+    color: #005778;
     background-color: #F4F4F4;
     border: none;
 }
@@ -1038,7 +1061,7 @@ span.title,
 }
 
 .sandboxes-content .sandbox-item:hover {
-    background-color: #10759D;
+    background-color: #005778;
     color: #FFF;
     cursor: pointer;
 }
@@ -1051,7 +1074,7 @@ span.title,
 }
 
 .sandboxes-content .sandbox-item.sandbox:hover {
-    background-color: #10759D;
+    background-color: #005778;
     color: #FFF;
     cursor: pointer;
 }
@@ -1067,7 +1090,7 @@ span.title,
 
 .settings-content .settings-item
 {
-    color: #10759D;
+    color: #005778;
     padding: 4px 0 4px 5px;
     font-size: 14px;
     text-decoration: none;
@@ -1087,7 +1110,7 @@ span.title,
 }
 
 .settings-content .settings-item:hover {
-    background-color: #10759D;
+    background-color: #005778;
     color: #FFF;
     cursor: pointer;
 }
@@ -1125,7 +1148,7 @@ span.title,
 a {
     font-weight: 300;
     font-size: 12px;
-    color: #10759D;
+    color: #005778;
     outline: none;
 }
 
@@ -1396,8 +1419,8 @@ a.selected {
 
 .btn-basic {
     color: #FFF;
-    background-color: #10759D;
-    border-color: #10759D;
+    background-color: #005778;
+    border-color: #005778;
     font-weight: 300;
     font-size: 12px;
     padding: 3px 6px 3px 6px;
@@ -1652,7 +1675,7 @@ fieldset[disabled] .btn-cancel.active {
 }
 
 .app-detail-value>a {
-    color: #10759D;
+    color: #005778;
     font-size: 14px;
     font-weight: 600;
     word-wrap: break-word;
@@ -1706,7 +1729,7 @@ fieldset[disabled] .btn-cancel.active {
 }
 
 .thumb-holder a:hover {
-    color: #10759D;
+    color: #005778;
     text-decoration: none;
     cursor: pointer;
 }
@@ -1960,7 +1983,7 @@ fieldset[disabled] .btn-cancel.active {
 }
 
 .detail-form-value a {
-    color: #10759D;
+    color: #005778;
     font-size: 12px;
     font-weight: 600;
 }
@@ -2016,7 +2039,7 @@ fieldset[disabled] .btn-cancel.active {
     border-bottom: 1px solid #E6E6E6;
     color: #FFF;
     /*border-radius: 4px;*/
-    background-color: #10759D;
+    background-color: #005778;
 }
 .modal-footer {
     padding: 10px 24px 4px;
@@ -2281,7 +2304,7 @@ td {
 }
 
 .btn-image {
-    color: #10759D;
+    color: #005778;
     margin-right: 5px;
     outline: none;
 }
@@ -2560,7 +2583,7 @@ td {
     color: #FFF;
     box-shadow: 0 0 10px #58585A;
     padding: 0;
-    background-color: #10759D;
+    background-color: #005778;
     border-radius: 3px;
     border: 1px solid #FFF;
     cursor:pointer
@@ -2574,7 +2597,7 @@ td {
 }
 .message_info div {
     padding: 5px 10px;
-    background-color: #10759D;
+    background-color: #005778;
     border-radius: 3px;
     border: 1px solid #E6E6E6;
 }
@@ -2685,7 +2708,7 @@ td {
 
 .start-link-text {
     float: right;
-    color: #10759D;
+    color: #005778;
     font-size: 22px;
     font-weight:normal;
 }
@@ -2740,7 +2763,7 @@ footer .copyright {
 }
 
 footer .copyright>a {
-    color: #10759D;
+    color: #005778;
     font-weight: 400;
     font-size: 14px;
 }

@@ -5,9 +5,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     function ($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, personaServices, $location, $state, branded, $timeout, $window, $uibModal, cookieService) {
 
         $scope.size = {
-            navBarHeight: 60,
+            navBarHeight: 64,
             footerHeight: 60,
-            sandboxBarHeight: 50,
+            sandboxBarHeight: 0,
             screenH: 700,
             screenW: 1200
         };
@@ -73,7 +73,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                         $scope.goToDashboard();
                     } else {
                         // User can't go to a page which requires a sandbox without a sandbox
-                        $scope.showing.navBar = false;
+                        $scope.showing.navBar = true;
                         $scope.showing.footer = false;
                         $scope.showing.sideNavBar = false;
                         $state.go('create-sandbox', {});
@@ -3146,7 +3146,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     function ($rootScope, $scope, $state, $timeout, appsSettings, branded) {
 
         $scope.createProgress = 0;
-        $scope.showing.navBar = false;
+        $scope.showing.navBar = true;
         $scope.showing.sideNavBar = false;
         $scope.showing.footer = false;
 

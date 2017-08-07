@@ -112,6 +112,13 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
             authenticate: true
         })
 
+        .state('ehr-integration', {
+            url: '/ehr-integration',
+            templateUrl: 'static/js/templates/ehrIntegration.html',
+            needsSandbox: true,
+            authenticate: true
+        })
+
         .state('settings', {
             url: '/settings',
             templateUrl: 'static/js/templates/settings.html',
