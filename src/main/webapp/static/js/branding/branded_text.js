@@ -2,10 +2,10 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
 
     $provide.value("brandedText", {
             hspc: {
-                mainImage: "static/branding/hspc/images/hspc-sndbx-logo.png",
-                mainImage2x: "static/branding/hspc/images/hspc-sndbx-logo@2x.png 2x",
-                whiteImage: "static/branding/hspc/images/hspc-sndbx-logo-wh.png",
-                whiteImage2x: "static/branding/hspc/images/hspc-sndbx-logo-wh@2x.png 2x",
+                mainImage: "https://content.hspconsortium.org/images/hspc-sandbox/logo/hspc-sndbx-logo.png",
+                mainImage2x: "https://content.hspconsortium.org/images/hspc-sandbox/logo/hspc-sndbx-logo@2x.png 2x",
+                whiteImage: "https://content.hspconsortium.org/images/hspc-sandbox/logo/hspc-sndbx-logo-wh.png",
+                whiteImage2x: "https://content.hspconsortium.org/images/hspc-sandbox/logo/hspc-sndbx-logo-wh@2x.png 2x",
                 mainTitle: "The Healthcare Innovation Ecosystem",
                 sandboxText: "",
                 moreLinks: true,
@@ -14,13 +14,13 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                 copyright: "© 2017 by Healthcare Services Platform Consortium",
                 showCert: true,
                 loginDoc: "",
-                defaultSchemaVersion : "3",
+                defaultApiEndpointIndex : "4",
                 defaultLaunchScenario: true,
-                sandboxSchemaVersions : [
-                    {version: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", altName: "FHIR v1.0.2", canCreate: true},
-                    {version: "2", name: "FHIR DSTU 2 (v1.6.0)", fhirVersion: "1.6.0", altName: "FHIR v1.6", canCreate: false},
-                    {version: "3", name: "FHIR STU 3 (v1.8.0)", fhirVersion: "1.8.0", altName: "FHIR v1.8", canCreate: true},
-                    {version: "4", name: "FHIR STU 3 (v1.9.0)", fhirVersion: "1.9.0", altName: "FHIR v1.9", canCreate: true}
+                sandboxApiEndpointIndexes : [
+                    {index: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", altName: "FHIR v1.0.2", canCreate: true, supportsDataSets: false},
+                    {index: "2", name: "FHIR DSTU 2 (v1.6.0)", fhirVersion: "1.6.0", altName: "FHIR v1.6", canCreate: false, supportsDataSets: false},
+                    {index: "3", name: "FHIR STU 3 (v1.8.0)", fhirVersion: "1.8.0", altName: "FHIR v1.8", canCreate: false, supportsDataSets: false},
+                    {index: "4", name: "FHIR STU 3 (v3.0.1)", fhirVersion: "3.0.1", altName: "FHIR v3.0.1", canCreate: true, supportsDataSets: true}
                 ],
                 sandboxDescription: {
                     title: "What is a sandbox?",

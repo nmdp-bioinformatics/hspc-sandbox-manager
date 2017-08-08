@@ -66,10 +66,10 @@ public class LaunchScenarioController extends AbstractController  {
 
         Sandbox sandbox = sandboxService.findBySandboxId(launchScenario.getSandbox().getSandboxId());
         checkSandboxUserCreateAuthorization(request, sandbox);
-        checkCreatedByIsCurrentUserAuthorization(request, launchScenario.getCreatedBy().getLdapId());
+        checkCreatedByIsCurrentUserAuthorization(request, launchScenario.getCreatedBy().getSbmUserId());
 
         launchScenario.setSandbox(sandbox);
-        User user = userService.findByLdapId(launchScenario.getCreatedBy().getLdapId());
+        User user = userService.findBySbmUserId(launchScenario.getCreatedBy().getSbmUserId());
         launchScenario.setVisibility(getDefaultVisibility(user, sandbox));
         launchScenario.setCreatedBy(user);
 
@@ -105,7 +105,7 @@ public class LaunchScenarioController extends AbstractController  {
         checkSandboxUserReadAuthorization(request, sandbox);
         UserLaunch userLaunch = userLaunchService.findByUserIdAndLaunchScenarioId(getSystemUserId(request), existingLaunchScenario.getId());
         if (userLaunch == null) {
-            User user = userService.findByLdapId(getSystemUserId(request));
+            User user = userService.findBySbmUserId(getSystemUserId(request));
             userLaunchService.create(new UserLaunch(user, existingLaunchScenario, new Timestamp(new Date().getTime())));
         } else {
             userLaunchService.update(userLaunch);
@@ -151,6 +151,6 @@ public class LaunchScenarioController extends AbstractController  {
         checkSandboxUserReadAuthorization(request, sandbox);
         List<LaunchScenario> launchScenarios = launchScenarioService.findBySandboxIdAndCreatedByOrVisibility(sandboxId, oauthUserId, Visibility.PUBLIC);
         // Modify the lastLaunchSeconds field of each launch scenario to match when this user last launched each launch scenario
-        return launchScenarioService.updateLastLaunchForCurrentUser(launchScenarios, userService.findByLdapId(oauthUserId));
+        return launchScenarioService.updateLastLaunchForCurrentUser(launchScenarios, userService.findBySbmUserId(oauthUserId));
     }
 }

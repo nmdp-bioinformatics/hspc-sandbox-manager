@@ -38,19 +38,23 @@ public class UserServiceImpl implements UserService {
         return repository.save(user);
     }
 
-    public User findByLdapId(final String ldapId) {
-        User user = repository.findByLdapId(ldapId);
+    public User findBySbmUserId(final String sbmUserId) {
+        User user = repository.findBySbmUserId(sbmUserId);
 
-        if (termsOfUseService.orderByCreatedTimestamp().size() > 0) {
-            TermsOfUse latestTermsOfUse = termsOfUseService.orderByCreatedTimestamp().get(0);
-            user.setHasAcceptedLatestTermsOfUse(false);
-            for (TermsOfUseAcceptance termsOfUseAcceptance : user.getTermsOfUseAcceptances()) {
-                if (termsOfUseAcceptance.getTermsOfUse().getId().equals(latestTermsOfUse.getId())) {
-                    user.setHasAcceptedLatestTermsOfUse(true);
-                    return user;
-                }
-            }
-        }
+        if(user == null)
+            return null;
+
+        userHasAcceptedTermsOfUse(user);
+        return user;
+    }
+
+    public User findByUserEmail(final String email) {
+        User user = repository.findByUserEmail(email);
+
+        if(user == null)
+            return null;
+
+        userHasAcceptedTermsOfUse(user);
         return user;
     }
 
@@ -98,6 +102,22 @@ public class UserServiceImpl implements UserService {
         acceptances.add(termsOfUseAcceptance);
         user.setTermsOfUseAcceptances(acceptances);
         save(user);
+    }
+
+    private void userHasAcceptedTermsOfUse(User user) {
+        TermsOfUse latestTermsOfUse = termsOfUseService.mostRecent();
+        if (latestTermsOfUse != null) {
+            user.setHasAcceptedLatestTermsOfUse(false);
+            for (TermsOfUseAcceptance termsOfUseAcceptance : user.getTermsOfUseAcceptances()) {
+                if (termsOfUseAcceptance.getTermsOfUse().getId().equals(latestTermsOfUse.getId())) {
+                    user.setHasAcceptedLatestTermsOfUse(true);
+                    return;
+                }
+            }
+        } else {
+            // there are no terms so by default the user has accepted the latest
+            user.setHasAcceptedLatestTermsOfUse(true);
+        }
     }
 }
 

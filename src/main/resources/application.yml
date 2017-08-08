@@ -1,29 +1,50 @@
-endpoints:
-  jmx:
-    enabled: false
-
-multipart:
-  enabled: true
+server:
+  port: 8080
+  session:
+    cookie:
+      name: SBM_JSESSIONID
+  tomcat:
+    remote_ip_header: x-forwarded-for
+    protocol_header: x-forwarded-proto
 
 spring:
+  application:
+    name: HSPC Sandbox Manager
   datasource:
     base_url: jdbc:mysql://localhost:3306
-    url: ${spring.datasource.base_url}/sandman
+    my_schema: sandman
+    url: ${spring.datasource.base_url}/${spring.datasource.my_schema}
     username: root
     password: password
     driverClassName: com.mysql.jdbc.Driver
     validation-query: SELECT 1
     test-on-borrow: true
+    initialSize: 1
+    maxActive: 5
+  # Used to create the sandman schema
+  bootstrapDatasource:
+    url: ${spring.datasource.base_url}
+    username: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    driverClassName: ${spring.datasource.driverClassName}
+    validation-query: ${${spring.datasource.validation-query}}
+    test-on-borrow: ${spring.datasource.test-on-borrow}
+    initialSize: 1
+    maxActive: 1
   jpa:
-    database: MYSQL
-    show-sql: true
     hibernate:
-      ddl-auto: update
+      # Do not commit with a different value (update, create, etc)
+      # Instead, use flywaydb scripts at /src/main/resources/db/mysql/migrate
+      ddl-auto: validate
+      show-sql: false
       dialect: org.hibernate.dialect.MySQL5InnoDBDialect
       naming_strategy: org.hibernate.cfg.ImprovedNamingStrategy
+
+flyway:
+  locations: db/mysql/migration
+
 hspc:
   platform:
-    hostUrl: http://localhost
     # When a user is added to a PUBLIC sandbox, these are their default Sandbox Roles
     defaultPublicSandboxRoles: USER
     # When a user is added to a PRIVATE sandbox, these are their default Sandbox Roles
@@ -37,39 +58,33 @@ hspc:
     #    defaultSandboxVisibility: PUBLIC
     defaultSandboxVisibility: PRIVATE
     authorization:
-      port: 8080
-      context: /hspc-reference-authorization
-      baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.authorization.port}${hspc.platform.authorization.context}
+      url: http://localhost:8060
+      tokenEndpoint: ${hspc.platform.authorization.url}/token
+      authorizeEndpoint: ${hspc.platform.authorization.url}/authorize
+      adminAccess:
+        clientId: sandman_admin
+        clientSecret: secret
     api:
       version1:
-        port: 8080
-        context: /hspc-reference-api-v1
-        baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version1.port}${hspc.platform.api.version1.context}
+        baseUrl: http://localhost:8071/
       version2:
-        port: 8080
-        context: /hspc-reference-api-v2
-        baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version2.port}${hspc.platform.api.version2.context}
+        baseUrl: http://localhost:8072/
       version3:
-        port: 8080
-        context: /hspc-reference-api-v3
-        baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version3.port}${hspc.platform.api.version3.context}
+        baseUrl: http://localhost:8073/
       version4:
-        port: 8080
-        context: /hspc-reference-api-v4
-        baseUrl:  ${hspc.platform.hostUrl}:${hspc.platform.api.version4.port}${hspc.platform.api.version4.context}
-      oauth2:
-        clientId: hspc_resource_server
-        clientSecret: secret
-      oauthUserInfoEndpointURL: ${hspc.platform.authorization.baseUrl}/userinfo
-      oauthClientEndpointURL: ${hspc.platform.authorization.baseUrl}/api/clients
-      oauthUserLoginEndpointURL: ${hspc.platform.authorization.baseUrl}/j_spring_security_check
-      oauthUser: admin
-      oauthUserPassword: password
+        baseUrl: http://localhost:8074/
+      oauthUserInfoEndpointURL: ${hspc.platform.authorization.url}/userinfo
+      oauthClientEndpointURL: ${hspc.platform.authorization.url}/api/clients
     messaging:
-      port: 8080
-      context: /hspc-reference-messaging/
       sendEmail: false
-      baseUrl: ${hspc.platform.hostUrl}:${hspc.platform.messaging.port}${hspc.platform.messaging.context}
-      emailSenderEndpointURL: ${hspc.platform.messaging.baseUrl}mailsender
-      sandboxUserEndpointURL: ${hspc.platform.messaging.baseUrl}sandboxuser
+      url: http://localhost:8091
+      emailSenderEndpointURL: ${hspc.platform.messaging.url}/mailsender
+    syntheticData:
+#      fhirServerUrl: https://syntheticmass.mitre.org/fhir
+       fhirServerUrl: ${hspc.platform.api.version3.baseUrl}/synthea2/open
+    jwt:
+      key: devKeyDoNotUseInProductionShouldBeOverwrittenInProdConfiguration
+      signatureAlgorithm: HS256
 
+multipart:
+  enabled: true

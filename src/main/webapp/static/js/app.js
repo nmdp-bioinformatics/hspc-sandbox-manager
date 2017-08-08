@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootstrap', 'highcharts-ng', 'sandManApp.filters', 'sandManApp.services',
-    'sandManApp.controllers', 'sandManApp.directives', "sandManApp.branding"],
+    'sandManApp.controllers', 'sandManApp.directives', "sandManApp.branding", "ngCookies"],
     function($stateProvider, $urlRouterProvider, $locationProvider ){
 
 //   $locationProvider.html5Mode(true);
@@ -108,6 +108,13 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
         .state('data-manager', {
             url: '/data-manager',
             templateUrl: 'static/js/templates/dataManager.html',
+            needsSandbox: true,
+            authenticate: true
+        })
+
+        .state('ehr-integration', {
+            url: '/ehr-integration',
+            templateUrl: 'static/js/templates/ehrIntegration.html',
             needsSandbox: true,
             authenticate: true
         })

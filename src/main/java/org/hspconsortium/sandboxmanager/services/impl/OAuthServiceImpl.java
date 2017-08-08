@@ -98,6 +98,21 @@ public class OAuthServiceImpl implements OAuthService {
         return null;
     }
 
+    @Override
+    public String getOAuthUserEmail(HttpServletRequest request) {
+        try {
+            JSONObject jsonObject = getOAuthUser(request);
+            if (jsonObject != null) {
+                //TODO change to email when FireBase starts sending email
+                return (String) jsonObject.get("preferred_username");
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+
     private JSONObject getOAuthUser(HttpServletRequest request) {
 
         String authToken = getBearerToken(request);

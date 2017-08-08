@@ -58,7 +58,7 @@ public class AdminController extends AbstractController {
 
     @RequestMapping(method = RequestMethod.GET, produces ="application/json", params = {"interval"})
     public @ResponseBody String getSandboxStatistics(HttpServletRequest request, @RequestParam(value = "interval") String intervalDays) throws UnsupportedEncodingException {
-        User user = userService.findByLdapId(getSystemUserId(request));
+        User user = userService.findBySbmUserId(getSystemUserId(request));
         checkUserSystemRole(user, SystemRole.ADMIN);
         return adminService.getSandboxStatistics(intervalDays);
     }
@@ -68,7 +68,7 @@ public class AdminController extends AbstractController {
     @Transactional
     public void deleteSandboxById(HttpServletRequest request, @PathVariable String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
-        User user = userService.findByLdapId(getSystemUserId(request));
+        User user = userService.findBySbmUserId(getSystemUserId(request));
         checkUserSystemRole(user, SystemRole.ADMIN);
 
         //delete sandbox invites

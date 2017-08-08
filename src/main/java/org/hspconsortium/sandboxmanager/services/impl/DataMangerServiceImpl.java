@@ -17,16 +17,15 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
+import org.hspconsortium.sandboxmanager.model.DataSet;
 import org.hspconsortium.sandboxmanager.model.Sandbox;
 import org.hspconsortium.sandboxmanager.model.SandboxImport;
-import org.hspconsortium.sandboxmanager.model.SnapshotAction;
 import org.hspconsortium.sandboxmanager.services.DataManagerService;
 import org.hspconsortium.sandboxmanager.services.SandboxService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -248,7 +247,12 @@ public class DataMangerServiceImpl implements DataManagerService {
     }
 
     private boolean resetSandboxFhirData(final Sandbox sandbox, final String bearerToken ) throws UnsupportedEncodingException {
-        if (postToSandbox(sandbox, "{}", "/sandbox/reset", bearerToken )) {
+        String jsonString = "{}";
+        if (!sandbox.getDataSet().equals(DataSet.NA)) {
+            jsonString = "{\"dataSet\": \"" + sandbox.getDataSet() + "\"}";
+        }
+
+        if (postToSandbox(sandbox, jsonString, "/sandbox/reset", bearerToken )) {
             sandboxService.reset(sandbox, bearerToken);
             return true;
         }

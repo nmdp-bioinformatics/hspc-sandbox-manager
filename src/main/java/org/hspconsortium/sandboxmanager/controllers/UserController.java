@@ -30,7 +30,9 @@ import org.hspconsortium.sandboxmanager.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpServerErrorException;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +41,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 @RestController
 @RequestMapping({"/REST/user"})
@@ -53,6 +56,8 @@ public class UserController extends AbstractController {
     private final UserPersonaService userPersonaService;
     private final SandboxActivityLogService sandboxActivityLogService;
 
+    private static Semaphore semaphore = new Semaphore(1);
+
     @Inject
     public UserController(final OAuthService oAuthService, final UserService userService,
                           final SandboxActivityLogService sandboxActivityLogService,
@@ -63,25 +68,63 @@ public class UserController extends AbstractController {
         this.sandboxActivityLogService = sandboxActivityLogService;
     }
 
-    @RequestMapping(method = RequestMethod.GET, params = {"ldapId"})
+    @CrossOrigin(origins = "*")
+    @RequestMapping(method = RequestMethod.GET, params = {"sbmUserId"})
     @Transactional
-    public @ResponseBody User getUser(final HttpServletRequest request, @RequestParam(value = "ldapId") String ldapId) {
+    public @ResponseBody
+    User getUser(final HttpServletRequest request, @RequestParam(value = "sbmUserId") String sbmUserId) {
+        checkUserAuthorization(request, sbmUserId);
+        String oauthUsername = oAuthService.getOAuthUserName(request);
+        String oauthUserEmail = oAuthService.getOAuthUserEmail(request);
 
-        checkUserAuthorization(request, ldapId);
-        User user = userService.findByLdapId(ldapId);
+        try {
+            semaphore.acquire();
+            createUserIfNotExists(sbmUserId, oauthUsername, oauthUserEmail);
+        } catch (InterruptedException e) {
+            LOGGER.error("User create thread interrupted.", e);
+        } catch(Throwable e) {
+            LOGGER.error("Exception handling the creation of a user.", e);
+        } finally {
+            // thread will be released in the event of an exception or successful user return
+            semaphore.release();
+        }
 
+        return userService.findBySbmUserId(sbmUserId);
+    }
+
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/acceptterms", method = RequestMethod.POST, params = {"sbmUserId", "termsId"})
+    @Transactional
+    public void acceptTermsOfUse(final HttpServletRequest request, @RequestParam(value = "sbmUserId") String sbmUserId,
+                                 @RequestParam(value = "termsId") String termsId) {
+
+        checkUserAuthorization(request, sbmUserId);
+        User user = userService.findBySbmUserId(sbmUserId);
+        userService.acceptTermsOfUse(user, termsId);
+    }
+
+    private void createUserIfNotExists(String sbmUserId, String oauthUsername, String oauthUserEmail) {
+        User user = userService.findBySbmUserId(sbmUserId);
+        if (user == null) {
+            user = userService.findByUserEmail(oauthUserEmail);
+            if (user != null) {
+                user.setSbmUserId(sbmUserId);
+            }
+        }
         // Create User if needed (if it's the first login to the system)
         if (user == null) {
-            UserPersona userPersona = userPersonaService.findByLdapId(ldapId);
+            UserPersona userPersona = userPersonaService.findByPersonaUserId(sbmUserId);
             if (userPersona != null) {
                 //This is a user persona. A user persona cannot be a sandbox user also
-                return null;
+                return;
             }
 
             user = new User();
             user.setCreatedTimestamp(new Timestamp(new Date().getTime()));
-            user.setLdapId(ldapId);
-            user.setName(oAuthService.getOAuthUserName(request));
+            user.setSbmUserId(sbmUserId);
+            user.setName(oauthUsername);
+            user.setEmail(oauthUserEmail);
+            user.setHasAcceptedLatestTermsOfUse(false);
             sandboxActivityLogService.systemUserCreated(null, user);
 
             Set<SystemRole> systemRoles = new HashSet<>();
@@ -92,7 +135,8 @@ public class UserController extends AbstractController {
             }
             user.setSystemRoles(systemRoles);
             userService.save(user);
-        } else if (user.getName() == null || user.getName().isEmpty() || !user.getName().equalsIgnoreCase(oAuthService.getOAuthUserName(request))) {
+        } else if (user.getName() == null || user.getName().isEmpty() || !user.getName().equalsIgnoreCase(oauthUsername) ||
+                user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().equalsIgnoreCase(oauthUserEmail)) {
 
             Set<SystemRole> curSystemRoles = user.getSystemRoles();
             if (curSystemRoles.size() == 0) {
@@ -105,21 +149,9 @@ public class UserController extends AbstractController {
                 user.setSystemRoles(systemRoles);
             }
             // Set or Update Name
-            user.setName(oAuthService.getOAuthUserName(request));
+            user.setName(oauthUsername);
+            user.setEmail(oauthUserEmail);
             userService.save(user);
         }
-
-        return userService.findByLdapId(ldapId);
     }
-
-    @RequestMapping(value = "/acceptterms", method = RequestMethod.POST, params = {"ldapId", "termsId"})
-    @Transactional
-    public void acceptTermsOfUse(final HttpServletRequest request, @RequestParam(value = "ldapId") String ldapId,
-                            @RequestParam(value = "termsId") String termsId) {
-
-        checkUserAuthorization(request, ldapId);
-        User user = userService.findByLdapId(ldapId);
-        userService.acceptTermsOfUse(user, termsId);
-    }
-
 }

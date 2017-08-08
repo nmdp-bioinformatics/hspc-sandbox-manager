@@ -9,7 +9,9 @@ public interface UserService {
 
     User save(final User user);
 
-    User findByLdapId(final String ldapId);
+    User findBySbmUserId(final String sbmUserId);
+
+    User findByUserEmail(final String email);
 
     String fullCount();
 

@@ -62,13 +62,13 @@ public class UserLaunchServiceImpl implements UserLaunchService {
     }
 
     @Override
-    public UserLaunch findByUserIdAndLaunchScenarioId(String ldapId, int launchScenarioId) {
-        return repository.findByUserIdAndLaunchScenarioId(ldapId, launchScenarioId);
+    public UserLaunch findByUserIdAndLaunchScenarioId(String sbmUserId, int launchScenarioId) {
+        return repository.findByUserIdAndLaunchScenarioId(sbmUserId, launchScenarioId);
     }
 
     @Override
-    public List<UserLaunch> findByUserId(String ldapId) {
-        return repository.findByUserId(ldapId);
+    public List<UserLaunch> findByUserId(String sbmUserId) {
+        return repository.findByUserId(sbmUserId);
     }
 
     @Override

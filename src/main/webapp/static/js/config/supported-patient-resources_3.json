@@ -6,7 +6,6 @@
     {"resourceType": "AllergyIntolerance", "patientSearch": "patient"},
     {"resourceType": "Condition", "patientSearch": "subject"},
     {"resourceType": "Procedure", "patientSearch": "subject"},
-    {"resourceType": "DiagnosticRequest", "patientSearch": "patient"},
     {"resourceType": "DiagnosticReport", "patientSearch": "subject"},
     {"resourceType": "Immunization", "patientSearch": "patient"},
     {"resourceType": "CarePlan", "patientSearch": "subject"},

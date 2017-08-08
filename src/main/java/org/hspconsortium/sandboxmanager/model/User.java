@@ -13,8 +13,11 @@ import java.util.Set;
 @Entity
 @NamedQueries({
         // Used to retrieve a user instance for multiple uses
-        @NamedQuery(name="User.findByLdapId",
-                query="SELECT c FROM User c WHERE c.ldapId = :ldapId"),
+        @NamedQuery(name="User.findBySbmUserId",
+                query="SELECT c FROM User c WHERE c.sbmUserId = :sbmUserId"),
+        // Used to retrieve a user instance for sandbox invites
+        @NamedQuery(name="User.findByUserEmail",
+                query="SELECT c FROM User c WHERE c.email = :email"),
         // Used for statistics
         @NamedQuery(name="User.fullCount",
                 query="SELECT COUNT(*) FROM User c"),
@@ -26,7 +29,8 @@ import java.util.Set;
 public class User {
     private Integer id;
     private Timestamp createdTimestamp;
-    private String ldapId;
+    private String email;
+    private String sbmUserId;
     private String name;
     private Set<SystemRole> systemRoles = new HashSet<>();
     private List<Sandbox> sandboxes = new ArrayList<>();
@@ -51,12 +55,20 @@ public class User {
         this.createdTimestamp = createdTimestamp;
     }
 
-    public String getLdapId() {
-        return ldapId;
+    public String getEmail() {
+        return email;
     }
 
-    public void setLdapId(String ldapId) {
-        this.ldapId = ldapId;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getSbmUserId() {
+        return sbmUserId;
+    }
+
+    public void setSbmUserId(String sbmUserId) {
+        this.sbmUserId = sbmUserId;
     }
 
     public String getName() {

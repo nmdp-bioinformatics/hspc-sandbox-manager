@@ -80,7 +80,7 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
 
         UserPersona userPersona = null;
         if (launchScenario.getUserPersona() != null) {
-            userPersona = userPersonaService.findByLdapIdAndSandboxId(launchScenario.getUserPersona().getLdapId(), sandbox.getSandboxId());
+            userPersona = userPersonaService.findByPersonaUserIdAndSandboxId(launchScenario.getUserPersona().getPersonaUserId(), sandbox.getSandboxId());
         }
         if (userPersona == null && launchScenario.getUserPersona() != null) {
             userPersona = launchScenario.getUserPersona();
@@ -119,6 +119,7 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
         if (updateLaunchScenario != null) {
             updateLaunchScenario.setLastLaunchSeconds(launchScenario.getLastLaunchSeconds());
             updateLaunchScenario.setDescription(launchScenario.getDescription());
+            updateLaunchScenario.setLaunchEmbedded(launchScenario.isLaunchEmbedded());
             updateContextParams(updateLaunchScenario, launchScenario.getContextParams());
             if (launchScenario.getApp().getAuthClient().getAuthDatabaseId() == null) {
                 // Create an anonymous App for a custom launch
@@ -195,7 +196,7 @@ public class LaunchScenarioServiceImpl implements LaunchScenarioService {
     @Override
     public List<LaunchScenario> updateLastLaunchForCurrentUser(final List<LaunchScenario> launchScenarios, final User user) {
         for (LaunchScenario launchScenario : launchScenarios) {
-            UserLaunch userLaunch = userLaunchService.findByUserIdAndLaunchScenarioId(user.getLdapId(), launchScenario.getId());
+            UserLaunch userLaunch = userLaunchService.findByUserIdAndLaunchScenarioId(user.getSbmUserId(), launchScenario.getId());
             if (userLaunch != null) {
                 launchScenario.setLastLaunchSeconds(userLaunch.getLastLaunchSeconds());
             } else {

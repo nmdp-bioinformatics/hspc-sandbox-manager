@@ -30,8 +30,6 @@ public interface SandboxService {
 
     boolean hasMemberRole(final Sandbox sandbox, final User user, final Role role);
 
-    boolean sandboxIdAvailable(final String sandboxId);
-
     void addSandboxImport(final Sandbox sandbox, final SandboxImport sandboxImport);
 
     void reset(final Sandbox sandboxId, final String bearerToken);
@@ -50,7 +48,7 @@ public interface SandboxService {
 
     String fullCount();
 
-    String schemaCount(final String schemaVersion);
+    String schemaCount(final String apiEndpointIndex);
 
     String intervalCount(final Timestamp intervalTime);
 }

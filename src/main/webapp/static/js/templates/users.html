@@ -18,8 +18,8 @@
                                 <tbody class="scrollContent">
                                 <tr ng-repeat="user in users">
                                     <td>{{user.name}}</td>
-                                    <td>{{user.ldapId}}</td>
-                                    <td><i ng-show="showDelete(user.ldapId)" ng-click="removeUser(user.ldapId)" class="fa fa-times-circle"></i></td>
+                                    <td>{{user.email}}</td>
+                                    <td><i ng-show="showDelete(user.sbmUserId)" ng-click="removeUser(user)" class="fa fa-times-circle"></i></td>
                                 </tbody>
                             </table>
                         </div>
@@ -50,10 +50,10 @@
                                 <tr ng-repeat="userRole in userRoles">
                                 <tr ng-repeat="sandboxInvite in sandboxInvites">
                                     <td>{{sandboxInvite.status}}</td>
-                                    <td>{{sandboxInvite.invitee.ldapId}}</td>
+                                    <td>{{sandboxInvite.invitee.email}}</td>
                                     <td>
                                         <button ng-click="revokeInvite(sandboxInvite)" class="btn btn-cancel" style="float: right"><i class="fa fa-remove"></i> Revoke</button>
-                                        <button ng-click="resendInvite(sandboxInvite.invitee.ldapId)" class="btn btn-accept" style="float: right"><i class="fa fa-share"></i> Resend</button>
+                                        <button ng-click="resendInvite(sandboxInvite.invitee.email)" class="btn btn-accept" style="float: right"><i class="fa fa-share"></i> Resend</button>
                                     </td>
                                 </tr>
                                 <tr ng-if="sandboxInvites.length === 0">

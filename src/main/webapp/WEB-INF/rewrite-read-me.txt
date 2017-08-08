@@ -1,5 +1,0 @@
-urlrewrite.xml contains url rewrite rules which are applied when running embedded Tomcat
-These are applied by the UrlRewriteFilter Bean in SandboxManagerApplication.java
-
-rewrite.conf contains url rewrite rules which are applied when running in a Tomcat container
-

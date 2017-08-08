@@ -9,17 +9,20 @@ import java.sql.Timestamp;
 @NamedQueries({
         // Used to retrieve all sandbox invites for an invitee to show a user their sandbox invites
         @NamedQuery(name="SandboxInvite.findInvitesByInviteeId",
-                query="SELECT c FROM SandboxInvite c WHERE c.invitee.ldapId = :inviteeId"),
+                query="SELECT c FROM SandboxInvite c WHERE c.invitee.sbmUserId = :inviteeId"),
         // Used to delete all sandbox invites when a sandbox is deleted
         // Used to retrieve all sandbox invites for a sandbox
         @NamedQuery(name="SandboxInvite.findInvitesBySandboxId",
                 query="SELECT c FROM SandboxInvite c WHERE c.sandbox.sandboxId = :sandboxId"),
         // Used to retrieve an existing sandbox invite to change it's status ex. PENDING to REVOKED
         @NamedQuery(name="SandboxInvite.findInvitesByInviteeIdAndSandboxId",
-                query="SELECT c FROM SandboxInvite c WHERE c.invitee.ldapId = :inviteeId and c.sandbox.sandboxId = :sandboxId"),
+                query="SELECT c FROM SandboxInvite c WHERE c.invitee.sbmUserId = :inviteeId and c.sandbox.sandboxId = :sandboxId"),
+        // Used to retrieve an existing sandbox invite to change it's status ex. PENDING to REVOKED
+        @NamedQuery(name="SandboxInvite.findInvitesByInviteeEmailAndSandboxId",
+                query="SELECT c FROM SandboxInvite c WHERE c.invitee.email = :inviteeEmail and c.sandbox.sandboxId = :sandboxId"),
         // Used to retrieve all sandbox invites for an invitee to show a user their PENDING (or other status) sandbox invites
         @NamedQuery(name="SandboxInvite.findInvitesByInviteeIdAndStatus",
-                query="SELECT c FROM SandboxInvite c WHERE c.invitee.ldapId = :inviteeId and c.status = :status"),
+                query="SELECT c FROM SandboxInvite c WHERE c.invitee.sbmUserId = :inviteeId and c.status = :status"),
         // Used to retrieve all sandbox invites for a sandbox to show a user manager PENDING, REJECTED, etc sandbox invites
         @NamedQuery(name="SandboxInvite.findInvitesBySandboxIdAndStatus",
                 query="SELECT c FROM SandboxInvite c WHERE c.sandbox.sandboxId = :sandboxId and c.status = :status")

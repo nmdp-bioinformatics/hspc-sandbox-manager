@@ -1,6 +1,12 @@
-# README #
+# HSPC Sandbox Manager
 
 Welcome to the HSPC Sandbox Manager!  
+
+# HSPC Sandbox
+
+*Note:* If you are wanting to build and test SMART on FHIR Apps, it is recommended that you use the free cloud-hosted version of the HSPC Sandbox.
+
+[HSPC Sandbox](https://sandbox.hspconsortium.org)
 
 ### How do I get set up? ###
 
