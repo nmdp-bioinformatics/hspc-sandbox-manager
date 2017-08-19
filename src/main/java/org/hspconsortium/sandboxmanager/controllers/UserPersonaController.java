@@ -95,7 +95,18 @@ public class UserPersonaController extends AbstractController {
         return userPersonaService.findBySandboxIdAndCreatedByOrVisibility(sandboxId, oauthUserId, Visibility.PUBLIC);
     }
 
-   @RequestMapping(method = RequestMethod.GET, params = {"lookUpId"})
+    @RequestMapping(value = "/default", method = RequestMethod.GET, produces = "application/json", params = {"sandboxId"})
+    @SuppressWarnings("unchecked")
+    public @ResponseBody UserPersona getSandboxDefaultUserPersona(HttpServletRequest request,
+                                                                     @RequestParam(value = "sandboxId") String sandboxId) {
+
+        String oauthUserId = oAuthService.getOAuthUserId(request);
+        Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
+        checkSandboxUserReadAuthorization(request, sandbox);
+        return userPersonaService.findDefaultBySandboxId(sandboxId, oauthUserId, Visibility.PUBLIC);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, params = {"lookUpId"})
     public @ResponseBody String checkForUserPersonaById(@RequestParam(value = "lookUpId")  String id) {
         UserPersona userPersona = userPersonaService.findByPersonaUserId(id);
         return (userPersona == null) ? null : userPersona.getPersonaUserId();

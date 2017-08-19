@@ -162,6 +162,19 @@ public class SandboxActivityLogServiceImpl implements SandboxActivityLogService 
     }
 
     @Override
+    public SandboxActivityLog userDelete(final User user) {
+        List<SandboxActivityLog> sandboxActivityLogList = findByUserId(user.getId());
+        for (SandboxActivityLog sandboxActivityLog : sandboxActivityLogList) {
+            delete(sandboxActivityLog);
+        }
+
+        SandboxActivityLog sandboxActivityLog = createSandboxActivityLog(null, null);
+        sandboxActivityLog.setAdditionalInfo(userToJson(user));
+        sandboxActivityLog.setActivity(SandboxActivity.USER_DELETED);
+        return this.save(sandboxActivityLog);
+    }
+
+    @Override
     public List<SandboxActivityLog> findBySandboxId(String sandboxId) {
         return repository.findBySandboxId(sandboxId);
     }
@@ -169,6 +182,11 @@ public class SandboxActivityLogServiceImpl implements SandboxActivityLogService 
     @Override
     public List<SandboxActivityLog> findByUserSbmUserId(String sbmUserId) {
         return repository.findByUserSbmUserId(sbmUserId);
+    }
+
+    @Override
+    public List<SandboxActivityLog> findByUserId(int userId) {
+        return repository.findByUserId(userId);
     }
 
     @Override
@@ -194,6 +212,13 @@ public class SandboxActivityLogServiceImpl implements SandboxActivityLogService 
         Type type = new TypeToken<Sandbox>() {
         }.getType();
         return gson.toJson(sandbox, type);
+    }
+
+    private static String userToJson(User user) {
+        Gson gson = new Gson();
+        Type type = new TypeToken<User>() {
+        }.getType();
+        return gson.toJson(user, type);
     }
 
 }

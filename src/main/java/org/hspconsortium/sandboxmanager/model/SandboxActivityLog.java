@@ -1,5 +1,7 @@
 package org.hspconsortium.sandboxmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 
@@ -8,6 +10,9 @@ import java.sql.Timestamp;
         // Not currently used, available for a future dashboard
         @NamedQuery(name="SandboxActivityLog.findByUserSbmUserId",
                 query="SELECT c FROM SandboxActivityLog c WHERE c.user.sbmUserId = :sbmUserId"),
+        // Used to find all activity for a user for deleting the user
+        @NamedQuery(name="SandboxActivityLog.findByUserId",
+                query="SELECT c FROM SandboxActivityLog c WHERE c.user.id = :userId"),
         // Used to delete all activity records when a sandbox is deleted, to remove foreign keys
         @NamedQuery(name="SandboxActivityLog.findBySandboxId",
                 query="SELECT c FROM SandboxActivityLog c WHERE c.sandbox.sandboxId = :sandboxId"),
@@ -46,6 +51,8 @@ public class SandboxActivityLog {
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name="user_id")
+    @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true,
+            value={"sandboxes", "termsOfUseAcceptances", "systemRoles"})
     public User getUser() {
         return user;
     }
@@ -65,6 +72,7 @@ public class SandboxActivityLog {
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name="sandbox_id")
+    @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true, value={"userRoles", "imports", "dataSet"})
     public Sandbox getSandbox() {
         return sandbox;
     }

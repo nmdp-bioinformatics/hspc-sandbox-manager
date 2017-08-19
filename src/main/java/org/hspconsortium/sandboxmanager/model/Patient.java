@@ -1,5 +1,7 @@
 package org.hspconsortium.sandboxmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.math.BigInteger;
 
@@ -55,6 +57,7 @@ public class Patient {
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name="sandbox_id")
+    @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true, value={"userRoles", "imports", "dataSet"})
     public Sandbox getSandbox() {
         return sandbox;
     }

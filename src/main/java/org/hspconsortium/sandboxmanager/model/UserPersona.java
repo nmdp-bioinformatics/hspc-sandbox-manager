@@ -1,5 +1,7 @@
 package org.hspconsortium.sandboxmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 
@@ -21,6 +23,10 @@ import java.sql.Timestamp;
         @NamedQuery(name="UserPersona.findBySandboxIdAndCreatedByOrVisibility",
                 query="SELECT c FROM UserPersona c WHERE c.sandbox.sandboxId = :sandboxId and " +
                 "(c.createdBy.sbmUserId = :createdBy or c.visibility = :visibility)"),
+        // Used to retrieve a default user persona visible to a user of this a sandbox
+        @NamedQuery(name="UserPersona.findDefaultBySandboxId",
+                query="SELECT c FROM UserPersona c WHERE c.sandbox.sandboxId = :sandboxId and " +
+                        "(c.createdBy.sbmUserId = :createdBy or c.visibility = :visibility)  order by c.visibility"),
         // Used to delete a user's PRIVATE user personas when they are removed from a sandbox
         @NamedQuery(name="UserPersona.findBySandboxIdAndCreatedBy",
                 query="SELECT c FROM UserPersona c WHERE c.sandbox.sandboxId = :sandboxId and " +
@@ -109,6 +115,8 @@ public class UserPersona extends AbstractSandboxItem {
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name="created_by_id")
+    @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true,
+            value={"sandboxes", "termsOfUseAcceptances", "systemRoles"})
     public User getCreatedBy() {
         return createdBy;
     }
@@ -127,6 +135,7 @@ public class UserPersona extends AbstractSandboxItem {
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name="sandbox_id")
+    @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true, value={"userRoles", "imports", "dataSet"})
     public Sandbox getSandbox() {
         return sandbox;
     }
