@@ -2,6 +2,7 @@ package org.hspconsortium.sandboxmanager.services;
 
 import org.hspconsortium.sandboxmanager.model.InviteStatus;
 import org.hspconsortium.sandboxmanager.model.SandboxInvite;
+import org.hspconsortium.sandboxmanager.model.User;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,6 +17,8 @@ public interface SandboxInviteService {
 
     SandboxInvite create(SandboxInvite sandboxInvite) throws IOException;
 
+    void mergeSandboxInvites(final User user, final String oauthUserEmail);
+
     SandboxInvite getById(final int id);
 
     List<SandboxInvite> findInvitesByInviteeId(final String inviteeId);
@@ -25,6 +28,8 @@ public interface SandboxInviteService {
     List<SandboxInvite> findInvitesByInviteeIdAndSandboxId(final String inviteeId, final String sandboxId);
 
     List<SandboxInvite> findInvitesByInviteeEmailAndSandboxId(final String inviteeEmail, final String sandboxId);
+
+    List<SandboxInvite> findInvitesByInviteeEmail(final String inviteeEmail);
 
     List<SandboxInvite> findInvitesByInviteeIdAndStatus(final String inviteeId, final InviteStatus status);
 

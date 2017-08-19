@@ -1,6 +1,5 @@
 package org.hspconsortium.sandboxmanager.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -96,7 +95,7 @@ public class User {
             @JoinColumn(name = "user_id", nullable = false, updatable = false) },
             inverseJoinColumns = { @JoinColumn(name = "sandbox_id",
                     nullable = false, updatable = false) })
-    @JsonIgnore
+    @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true, value={"userRoles", "imports", "dataSet"})
     public List<Sandbox> getSandboxes() {
         return sandboxes;
     }
@@ -117,7 +116,7 @@ public class User {
     @OneToMany(cascade={CascadeType.ALL}, fetch = FetchType.LAZY)
     @JoinTable(name = "user_terms_of_use_acceptance",
             joinColumns = {@JoinColumn(name = "user_id", nullable = false, updatable = false)})
-    @JsonIgnoreProperties("termsOfUse")
+    @JsonIgnoreProperties(ignoreUnknown = true, value={"termsOfUse"})
     public List<TermsOfUseAcceptance> getTermsOfUseAcceptances() {
         return termsOfUseAcceptances;
     }

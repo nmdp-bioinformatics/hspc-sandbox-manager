@@ -27,5 +27,7 @@ public interface UserPersonaService {
 
     List<UserPersona> findBySandboxIdAndCreatedByOrVisibility(String sandboxId, String createdBy, Visibility visibility);
 
+    UserPersona findDefaultBySandboxId(String sandboxId, String createdBy, Visibility visibility);
+
     List<UserPersona> findBySandboxIdAndCreatedBy(String sandboxId, String createdBy);
 }

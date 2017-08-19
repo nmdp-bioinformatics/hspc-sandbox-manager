@@ -23,10 +23,7 @@ package org.hspconsortium.sandboxmanager.controllers;
 import org.hspconsortium.sandboxmanager.model.SystemRole;
 import org.hspconsortium.sandboxmanager.model.User;
 import org.hspconsortium.sandboxmanager.model.UserPersona;
-import org.hspconsortium.sandboxmanager.services.OAuthService;
-import org.hspconsortium.sandboxmanager.services.SandboxActivityLogService;
-import org.hspconsortium.sandboxmanager.services.UserPersonaService;
-import org.hspconsortium.sandboxmanager.services.UserService;
+import org.hspconsortium.sandboxmanager.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,6 +50,7 @@ public class UserController extends AbstractController {
     private static Logger LOGGER = LoggerFactory.getLogger(UserController.class.getName());
 
     private final UserService userService;
+    private final SandboxInviteService sandboxInviteService;
     private final UserPersonaService userPersonaService;
     private final SandboxActivityLogService sandboxActivityLogService;
 
@@ -61,9 +59,11 @@ public class UserController extends AbstractController {
     @Inject
     public UserController(final OAuthService oAuthService, final UserService userService,
                           final SandboxActivityLogService sandboxActivityLogService,
+                          final SandboxInviteService sandboxInviteService,
                           final UserPersonaService userPersonaService) {
         super(oAuthService);
         this.userService = userService;
+        this.sandboxInviteService = sandboxInviteService;
         this.userPersonaService = userPersonaService;
         this.sandboxActivityLogService = sandboxActivityLogService;
     }
@@ -150,6 +150,12 @@ public class UserController extends AbstractController {
             }
             // Set or Update Name
             user.setName(oauthUsername);
+
+            if (!user.getEmail().equalsIgnoreCase(oauthUserEmail)) {
+                // If the user's email is changing, merge any sandbox invites sent
+                // to the new email to the existing, "full" user
+                sandboxInviteService.mergeSandboxInvites(user, oauthUserEmail);
+            }
             user.setEmail(oauthUserEmail);
             userService.save(user);
         }

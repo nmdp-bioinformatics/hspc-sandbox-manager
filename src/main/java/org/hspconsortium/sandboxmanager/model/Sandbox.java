@@ -1,5 +1,7 @@
 package org.hspconsortium.sandboxmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -131,6 +133,8 @@ public class Sandbox extends AbstractItem {
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name="created_by_id")
+    @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true,
+            value={"sandboxes", "termsOfUseAcceptances", "systemRoles"})
     public User getCreatedBy() {
         return createdBy;
     }

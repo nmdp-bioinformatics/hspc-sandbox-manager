@@ -38,6 +38,12 @@ public class UserServiceImpl implements UserService {
         return repository.save(user);
     }
 
+    @Override
+    @Transactional
+    public void delete(final User user) {
+        repository.delete(user);
+    }
+
     public User findBySbmUserId(final String sbmUserId) {
         User user = repository.findBySbmUserId(sbmUserId);
 

@@ -76,6 +76,7 @@ public class SandboxInviteServiceImpl implements SandboxInviteService {
                 invitee = userService.findByUserEmail(sandboxInvite.getInvitee().getEmail());
             }
 
+            // If no user exists for the invitee, create one
             if (invitee == null) {
                 sandboxInvite.getInvitee().setCreatedTimestamp(new Timestamp(new Date().getTime()));
                 invitee = userService.save(sandboxInvite.getInvitee());
@@ -88,6 +89,22 @@ public class SandboxInviteServiceImpl implements SandboxInviteService {
             return save(sandboxInvite);
         }
         return null;
+    }
+
+    @Override
+    @Transactional
+    public void mergeSandboxInvites(final User user, final String oauthUserEmail) {
+        User tempUser = userService.findByUserEmail(oauthUserEmail);
+
+        // If there's already a "temp" user with the new email, move any invites to the "full" user
+        if (tempUser != null && tempUser.getSbmUserId() == null) {
+            List<SandboxInvite> invites = findInvitesByInviteeEmail(oauthUserEmail);
+            for (SandboxInvite invite : invites) {
+                invite.setInvitee(user);
+                save(invite);
+            }
+            userService.delete(tempUser);
+        }
     }
 
     @Override
@@ -113,6 +130,11 @@ public class SandboxInviteServiceImpl implements SandboxInviteService {
     @Override
     public List<SandboxInvite> findInvitesByInviteeEmailAndSandboxId(final String inviteeEmail, final String sandboxId) {
         return repository.findInvitesByInviteeEmailAndSandboxId(inviteeEmail, sandboxId);
+    }
+
+    @Override
+    public List<SandboxInvite> findInvitesByInviteeEmail(final String inviteeEmail) {
+        return repository.findInvitesByInviteeEmail(inviteeEmail);
     }
 
     @Override

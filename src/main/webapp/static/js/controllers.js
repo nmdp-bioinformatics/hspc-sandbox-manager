@@ -2665,7 +2665,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 }
             };
     }).controller("AppsController", function ($scope, $rootScope, $state, appRegistrationServices, sandboxManagement,
-                                              userServices, tools, fhirApiServices, appsService, launchApp, $uibModal, docLinks) {
+                                              userServices, tools, fhirApiServices, appsService, personaServices, launchApp, $uibModal, docLinks) {
 
     $scope.all_user_apps = [];
     $scope.default_apps = [];
@@ -2676,6 +2676,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     $scope.docLink = docLinks.docLink;
     $scope.clientTypes = ["Public Client", "Confidential Client"];
 
+    var defaultPersona;
+    personaServices.getDefaultPersonaBySandbox().then(function (persona) {
+        defaultPersona = persona;
+    });
 
     $scope.showing = {appDetail: false};
 
@@ -2862,7 +2866,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         }
 
         if (patientQuery !== undefined) {
-            launchApp.launchFromApp(app, {fhirId: patientQuery});
+            launchApp.launchFromApp(app, {fhirId: patientQuery}, defaultPersona);
         } else {
             openPatientPicker(app);
         }
@@ -2898,7 +2902,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         });
 
         modalInstance.result.then(function (patient) {
-            launchApp.launchFromApp(app, patient);
+            launchApp.launchFromApp(app, patient, defaultPersona);
         });
     }
 

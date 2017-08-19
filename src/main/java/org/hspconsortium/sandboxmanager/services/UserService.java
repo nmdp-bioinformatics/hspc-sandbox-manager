@@ -9,6 +9,8 @@ public interface UserService {
 
     User save(final User user);
 
+    void delete(final User user);
+
     User findBySbmUserId(final String sbmUserId);
 
     User findByUserEmail(final String email);

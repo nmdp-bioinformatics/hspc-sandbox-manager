@@ -1337,7 +1337,7 @@ angular.module('sandManApp.services', [])
                     return item.createdBy.sbmUserId.toLocaleLowerCase() === this.sandboxManagerUser().sbmUserId.toLocaleLowerCase();
                 } else { // PUBLIC Item
                     if (sandbox.visibility === "PRIVATE") {
-                        return !this.hasSandboxRole(item.sandbox.userRoles, "READ_ONLY");
+                        return !this.hasSandboxRole(sandbox.userRoles, "READ_ONLY");
                     } else {
                         return this.hasSandboxRole(sandbox.userRoles, "ADMIN");
                     }
@@ -1469,6 +1469,22 @@ angular.module('sandManApp.services', [])
                 $rootScope.$emit('persona-list-update');
                 deferred.resolve(results);
             }).fail(function(){
+            });
+            return deferred;
+        },
+        getDefaultPersonaBySandbox: function() {
+            var deferred = $.Deferred();
+            $.ajax({
+                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona/default?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
+                type: 'GET',
+                contentType: "application/json",
+                beforeSend : function( xhr ) {
+                    xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                }
+            }).done(function(result){
+                deferred.resolve(result);
+            }).fail(function(){
+                deferred.reject();
             });
             return deferred;
         },
@@ -1884,8 +1900,8 @@ angular.module('sandManApp.services', [])
                 }
                 this.launch(pdmService.getPatientDataManagerApp(), patient);
             },
-            launchFromApp: function(app, patient){
-                this.launch(app, patient);
+            launchFromApp: function(app, patient, persona){
+                this.launch(app, patient, undefined, persona);
             }
     }
 

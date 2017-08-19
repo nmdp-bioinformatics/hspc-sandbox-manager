@@ -29,7 +29,8 @@ public class UserRole {
 
     @ManyToOne(cascade={CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name="user_id")
-    @JsonIgnoreProperties("termsOfUseAcceptances")
+    @JsonIgnoreProperties(ignoreUnknown = true, allowSetters = true,
+            value={"sandboxes", "termsOfUseAcceptances", "systemRoles"})
     public User getUser() {
         return user;
     }
