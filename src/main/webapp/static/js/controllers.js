@@ -2698,6 +2698,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         }
     });
 
+    $scope.getLogoUri = function (logo) {
+        return logo + "?" + new Date().getTime();
+    };
+
     $rootScope.$on('app-list-update', function () {
         $scope.all_user_apps = angular.copy(appRegistrationServices.getAppList());
         $rootScope.$digest();
@@ -3031,6 +3035,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         });
         return found;
     }
+
+    $scope.getLogoUri = function (logo) {
+        return logo + "?" + new Date().getTime();
+    };
 
     $scope.registerApp = function (appManifest) {
 
