@@ -2699,7 +2699,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     });
 
     $scope.getLogoUri = function (logo) {
-        return logo + "?" + new Date().getTime();
+        if (logo) {
+            return logo + "?" + new Date().getTime();
+        }
     };
 
     $rootScope.$on('app-list-update', function () {
@@ -3037,7 +3039,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     }
 
     $scope.getLogoUri = function (logo) {
-        return logo + "?" + new Date().getTime();
+        if (logo) {
+            return logo + "?" + new Date().getTime();
+        }
     };
 
     $scope.registerApp = function (appManifest) {
