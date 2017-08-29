@@ -2922,9 +2922,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         var updateClientJSON = angular.copy($scope.clientJSON);
         delete updateClientJSON.logo;
 
-        var i = updateClientJSON.logoUri.lastIndexOf("?");
-        if (i > -1) {
-            updateClientJSON.logoUri = updateClientJSON.logoUri.substr(0, i);
+        if (updateClientJSON.logoUri) {
+            var i = updateClientJSON.logoUri.lastIndexOf("?");
+            if (i > -1) {
+                updateClientJSON.logoUri = updateClientJSON.logoUri.substr(0, i);
+            }
         }
 
         if ($scope.clientJSON.clientType !== "Public Client") {
