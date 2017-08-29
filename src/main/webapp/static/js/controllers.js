@@ -2076,7 +2076,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
             $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
             $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
-            $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
+            if ($scope.selectedScenario.app.logoUri) {
+                $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
+            }
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
         });
@@ -2091,7 +2093,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
             $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
             $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
-            $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
+            if ($scope.selectedScenario.app.logoUri) {
+                $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
+            }
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
         });
@@ -2700,12 +2704,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         }
     });
 
-    $scope.getLogoUri = function (logo) {
-        if (logo) {
-            return logo + "?" + new Date().getTime();
-        }
-    };
-
     $rootScope.$on('app-list-update', function () {
         $scope.all_user_apps = angular.copy(appRegistrationServices.getAppList());
         $rootScope.$digest();
@@ -2809,7 +2807,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 $scope.galleryOffset = 80;
                 $scope.selected.selectedApp.clientJSON = JSON.parse(resultApp.clientJSON);
                 $scope.clientJSON = $scope.selected.selectedApp.clientJSON;
-                $scope.clientJSON.logoUri = $scope.clientJSON.logoUri + "?" + new Date().getTime();
+                if (resultApp.logoUri) {
+                    $scope.clientJSON.logoUri = resultApp.logoUri + "?" + new Date().getTime();
+                }
                 if ($scope.selected.selectedApp.clientJSON.tokenEndpointAuthMethod === "SECRET_BASIC") {
                     $scope.clientJSON.clientType = "Confidential Client";
                 } else {
