@@ -58,16 +58,16 @@
                     </ul>
                 </label>
                 <div class="right-form-group" ng-show="supportsDataSets">
-                    <input type="checkbox" ng-model="defaultDataSet" class="right-form-input-checkbox"/>
+                    <input ng-disabled="!canReset()" type="checkbox" ng-model="defaultDataSet" class="right-form-input-checkbox"/>
                     <label class="right-form-checkbox-label">Apply Default Data Set</label>
                     <label class="create-form-description">If not selected, the sandbox will be empty</label>
                 </div>
-                <div tooltip-placement="top" uib-tooltip="Only the sandbox creator can delete the sandbox" tooltip-trigger="!canDelete() ? 'mouseenter' : 'none'">
+                <div tooltip-placement="top" uib-tooltip="Only a sandbox Admin can reset the sandbox" tooltip-trigger="!canReset() ? 'mouseenter' : 'none'">
                     <div class="right-form-group">
-                        <input ng-disabled="!canDelete()" type="checkbox" ng-model="confirmReset" class="right-form-input-checkbox"/>
+                        <input ng-disabled="!canReset()" type="checkbox" ng-model="confirmReset" class="right-form-input-checkbox"/>
                         <label class="right-form-checkbox-label">Are you sure you want to reset sandbox <b>{{sandbox.name}}</b>? </label>
                     </div>
-                    <div ng-disabled="!canDelete() || !confirmReset" class="btn btn-basic btn-md" ng-click="resetSandbox()"><i class="fa fa-undo fa-lg"></i> Reset Sandbox</div>
+                    <div ng-disabled="!canReset() || !confirmReset" class="btn btn-basic btn-md" ng-click="resetSandbox()"><i class="fa fa-undo fa-lg"></i> Reset Sandbox</div>
 
                 </div>
             </div>

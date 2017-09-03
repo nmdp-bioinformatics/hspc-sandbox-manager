@@ -80,7 +80,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     }
                 });
                 event.preventDefault();
-            } else if (toState.name == "progress" && !sandboxManagement.creatingSandbox()) {
+            } else if (toState.name === "progress" && !sandboxManagement.creatingSandbox()) {
 //                $scope.signin();
                 event.preventDefault();
             } else if (toState.scenarioBuilderStep && sandboxManagement.getScenarioBuilder().userPersona === "") {
@@ -147,7 +147,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                                                 isUpdate: (sandboxManagerUser.termsOfUseAcceptances.length > 0),
                                                 text: terms.value,
                                                 callback: function (result) { //setting callback
-                                                    if (result == true) {
+                                                    if (result === true) {
                                                         sandboxManagement.acceptTermsOfUse($scope.oauthUser.sbmUserId, terms.id);
                                                     } else {
                                                         $scope.signout();
@@ -256,19 +256,27 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
         $scope.canCreateSandbox = function () {
-            return userServices.sandboxManagerUser() !== undefined && (userServices.hasSystemRole("CREATE_SANDBOX") || userServices.hasSystemRole("ADMIN"));
+            return $scope.isSystemAdmin() || (userServices.sandboxManagerUser() !== undefined && (userServices.hasSystemRole("CREATE_SANDBOX")));
         };
 
         $scope.isSystemAdmin = function () {
             return userServices.sandboxManagerUser() !== undefined && (userServices.hasSystemRole("ADMIN"));
         };
 
+        $scope.isSandboxOwner = function () {
+            return (sandboxManagement.getSandbox().createdBy.sbmUserId.toLowerCase() === userServices.getOAuthUser().sbmUserId.toLowerCase());
+        };
+
+        $scope.isSandboxAdmin = function () {
+            return sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "ADMIN");
+        };
+
         $scope.canManageUsers = function () {
-            return sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "MANAGE_USERS");
+            return $scope.isSandboxAdmin() || (sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "MANAGE_USERS"));
         };
 
         $scope.canManageData = function () {
-            return sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "MANAGE_DATA");
+            return $scope.isSandboxAdmin() || (sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "MANAGE_DATA"));
         };
 
         $scope.goToDashboard = function () {
@@ -442,11 +450,13 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
         $scope.showDelete = function (sbmUserId) {
-            // Only Sandbox creater can delete users
-            if (sandboxManagement.getSandbox().createdBy !== undefined && userServices.getOAuthUser() !== undefined &&
-                sandboxManagement.getSandbox().createdBy.sbmUserId.toLowerCase() === userServices.getOAuthUser().sbmUserId.toLowerCase()) {
-                // Don't allow deleting self
-                return sandboxManagement.getSandbox().createdBy.sbmUserId.toLowerCase() !== sbmUserId.toLowerCase();
+
+            // Only Sandbox Admin can delete users
+            if (userServices.getOAuthUser() !== undefined &&
+                userServices.userHasSandboxRole(userServices.getOAuthUser().sbmUserId, sandboxManagement.getSandbox().userRoles, "ADMIN")) {
+                // Don't allow deleting self or Sandbox creator
+                return ((sandboxManagement.getSandbox().createdBy.sbmUserId.toLowerCase() !== sbmUserId.toLowerCase()) &&
+                    (userServices.getOAuthUser().sbmUserId.toLowerCase() !== sbmUserId.toLowerCase()));
             }
             return false;
         };
@@ -465,7 +475,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                             type: "confirm-error",
                             text: "Are you sure you want to remove the user " + user.email + "?",
                             callback: function (result) { //setting callback
-                                if (result == true) {
+                                if (result === true) {
                                     sandboxManagement.removeUserFromSandboxByUserId(user.sbmUserId).then(function () {
                                         sandboxManagement.getSandboxById().then(function () {
                                             getUsers();
@@ -476,6 +486,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                         };
                     }
                 }
+            });
+        };
+
+        $scope.updateRole = function (user, role, add) {
+            sandboxManagement.updateSandboxUserRoleByUserId(user.sbmUserId, role, add).then(function () {
             });
         };
 
@@ -528,6 +543,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             var userRoles = sandboxManagement.getSandbox().userRoles;
             userRoles.forEach(function (userRole) {
                 if (!contains($scope.users, userRole.user)) {
+                    if (userServices.userHasSandboxRole(userRole.user.sbmUserId, sandboxManagement.getSandbox().userRoles, "ADMIN")) {
+                        userRole.user.isAdmin = true;
+                    }
                     $scope.users.push(userRole.user);
                 }
             });
@@ -551,10 +569,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.allowOpenAccess = $scope.sandbox.allowOpenAccess;
         $scope.defaultDataSet = true;
 
-        $scope.canEdit = function () {
-            return userServices.canModifySandbox(sandboxManagement.getSandbox())
-        };
-
         appsSettings.getSettings().then(function (settings) {
             $scope.openFhirUrl = settings.baseServiceUrl_1 + $scope.sandbox.sandboxId + "/open";
             if ($scope.sandbox.apiEndpointIndex === "2") {
@@ -577,8 +591,19 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.fhirVersion = apiEndpointIndexServices.getSandboxApiEndpointIndex().name;
         $scope.supportsDataSets = apiEndpointIndexServices.getSandboxApiEndpointIndex().supportsDataSets;
 
+        $scope.canEdit = function () {
+            return userServices.canModifySandbox(sandboxManagement.getSandbox())
+        };
+
+        // Only the owner can delete
         $scope.canDelete = function () {
             return (sandboxManagement.getSandbox().createdBy.sbmUserId.toLowerCase() === userServices.getOAuthUser().sbmUserId.toLowerCase());
+        };
+
+        // Only an Admin can reset
+        $scope.canReset = function () {
+            return (userServices.getOAuthUser() !== undefined &&
+                userServices.userHasSandboxRole(userServices.getOAuthUser().sbmUserId, sandboxManagement.getSandbox().userRoles, "ADMIN"));
         };
 
         $scope.updateSandbox = function () {
@@ -600,7 +625,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                             text: "Are you sure you want to delete sandbox " + sandboxManagement.getSandbox().name + "? " +
                             "This is not reversible and will delete all FHIR data, launch scenarios, registered app, etc.",
                             callback: function (result) { //setting callback
-                                if (result == true) {
+                                if (result === true) {
                                     var modalProgress = openModalProgressDialog("Deleting...");
                                     sandboxManagement.deleteSandbox().then(function () {
                                         window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/#/dashboard-view";

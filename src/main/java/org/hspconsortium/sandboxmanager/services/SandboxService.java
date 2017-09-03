@@ -28,6 +28,8 @@ public interface SandboxService {
 
     void addMemberRole(final Sandbox sandbox, final User user, final Role role);
 
+    void removeMemberRole(final Sandbox sandbox, final User user, final Role role);
+
     boolean hasMemberRole(final Sandbox sandbox, final User user, final Role role);
 
     void addSandboxImport(final Sandbox sandbox, final SandboxImport sandboxImport);

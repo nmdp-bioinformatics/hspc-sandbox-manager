@@ -64,7 +64,8 @@ public class SandboxInviteController extends AbstractController {
 
         // Make sure the inviter has rights to this sandbox
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxInvite.getSandbox().getSandboxId());
-        checkUserSandboxRole(request, sandbox, Role.MANAGE_USERS);
+        User user = userService.findBySbmUserId(getSystemUserId(request));
+        checkSystemUserCanManageSandboxUsersAuthorization(request, sandbox, user);
 
         // Check for an existing invite for this invitee
         List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesByInviteeIdAndSandboxId(sandboxInvite.getInvitee().getSbmUserId(), sandboxInvite.getSandbox().getSandboxId());
@@ -123,7 +124,8 @@ public class SandboxInviteController extends AbstractController {
     List<SandboxInvite> getSandboxInvitesBySandbox(HttpServletRequest request, @RequestParam(value = "sandboxId") String sandboxId,
            @RequestParam(value = "status") InviteStatus status) throws UnsupportedEncodingException {
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-        checkUserSandboxRole(request, sandbox, Role.MANAGE_USERS);
+        User user = userService.findBySbmUserId(getSystemUserId(request));
+        checkSystemUserCanManageSandboxUsersAuthorization(request, sandbox, user);
 
         if (status == null) {
             List<SandboxInvite> sandboxInvites = sandboxInviteService.findInvitesBySandboxId(sandboxId);
@@ -168,8 +170,8 @@ public class SandboxInviteController extends AbstractController {
         } else if ((sandboxInvite.getStatus() == InviteStatus.PENDING || sandboxInvite.getStatus() == InviteStatus.REJECTED) && status == InviteStatus.REVOKED ) {
 
             // Revoking Invite
-            checkUserSandboxRole(request, sandboxInvite.getSandbox(), Role.MANAGE_USERS);
             User user = userService.findBySbmUserId(getSystemUserId(request));
+            checkSystemUserCanManageSandboxUsersAuthorization(request, sandboxInvite.getSandbox(), user);
             sandboxActivityLogService.sandboxUserInviteRevoked(sandboxInvite.getSandbox(), user);
             sandboxInvite.setStatus(status);
             sandboxInviteService.save(sandboxInvite);

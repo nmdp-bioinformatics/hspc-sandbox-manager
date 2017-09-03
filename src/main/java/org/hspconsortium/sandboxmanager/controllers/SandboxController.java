@@ -104,7 +104,7 @@ public class SandboxController extends AbstractController {
     public void deleteSandboxById(HttpServletRequest request, @PathVariable String id) {
         Sandbox sandbox = sandboxService.findBySandboxId(id);
         User user = userService.findBySbmUserId(getSystemUserId(request));
-        checkSystemUserCanModifySandboxAuthorization(request, sandbox, user);
+        checkSystemUserDeleteSandboxAuthorization(request, sandbox, user);
 
         //delete sandbox invites
         List<SandboxInvite> invites = sandboxInviteService.findInvitesBySandboxId(sandbox.getSandboxId());
@@ -143,7 +143,31 @@ public class SandboxController extends AbstractController {
         String removeUserId = java.net.URLDecoder.decode(userIdEncoded, StandardCharsets.UTF_8.name());
 
         User removedUser = userService.findBySbmUserId(removeUserId);
-        sandboxService.removeMember(sandbox, removedUser, oAuthService.getBearerToken(request));
+        // Don't allow the Sandbox creator to be removed
+        if (!removedUser.equals(sandbox.getCreatedBy())) {
+            sandboxService.removeMember(sandbox, removedUser, oAuthService.getBearerToken(request));
+        }
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT, consumes = "application/json", params = {"editUserRole", "role", "add"})
+    @Transactional
+    public void updateSandboxMemberRole(HttpServletRequest request, @PathVariable String id, @RequestParam(value = "editUserRole") String userIdEncoded,
+                @RequestParam(value = "role") Role role, @RequestParam(value = "add") boolean add) throws UnsupportedEncodingException {
+        Sandbox sandbox = sandboxService.findBySandboxId(id);
+        User user = userService.findBySbmUserId(getSystemUserId(request));
+
+        checkSystemUserCanModifySandboxAuthorization(request, sandbox, user);
+        String modifyUserId = java.net.URLDecoder.decode(userIdEncoded, StandardCharsets.UTF_8.name());
+
+        User modifyUser = userService.findBySbmUserId(modifyUserId);
+        // Don't allow the Sandbox creator to be modified
+        if (!modifyUser.equals(sandbox.getCreatedBy())) {
+            if (add) {
+                sandboxService.addMemberRole(sandbox, modifyUser, role);
+            } else {
+                sandboxService.removeMemberRole(sandbox, modifyUser, role);
+            }
+        }
     }
 
     @RequestMapping(value = "/{id}/login", method = RequestMethod.POST, params = {"userId"})

@@ -198,7 +198,7 @@ angular.module('sandManApp.services', [])
                     return false;
                 } else {
                     lastSearch.data.link.forEach(function(link) {
-                        if (link.relation == "next") {
+                        if (link.relation === "next") {
                             hasLink = true;
                         }
                     });
@@ -211,7 +211,7 @@ angular.module('sandManApp.services', [])
                     return false;
                 } else {
                     lastSearch.data.link.forEach(function(link) {
-                        if (link.relation == "previous") {
+                        if (link.relation === "previous") {
                             hasLink = true;
                         }
                     });
@@ -285,7 +285,7 @@ angular.module('sandManApp.services', [])
 
                 if (this.hasNext(lastSearch)) {
                     lastSearch.data.link.forEach(function (link) {
-                        if (link.relation == "next") {
+                        if (link.relation === "next") {
                             var querySting = decodeURIComponent(link.url).split("?");
                             var paramPairs = querySting[1].split("&");
                             for (var i = 0; i < paramPairs.length; i++) {
@@ -297,7 +297,7 @@ angular.module('sandManApp.services', [])
                         }
                     });
                     lastSearch.data.link.forEach(function(link) {
-                        if (link.relation == "next") {
+                        if (link.relation === "next") {
                             var querySting = decodeURIComponent(link.url).split("?");
                             var paramPairs = querySting[1].split("&");
                             for (var i = 0; i < paramPairs.length; i++) {
@@ -308,7 +308,7 @@ angular.module('sandManApp.services', [])
                                     } else {
                                         count.start = Number(parts[1]) - pageSize + 1;
                                     }
-                                    if ((Number(parts[1]) + pageSize) != count.total) {
+                                    if ((Number(parts[1]) + pageSize) !== count.total) {
                                         count.end = Number(parts[1]);
                                     } else {
                                         count.end = count.total;
@@ -319,7 +319,7 @@ angular.module('sandManApp.services', [])
                     });
                 } else {
                     lastSearch.data.link.forEach(function (link) {
-                        if (link.relation == "self") {
+                        if (link.relation === "self") {
                             var querySting = decodeURIComponent(link.url).split("?");
                             var paramPairs = querySting[1].split("&");
                             for (var i = 0; i < paramPairs.length; i++) {
@@ -331,7 +331,7 @@ angular.module('sandManApp.services', [])
                         }
                     });
                     lastSearch.data.link.forEach(function(link) {
-                        if (link.relation == "self") {
+                        if (link.relation === "self") {
                             var querySting = decodeURIComponent(link.url).split("?");
                             var paramPairs = querySting[1].split("&");
                             for (var i = 0; i < paramPairs.length; i++) {
@@ -1027,6 +1027,23 @@ angular.module('sandManApp.services', [])
                 });
                 return deferred;
             },
+            updateSandboxUserRoleByUserId: function(sbmUserId, role, add) {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "?editUserRole=" + encodeURIComponent(sbmUserId) + "&role=" + role + "&add=" + add,
+                    type: 'PUT',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(){
+                    that.getSandboxById();
+                    deferred.resolve();
+                }).fail(function(){
+                });
+                return deferred;
+            },
             getSandboxById: function() {
                 var that = this;
                 var deferred = $.Deferred();
@@ -1325,7 +1342,17 @@ angular.module('sandManApp.services', [])
             hasSandboxRole: function(roles, role) {
                 var hasRole = false;
                 roles.forEach(function(userRole){
-                    if (sandboxManagerUser != undefined && userRole.user.sbmUserId.toLocaleLowerCase() === sandboxManagerUser.sbmUserId.toLocaleLowerCase()
+                    if (sandboxManagerUser !== undefined && userRole.user.sbmUserId.toLocaleLowerCase() === sandboxManagerUser.sbmUserId.toLocaleLowerCase()
+                        && userRole.role === role) {
+                        hasRole = true;
+                    }
+                });
+                return hasRole;
+            },
+            userHasSandboxRole: function(sbmUserId, roles, role) {
+                var hasRole = false;
+                roles.forEach(function(userRole){
+                    if (userRole.user.sbmUserId.toLocaleLowerCase() === sbmUserId.toLocaleLowerCase()
                         && userRole.role === role) {
                         hasRole = true;
                     }
