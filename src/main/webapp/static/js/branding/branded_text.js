@@ -13,14 +13,16 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                 showEmptyInviteList: true,
                 copyright: "© 2017 by Healthcare Services Platform Consortium",
                 showCert: true,
+                showTermsLink: true,
+                userSettingsPWM: false,
                 loginDoc: "",
                 defaultApiEndpointIndex : "4",
                 defaultLaunchScenario: true,
                 sandboxApiEndpointIndexes : [
-                    {index: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", altName: "FHIR v1.0.2", canCreate: true, supportsDataSets: false},
-                    {index: "2", name: "FHIR DSTU 2 (v1.6.0)", fhirVersion: "1.6.0", altName: "FHIR v1.6", canCreate: false, supportsDataSets: false},
-                    {index: "3", name: "FHIR STU 3 (v1.8.0)", fhirVersion: "1.8.0", altName: "FHIR v1.8", canCreate: false, supportsDataSets: false},
-                    {index: "4", name: "FHIR STU 3 (v3.0.1)", fhirVersion: "3.0.1", altName: "FHIR v3.0.1", canCreate: true, supportsDataSets: true}
+                    {index: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", fhirTag: "1_0_2", altName: "FHIR v1.0.2", canCreate: true, supportsDataSets: false},
+                    {index: "2", name: "FHIR DSTU 2 (v1.6.0)", fhirVersion: "1.6.0", fhirTag: "1_0_2", altName: "FHIR v1.6", canCreate: false, supportsDataSets: false},
+                    {index: "3", name: "FHIR STU 3 (v1.8.0)", fhirVersion: "1.8.0", fhirTag: "1_8_0", altName: "FHIR v1.8", canCreate: false, supportsDataSets: false},
+                    {index: "4", name: "FHIR STU 3 (v3.0.1)", fhirVersion: "3.0.1", fhirTag: "3_0_1", altName: "FHIR v3.0.1", canCreate: true, supportsDataSets: true}
                 ],
                 sandboxDescription: {
                     title: "What is a sandbox?",
@@ -45,6 +47,6 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                     {name: "sandboxPersona", link: "https://healthservices.atlassian.net/wiki/display/HSPC/Sandbox+Persona"},       
                     {name: "mainDocs", link: "https://healthservices.atlassian.net/wiki/display/HSPC/HSPC+Sandbox"}
                 ]
-            }
+        }
     });
 }]);

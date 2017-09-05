@@ -32,6 +32,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.sandboxText = branded.sandboxText;
         $scope.copyright = branded.copyright;
         $scope.showCert = branded.showCert;
+        $scope.showTermsLink = branded.showTermsLink;
+        $scope.userSettingsPWM = branded.userSettingsPWM;
         $scope.loginDoc = branded.loginDoc;
         $scope.mainImage = branded.mainImage;
         $scope.showing.defaultLaunchScenario = branded.defaultLaunchScenario;
@@ -232,9 +234,13 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
         $scope.userSettings = function () {
-            appsSettings.getSettings().then(function(settings){
-                $window.open(settings.userManagementUrl, '_blank');
-            });
+            if ($scope.userSettingsPWM) {
+                userServices.userSettingsPWM();
+            } else {
+                appsSettings.getSettings().then(function (settings) {
+                    $window.open(settings.userManagementUrl, '_blank');
+                });
+            }
         };
 
         $scope.selectSandbox = function (sandbox) {
@@ -285,10 +291,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             } else {
                 window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/#/dashboard-view";
             }
-        };
-
-        $scope.manageUserAccount = function () {
-            userServices.userSettings();
         };
 
         $rootScope.$on('refresh-sandboxes', function () {

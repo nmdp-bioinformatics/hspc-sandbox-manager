@@ -1323,11 +1323,21 @@ angular.module('sandManApp.services', [])
                 }
                 return deferred;
             },
-            //TODO: start using this again and point to FireBase
-            userSettings: function() {
+            userSettingsPWM: function() {
                 var that = this;
                 appsSettings.getSettings().then(function(settings){
-                    window.location.href = settings.userManagementUrl
+                    $.ajax({
+                        url: settings.userManagementUrl,
+                        type: 'GET',
+                        beforeSend : function( xhr ) {
+                            xhr.setRequestHeader( 'c8381465-a7f8-4ecc-958d-ec296d6e8671', that.getOAuthUser().sbmUserId);
+                            xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+                        }
+
+                    }).done(function(data){
+                        window.location.href = settings.userManagementUrl + "/private/"
+                    }).fail(function(){
+                    });
                 });
             },
             hasSystemRole: function(role) {
@@ -2207,13 +2217,8 @@ angular.module('sandManApp.services', [])
     return {
         loadSettings: function(){
             var deferred = $.Deferred();
-            var apiEndpointIndex = apiEndpointIndexServices.getSandboxApiEndpointIndex().index;
-            var supportedResources = 'static/js/config/supported-patient-resources.json';
-            if (apiEndpointIndex === "3" || apiEndpointIndex === "4") {
-                supportedResources = 'static/js/config/supported-patient-resources_3.json';
-            } else if (apiEndpointIndex === "4") {
-                supportedResources = 'static/js/config/supported-patient-resources_4.json';
-            }
+            var fhirTag = apiEndpointIndexServices.getSandboxApiEndpointIndex().fhirTag;
+            var supportedResources = 'static/js/config/supported-patient-resources_' + fhirTag + '.json';
             $http.get(supportedResources).success(function(result){
                 resources = result;
                 deferred.resolve(result);
@@ -2239,13 +2244,8 @@ angular.module('sandManApp.services', [])
     return {
         loadSettings: function(){
             var deferred = $.Deferred();
-            var apiEndpointIndex = apiEndpointIndexServices.getSandboxApiEndpointIndex().index;
-            var exportResources = 'static/js/config/export-resources.json';
-            if (apiEndpointIndex === "3" || apiEndpointIndex === "4") {
-                exportResources = 'static/js/config/export-resources_3.json';
-            } else if (apiEndpointIndex === "4") {
-                exportResources = 'static/js/config/export-resources_4.json';
-            }
+            var fhirTag = apiEndpointIndexServices.getSandboxApiEndpointIndex().fhirTag;
+            var exportResources = 'static/js/config/export-resources_' + fhirTag + '.json';
             $http.get(exportResources).success(function(result){
                 resources = result;
                 deferred.resolve(result);
@@ -2271,11 +2271,8 @@ angular.module('sandManApp.services', [])
     return {
         loadSettings: function(){
             var deferred = $.Deferred();
-            var apiEndpointIndex = apiEndpointIndexServices.getSandboxApiEndpointIndex().index;
-            var dataManagerResources = 'static/js/config/data-manager-resources.json';
-            if (apiEndpointIndex === "3" || apiEndpointIndex === "4") {
-                dataManagerResources = 'static/js/config/data-manager-resources_3.json';
-            }
+            var fhirTag = apiEndpointIndexServices.getSandboxApiEndpointIndex().fhirTag;
+            var dataManagerResources = 'static/js/config/data-manager-resources_' + fhirTag + '.json';
             $http.get(dataManagerResources).success(function(result){
                 resources = result;
                 deferred.resolve(result);
