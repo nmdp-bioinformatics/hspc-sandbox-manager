@@ -1887,8 +1887,10 @@ angular.module('sandManApp.services', [])
                     // '&redirect=' + encodeURIComponent(window.location.href + '/launch.html?key='+key ), '_blank');
 
                 var params = {};
+                var patientId = undefined;
                 if (patientContext !== undefined && patientContext.name !== 'None' && patientContext !== "") {
-                    params = {patient: patientContext.fhirId}
+                    params = {patient: patientContext.fhirId};
+                    patientId = patientContext.fhirId;
                 }
 
                 if (contextParams !== undefined) {
@@ -1914,7 +1916,7 @@ angular.module('sandManApp.services', [])
 
                     launchDetails = {
                         userPersona: userPersonaCopy,
-                        patientContext: patientContext.fhirId
+                        patientContext: patientId
                     };
                 }
 
