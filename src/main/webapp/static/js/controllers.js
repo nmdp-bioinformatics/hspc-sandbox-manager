@@ -332,6 +332,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         // are different. A timeout runs after each digest to check since the
         // uiView height is modified outside of angular's detection.
         $scope.sideNavHeight = document.getElementById('uiView').offsetHeight;
+
         function postDigest(callback) {
             var unregister = $rootScope.$watch(function () {
                 unregister();
@@ -1463,7 +1464,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 allowOpenAccess: $scope.sandboxAllowOpenAccess,
                 dataSet: ($scope.selectedSandboxApiEndpointIndex.supportsDataSets ? ($scope.defaultDataSet ? "DEFAULT" : "NONE") : "NA")
 
-        }).then(function (sandbox) {
+            }).then(function (sandbox) {
                 sandboxManagement.setCreatingSandbox(false);
                 $scope.showing.progress = false;
                 $rootScope.$emit('sandbox-created', $scope.sandboxId);
@@ -1703,36 +1704,36 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
         $scope.onSelected = $scope.onSelected || function (p) {
-                if ($scope.selected.selectedPatient !== p) {
-                    $scope.selected.selectedPatient = p;
-                    $scope.selected.patientSelected = true;
-                    $scope.showing.patientDetail = true;
+            if ($scope.selected.selectedPatient !== p) {
+                $scope.selected.selectedPatient = p;
+                $scope.selected.patientSelected = true;
+                $scope.showing.patientDetail = true;
 
-                    patientResources.getSupportedResources().done(function (resources) {
-                        $scope.selected.patientResources = [];
-                        for (var i = 0; i < resources.length; i++) {
-                            var query = {};
-                            query[resources[i].patientSearch] = "Patient/" + p.id;
-                            fhirApiServices.queryResourceInstances(resources[i].resourceType, query, undefined, undefined, 1)
-                                .then(function (resource, queryResult) {
-                                    $scope.selected.patientResources.push({
-                                        resourceType: queryResult.config.type,
-                                        count: queryResult.data.total
-                                    });
-                                    $scope.selected.patientResources = $filter('orderBy')($scope.selected.patientResources, "resourceType");
-
-                                    emptyArray(resourcesNames);
-                                    emptyArray(resourceCounts);
-                                    angular.forEach($scope.selected.patientResources, function (resource) {
-                                        resourcesNames.push(resource.resourceType);
-                                        resourceCounts.push(parseInt(resource.count));
-                                    });
-                                    $rootScope.$digest();
+                patientResources.getSupportedResources().done(function (resources) {
+                    $scope.selected.patientResources = [];
+                    for (var i = 0; i < resources.length; i++) {
+                        var query = {};
+                        query[resources[i].patientSearch] = "Patient/" + p.id;
+                        fhirApiServices.queryResourceInstances(resources[i].resourceType, query, undefined, undefined, 1)
+                            .then(function (resource, queryResult) {
+                                $scope.selected.patientResources.push({
+                                    resourceType: queryResult.config.type,
+                                    count: queryResult.data.total
                                 });
-                        }
-                    });
-                }
-            };
+                                $scope.selected.patientResources = $filter('orderBy')($scope.selected.patientResources, "resourceType");
+
+                                emptyArray(resourcesNames);
+                                emptyArray(resourceCounts);
+                                angular.forEach($scope.selected.patientResources, function (resource) {
+                                    resourcesNames.push(resource.resourceType);
+                                    resourceCounts.push(parseInt(resource.count));
+                                });
+                                $rootScope.$digest();
+                            });
+                    }
+                });
+            }
+        };
         // **** END Loads Patient Resource Counts for Patient Details ****//
 
         $scope.skipPatient = function () {
@@ -2048,7 +2049,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         sandboxManagement.getScenarioBuilder().owner = userServices.getOAuthUser();
         $scope.docLink = docLinks.docLink;
 
-        $scope.$watch('selectedScenario.launchEmbedded', function() {
+        $scope.$watch('selectedScenario.launchEmbedded', function () {
             if ($scope.selectedScenario.launchEmbedded !== undefined && $scope.selectedScenario.launchEmbedded !== $scope.launchEmbedded) {
                 $scope.launchEmbedded = $scope.selectedScenario.launchEmbedded;
                 sandboxManagement.updateLaunchScenario($scope.selectedScenario);
@@ -2101,8 +2102,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
             $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
-            $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
-            $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
+                $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
+                $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
             if ($scope.selectedScenario.app.logoUri) {
                 $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
             }
@@ -2118,8 +2119,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
             $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
-            $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
-            $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
+                $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
+                $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
             if ($scope.selectedScenario.app.logoUri) {
                 $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
             }
@@ -2372,7 +2373,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         modalInstance.result.then(function (result) {
             var scenario = result.scenario;
             if (result.launch) {
-                    launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
+                launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
             } else {
                 sandboxManagement.addFullLaunchScenarioList(scenario);
             }
@@ -2679,24 +2680,24 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         }
 
         $scope.onSelected = $scope.onSelected || function (p) {
-                var pid = p.id;
-                var client_id = tools.decodeURLParam($stateParams.endpoint, "client_id");
+            var pid = p.id;
+            var client_id = tools.decodeURLParam($stateParams.endpoint, "client_id");
 
-                // Pre Launch is for the mock launch flow
-                if ($scope.selected.preLaunch) {
-                    var to = decodeURIComponent($stateParams.endpoint);
-                    return window.location = to + "?patient_id=" + pid + "&iss=" + $stateParams.iss + "&launch_uri=" + $stateParams.launch_uri + "&context_params=" + $stateParams.context_params;
-                } else {
+            // Pre Launch is for the mock launch flow
+            if ($scope.selected.preLaunch) {
+                var to = decodeURIComponent($stateParams.endpoint);
+                return window.location = to + "?patient_id=" + pid + "&iss=" + $stateParams.iss + "&launch_uri=" + $stateParams.launch_uri + "&context_params=" + $stateParams.context_params;
+            } else {
 
-                    fhirApiServices
-                        .registerContext({client_id: client_id}, {patient: pid})
-                        .then(function (c) {
-                            var to = decodeURIComponent($stateParams.endpoint);
-                            to = to.replace(/scope=/, "launch=" + c.launch_id + "&scope=");
-                            return window.location = to;
-                        });
-                }
-            };
+                fhirApiServices
+                    .registerContext({client_id: client_id}, {patient: pid})
+                    .then(function (c) {
+                        var to = decodeURIComponent($stateParams.endpoint);
+                        to = to.replace(/scope=/, "launch=" + c.launch_id + "&scope=");
+                        return window.location = to;
+                    });
+            }
+        };
     }).controller("AppsController", function ($scope, $rootScope, $state, appRegistrationServices, sandboxManagement,
                                               userServices, tools, fhirApiServices, appsService, personaServices, launchApp, $uibModal, docLinks) {
 
