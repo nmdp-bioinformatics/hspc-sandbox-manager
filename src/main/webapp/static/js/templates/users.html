@@ -4,7 +4,7 @@
             <div class="col-lg-12">
                 <div class="sub-header">Users</div>
                 <div class="box">
-                    <div class="scrollableContainer" ng-style="{height: canInvite() ? '200px' : '400px'}">
+                    <div class="scrollableContainer" ng-style="{height: canInvite() ? '225px' : '425px'}">
                         <div class="headerSpacer"></div>
                         <div class="scrollArea">
                             <table class="user-management-table table table-striped">
@@ -12,6 +12,7 @@
                                 <tr>
                                     <th><div class="th-inner" table-header-inner>Name</div></th>
                                     <th><div class="th-inner" table-header-inner>Email</div></th>
+                                    <th><div class="th-inner" table-header-inner>Roles</div></th>
                                     <th><div class="th-inner" table-header-inner></div></th>
                                 </tr>
                                 </thead>
@@ -19,6 +20,7 @@
                                 <tr ng-repeat="user in users">
                                     <td>{{user.name}}</td>
                                     <td>{{user.email}}</td>
+                                    <td><input type="checkbox" ng-disabled="!isSandboxAdmin() || !showDelete(user.sbmUserId)" ng-click="updateRole(user,'ADMIN', user.isAdmin)" ng-model="user.isAdmin" style="margin-right: 5px"/>Admin</td>
                                     <td><i ng-show="showDelete(user.sbmUserId)" ng-click="removeUser(user)" class="fa fa-times-circle"></i></td>
                                 </tbody>
                             </table>
@@ -35,7 +37,7 @@
             <div class="col-lg-12" ng-show="canInvite()">
                 <div class="sub-header">Invitations</div>
                 <div class="box">
-                    <div class="scrollableContainer" style="height: 200px">
+                    <div class="scrollableContainer" style="height: 225px">
                         <div class="headerSpacer"></div>
                         <div class="scrollArea">
                             <table class="invite-table table table-striped">

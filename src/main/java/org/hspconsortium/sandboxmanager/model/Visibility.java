@@ -1,7 +1,7 @@
 package org.hspconsortium.sandboxmanager.model;
 
 public enum Visibility {
-    PUBLIC(0), PRIVATE(1), SHARED(2);
+    PUBLIC(0), PRIVATE(1), SHARED(2); // SHARED is not yet used
 
     private int numVal;
 

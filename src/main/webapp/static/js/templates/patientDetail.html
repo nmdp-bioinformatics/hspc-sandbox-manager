@@ -25,6 +25,10 @@
                         <label class="detail-form-value" ng-show="!canManageData() || !showing.patientDataManager || showing.importExternalPatient">{{selected.selectedPatient | nameGivenFamily}}</label>
                     </div>
                     <div class="detail-form">
+                        <label class="detail-form-label">FHIR ID:</label>
+                        <label class="detail-form-value">{{selected.selectedPatient.id}}</label>
+                    </div>
+                    <div class="detail-form">
                         <label class="detail-form-label">Gender:</label>
                         <label class="detail-form-value">{{selected.selectedPatient.gender}}</label>
                     </div>

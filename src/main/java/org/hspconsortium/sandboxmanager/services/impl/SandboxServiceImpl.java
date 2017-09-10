@@ -316,6 +316,29 @@ public class SandboxServiceImpl implements SandboxService {
     }
 
     @Override
+    @Transactional
+    public void removeMemberRole(final Sandbox sandbox, final User user, final Role role) {
+        if (isSandboxMember(sandbox, user)) {
+            List<UserRole> allUserRoles = sandbox.getUserRoles();
+            UserRole removeUserRole = null;
+            Iterator<UserRole> iterator = allUserRoles.iterator();
+            while (iterator.hasNext()) {
+                UserRole userRole = iterator.next();
+                if (userRole.getUser().getId().equals(user.getId()) &&
+                        userRole.getRole().equals(role)) {
+                    removeUserRole = userRole;
+                    iterator.remove();
+                }
+            }
+            if (removeUserRole != null) {
+                sandbox.setUserRoles(allUserRoles);
+                save(sandbox);
+                userRoleService.delete(removeUserRole);
+            }
+        }
+    }
+
+    @Override
     public boolean hasMemberRole(final Sandbox sandbox, final User user, final Role role) {
         List<UserRole> userRoles = sandbox.getUserRoles();
         for(UserRole userRole : userRoles) {

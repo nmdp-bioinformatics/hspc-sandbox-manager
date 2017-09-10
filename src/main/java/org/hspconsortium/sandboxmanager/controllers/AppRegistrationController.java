@@ -135,6 +135,7 @@ public class AppRegistrationController extends AbstractController {
         App app = appService.getById(id);
         checkSandboxUserModifyAuthorization(request, app.getSandbox(), app);
         app.setLogoUri(request.getRequestURL().toString());
+        appService.save(app);
         try {
             Image image = new Image();
             image.setBytes(file.getBytes());

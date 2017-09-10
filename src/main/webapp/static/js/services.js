@@ -198,7 +198,7 @@ angular.module('sandManApp.services', [])
                     return false;
                 } else {
                     lastSearch.data.link.forEach(function(link) {
-                        if (link.relation == "next") {
+                        if (link.relation === "next") {
                             hasLink = true;
                         }
                     });
@@ -211,7 +211,7 @@ angular.module('sandManApp.services', [])
                     return false;
                 } else {
                     lastSearch.data.link.forEach(function(link) {
-                        if (link.relation == "previous") {
+                        if (link.relation === "previous") {
                             hasLink = true;
                         }
                     });
@@ -285,7 +285,7 @@ angular.module('sandManApp.services', [])
 
                 if (this.hasNext(lastSearch)) {
                     lastSearch.data.link.forEach(function (link) {
-                        if (link.relation == "next") {
+                        if (link.relation === "next") {
                             var querySting = decodeURIComponent(link.url).split("?");
                             var paramPairs = querySting[1].split("&");
                             for (var i = 0; i < paramPairs.length; i++) {
@@ -297,7 +297,7 @@ angular.module('sandManApp.services', [])
                         }
                     });
                     lastSearch.data.link.forEach(function(link) {
-                        if (link.relation == "next") {
+                        if (link.relation === "next") {
                             var querySting = decodeURIComponent(link.url).split("?");
                             var paramPairs = querySting[1].split("&");
                             for (var i = 0; i < paramPairs.length; i++) {
@@ -308,7 +308,7 @@ angular.module('sandManApp.services', [])
                                     } else {
                                         count.start = Number(parts[1]) - pageSize + 1;
                                     }
-                                    if ((Number(parts[1]) + pageSize) != count.total) {
+                                    if ((Number(parts[1]) + pageSize) !== count.total) {
                                         count.end = Number(parts[1]);
                                     } else {
                                         count.end = count.total;
@@ -319,7 +319,7 @@ angular.module('sandManApp.services', [])
                     });
                 } else {
                     lastSearch.data.link.forEach(function (link) {
-                        if (link.relation == "self") {
+                        if (link.relation === "self") {
                             var querySting = decodeURIComponent(link.url).split("?");
                             var paramPairs = querySting[1].split("&");
                             for (var i = 0; i < paramPairs.length; i++) {
@@ -331,7 +331,7 @@ angular.module('sandManApp.services', [])
                         }
                     });
                     lastSearch.data.link.forEach(function(link) {
-                        if (link.relation == "self") {
+                        if (link.relation === "self") {
                             var querySting = decodeURIComponent(link.url).split("?");
                             var paramPairs = querySting[1].split("&");
                             for (var i = 0; i < paramPairs.length; i++) {
@@ -1027,6 +1027,23 @@ angular.module('sandManApp.services', [])
                 });
                 return deferred;
             },
+            updateSandboxUserRoleByUserId: function(sbmUserId, role, add) {
+                var that = this;
+                var deferred = $.Deferred();
+                $.ajax({
+                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "?editUserRole=" + encodeURIComponent(sbmUserId) + "&role=" + role + "&add=" + add,
+                    type: 'PUT',
+                    contentType: "application/json",
+                    beforeSend : function( xhr ) {
+                        xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
+                    }
+                }).done(function(){
+                    that.getSandboxById();
+                    deferred.resolve();
+                }).fail(function(){
+                });
+                return deferred;
+            },
             getSandboxById: function() {
                 var that = this;
                 var deferred = $.Deferred();
@@ -1306,11 +1323,21 @@ angular.module('sandManApp.services', [])
                 }
                 return deferred;
             },
-            //TODO: start using this again and point to FireBase
-            userSettings: function() {
+            userSettingsPWM: function() {
                 var that = this;
                 appsSettings.getSettings().then(function(settings){
-                    window.location.href = settings.userManagementUrl
+                    $.ajax({
+                        url: settings.userManagementUrl,
+                        type: 'GET',
+                        beforeSend : function( xhr ) {
+                            xhr.setRequestHeader( 'c8381465-a7f8-4ecc-958d-ec296d6e8671', that.getOAuthUser().sbmUserId);
+                            xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
+                        }
+
+                    }).done(function(data){
+                        window.location.href = settings.userManagementUrl + "/private/"
+                    }).fail(function(){
+                    });
                 });
             },
             hasSystemRole: function(role) {
@@ -1325,7 +1352,17 @@ angular.module('sandManApp.services', [])
             hasSandboxRole: function(roles, role) {
                 var hasRole = false;
                 roles.forEach(function(userRole){
-                    if (sandboxManagerUser != undefined && userRole.user.sbmUserId.toLocaleLowerCase() === sandboxManagerUser.sbmUserId.toLocaleLowerCase()
+                    if (sandboxManagerUser !== undefined && userRole.user.sbmUserId.toLocaleLowerCase() === sandboxManagerUser.sbmUserId.toLocaleLowerCase()
+                        && userRole.role === role) {
+                        hasRole = true;
+                    }
+                });
+                return hasRole;
+            },
+            userHasSandboxRole: function(sbmUserId, roles, role) {
+                var hasRole = false;
+                roles.forEach(function(userRole){
+                    if (userRole.user.sbmUserId.toLocaleLowerCase() === sbmUserId.toLocaleLowerCase()
                         && userRole.role === role) {
                         hasRole = true;
                     }
@@ -1850,8 +1887,10 @@ angular.module('sandManApp.services', [])
                     // '&redirect=' + encodeURIComponent(window.location.href + '/launch.html?key='+key ), '_blank');
 
                 var params = {};
+                var patientId = undefined;
                 if (patientContext !== undefined && patientContext.name !== 'None' && patientContext !== "") {
-                    params = {patient: patientContext.fhirId}
+                    params = {patient: patientContext.fhirId};
+                    patientId = patientContext.fhirId;
                 }
 
                 if (contextParams !== undefined) {
@@ -1877,7 +1916,7 @@ angular.module('sandManApp.services', [])
 
                     launchDetails = {
                         userPersona: userPersonaCopy,
-                        patientContext: patientContext.fhirId
+                        patientContext: patientId
                     };
                 }
 
@@ -2180,13 +2219,8 @@ angular.module('sandManApp.services', [])
     return {
         loadSettings: function(){
             var deferred = $.Deferred();
-            var apiEndpointIndex = apiEndpointIndexServices.getSandboxApiEndpointIndex().index;
-            var supportedResources = 'static/js/config/supported-patient-resources.json';
-            if (apiEndpointIndex === "3" || apiEndpointIndex === "4") {
-                supportedResources = 'static/js/config/supported-patient-resources_3.json';
-            } else if (apiEndpointIndex === "4") {
-                supportedResources = 'static/js/config/supported-patient-resources_4.json';
-            }
+            var fhirTag = apiEndpointIndexServices.getSandboxApiEndpointIndex().fhirTag;
+            var supportedResources = 'static/js/config/supported-patient-resources_' + fhirTag + '.json';
             $http.get(supportedResources).success(function(result){
                 resources = result;
                 deferred.resolve(result);
@@ -2212,13 +2246,8 @@ angular.module('sandManApp.services', [])
     return {
         loadSettings: function(){
             var deferred = $.Deferred();
-            var apiEndpointIndex = apiEndpointIndexServices.getSandboxApiEndpointIndex().index;
-            var exportResources = 'static/js/config/export-resources.json';
-            if (apiEndpointIndex === "3" || apiEndpointIndex === "4") {
-                exportResources = 'static/js/config/export-resources_3.json';
-            } else if (apiEndpointIndex === "4") {
-                exportResources = 'static/js/config/export-resources_4.json';
-            }
+            var fhirTag = apiEndpointIndexServices.getSandboxApiEndpointIndex().fhirTag;
+            var exportResources = 'static/js/config/export-resources_' + fhirTag + '.json';
             $http.get(exportResources).success(function(result){
                 resources = result;
                 deferred.resolve(result);
@@ -2244,11 +2273,8 @@ angular.module('sandManApp.services', [])
     return {
         loadSettings: function(){
             var deferred = $.Deferred();
-            var apiEndpointIndex = apiEndpointIndexServices.getSandboxApiEndpointIndex().index;
-            var dataManagerResources = 'static/js/config/data-manager-resources.json';
-            if (apiEndpointIndex === "3" || apiEndpointIndex === "4") {
-                dataManagerResources = 'static/js/config/data-manager-resources_3.json';
-            }
+            var fhirTag = apiEndpointIndexServices.getSandboxApiEndpointIndex().fhirTag;
+            var dataManagerResources = 'static/js/config/data-manager-resources_' + fhirTag + '.json';
             $http.get(dataManagerResources).success(function(result){
                 resources = result;
                 deferred.resolve(result);

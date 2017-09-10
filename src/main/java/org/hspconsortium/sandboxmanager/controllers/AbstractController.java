@@ -23,14 +23,9 @@ package org.hspconsortium.sandboxmanager.controllers;
 import org.apache.http.HttpStatus;
 import org.hspconsortium.sandboxmanager.model.*;
 import org.hspconsortium.sandboxmanager.services.OAuthService;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 abstract class AbstractController {
     final OAuthService oAuthService;
@@ -60,14 +55,23 @@ abstract class AbstractController {
         checkUserAuthorization(request, createdBySbmUserId);
     }
 
+    // Checks to see if the authorized User is a member of the Sandbox
     String checkSandboxUserReadAuthorization(final HttpServletRequest request, final Sandbox sandbox) {
         return checkSandboxMember(sandbox, oAuthService.getOAuthUserId(request));
     }
 
+    // Checks to see if a User has can create a Sandbox Item
     String checkSandboxUserCreateAuthorization(final HttpServletRequest request, final Sandbox sandbox) {
         return checkSandboxUserNotReadOnlyAuthorization(request, sandbox);
     }
 
+    // Can a User modify a given Item in a given Sandbox
+    // 1) The User must be a member of the Sandbox
+    // 2) The User must have the right to modify the Item
+    //    a) If the Item is Private, the user must be the creator of the Item
+    //    b) If the Item is Public
+    //       i) If the Sandbox is Private, the User must have non-read-only rights to the Sandbox
+    //       ii) If the Sandbox is Public, the User mush be a Sandbox Admin
     String checkSandboxUserModifyAuthorization(final HttpServletRequest request, final Sandbox sandbox, final AbstractSandboxItem abstractSandboxItem) {
 
         //Fast fail for non-sandbox members
@@ -91,14 +95,62 @@ abstract class AbstractController {
                 , HttpStatus.SC_UNAUTHORIZED));
     }
 
+    String checkSystemUserDeleteSandboxAuthorization(final HttpServletRequest request, final Sandbox sandbox, final User user) {
+        String oauthUserId = oAuthService.getOAuthUserId(request);
+
+        // If the sandbox is PRIVATE, only the creator can delete.
+        // If the sandbox is PUBLIC, a system sandbox creator or system admin can delete.
+        if (checkSystemUserCanModifySandbox(oauthUserId, sandbox, user) &&
+                (sandbox.getVisibility() == Visibility.PRIVATE && sandbox.getCreatedBy().getSbmUserId().equalsIgnoreCase(oauthUserId))) {
+            return oauthUserId;
+        }
+        throw new UnauthorizedException(String.format("Response Status : %s.\n" +
+                        "Response Detail : User not authorized to perform this action."
+                , HttpStatus.SC_UNAUTHORIZED));
+    }
+
+    // Sandbox Admin rights
     String checkSystemUserCanModifySandboxAuthorization(final HttpServletRequest request, final Sandbox sandbox, final User user) {
         String oauthUserId = oAuthService.getOAuthUserId(request);
 
-        // If the sandbox is PRIVATE, only the creator can modify (currently). If the sandbox is PUBLIC, a system sandbox creator can modify.
-        if ((sandbox.getVisibility() == Visibility.PRIVATE && sandbox.getCreatedBy().getSbmUserId().equalsIgnoreCase(oauthUserId)) ||
-                (user.getSbmUserId().equalsIgnoreCase(oauthUserId) && checkUserHasSystemRole(user, SystemRole.CREATE_SANDBOX))) {
+        // If the Sandbox is PRIVATE, only an Admin can modify.
+        // If the Sandbox is PUBLIC, a system sandbox creator or system Admin can modify.
+        if (checkSystemUserCanModifySandbox(oauthUserId, sandbox, user)) {
             return oauthUserId;
         }
+
+        throw new UnauthorizedException(String.format("Response Status : %s.\n" +
+                        "Response Detail : User not authorized to perform this action."
+                , HttpStatus.SC_UNAUTHORIZED));
+    }
+
+    String checkSystemUserCanManageSandboxDataAuthorization(final HttpServletRequest request, final Sandbox sandbox, final User user) {
+        String oauthUserId = oAuthService.getOAuthUserId(request);
+
+        // If the Sandbox is PRIVATE, only an Admin or data manager can manage data.
+        // If the Sandbox is PUBLIC, a system sandbox creator or system Admin can manage data.
+        if (checkSystemUserCanModifySandbox(oauthUserId, sandbox, user) ||
+                (sandbox.getVisibility() == Visibility.PRIVATE && checkUserHasSandboxRole(oauthUserId, sandbox, Role.MANAGE_DATA))) {
+            return oauthUserId;
+        }
+
+        throw new UnauthorizedException(String.format("Response Status : %s.\n" +
+                        "Response Detail : User not authorized to perform this action."
+                , HttpStatus.SC_UNAUTHORIZED));
+    }
+
+    // Can manage user's is for inviting users to a sandbox
+    // Only Admin's can delete Users
+    String checkSystemUserCanManageSandboxUsersAuthorization(final HttpServletRequest request, final Sandbox sandbox, final User user) {
+        String oauthUserId = oAuthService.getOAuthUserId(request);
+
+        // If the Sandbox is PRIVATE, only an Admin or data manager can manage users.
+        // If the Sandbox is PUBLIC, a system sandbox creator or system Admin can manage users.
+        if (checkSystemUserCanModifySandbox(oauthUserId, sandbox, user) ||
+                ((sandbox.getVisibility() == Visibility.PRIVATE && checkUserHasSandboxRole(oauthUserId, sandbox, Role.MANAGE_USERS)))) {
+            return oauthUserId;
+        }
+
         throw new UnauthorizedException(String.format("Response Status : %s.\n" +
                         "Response Detail : User not authorized to perform this action."
                 , HttpStatus.SC_UNAUTHORIZED));
@@ -122,6 +174,20 @@ abstract class AbstractController {
         }
     }
 
+//                                  Default Sandbox Item Visibility
+//            *-------------------------------------------------------------------------------------*
+//            |                       |                           |                                 |
+//            |                       |      Private Sandbox      |          Public Sandbox         |
+//            *-------------------------------------------------------------------------------------*
+//            |                       |                           |                                 |
+//  Sandbox   |         USER          |          PUBLIC           |              PRIVATE            |
+//   Role     |                       |                           |                                 |
+//            *-------------------------------------------------------------------------------------*
+//            |                       |                           |                                 |
+//            |        ADMIN          |          PUBLIC           |              PUBLIC             |
+//            |                       |                           |                                 |
+//            *-------------------------------------------------------------------------------------*
+
     Visibility getDefaultVisibility(final User user, final Sandbox sandbox) {
 
         // For a PRIVATE sandbox, non-readonly user's default visibility is PUBLIC.
@@ -131,6 +197,14 @@ abstract class AbstractController {
             return Visibility.PUBLIC;
         }
         return Visibility.PRIVATE;
+    }
+
+    private boolean checkSystemUserCanModifySandbox(final String oauthUserId, final Sandbox sandbox, final User user) {
+        // If the Sandbox is PRIVATE, only an Admin can modify.
+        // If the Sandbox is PUBLIC, a system sandbox creator or system Admin can modify.
+        return  (user.getSbmUserId().equalsIgnoreCase(oauthUserId) &&
+                ((sandbox.getVisibility() == Visibility.PRIVATE && checkUserHasSandboxRole(oauthUserId, sandbox, Role.ADMIN)) ||
+                        (checkUserHasSystemRole(user, SystemRole.ADMIN) || checkUserHasSystemRole(user, SystemRole.CREATE_SANDBOX))));
     }
 
     private String checkSandboxUserNotReadOnlyAuthorization(final HttpServletRequest request, final Sandbox sandbox) {

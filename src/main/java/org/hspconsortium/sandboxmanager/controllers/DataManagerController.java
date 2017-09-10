@@ -79,7 +79,7 @@ public class DataManagerController extends AbstractController {
         User user = userService.findBySbmUserId(getSystemUserId(request));
         checkUserAuthorization(request, user.getSbmUserId());
         Sandbox sandbox = sandboxService.findBySandboxId(sandboxId);
-        checkUserSandboxRole(request, sandbox, Role.MANAGE_DATA);
+        checkSystemUserCanManageSandboxDataAuthorization(request, sandbox, user);
         sandboxActivityLogService.sandboxImport(sandbox, user);
         String endpoint = null;
         if (encodedEndpoint != null) {

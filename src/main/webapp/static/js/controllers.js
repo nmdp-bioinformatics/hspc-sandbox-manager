@@ -32,6 +32,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.sandboxText = branded.sandboxText;
         $scope.copyright = branded.copyright;
         $scope.showCert = branded.showCert;
+        $scope.showTermsLink = branded.showTermsLink;
+        $scope.userSettingsPWM = branded.userSettingsPWM;
         $scope.loginDoc = branded.loginDoc;
         $scope.mainImage = branded.mainImage;
         $scope.showing.defaultLaunchScenario = branded.defaultLaunchScenario;
@@ -80,7 +82,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     }
                 });
                 event.preventDefault();
-            } else if (toState.name == "progress" && !sandboxManagement.creatingSandbox()) {
+            } else if (toState.name === "progress" && !sandboxManagement.creatingSandbox()) {
 //                $scope.signin();
                 event.preventDefault();
             } else if (toState.scenarioBuilderStep && sandboxManagement.getScenarioBuilder().userPersona === "") {
@@ -147,7 +149,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                                                 isUpdate: (sandboxManagerUser.termsOfUseAcceptances.length > 0),
                                                 text: terms.value,
                                                 callback: function (result) { //setting callback
-                                                    if (result == true) {
+                                                    if (result === true) {
                                                         sandboxManagement.acceptTermsOfUse($scope.oauthUser.sbmUserId, terms.id);
                                                     } else {
                                                         $scope.signout();
@@ -232,9 +234,13 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
         $scope.userSettings = function () {
-            appsSettings.getSettings().then(function(settings){
-                $window.open(settings.userManagementUrl, '_blank');
-            });
+            if ($scope.userSettingsPWM) {
+                userServices.userSettingsPWM();
+            } else {
+                appsSettings.getSettings().then(function (settings) {
+                    $window.open(settings.userManagementUrl, '_blank');
+                });
+            }
         };
 
         $scope.selectSandbox = function (sandbox) {
@@ -256,19 +262,27 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
         $scope.canCreateSandbox = function () {
-            return userServices.sandboxManagerUser() !== undefined && (userServices.hasSystemRole("CREATE_SANDBOX") || userServices.hasSystemRole("ADMIN"));
+            return $scope.isSystemAdmin() || (userServices.sandboxManagerUser() !== undefined && (userServices.hasSystemRole("CREATE_SANDBOX")));
         };
 
         $scope.isSystemAdmin = function () {
             return userServices.sandboxManagerUser() !== undefined && (userServices.hasSystemRole("ADMIN"));
         };
 
+        $scope.isSandboxOwner = function () {
+            return (sandboxManagement.getSandbox().createdBy.sbmUserId.toLowerCase() === userServices.getOAuthUser().sbmUserId.toLowerCase());
+        };
+
+        $scope.isSandboxAdmin = function () {
+            return sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "ADMIN");
+        };
+
         $scope.canManageUsers = function () {
-            return sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "MANAGE_USERS");
+            return $scope.isSandboxAdmin() || (sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "MANAGE_USERS"));
         };
 
         $scope.canManageData = function () {
-            return sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "MANAGE_DATA");
+            return $scope.isSandboxAdmin() || (sandboxManagement.getSandbox().userRoles !== undefined && userServices.hasSandboxRole(sandboxManagement.getSandbox().userRoles, "MANAGE_DATA"));
         };
 
         $scope.goToDashboard = function () {
@@ -277,10 +291,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             } else {
                 window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/#/dashboard-view";
             }
-        };
-
-        $scope.manageUserAccount = function () {
-            userServices.userSettings();
         };
 
         $rootScope.$on('refresh-sandboxes', function () {
@@ -322,6 +332,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         // are different. A timeout runs after each digest to check since the
         // uiView height is modified outside of angular's detection.
         $scope.sideNavHeight = document.getElementById('uiView').offsetHeight;
+
         function postDigest(callback) {
             var unregister = $rootScope.$watch(function () {
                 unregister();
@@ -442,11 +453,13 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
         $scope.showDelete = function (sbmUserId) {
-            // Only Sandbox creater can delete users
-            if (sandboxManagement.getSandbox().createdBy !== undefined && userServices.getOAuthUser() !== undefined &&
-                sandboxManagement.getSandbox().createdBy.sbmUserId.toLowerCase() === userServices.getOAuthUser().sbmUserId.toLowerCase()) {
-                // Don't allow deleting self
-                return sandboxManagement.getSandbox().createdBy.sbmUserId.toLowerCase() !== sbmUserId.toLowerCase();
+
+            // Only Sandbox Admin can delete users
+            if (userServices.getOAuthUser() !== undefined &&
+                userServices.userHasSandboxRole(userServices.getOAuthUser().sbmUserId, sandboxManagement.getSandbox().userRoles, "ADMIN")) {
+                // Don't allow deleting self or Sandbox creator
+                return ((sandboxManagement.getSandbox().createdBy.sbmUserId.toLowerCase() !== sbmUserId.toLowerCase()) &&
+                    (userServices.getOAuthUser().sbmUserId.toLowerCase() !== sbmUserId.toLowerCase()));
             }
             return false;
         };
@@ -465,7 +478,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                             type: "confirm-error",
                             text: "Are you sure you want to remove the user " + user.email + "?",
                             callback: function (result) { //setting callback
-                                if (result == true) {
+                                if (result === true) {
                                     sandboxManagement.removeUserFromSandboxByUserId(user.sbmUserId).then(function () {
                                         sandboxManagement.getSandboxById().then(function () {
                                             getUsers();
@@ -476,6 +489,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                         };
                     }
                 }
+            });
+        };
+
+        $scope.updateRole = function (user, role, add) {
+            sandboxManagement.updateSandboxUserRoleByUserId(user.sbmUserId, role, add).then(function () {
             });
         };
 
@@ -528,6 +546,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             var userRoles = sandboxManagement.getSandbox().userRoles;
             userRoles.forEach(function (userRole) {
                 if (!contains($scope.users, userRole.user)) {
+                    if (userServices.userHasSandboxRole(userRole.user.sbmUserId, sandboxManagement.getSandbox().userRoles, "ADMIN")) {
+                        userRole.user.isAdmin = true;
+                    }
                     $scope.users.push(userRole.user);
                 }
             });
@@ -551,10 +572,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.allowOpenAccess = $scope.sandbox.allowOpenAccess;
         $scope.defaultDataSet = true;
 
-        $scope.canEdit = function () {
-            return userServices.canModifySandbox(sandboxManagement.getSandbox())
-        };
-
         appsSettings.getSettings().then(function (settings) {
             $scope.openFhirUrl = settings.baseServiceUrl_1 + $scope.sandbox.sandboxId + "/open";
             if ($scope.sandbox.apiEndpointIndex === "2") {
@@ -577,8 +594,19 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.fhirVersion = apiEndpointIndexServices.getSandboxApiEndpointIndex().name;
         $scope.supportsDataSets = apiEndpointIndexServices.getSandboxApiEndpointIndex().supportsDataSets;
 
+        $scope.canEdit = function () {
+            return userServices.canModifySandbox(sandboxManagement.getSandbox())
+        };
+
+        // Only the owner can delete
         $scope.canDelete = function () {
             return (sandboxManagement.getSandbox().createdBy.sbmUserId.toLowerCase() === userServices.getOAuthUser().sbmUserId.toLowerCase());
+        };
+
+        // Only an Admin can reset
+        $scope.canReset = function () {
+            return (userServices.getOAuthUser() !== undefined &&
+                userServices.userHasSandboxRole(userServices.getOAuthUser().sbmUserId, sandboxManagement.getSandbox().userRoles, "ADMIN"));
         };
 
         $scope.updateSandbox = function () {
@@ -600,7 +628,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                             text: "Are you sure you want to delete sandbox " + sandboxManagement.getSandbox().name + "? " +
                             "This is not reversible and will delete all FHIR data, launch scenarios, registered app, etc.",
                             callback: function (result) { //setting callback
-                                if (result == true) {
+                                if (result === true) {
                                     var modalProgress = openModalProgressDialog("Deleting...");
                                     sandboxManagement.deleteSandbox().then(function () {
                                         window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/#/dashboard-view";
@@ -1436,7 +1464,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 allowOpenAccess: $scope.sandboxAllowOpenAccess,
                 dataSet: ($scope.selectedSandboxApiEndpointIndex.supportsDataSets ? ($scope.defaultDataSet ? "DEFAULT" : "NONE") : "NA")
 
-        }).then(function (sandbox) {
+            }).then(function (sandbox) {
                 sandboxManagement.setCreatingSandbox(false);
                 $scope.showing.progress = false;
                 $rootScope.$emit('sandbox-created', $scope.sandboxId);
@@ -1676,36 +1704,36 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
         $scope.onSelected = $scope.onSelected || function (p) {
-                if ($scope.selected.selectedPatient !== p) {
-                    $scope.selected.selectedPatient = p;
-                    $scope.selected.patientSelected = true;
-                    $scope.showing.patientDetail = true;
+            if ($scope.selected.selectedPatient !== p) {
+                $scope.selected.selectedPatient = p;
+                $scope.selected.patientSelected = true;
+                $scope.showing.patientDetail = true;
 
-                    patientResources.getSupportedResources().done(function (resources) {
-                        $scope.selected.patientResources = [];
-                        for (var i = 0; i < resources.length; i++) {
-                            var query = {};
-                            query[resources[i].patientSearch] = "Patient/" + p.id;
-                            fhirApiServices.queryResourceInstances(resources[i].resourceType, query, undefined, undefined, 1)
-                                .then(function (resource, queryResult) {
-                                    $scope.selected.patientResources.push({
-                                        resourceType: queryResult.config.type,
-                                        count: queryResult.data.total
-                                    });
-                                    $scope.selected.patientResources = $filter('orderBy')($scope.selected.patientResources, "resourceType");
-
-                                    emptyArray(resourcesNames);
-                                    emptyArray(resourceCounts);
-                                    angular.forEach($scope.selected.patientResources, function (resource) {
-                                        resourcesNames.push(resource.resourceType);
-                                        resourceCounts.push(parseInt(resource.count));
-                                    });
-                                    $rootScope.$digest();
+                patientResources.getSupportedResources().done(function (resources) {
+                    $scope.selected.patientResources = [];
+                    for (var i = 0; i < resources.length; i++) {
+                        var query = {};
+                        query[resources[i].patientSearch] = "Patient/" + p.id;
+                        fhirApiServices.queryResourceInstances(resources[i].resourceType, query, undefined, undefined, 1)
+                            .then(function (resource, queryResult) {
+                                $scope.selected.patientResources.push({
+                                    resourceType: queryResult.config.type,
+                                    count: queryResult.data.total
                                 });
-                        }
-                    });
-                }
-            };
+                                $scope.selected.patientResources = $filter('orderBy')($scope.selected.patientResources, "resourceType");
+
+                                emptyArray(resourcesNames);
+                                emptyArray(resourceCounts);
+                                angular.forEach($scope.selected.patientResources, function (resource) {
+                                    resourcesNames.push(resource.resourceType);
+                                    resourceCounts.push(parseInt(resource.count));
+                                });
+                                $rootScope.$digest();
+                            });
+                    }
+                });
+            }
+        };
         // **** END Loads Patient Resource Counts for Patient Details ****//
 
         $scope.skipPatient = function () {
@@ -2021,7 +2049,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         sandboxManagement.getScenarioBuilder().owner = userServices.getOAuthUser();
         $scope.docLink = docLinks.docLink;
 
-        $scope.$watch('selectedScenario.launchEmbedded', function() {
+        $scope.$watch('selectedScenario.launchEmbedded', function () {
             if ($scope.selectedScenario.launchEmbedded !== undefined && $scope.selectedScenario.launchEmbedded !== $scope.launchEmbedded) {
                 $scope.launchEmbedded = $scope.selectedScenario.launchEmbedded;
                 sandboxManagement.updateLaunchScenario($scope.selectedScenario);
@@ -2074,8 +2102,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
             $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
-            $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
-            $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
+                $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
+                $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
+            if ($scope.selectedScenario.app.logoUri) {
+                $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
+            }
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
         });
@@ -2088,8 +2119,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
             $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
-            $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
-            $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
+                $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
+                $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
+            if ($scope.selectedScenario.app.logoUri) {
+                $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
+            }
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
         });
@@ -2339,7 +2373,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         modalInstance.result.then(function (result) {
             var scenario = result.scenario;
             if (result.launch) {
-                    launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
+                launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
             } else {
                 sandboxManagement.addFullLaunchScenarioList(scenario);
             }
@@ -2646,24 +2680,24 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         }
 
         $scope.onSelected = $scope.onSelected || function (p) {
-                var pid = p.id;
-                var client_id = tools.decodeURLParam($stateParams.endpoint, "client_id");
+            var pid = p.id;
+            var client_id = tools.decodeURLParam($stateParams.endpoint, "client_id");
 
-                // Pre Launch is for the mock launch flow
-                if ($scope.selected.preLaunch) {
-                    var to = decodeURIComponent($stateParams.endpoint);
-                    return window.location = to + "?patient_id=" + pid + "&iss=" + $stateParams.iss + "&launch_uri=" + $stateParams.launch_uri + "&context_params=" + $stateParams.context_params;
-                } else {
+            // Pre Launch is for the mock launch flow
+            if ($scope.selected.preLaunch) {
+                var to = decodeURIComponent($stateParams.endpoint);
+                return window.location = to + "?patient_id=" + pid + "&iss=" + $stateParams.iss + "&launch_uri=" + $stateParams.launch_uri + "&context_params=" + $stateParams.context_params;
+            } else {
 
-                    fhirApiServices
-                        .registerContext({client_id: client_id}, {patient: pid})
-                        .then(function (c) {
-                            var to = decodeURIComponent($stateParams.endpoint);
-                            to = to.replace(/scope=/, "launch=" + c.launch_id + "&scope=");
-                            return window.location = to;
-                        });
-                }
-            };
+                fhirApiServices
+                    .registerContext({client_id: client_id}, {patient: pid})
+                    .then(function (c) {
+                        var to = decodeURIComponent($stateParams.endpoint);
+                        to = to.replace(/scope=/, "launch=" + c.launch_id + "&scope=");
+                        return window.location = to;
+                    });
+            }
+        };
     }).controller("AppsController", function ($scope, $rootScope, $state, appRegistrationServices, sandboxManagement,
                                               userServices, tools, fhirApiServices, appsService, personaServices, launchApp, $uibModal, docLinks) {
 
@@ -2795,12 +2829,15 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.clientJSON.redirectUri = $scope.selected.selectedApp.authClient.redirectUri;
             $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
             $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
-            $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri;
+            $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri + "?" + new Date().getTime();
         } else {
             appRegistrationServices.getSandboxApp(app.id).then(function (resultApp) {
                 $scope.galleryOffset = 80;
                 $scope.selected.selectedApp.clientJSON = JSON.parse(resultApp.clientJSON);
                 $scope.clientJSON = $scope.selected.selectedApp.clientJSON;
+                if (resultApp.logoUri) {
+                    $scope.clientJSON.logoUri = resultApp.logoUri + "?" + new Date().getTime();
+                }
                 if ($scope.selected.selectedApp.clientJSON.tokenEndpointAuthMethod === "SECRET_BASIC") {
                     $scope.clientJSON.clientType = "Confidential Client";
                 } else {
@@ -2912,6 +2949,13 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         }
         var updateClientJSON = angular.copy($scope.clientJSON);
         delete updateClientJSON.logo;
+
+        if (updateClientJSON.logoUri) {
+            var i = updateClientJSON.logoUri.lastIndexOf("?");
+            if (i > -1) {
+                updateClientJSON.logoUri = updateClientJSON.logoUri.substr(0, i);
+            }
+        }
 
         if ($scope.clientJSON.clientType !== "Public Client") {
             updateClientJSON.tokenEndpointAuthMethod = "SECRET_BASIC";

@@ -1,7 +1,6 @@
 package org.hspconsortium.sandboxmanager.services;
 
 import org.hspconsortium.sandboxmanager.model.Sandbox;
-import org.hspconsortium.sandboxmanager.model.SnapshotAction;
 
 import java.io.UnsupportedEncodingException;
 
