@@ -14,5 +14,6 @@
     "hspcAccountCookieName": "hspc-token",
     "personaCookieName": "hspc-persona-token",
     "personaCookieTimeout": 180000,
-    "personaCookieDomain": "localhost"
+    "personaCookieDomain": "localhost",
+    "sandboxManagerApiUrl": "http://localhost:12000/"
 }

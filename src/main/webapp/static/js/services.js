@@ -758,7 +758,7 @@ angular.module('sandManApp.services', [])
                     launchScenario.sandbox = sandbox;
                 }
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario",
+                    url: "http://localhost:12000/api/launchScenario",
                     type: 'POST',
                     data: JSON.stringify(launchScenario),
                     contentType: "application/json",
@@ -782,7 +782,7 @@ angular.module('sandManApp.services', [])
                 updatedLaunchScenario.app = angular.copy(updatedLaunchScenario.app);
                 delete updatedLaunchScenario.app.clientJSON;
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario/" + updatedLaunchScenario.id,
+                    url: "http://localhost:12000/api/launchScenario/" + updatedLaunchScenario.id,
                     type: 'PUT',
                     data: JSON.stringify(updatedLaunchScenario),
                     contentType: "application/json",
@@ -800,7 +800,7 @@ angular.module('sandManApp.services', [])
                 updatedLaunchScenario.app = angular.copy(updatedLaunchScenario.app);
                 delete updatedLaunchScenario.app.clientJSON;
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario/" + updatedLaunchScenario.id + "/launched",
+                    url: "http://localhost:12000/api/launchScenario/" + updatedLaunchScenario.id + "/launched",
                     type: 'PUT',
                     data: JSON.stringify(updatedLaunchScenario),
                     contentType: "application/json",
@@ -815,7 +815,7 @@ angular.module('sandManApp.services', [])
             deleteLaunchScenario: function(launchScenario){
                 var that = this;
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario/" + launchScenario.id,
+                    url: "http://localhost:12000/api/launchScenario/" + launchScenario.id,
                     type: 'DELETE',
                     beforeSend : function( xhr ) {
                         xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
@@ -830,7 +830,7 @@ angular.module('sandManApp.services', [])
             getLaunchScenarioByApp: function(appId){
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario?appId=" + appId,
+                    url: "http://localhost:12000/api/launchScenario?appId=" + appId,
                     type: 'GET',
                     beforeSend : function( xhr ) {
                         xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
@@ -845,7 +845,7 @@ angular.module('sandManApp.services', [])
             getLaunchScenarioByUserPersona: function(userPersonaId){
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario?userPersonaId=" + userPersonaId,
+                    url: "http://localhost:12000/api/launchScenario?userPersonaId=" + userPersonaId,
                     type: 'GET',
                     beforeSend : function( xhr ) {
                         xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
@@ -860,7 +860,7 @@ angular.module('sandManApp.services', [])
             getSandboxLaunchScenarios: function() {
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/launchScenario?sandboxId=" + sandbox.sandboxId,
+                    url: "http://localhost:12000/api/launchScenario?sandboxId=" + sandbox.sandboxId,
                     type: 'GET',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -896,7 +896,7 @@ angular.module('sandManApp.services', [])
                 };
 
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox",
+                    url: "http://localhost:12000/api/sandbox",
                     type: 'POST',
                     data: JSON.stringify(createSandbox),
                     contentType: "application/json",
@@ -923,7 +923,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId,
+                    url: "http://localhost:12000/api/sandbox/" + sandbox.sandboxId,
                     type: 'PUT',
                     data: JSON.stringify(sandbox),
                     contentType: "application/json",
@@ -942,7 +942,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId,
+                    url: "http://localhost:12000/api/sandbox/" + sandbox.sandboxId,
                     type: 'DELETE',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -958,7 +958,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/fhirdata/reset?sandboxId=" + sandbox.sandboxId + "&dataSet=" + dataSet,
+                    url: "http://localhost:12000/api/fhirdata/reset?sandboxId=" + sandbox.sandboxId + "&dataSet=" + dataSet,
                     type: 'POST',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -974,7 +974,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/fhirdata/import?sandboxId=" + sandbox.sandboxId,
+                    url: "http://localhost:12000/api/fhirdata/import?sandboxId=" + sandbox.sandboxId,
                     type: 'GET',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -990,7 +990,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox?userId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId),
+                    url: "http://localhost:12000/api/sandbox?userId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId),
                     type: 'GET',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -1015,7 +1015,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "?removeUserId=" + encodeURIComponent(sbmUserId),
+                    url: "http://localhost:12000/api/sandbox/" + sandbox.sandboxId + "?removeUserId=" + encodeURIComponent(sbmUserId),
                     type: 'PUT',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -1031,7 +1031,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "?editUserRole=" + encodeURIComponent(sbmUserId) + "&role=" + role + "&add=" + add,
+                    url: "http://localhost:12000/api/sandbox/" + sandbox.sandboxId + "?editUserRole=" + encodeURIComponent(sbmUserId) + "&role=" + role + "&add=" + add,
                     type: 'PUT',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -1053,7 +1053,7 @@ angular.module('sandManApp.services', [])
                         deferred.resolve("reserved");
                     } else if (sandboxId !== undefined) {
                         $.ajax({
-                            url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandboxId,
+                            url: "http://localhost:12000/api/sandbox/" + sandboxId,
                             type: 'GET',
                             contentType: "application/json",
                             beforeSend: function (xhr) {
@@ -1090,7 +1090,7 @@ angular.module('sandManApp.services', [])
                 var deferred = $.Deferred();
                 // Record the sandbox login
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox/" + sandbox.sandboxId + "/login" + "?userId=" + encodeURIComponent(sbmUserId),
+                    url: "http://localhost:12000/api/sandbox/" + sandbox.sandboxId + "/login" + "?userId=" + encodeURIComponent(sbmUserId),
                     type: 'POST',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -1106,7 +1106,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/termsofuse",
+                    url: "http://localhost:12000/api/termsofuse",
                     type: 'GET',
                     contentType: "application/json"
                 }).done(function(terms){
@@ -1119,7 +1119,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/user/acceptterms?sbmUserId=" + encodeURIComponent(sbmUserId) + "&termsId=" + termsId,
+                    url: "http://localhost:12000/api/user/acceptterms?sbmUserId=" + encodeURIComponent(sbmUserId) + "&termsId=" + termsId,
                     type: 'POST',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -1166,7 +1166,7 @@ angular.module('sandManApp.services', [])
             getConfigByType: function(type) {
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/config/" + type,
+                    url: "http://localhost:12000/api/config/" + type,
                     type: 'GET',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -1183,7 +1183,7 @@ angular.module('sandManApp.services', [])
                 var that = this;
                 var deferred = $.Deferred();
                 $.ajax({
-                    url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/admin?interval=30",
+                    url: "http://localhost:12000/api/admin?interval=30",
                     type: 'GET',
                     contentType: "application/json",
                     beforeSend : function( xhr ) {
@@ -1243,7 +1243,7 @@ angular.module('sandManApp.services', [])
             var that = this;
             var deferred = $.Deferred();
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/fhirdata/import?sandboxId=" + sandboxManagement.getSandbox().sandboxId + "&patientId=" + patientId + "&fhirIdPrefix=" + fhirIdPrefix + "&endpoint=" +  encodeURIComponent(endpoint),
+                url: "http://localhost:12000/api/fhirdata/import?sandboxId=" + sandboxManagement.getSandbox().sandboxId + "&patientId=" + patientId + "&fhirIdPrefix=" + fhirIdPrefix + "&endpoint=" +  encodeURIComponent(endpoint),
                 type: 'POST',
                 contentType: "application/json",
                 beforeSend: function (xhr) {
@@ -1307,7 +1307,8 @@ angular.module('sandManApp.services', [])
                     deferred.resolve(sandboxManagerUser);
                 } else {
                     $.ajax({
-                        url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/user?sbmUserId=" + encodeURIComponent(sbmUserId),
+                        // url: "http://localhost:12000/api/user?sbmUserId=" + encodeURIComponent(sbmUserId),
+                        url: "http://localhost:12000/api/user?sbmUserId=" + encodeURIComponent(sbmUserId),
                         type: 'GET',
                         contentType: "application/json",
                         beforeSend: function (xhr) {
@@ -1436,7 +1437,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var that = this;
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona",
+                url: "http://localhost:12000/api/userPersona",
                 type: 'POST',
                 data: JSON.stringify(personaBuilder),
                 contentType: "application/json",
@@ -1457,7 +1458,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var that = this;
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona",
+                url: "http://localhost:12000/api/userPersona",
                 type: 'PUT',
                 data: JSON.stringify(persona),
                 contentType: "application/json",
@@ -1478,7 +1479,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var that = this;
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona/" + persona.id,
+                url: "http://localhost:12000/api/userPersona/" + persona.id,
                 type: 'DELETE',
                 beforeSend : function( xhr ) {
                     xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
@@ -1495,7 +1496,7 @@ angular.module('sandManApp.services', [])
         getPersonaListBySandbox: function() {
             var deferred = $.Deferred();
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
+                url: "http://localhost:12000/api/userPersona?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
                 type: 'GET',
                 contentType: "application/json",
                 beforeSend : function( xhr ) {
@@ -1512,7 +1513,7 @@ angular.module('sandManApp.services', [])
         getDefaultPersonaBySandbox: function() {
             var deferred = $.Deferred();
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona/default?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
+                url: "http://localhost:12000/api/userPersona/default?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
                 type: 'GET',
                 contentType: "application/json",
                 beforeSend : function( xhr ) {
@@ -1528,7 +1529,7 @@ angular.module('sandManApp.services', [])
         checkForUserPersonaById: function(userPersonaId) {
             var deferred = $.Deferred();
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona?lookUpId=" + userPersonaId,
+                url: "http://localhost:12000/api/userPersona?lookUpId=" + userPersonaId,
                 type: 'GET'
             }).done(function(persona){
                 if (persona !== undefined && persona !== "") {
@@ -1573,7 +1574,7 @@ angular.module('sandManApp.services', [])
 
             app.clientJSON = JSON.stringify(app.clientJSON);
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/app",
+                url: "http://localhost:12000/api/app",
                 type: 'POST',
                 data: JSON.stringify(app),
                 contentType: "application/json",
@@ -1610,7 +1611,7 @@ angular.module('sandManApp.services', [])
             newApp.clientJSON = JSON.stringify(newApp.clientJSON);
 
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/app/" + newApp.id,
+                url: "http://localhost:12000/api/app/" + newApp.id,
                 type: 'PUT',
                 data: JSON.stringify(newApp),
                 contentType: "application/json",
@@ -1642,7 +1643,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var that = this;
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/app/" + appId,
+                url: "http://localhost:12000/api/app/" + appId,
                 type: 'DELETE',
                 beforeSend : function( xhr ) {
                     xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
@@ -1662,7 +1663,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var that = this;
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/app/" + appId,
+                url: "http://localhost:12000/api/app/" + appId,
                 type: 'GET',
                 beforeSend : function( xhr ) {
                     xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
@@ -1680,7 +1681,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var that = this;
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/app?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
+                url: "http://localhost:12000/api/app?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
                 type: 'GET',
                 beforeSend : function( xhr ) {
                     xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
@@ -1704,7 +1705,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var formData = new FormData();
             formData.append("file", file);
-            $http.post(appsSettings.getSandboxUrlSettings().baseRestUrl + "/app/" + id + "/image", formData, {
+            $http.post("http://localhost:12000/api/app/" + id + "/image", formData, {
                 transformRequest: angular.identity,
                 headers: {
                     'Content-Type': undefined,
@@ -1752,7 +1753,7 @@ angular.module('sandManApp.services', [])
             };
 
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite",
+                url: "http://localhost:12000/api/sandboxinvite",
                 type: 'PUT',
                 data: JSON.stringify(sandboxInvite),
                 contentType: "application/json",
@@ -1772,7 +1773,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var that = this;
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite?sbmUserId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId) +
+                url: "http://localhost:12000/api/sandboxinvite?sbmUserId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId) +
                     "&status=" + status,
                 type: 'GET',
                 beforeSend : function( xhr ) {
@@ -1790,7 +1791,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var that = this;
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite?sandboxId=" + sandboxManagement.getSandbox().sandboxId +
+                url: "http://localhost:12000/api/sandboxinvite?sandboxId=" + sandboxManagement.getSandbox().sandboxId +
                 "&status=" + status,
                 type: 'GET',
                 beforeSend : function( xhr ) {
@@ -1808,7 +1809,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var that = this;
             $.ajax({
-                url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandboxinvite/" + sandboxInvite.id + "?status=" + status,
+                url: "http://localhost:12000/api/sandboxinvite/" + sandboxInvite.id + "?status=" + status,
                 type: 'PUT',
                 beforeSend : function( xhr ) {
                     xhr.setRequestHeader( 'Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token );
@@ -1922,7 +1923,7 @@ angular.module('sandManApp.services', [])
 
                 registerAppContext(app, params, launchDetails, key);
                 if(userPersona !== null && userPersona !== undefined && userPersona) {
-                    $http.post(appsSettings.getSandboxUrlSettings().baseRestUrl + "/userPersona/authenticate", {
+                    $http.post("http://localhost:12000/api/userPersona/authenticate", {
                         username: userPersona.personaUserId,
                         password: userPersona.password
                     }).then(function(response){
@@ -2069,7 +2070,7 @@ angular.module('sandManApp.services', [])
                         deferred.resolve("reserved");
                     } else {
                         $.ajax({
-                            url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox?lookUpId=" + sandboxId,
+                            url: "http://localhost:12000/api/sandbox?lookUpId=" + sandboxId,
                             type: 'GET'
                         }).done(function (sandbox) {
                             if (sandbox !== undefined && sandbox !== "") {
@@ -2092,7 +2093,7 @@ angular.module('sandManApp.services', [])
                 var deferred = $.Deferred();
                 appsSettings.getSettings().then(function (settings) {
                     $.ajax({
-                        url: appsSettings.getSandboxUrlSettings().baseRestUrl + "/sandbox?sandboxId=" + sandboxId,
+                        url: "http://localhost:12000/api/sandbox?sandboxId=" + sandboxId,
                         type: 'GET'
                     }).done(function (sandbox) {
                         if (sandbox !== undefined && sandbox !== "") {
@@ -2370,7 +2371,7 @@ angular.module('sandManApp.services', [])
                 if (sandboxUrlSettings.sandboxId === "") {
                     sandboxUrlSettings.sandboxId = undefined;
                 }
-                sandboxUrlSettings.baseRestUrl = sandboxUrlSettings.sandboxManagerRootUrl + "/REST";
+                // sandboxUrlSettings.baseRestUrl = sandboxUrlSettings.sandboxManagerRootUrl + "/REST";
 
             }
             return sandboxUrlSettings;
@@ -2391,6 +2392,7 @@ angular.module('sandManApp.services', [])
                     settings.userManagementUrl = envInfo.userManagementUrl || settings.userManagementUrl;
                     settings.sbmUrlHasContextPath = envInfo.sbmUrlHasContextPath || settings.sbmUrlHasContextPath;
                     settings.personaCookieDomain = envInfo.personaCookieDomain || settings.personaCookieDomain;
+                    settings.sandboxManagerApiUrl = envInfo.sandboxManagerApiUrl || settings.sandboxManagerApiUrl;
                 }
                 deferred.resolve(settings);
                 });

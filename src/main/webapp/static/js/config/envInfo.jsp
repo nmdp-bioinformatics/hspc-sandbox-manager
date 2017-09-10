@@ -15,5 +15,6 @@
             "hostOrg": "<%= System.getProperty("hostOrg") %>",
             "hspcAccountCookieName": "<%= System.getProperty("hspcAccountCookieName") %>",
             "personaCookieName": "<%= System.getProperty("personaCookieName") %>",
-            "personaCookieDomain": "<%= System.getProperty("personaCookieDomain") %>"
+            "personaCookieDomain": "<%= System.getProperty("personaCookieDomain") %>",
+            "sandboxManagerApiUrl": "<%= System.getProperty("sandboxManagerApiUrl") %>"
         });

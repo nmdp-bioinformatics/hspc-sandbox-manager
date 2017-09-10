@@ -54,6 +54,9 @@ public class EnvInfoController {
     @Value("${personaCookieDomain:}")
     String personaCookieDomain;
 
+    @Value("${sandboxManagerApiUrl:}")
+    String sandboxManagerApiUrl;
+
     @RequestMapping(method = RequestMethod.GET, produces ="application/javascript")
     public String get() {
         StringBuilder stringBuffer = new StringBuilder();
@@ -104,6 +107,9 @@ public class EnvInfoController {
         stringBuffer.append("\",");
         stringBuffer.append("\"personaCookieDomain\": \"");
         stringBuffer.append(personaCookieDomain);
+        stringBuffer.append("\",");
+        stringBuffer.append("\"sandboxManagerApiUrl\": \"");
+        stringBuffer.append(sandboxManagerApiUrl);
         stringBuffer.append("\"");
         stringBuffer.append("});");
 
