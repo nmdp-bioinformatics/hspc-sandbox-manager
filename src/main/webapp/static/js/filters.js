@@ -3,15 +3,15 @@
 /* Filters */
 
 angular.module('sandManApp.filters', []).filter('formatAttribute', function ($filter) {
-        return function (input) {
-            if (Object.prototype.toString.call(input) === '[object Date]') {
-                return $filter('date')(input, 'MM/dd/yyyy HH:mm');
-            } else {
-                return input;
-            }
-        };
+    return function (input) {
+        if (Object.prototype.toString.call(input) === '[object Date]') {
+            return $filter('date')(input, 'MM/dd/yyyy HH:mm');
+        } else {
+            return input;
+        }
+    };
 }).filter('nameGivenFamily', function () {
-    return function(p){
+    return function (p) {
         var isArrayName = p && p.name && p.name[0];
         var personName;
 
@@ -36,7 +36,7 @@ angular.module('sandManApp.filters', []).filter('formatAttribute', function ($fi
         return user;
     };
 }).filter('nameFamilyGiven', function () {
-    return function(p){
+    return function (p) {
         var isArrayName = p && p.name && p.name[0];
         var personName;
 
@@ -62,7 +62,7 @@ angular.module('sandManApp.filters', []).filter('formatAttribute', function ($fi
         return user;
     };
 }).filter('ageFilter', function () {
-    return function(dob) {
+    return function (dob) {
         // var dob = patient.birthDate;
         if (!dob) return "";
 
@@ -77,7 +77,7 @@ angular.module('sandManApp.filters', []).filter('formatAttribute', function ($fi
             .replace(/minutes?/, "min");
     }
 }).filter('capFilter', function () {
-    return function(input) {
+    return function (input) {
         return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
     }
 });
