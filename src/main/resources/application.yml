@@ -11,48 +11,5 @@ spring:
   application:
     name: HSPC Sandbox Manager
 
-hspc:
-  platform:
-    # When a user is added to a PUBLIC sandbox, these are their default Sandbox Roles
-    defaultPublicSandboxRoles: USER
-    # When a user is added to a PRIVATE sandbox, these are their default Sandbox Roles
-    defaultPrivateSandboxRoles: USER,MANAGE_USERS,MANAGE_DATA
-    # When a user creates a brand new sandbox, these are the default Sandbox Roles they are given in the new sandbox
-    defaultSandboxCreatorRoles: ADMIN,MANAGE_USERS,MANAGE_DATA
-    # When a user logs in to Sandbox Manager for the first time, these are the System Roles they are given
-    #    defaultSystemRoles: USER
-    defaultSystemRoles: USER,CREATE_SANDBOX
-    # When a user creates a brand new sandbox, this is the default visibility of the new sandbox
-    #    defaultSandboxVisibility: PUBLIC
-    defaultSandboxVisibility: PRIVATE
-    authorization:
-      url: http://localhost:8060
-      tokenEndpoint: ${hspc.platform.authorization.url}/token
-      authorizeEndpoint: ${hspc.platform.authorization.url}/authorize
-      adminAccess:
-        clientId: sandman_admin
-        clientSecret: secret
-    api:
-      version1:
-        baseUrl: http://localhost:8071/
-      version2:
-        baseUrl: http://localhost:8072/
-      version3:
-        baseUrl: http://localhost:8073/
-      version4:
-        baseUrl: http://localhost:8074/
-      oauthUserInfoEndpointURL: ${hspc.platform.authorization.url}/userinfo
-      oauthClientEndpointURL: ${hspc.platform.authorization.url}/api/clients
-    messaging:
-      sendEmail: false
-      url: http://localhost:8091
-      emailSenderEndpointURL: ${hspc.platform.messaging.url}/mailsender
-    syntheticData:
-#      fhirServerUrl: https://syntheticmass.mitre.org/fhir
-       fhirServerUrl: ${hspc.platform.api.version3.baseUrl}/synthea2/open
-    jwt:
-      key: devKeyDoNotUseInProductionShouldBeOverwrittenInProdConfiguration
-      signatureAlgorithm: HS256
-
 multipart:
   enabled: true
