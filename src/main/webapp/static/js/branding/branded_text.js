@@ -1,7 +1,7 @@
 angular.module("sandManApp.branding", [], ["$provide", function($provide) {
 
     $provide.value("brandedText", {
-            hspc: {
+            default: {
                 mainImage: "https://content.hspconsortium.org/images/hspc-sandbox/logo/hspc-sndbx-logo.png",
                 mainImage2x: "https://content.hspconsortium.org/images/hspc-sandbox/logo/hspc-sndbx-logo@2x.png 2x",
                 whiteImage: "https://content.hspconsortium.org/images/hspc-sandbox/logo/hspc-sndbx-logo-wh.png",
