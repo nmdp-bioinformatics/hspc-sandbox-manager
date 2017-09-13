@@ -48,7 +48,7 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
 
                 return {
                     'height': height + 'px',
-                    'width' : (width + toggle) + 'px'
+                    'width': (width + toggle) + 'px'
                 };
             };
 
@@ -59,221 +59,221 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
         });
     }
 }).directive('screenSize', function ($window) {
-        return function (scope, element, attr) {
+    return function (scope, element, attr) {
 
-            var w = angular.element($window);
-            scope.$parent.$watch(function () {
+        var w = angular.element($window);
+        scope.$parent.$watch(function () {
+            return {
+                'h': w.height(),
+                'w': w.width()
+            };
+        }, function (newValue, oldValue) {
+            scope.$parent.windowHeight = newValue.h;
+            scope.$parent.windowWidth = newValue.w;
+
+            scope.$parent.scrollScreen = function (height, width) {
+
+                scope.$parent.$eval(attr.notifier);
+
+                return (newValue.h < height) || (newValue.w < width)
+            };
+
+            scope.$parent.scrollHeight = function (height) {
+
+                scope.$parent.$eval(attr.notifier);
+
+                return (newValue.h < height)
+            };
+
+            scope.$parent.scrollWidth = function (width) {
+
+                scope.$parent.$eval(attr.notifier);
+
+                return (newValue.w < width)
+            };
+        }, true);
+
+        w.bind('screenSize', function () {
+            scope.$parent.$apply();
+        });
+    }
+}).directive('center', function ($window) {
+    return function (scope, element, attr) {
+
+        var w = angular.element($window);
+        scope.$parent.$watch(function () {
+            return {
+                'h': w.height(),
+                'w': w.width()
+            };
+        }, function (newValue, oldValue) {
+            scope.$parent.windowHeight = newValue.h;
+            scope.$parent.windowWidth = newValue.w;
+
+            scope.$parent.centerWithOffset = function (offsetW) {
+
+                scope.$parent.$eval(attr.notifier);
+
                 return {
-                    'h': w.height(),
-                    'w': w.width()
+                    'left': (newValue.w / 2) - offsetW
                 };
-            }, function (newValue, oldValue) {
-                scope.$parent.windowHeight = newValue.h;
-                scope.$parent.windowWidth = newValue.w;
+            };
+        }, true);
 
-                scope.$parent.scrollScreen = function (height, width) {
+        w.bind('center', function () {
+            scope.$parent.$apply();
+        });
+    }
+}).directive('enterKey', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            var key = typeof event.which === "undefined" ? event.keyCode : event.which;
+            if (key === 13) {
+                scope.$apply(function () {
+                    scope.$eval(attrs.enterKey);
+                });
 
-                    scope.$parent.$eval(attr.notifier);
-
-                    return (newValue.h < height) || (newValue.w < width)
-                };
-
-                scope.$parent.scrollHeight = function (height) {
-
-                    scope.$parent.$eval(attr.notifier);
-
-                    return (newValue.h < height)
-                };
-
-                scope.$parent.scrollWidth = function (width) {
-
-                    scope.$parent.$eval(attr.notifier);
-
-                    return (newValue.w < width)
-                };
-            }, true);
-
-            w.bind('screenSize', function () {
-                scope.$parent.$apply();
-            });
-        }
-    }).directive('center', function ($window) {
-        return function (scope, element, attr) {
-
-            var w = angular.element($window);
-            scope.$parent.$watch(function () {
-                return {
-                    'h': w.height(),
-                    'w': w.width()
-                };
-            }, function (newValue, oldValue) {
-                scope.$parent.windowHeight = newValue.h;
-                scope.$parent.windowWidth = newValue.w;
-
-                scope.$parent.centerWithOffset = function (offsetW) {
-
-                    scope.$parent.$eval(attr.notifier);
-
+                event.preventDefault();
+            }
+        });
+    };
+}).directive('tableHeaderInner', function () {
+    return {
+        link: function (scope, elem, attrs) {
+            scope.$watch(function () {
                     return {
-                        'left': (newValue.w/2) - offsetW
-                    };
-                };
-            }, true);
-
-            w.bind('center', function () {
-                scope.$parent.$apply();
-            });
-        }
-    }).directive('enterKey', function () {
-        return function (scope, element, attrs) {
-            element.bind("keydown keypress", function (event) {
-                var key = typeof event.which === "undefined" ? event.keyCode : event.which;
-                if(key === 13) {
-                    scope.$apply(function (){
-                        scope.$eval(attrs.enterKey);
+                        width: elem.parent().width()
+                    }
+                },
+                function (width) {
+                    var newWidth = elem.parent()[0].clientWidth;
+                    if (newWidth < 50) {
+                        newWidth = 50;
+                    }
+                    elem.css({
+                        width: newWidth + 'px'
                     });
-
-                    event.preventDefault();
+                }, //listener
+                true  //deep watch
+            );
+        }
+    }
+}).directive('tableContextHeaderInner', function () {
+    return {
+        link: function (scope, elem, attrs) {
+            scope.$watch(function () {
+                    return {
+                        width: elem.parent().width()
+                    }
+                },
+                function (width) {
+                    var newWidth = elem.parent()[0].clientWidth;
+                    if (newWidth < 100) {
+                        newWidth = 100;
+                    }
+                    elem.css({
+                        width: newWidth + 'px'
+                    });
+                }, //listener
+                true  //deep watch
+            );
+        }
+    }
+}).directive('tableFixedWidthColumn', function () {
+    return {
+        link: function (scope, elem, attrs) {
+            scope.$watch(function () {
+                    return {
+                        width: elem.parent().width()
+                    }
+                },
+                function (width) {
+                    elem.css({
+                        width: elem.parent()[0].clientWidth + 'px'
+                    });
+                }, //listener
+                true  //deep watch
+            );
+        }
+    }
+}).directive('arrowSelector', ['$document', function ($document) {
+    return {
+        restrict: 'A',
+        link: function (scope, elem, attrs, ctrl) {
+            $document.bind('keydown', function (e) {
+                if (e.keyCode == 38) {
+                    scope.$parent.arrowUpDownResourceTable("up");
+                    scope.$parent.$apply();
+                    e.preventDefault();
                 }
-            });
-        };
-    }).directive( 'tableHeaderInner', function() {
-        return {
-            link: function( scope, elem, attrs ) {
-                scope.$watch(function () {
-                        return {
-                            width: elem.parent().width()
-                        }
-                    },
-                    function( width ) {
-                        var newWidth = elem.parent()[0].clientWidth;
-                        if (newWidth < 50){
-                            newWidth = 50;
-                        }
-                        elem.css({
-                            width: newWidth + 'px'
-                        });
-                    }, //listener
-                    true  //deep watch
-                );
-            }
-        }
-    }).directive( 'tableContextHeaderInner', function() {
-        return {
-            link: function( scope, elem, attrs ) {
-                scope.$watch(function () {
-                        return {
-                            width: elem.parent().width()
-                        }
-                    },
-                    function( width ) {
-                        var newWidth = elem.parent()[0].clientWidth;
-                        if (newWidth < 100){
-                            newWidth = 100;
-                        }
-                        elem.css({
-                            width: newWidth + 'px'
-                        });
-                    }, //listener
-                    true  //deep watch
-                );
-            }
-        }
-    }).directive( 'tableFixedWidthColumn', function() {
-        return {
-            link: function( scope, elem, attrs ) {
-                scope.$watch(function () {
-                        return {
-                            width: elem.parent().width()
-                        }
-                    },
-                    function( width ) {
-                        elem.css({
-                            width: elem.parent()[0].clientWidth + 'px'
-                        });
-                    }, //listener
-                    true  //deep watch
-                );
-            }
-        }
-    }).directive('arrowSelector',['$document',function($document){
-    return{
-        restrict:'A',
-        link:function(scope,elem,attrs,ctrl){
-            $document.bind('keydown',function(e){
-                    if(e.keyCode == 38){
-                        scope.$parent.arrowUpDownResourceTable("up");
-                        scope.$parent.$apply();
-                        e.preventDefault();
-                    }
-                    if(e.keyCode == 40){
-                        scope.$parent.arrowUpDownResourceTable("down");
-                        scope.$parent.$apply();
-                        e.preventDefault();
-                    }
+                if (e.keyCode == 40) {
+                    scope.$parent.arrowUpDownResourceTable("down");
+                    scope.$parent.$apply();
+                    e.preventDefault();
+                }
             });
         }
     };
 }]).directive("scrollableTable", function () {
-        return {
-            restrict: 'E',
-            templateUrl: 'static/js/templates/scrollableTable.html'
-        };
-    }).directive('notification', function($timeout, $compile){
+    return {
+        restrict: 'E',
+        templateUrl: 'static/js/templates/scrollableTable.html'
+    };
+}).directive('notification', function ($timeout, $compile) {
 
-        return {
-            restrict: 'A',
-            template: '<div></div>',
-            replace: true,
-            link: function(scope, element) {
-                var el = angular.element('<span/>');
-
-                scope.message.isVisible = true;
-                switch(scope.message.type) {
-                    case 'error':
-                        el.append('<div ng-if="message.isVisible" ng-click="message.isVisible=false" class="message_error"><div>{{message.text}}</div></div>');
-                        break;
-                    case 'message':
-                        el.append('<div ng-if="message.isVisible" ng-click="message.isVisible=false" class="message_info"><div>{{message.text}}</div></div>');
-                        break;
-                }
-                $compile(el)(scope);
-                element.append(el);
-                $timeout(function (){
-                    scope.message.isVisible = false;
-                }, 3000);
-            }
-        }
-    }).directive('fileModel', ['$parse', function ($parse) {
     return {
         restrict: 'A',
-        link: function(scope, element, attrs) {
+        template: '<div></div>',
+        replace: true,
+        link: function (scope, element) {
+            var el = angular.element('<span/>');
+
+            scope.message.isVisible = true;
+            switch (scope.message.type) {
+                case 'error':
+                    el.append('<div ng-if="message.isVisible" ng-click="message.isVisible=false" class="message_error"><div>{{message.text}}</div></div>');
+                    break;
+                case 'message':
+                    el.append('<div ng-if="message.isVisible" ng-click="message.isVisible=false" class="message_info"><div>{{message.text}}</div></div>');
+                    break;
+            }
+            $compile(el)(scope);
+            element.append(el);
+            $timeout(function () {
+                scope.message.isVisible = false;
+            }, 3000);
+        }
+    }
+}).directive('fileModel', ['$parse', function ($parse) {
+    return {
+        restrict: 'A',
+        link: function (scope, element, attrs) {
             var model = $parse(attrs.fileModel);
             var modelSetter = model.assign;
 
-            element.bind('change', function(){
-                scope.$apply(function(){
+            element.bind('change', function () {
+                scope.$apply(function () {
                     modelSetter(scope, element[0].files[0]);
                 });
             });
         }
     };
-}]).directive('a', function() {
+}]).directive('a', function () {
     return {
         restrict: 'E',
-        link: function(scope, elem, attrs) {
-            if(!attrs.uiSref && (attrs.ngClick || attrs.href === '' || attrs.href === '#')){
-                elem.on('click', function(e){
+        link: function (scope, elem, attrs) {
+            if (!attrs.uiSref && (attrs.ngClick || attrs.href === '' || attrs.href === '#')) {
+                elem.on('click', function (e) {
                     e.preventDefault();
                 });
             }
         }
     };
-}).directive('resizer', function($document) {
+}).directive('resizer', function ($document) {
 
-    return function($scope, $element, $attrs) {
+    return function ($scope, $element, $attrs) {
 
-        $element.on('mousedown', function(event) {
+        $element.on('mousedown', function (event) {
             event.preventDefault();
 
             $document.on('mousemove', mousemove);
@@ -323,18 +323,18 @@ angular.module('sandManApp.directives', []).directive('resize', function ($windo
             $document.unbind('mouseup', mouseup);
         }
     };
-}).directive('focusMe', function($timeout, $parse) {
+}).directive('focusMe', function ($timeout, $parse) {
     return {
-        link: function(scope, element, attrs) {
+        link: function (scope, element, attrs) {
             var model = $parse(attrs.focusMe);
-            scope.$watch(model, function(value) {
+            scope.$watch(model, function (value) {
                 // if(value === true) {
-                    $timeout(function() {
-                        element[0].focus();
-                    });
-                    $timeout(function() {
-                        element[0].focus();
-                    },500);
+                $timeout(function () {
+                    element[0].focus();
+                });
+                $timeout(function () {
+                    element[0].focus();
+                }, 500);
                 // }
             });
         }
