@@ -13,8 +13,6 @@ spring:
 
 hspc:
   platform:
-    sandboxManagerApi:
-      url: http://localhost:12000
     # When a user is added to a PUBLIC sandbox, these are their default Sandbox Roles
     defaultPublicSandboxRoles: USER
     # When a user is added to a PRIVATE sandbox, these are their default Sandbox Roles

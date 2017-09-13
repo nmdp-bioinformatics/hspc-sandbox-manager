@@ -759,23 +759,25 @@ angular.module('sandManApp.services', [])
             if (sandbox.sandboxId !== '') {
                 launchScenario.sandbox = sandbox;
             }
-            $.ajax({
-                url: "http://localhost:12000/launchScenario",
-                type: 'POST',
-                data: JSON.stringify(launchScenario),
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (result) {
-                that.getSandboxLaunchScenarios();
-                if (showNotification) {
-                    notification.message("Launch Scenario Created");
-                }
-            }).fail(function () {
-                if (showNotification) {
-                    notification.message({type: "error", text: "Failed to Create Launch Scenario"});
-                }
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/launchScenario",
+                    type: 'POST',
+                    data: JSON.stringify(launchScenario),
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (result) {
+                    that.getSandboxLaunchScenarios();
+                    if (showNotification) {
+                        notification.message("Launch Scenario Created");
+                    }
+                }).fail(function () {
+                    if (showNotification) {
+                        notification.message({type: "error", text: "Failed to Create Launch Scenario"});
+                    }
+                });
             });
         },
         updateLaunchScenario: function (launchScenario) {
@@ -783,17 +785,19 @@ angular.module('sandManApp.services', [])
             var updatedLaunchScenario = angular.copy(launchScenario);
             updatedLaunchScenario.app = angular.copy(updatedLaunchScenario.app);
             delete updatedLaunchScenario.app.clientJSON;
-            $.ajax({
-                url: "http://localhost:12000/launchScenario/" + updatedLaunchScenario.id,
-                type: 'PUT',
-                data: JSON.stringify(updatedLaunchScenario),
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (result) {
-                that.getSandboxLaunchScenarios();
-            }).fail(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/launchScenario/" + updatedLaunchScenario.id,
+                    type: 'PUT',
+                    data: JSON.stringify(updatedLaunchScenario),
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (result) {
+                    that.getSandboxLaunchScenarios();
+                }).fail(function () {
+                });
             });
         },
         launchScenarioLaunched: function (launchScenario) {
@@ -801,85 +805,95 @@ angular.module('sandManApp.services', [])
             var updatedLaunchScenario = angular.copy(launchScenario);
             updatedLaunchScenario.app = angular.copy(updatedLaunchScenario.app);
             delete updatedLaunchScenario.app.clientJSON;
-            $.ajax({
-                url: "http://localhost:12000/launchScenario/" + updatedLaunchScenario.id + "/launched",
-                type: 'PUT',
-                data: JSON.stringify(updatedLaunchScenario),
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (result) {
-                that.getSandboxLaunchScenarios();
-            }).fail(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/launchScenario/" + updatedLaunchScenario.id + "/launched",
+                    type: 'PUT',
+                    data: JSON.stringify(updatedLaunchScenario),
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (result) {
+                    that.getSandboxLaunchScenarios();
+                }).fail(function () {
+                });
             });
         },
         deleteLaunchScenario: function (launchScenario) {
             var that = this;
-            $.ajax({
-                url: "http://localhost:12000/launchScenario/" + launchScenario.id,
-                type: 'DELETE',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (result) {
-                notification.message("Launch Scenario Deleted");
-                that.getSandboxLaunchScenarios();
-            }).fail(function () {
-                notification.message("Failed to Delete Launch Scenario");
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/launchScenario/" + launchScenario.id,
+                    type: 'DELETE',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (result) {
+                    notification.message("Launch Scenario Deleted");
+                    that.getSandboxLaunchScenarios();
+                }).fail(function () {
+                    notification.message("Failed to Delete Launch Scenario");
+                });
             });
         },
         getLaunchScenarioByApp: function (appId) {
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/launchScenario?appId=" + appId,
-                type: 'GET',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (results) {
-                deferred.resolve(results);
-            }).fail(function () {
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/launchScenario?appId=" + appId,
+                    type: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (results) {
+                    deferred.resolve(results);
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         getLaunchScenarioByUserPersona: function (userPersonaId) {
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/launchScenario?userPersonaId=" + userPersonaId,
-                type: 'GET',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (results) {
-                deferred.resolve(results);
-            }).fail(function () {
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/launchScenario?userPersonaId=" + userPersonaId,
+                    type: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (results) {
+                    deferred.resolve(results);
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         getSandboxLaunchScenarios: function () {
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/launchScenario?sandboxId=" + sandbox.sandboxId,
-                type: 'GET',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (launchScenarioList) {
-                fullLaunchScenarioList = [];
-                if (launchScenarioList) {
-                    launchScenarioList.forEach(function (launchScenario) {
-                        fullLaunchScenarioList.push(launchScenario);
-                    });
-                    orderByLastLaunch();
-                    $rootScope.$emit('launch-scenario-list-update');
-                }
-                deferred.resolve();
-            }).fail(function () {
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/launchScenario?sandboxId=" + sandbox.sandboxId,
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (launchScenarioList) {
+                    fullLaunchScenarioList = [];
+                    if (launchScenarioList) {
+                        launchScenarioList.forEach(function (launchScenario) {
+                            fullLaunchScenarioList.push(launchScenario);
+                        });
+                        orderByLastLaunch();
+                        $rootScope.$emit('launch-scenario-list-update');
+                    }
+                    deferred.resolve();
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
@@ -897,152 +911,170 @@ angular.module('sandManApp.services', [])
                 users: [userServices.getOAuthUser()]
             };
 
-            $.ajax({
-                url: "http://localhost:12000/sandbox",
-                type: 'POST',
-                data: JSON.stringify(createSandbox),
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (sandboxResult) {
-                sandbox = {
-                    id: sandboxResult.id,
-                    createdBy: sandboxResult.createdBy,
-                    name: sandboxResult.name,
-                    sandboxId: sandboxResult.sandboxId,
-                    description: sandboxResult.description
-                };
-                deferred.resolve(sandbox);
-            }).fail(function (error) {
-                errorService.setErrorMessage(error.responseText);
-                that.clearSandbox();
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/sandbox",
+                    type: 'POST',
+                    data: JSON.stringify(createSandbox),
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (sandboxResult) {
+                    sandbox = {
+                        id: sandboxResult.id,
+                        createdBy: sandboxResult.createdBy,
+                        name: sandboxResult.name,
+                        sandboxId: sandboxResult.sandboxId,
+                        description: sandboxResult.description
+                    };
+                    deferred.resolve(sandbox);
+                }).fail(function (error) {
+                    errorService.setErrorMessage(error.responseText);
+                    that.clearSandbox();
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         updateSandbox: function (sandbox) {
             var that = this;
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/sandbox/" + sandbox.sandboxId,
-                type: 'PUT',
-                data: JSON.stringify(sandbox),
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function () {
-                that.getSandboxById();
-                notification.message("Sandbox Updated");
-                deferred.resolve(true);
-            }).fail(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/sandbox/" + sandbox.sandboxId,
+                    type: 'PUT',
+                    data: JSON.stringify(sandbox),
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function () {
+                    that.getSandboxById();
+                    notification.message("Sandbox Updated");
+                    deferred.resolve(true);
+                }).fail(function () {
+                });
             });
             return deferred;
         },
         deleteSandbox: function () {
             var that = this;
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/sandbox/" + sandbox.sandboxId,
-                type: 'DELETE',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function () {
-                deferred.resolve(true);
-            }).fail(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/sandbox/" + sandbox.sandboxId,
+                    type: 'DELETE',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function () {
+                    deferred.resolve(true);
+                }).fail(function () {
+                });
             });
             return deferred;
         },
         resetSandbox: function (dataSet) {
             var that = this;
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/fhirdata/reset?sandboxId=" + sandbox.sandboxId + "&dataSet=" + dataSet,
-                type: 'POST',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function () {
-                deferred.resolve(true);
-            }).fail(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/fhirdata/reset?sandboxId=" + sandbox.sandboxId + "&dataSet=" + dataSet,
+                    type: 'POST',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function () {
+                    deferred.resolve(true);
+                }).fail(function () {
+                });
             });
             return deferred;
         },
         getSandboxImports: function () {
             var that = this;
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/fhirdata/import?sandboxId=" + sandbox.sandboxId,
-                type: 'GET',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (result) {
-                deferred.resolve(result);
-            }).fail(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/fhirdata/import?sandboxId=" + sandbox.sandboxId,
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (result) {
+                    deferred.resolve(result);
+                }).fail(function () {
+                });
             });
             return deferred;
         },
         getUserSandboxesByUserId: function () {
             var that = this;
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/sandbox?userId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId),
-                type: 'GET',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (sandboxResult) {
-                if (sandboxResult.length > 0) {
-                    that.setHasSandbox(true);
-                    sandboxes = sandboxResult;
-                    deferred.resolve(true);
-                } else {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/sandbox?userId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId),
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (sandboxResult) {
+                    if (sandboxResult.length > 0) {
+                        that.setHasSandbox(true);
+                        sandboxes = sandboxResult;
+                        deferred.resolve(true);
+                    } else {
+                        that.clearSandboxes();
+                        deferred.resolve(false);
+                    }
+                }).fail(function () {
                     that.clearSandboxes();
                     deferred.resolve(false);
-                }
-            }).fail(function () {
-                that.clearSandboxes();
-                deferred.resolve(false);
+                });
             });
             return deferred;
         },
         removeUserFromSandboxByUserId: function (sbmUserId) {
             var that = this;
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/sandbox/" + sandbox.sandboxId + "?removeUserId=" + encodeURIComponent(sbmUserId),
-                type: 'PUT',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (sandboxResult) {
-                deferred.resolve(true);
-            }).fail(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/sandbox/" + sandbox.sandboxId + "?removeUserId=" + encodeURIComponent(sbmUserId),
+                    type: 'PUT',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (sandboxResult) {
+                    deferred.resolve(true);
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         updateSandboxUserRoleByUserId: function (sbmUserId, role, add) {
             var that = this;
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/sandbox/" + sandbox.sandboxId + "?editUserRole=" + encodeURIComponent(sbmUserId) + "&role=" + role + "&add=" + add,
-                type: 'PUT',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function () {
-                that.getSandboxById();
-                deferred.resolve();
-            }).fail(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/sandbox/" + sandbox.sandboxId + "?editUserRole=" + encodeURIComponent(sbmUserId) + "&role=" + role + "&add=" + add,
+                    type: 'PUT',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function () {
+                    that.getSandboxById();
+                    deferred.resolve();
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
@@ -1055,7 +1087,7 @@ angular.module('sandManApp.services', [])
                     deferred.resolve("reserved");
                 } else if (sandboxId !== undefined) {
                     $.ajax({
-                        url: "http://localhost:12000/sandbox/" + sandboxId,
+                        url: settings.sandboxManagerApiUrl + "/sandbox/" + sandboxId,
                         type: 'GET',
                         contentType: "application/json",
                         beforeSend: function (xhr) {
@@ -1090,46 +1122,55 @@ angular.module('sandManApp.services', [])
         sandboxLogin: function (sbmUserId) {
             var that = this;
             var deferred = $.Deferred();
-            // Record the sandbox login
-            $.ajax({
-                url: "http://localhost:12000/sandbox/" + sandbox.sandboxId + "/login" + "?userId=" + encodeURIComponent(sbmUserId),
-                type: 'POST',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (sandboxResult) {
-                deferred.resolve(true);
-            }).fail(function () {
+            appsSettings.getSettings().then(function (settings) {
+                // Record the sandbox login
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/sandbox/" + sandbox.sandboxId + "/login" + "?userId=" + encodeURIComponent(sbmUserId),
+                    type: 'POST',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (sandboxResult) {
+                    deferred.resolve(true);
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         getTermsOfUse: function () {
             var that = this;
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/termsofuse",
-                type: 'GET',
-                contentType: "application/json"
-            }).done(function (terms) {
-                deferred.resolve(terms);
-            }).fail(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/termsofuse",
+                    type: 'GET',
+                    contentType: "application/json"
+                }).done(function (terms) {
+                    deferred.resolve(terms);
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         acceptTermsOfUse: function (sbmUserId, termsId) {
             var that = this;
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/user/acceptterms?sbmUserId=" + encodeURIComponent(sbmUserId) + "&termsId=" + termsId,
-                type: 'POST',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (terms) {
-                deferred.resolve(terms);
-            }).fail(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/user/acceptterms?sbmUserId=" + encodeURIComponent(sbmUserId) + "&termsId=" + termsId,
+                    type: 'POST',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (terms) {
+                    deferred.resolve(terms);
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
@@ -1167,34 +1208,38 @@ angular.module('sandManApp.services', [])
         },
         getConfigByType: function (type) {
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/config/" + type,
-                type: 'GET',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (results) {
-                deferred.resolve(results);
-            }).fail(function (err) {
-                deferred.reject(err);
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/config/" + type,
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (results) {
+                    deferred.resolve(results);
+                }).fail(function (err) {
+                    deferred.reject(err);
+                });
             });
             return deferred;
         },
         sandboxManagerStatistics: function () {
             var that = this;
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/admin?interval=30",
-                type: 'GET',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (results) {
-                deferred.resolve(results);
-            }).fail(function () {
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/admin?interval=30",
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (results) {
+                    deferred.resolve(results);
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         }
@@ -1244,16 +1289,19 @@ angular.module('sandManApp.services', [])
         importExternalFhirPatient: function (endpoint, patientId, fhirIdPrefix) {
             var that = this;
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/fhirdata/import?sandboxId=" + sandboxManagement.getSandbox().sandboxId + "&patientId=" + patientId + "&fhirIdPrefix=" + fhirIdPrefix + "&endpoint=" + encodeURIComponent(endpoint),
-                type: 'POST',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (result) {
-                deferred.resolve(result);
-            }).fail(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/fhirdata/import?sandboxId=" + sandboxManagement.getSandbox().sandboxId + "&patientId=" + patientId + "&fhirIdPrefix=" + fhirIdPrefix + "&endpoint=" + encodeURIComponent(endpoint),
+                    type: 'POST',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (result) {
+                    deferred.resolve(result);
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         }
@@ -1308,19 +1356,21 @@ angular.module('sandManApp.services', [])
             if (sandboxManagerUser !== undefined) {
                 deferred.resolve(sandboxManagerUser);
             } else {
-                $.ajax({
-                    url: "http://localhost:12000/user?sbmUserId=" + encodeURIComponent(sbmUserId),
-                    type: 'GET',
-                    contentType: "application/json",
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                    }
-                }).done(function (userResult) {
-                    sandboxManagerUser = userResult;
-                    $rootScope.$emit('user-loaded');
-                    deferred.resolve(userResult);
-                }).fail(function (error) {
-                    deferred.reject(error);
+                appsSettings.getSettings().then(function (settings) {
+                    $.ajax({
+                        url: settings.sandboxManagerApiUrl + "/user?sbmUserId=" + encodeURIComponent(sbmUserId),
+                        type: 'GET',
+                        contentType: "application/json",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                        }
+                    }).done(function (userResult) {
+                        sandboxManagerUser = userResult;
+                        $rootScope.$emit('user-loaded');
+                        deferred.resolve(userResult);
+                    }).fail(function (error) {
+                        deferred.reject(error);
+                    });
                 });
             }
             return deferred;
@@ -1437,113 +1487,126 @@ angular.module('sandManApp.services', [])
         createPersona: function () {
             var deferred = $.Deferred();
             var that = this;
-            $.ajax({
-                url: "http://localhost:12000/userPersona",
-                type: 'POST',
-                data: JSON.stringify(personaBuilder),
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function () {
-                that.clearUserPersonaBuilder();
-                that.getPersonaListBySandbox();
-                deferred.resolve();
-                $rootScope.$digest();
-            }).fail(function () {
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/userPersona",
+                    type: 'POST',
+                    data: JSON.stringify(personaBuilder),
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function () {
+                    that.clearUserPersonaBuilder();
+                    that.getPersonaListBySandbox();
+                    deferred.resolve();
+                    $rootScope.$digest();
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         updatePersona: function (persona) {
             var deferred = $.Deferred();
             var that = this;
-            $.ajax({
-                url: "http://localhost:12000/userPersona",
-                type: 'PUT',
-                data: JSON.stringify(persona),
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function () {
-                that.clearUserPersonaBuilder();
-                that.getPersonaListBySandbox();
-                deferred.resolve();
-                $rootScope.$digest();
-            }).fail(function () {
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/userPersona",
+                    type: 'PUT',
+                    data: JSON.stringify(persona),
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function () {
+                    that.clearUserPersonaBuilder();
+                    that.getPersonaListBySandbox();
+                    deferred.resolve();
+                    $rootScope.$digest();
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         deletePersona: function (persona) {
             var deferred = $.Deferred();
             var that = this;
-            $.ajax({
-                url: "http://localhost:12000/userPersona/" + persona.id,
-                type: 'DELETE',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function () {
-                that.getPersonaListBySandbox();
-                deferred.resolve();
-                $rootScope.$digest();
-            }).fail(function () {
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/userPersona/" + persona.id,
+                    type: 'DELETE',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function () {
+                    that.getPersonaListBySandbox();
+                    deferred.resolve();
+                    $rootScope.$digest();
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         getPersonaListBySandbox: function () {
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/userPersona?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
-                type: 'GET',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (results) {
-                personaList = results;
-                $rootScope.$emit('persona-list-update');
-                deferred.resolve(results);
-            }).fail(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/userPersona?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (results) {
+                    personaList = results;
+                    $rootScope.$emit('persona-list-update');
+                    deferred.resolve(results);
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         getDefaultPersonaBySandbox: function () {
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/userPersona/default?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
-                type: 'GET',
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (result) {
-                deferred.resolve(result);
-            }).fail(function () {
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/userPersona/default?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (result) {
+                    deferred.resolve(result);
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         checkForUserPersonaById: function (userPersonaId) {
             var deferred = $.Deferred();
-            $.ajax({
-                url: "http://localhost:12000/userPersona?lookUpId=" + userPersonaId,
-                type: 'GET'
-            }).done(function (persona) {
-                if (persona !== undefined && persona !== "") {
-                    deferred.resolve(persona);
-                } else {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/userPersona?lookUpId=" + userPersonaId,
+                    type: 'GET'
+                }).done(function (persona) {
+                    if (persona !== undefined && persona !== "") {
+                        deferred.resolve(persona);
+                    } else {
+                        deferred.resolve(undefined);
+                    }
+
+                    $rootScope.$digest();
+
+                }).fail(function (error) {
                     deferred.resolve(undefined);
-                }
-
-                $rootScope.$digest();
-
-            }).fail(function (error) {
-                deferred.resolve(undefined);
-                $rootScope.$digest();
+                    $rootScope.$digest();
+                });
             });
             return deferred;
         }
@@ -1574,32 +1637,34 @@ angular.module('sandManApp.services', [])
             delete app.logo;
 
             app.clientJSON = JSON.stringify(app.clientJSON);
-            $.ajax({
-                url: "http://localhost:12000/app",
-                type: 'POST',
-                data: JSON.stringify(app),
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (result) {
-                if (logo) {
-                    that.uploadAppImage(result.id, logo).then(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/app",
+                    type: 'POST',
+                    data: JSON.stringify(app),
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (result) {
+                    if (logo) {
+                        that.uploadAppImage(result.id, logo).then(function () {
+                            that.getSandboxApps();
+                            notification.message("App Created");
+                            deferred.resolve(result);
+                        }, function (err) {
+                            deferred.reject();
+                        });
+                    } else {
                         that.getSandboxApps();
                         notification.message("App Created");
                         deferred.resolve(result);
-                    }, function (err) {
-                        deferred.reject();
-                    });
-                } else {
-                    that.getSandboxApps();
-                    notification.message("App Created");
-                    deferred.resolve(result);
-                }
-            }).fail(function (error) {
-                errorService.setErrorMessage(error.message);
-                notification.message({type: "error", text: "Failed to Create App"});
-                deferred.reject();
+                    }
+                }).fail(function (error) {
+                    errorService.setErrorMessage(error.message);
+                    notification.message({type: "error", text: "Failed to Create App"});
+                    deferred.reject();
+                });
             });
             return deferred;
         },
@@ -1611,94 +1676,102 @@ angular.module('sandManApp.services', [])
             var newApp = angular.copy(app);
             newApp.clientJSON = JSON.stringify(newApp.clientJSON);
 
-            $.ajax({
-                url: "http://localhost:12000/app/" + newApp.id,
-                type: 'PUT',
-                data: JSON.stringify(newApp),
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (result) {
-                if (logo) {
-                    that.uploadAppImage(result.id, logo).then(function () {
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/app/" + newApp.id,
+                    type: 'PUT',
+                    data: JSON.stringify(newApp),
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (result) {
+                    if (logo) {
+                        that.uploadAppImage(result.id, logo).then(function () {
+                            that.getSandboxApps();
+                            notification.message("App Updated");
+                            deferred.resolve(result);
+                        }, function (err) {
+                            deferred.reject();
+                        });
+                    } else {
                         that.getSandboxApps();
                         notification.message("App Updated");
                         deferred.resolve(result);
-                    }, function (err) {
-                        deferred.reject();
-                    });
-                } else {
-                    that.getSandboxApps();
-                    notification.message("App Updated");
-                    deferred.resolve(result);
-                }
-            }).fail(function (error) {
-                errorService.setErrorMessage(error.message);
-                notification.message({type: "error", text: "Failed to Update App"});
-                deferred.reject();
+                    }
+                }).fail(function (error) {
+                    errorService.setErrorMessage(error.message);
+                    notification.message({type: "error", text: "Failed to Update App"});
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         deleteSandboxApp: function (appId) {
             var deferred = $.Deferred();
             var that = this;
-            $.ajax({
-                url: "http://localhost:12000/app/" + appId,
-                type: 'DELETE',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (result) {
-                that.getSandboxApps();
-                deferred.resolve();
-                notification.message("App Deleted");
-            }).fail(function (error) {
-                errorService.setErrorMessage(error.message);
-                notification.message({type: "error", text: "Failed to Delete App"});
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/app/" + appId,
+                    type: 'DELETE',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (result) {
+                    that.getSandboxApps();
+                    deferred.resolve();
+                    notification.message("App Deleted");
+                }).fail(function (error) {
+                    errorService.setErrorMessage(error.message);
+                    notification.message({type: "error", text: "Failed to Delete App"});
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         getSandboxApp: function (appId) {
             var deferred = $.Deferred();
             var that = this;
-            $.ajax({
-                url: "http://localhost:12000/app/" + appId,
-                type: 'GET',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (clientJSON) {
-                deferred.resolve(clientJSON);
-            }).fail(function (error) {
-                errorService.setErrorMessage(error.message);
-                deferred.reject();
-                notification.message({type: "error", text: "Failed to Retrieve App Info"});
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/app/" + appId,
+                    type: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (clientJSON) {
+                    deferred.resolve(clientJSON);
+                }).fail(function (error) {
+                    errorService.setErrorMessage(error.message);
+                    deferred.reject();
+                    notification.message({type: "error", text: "Failed to Retrieve App Info"});
+                });
             });
             return deferred;
         },
         getSandboxApps: function () {
             var deferred = $.Deferred();
             var that = this;
-            $.ajax({
-                url: "http://localhost:12000/app?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
-                type: 'GET',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (results) {
-                fullAppList = [];
-                if (results) {
-                    results.forEach(function (app) {
-                        fullAppList.push(app);
-                    });
-                    $rootScope.$emit('app-list-update');
-                }
-                deferred.resolve(fullAppList);
-                // $rootScope.$digest();
-            }).fail(function () {
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/app?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
+                    type: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (results) {
+                    fullAppList = [];
+                    if (results) {
+                        results.forEach(function (app) {
+                            fullAppList.push(app);
+                        });
+                        $rootScope.$emit('app-list-update');
+                    }
+                    deferred.resolve(fullAppList);
+                    // $rootScope.$digest();
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
@@ -1706,18 +1779,20 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var formData = new FormData();
             formData.append("file", file);
-            $http.post("http://localhost:12000/app/" + id + "/image", formData, {
-                transformRequest: angular.identity,
-                headers: {
-                    'Content-Type': undefined,
-                    'Authorization': 'BEARER ' + fhirApiServices.fhirClient().server.auth.token
-                }
-            }).success(function () {
-                deferred.resolve();
-            }).error(function (error) {
-                errorService.setErrorMessage(error.message);
-                deferred.reject();
-                // notification.message({ type:"error", text: "Failed to Upload Image" });
+            appsSettings.getSettings().then(function (settings) {
+                $http.post(settings.sandboxManagerApiUrl + "/app/" + id + "/image", formData, {
+                    transformRequest: angular.identity,
+                    headers: {
+                        'Content-Type': undefined,
+                        'Authorization': 'BEARER ' + fhirApiServices.fhirClient().server.auth.token
+                    }
+                }).success(function () {
+                    deferred.resolve();
+                }).error(function (error) {
+                    errorService.setErrorMessage(error.message);
+                    deferred.reject();
+                    // notification.message({ type:"error", text: "Failed to Upload Image" });
+                });
             });
             return deferred;
         },
@@ -1753,73 +1828,81 @@ angular.module('sandManApp.services', [])
                 sandbox: sandboxManagement.getSandbox()
             };
 
-            $.ajax({
-                url: "http://localhost:12000/sandboxinvite",
-                type: 'PUT',
-                data: JSON.stringify(sandboxInvite),
-                contentType: "application/json",
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function () {
-                notification.message("Invite Sent");
-                deferred.resolve();
-            }).fail(function (error) {
-                // notification.message({ type:"error", text: "Failed to Send Invite" });
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/sandboxinvite",
+                    type: 'PUT',
+                    data: JSON.stringify(sandboxInvite),
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function () {
+                    notification.message("Invite Sent");
+                    deferred.resolve();
+                }).fail(function (error) {
+                    // notification.message({ type:"error", text: "Failed to Send Invite" });
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         getSandboxInvitesBySbmUserId: function (status) {
             var deferred = $.Deferred();
             var that = this;
-            $.ajax({
-                url: "http://localhost:12000/sandboxinvite?sbmUserId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId) +
-                "&status=" + status,
-                type: 'GET',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (results) {
-                deferred.resolve(results);
-                $rootScope.$digest();
-            }).fail(function () {
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/sandboxinvite?sbmUserId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId) +
+                    "&status=" + status,
+                    type: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (results) {
+                    deferred.resolve(results);
+                    $rootScope.$digest();
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         getSandboxInvitesBySandboxId: function (status) {
             var deferred = $.Deferred();
             var that = this;
-            $.ajax({
-                url: "http://localhost:12000/sandboxinvite?sandboxId=" + sandboxManagement.getSandbox().sandboxId +
-                "&status=" + status,
-                type: 'GET',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (results) {
-                deferred.resolve(results);
-                $rootScope.$digest();
-            }).fail(function () {
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/sandboxinvite?sandboxId=" + sandboxManagement.getSandbox().sandboxId +
+                    "&status=" + status,
+                    type: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (results) {
+                    deferred.resolve(results);
+                    $rootScope.$digest();
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         },
         updateSandboxInvite: function (sandboxInvite, status) {
             var deferred = $.Deferred();
             var that = this;
-            $.ajax({
-                url: "http://localhost:12000/sandboxinvite/" + sandboxInvite.id + "?status=" + status,
-                type: 'PUT',
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                }
-            }).done(function (results) {
-                deferred.resolve(results);
-                $rootScope.$digest();
-            }).fail(function () {
-                deferred.reject();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/sandboxinvite/" + sandboxInvite.id + "?status=" + status,
+                    type: 'PUT',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (results) {
+                    deferred.resolve(results);
+                    $rootScope.$digest();
+                }).fail(function () {
+                    deferred.reject();
+                });
             });
             return deferred;
         }
@@ -1926,14 +2009,16 @@ angular.module('sandManApp.services', [])
 
             registerAppContext(app, params, launchDetails, key);
             if (userPersona !== null && userPersona !== undefined && userPersona) {
-                $http.post("http://localhost:12000/userPersona/authenticate", {
-                    username: userPersona.personaUserId,
-                    password: userPersona.password
-                }).then(function (response) {
-                    cookieService.addPersonaCookie(response.data.jwt);
-                }).catch(function (error) {
-                    $log.error(error);
-                    appWindow.close();
+                appsSettings.getSettings().then(function (settings) {
+                    $http.post(settings.sandboxManagerApiUrl + "/userPersona/authenticate", {
+                        username: userPersona.personaUserId,
+                        password: userPersona.password
+                    }).then(function (response) {
+                        cookieService.addPersonaCookie(response.data.jwt);
+                    }).catch(function (error) {
+                        $log.error(error);
+                        appWindow.close();
+                    });
                 });
             }
         },
@@ -2073,7 +2158,7 @@ angular.module('sandManApp.services', [])
                     deferred.resolve("reserved");
                 } else {
                     $.ajax({
-                        url: "http://localhost:12000/sandbox?lookUpId=" + sandboxId,
+                        url: settings.sandboxManagerApiUrl + "/sandbox?lookUpId=" + sandboxId,
                         type: 'GET'
                     }).done(function (sandbox) {
                         if (sandbox !== undefined && sandbox !== "") {
@@ -2096,7 +2181,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
-                    url: "http://localhost:12000/sandbox?sandboxId=" + sandboxId,
+                    url: settings.sandboxManagerApiUrl + "/sandbox?sandboxId=" + sandboxId,
                     type: 'GET'
                 }).done(function (sandbox) {
                     if (sandbox !== undefined && sandbox !== "") {
