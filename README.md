@@ -14,6 +14,10 @@ Welcome to the HSPC Sandbox Manager!
     mvn clean install
     ./run_local.sh
 
+#### Verify
+
+* http://localhost:8080/
+
 #### Configuration ####
 
 Various property files configure the sandbox manager:
