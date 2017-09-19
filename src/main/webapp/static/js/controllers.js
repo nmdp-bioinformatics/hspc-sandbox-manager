@@ -2734,8 +2734,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
     $rootScope.$on('app-list-update', function () {
         $scope.all_user_apps = angular.copy(appRegistrationServices.getAppList());
+        $scope.all_user_apps = $scope.all_user_apps.concat($scope.default_apps);
         $rootScope.$digest();
-        // $scope.all_user_apps = $scope.all_user_apps.concat($scope.default_apps);
     });
 
     $scope.registration = function () {
