@@ -2853,22 +2853,20 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         } else {
             if(app.id){
                 appRegistrationServices.getSandboxApp(app.id).then(function (resultApp) {
-                    $scope.selected.selectedApp.clientJSON = JSON.parse(resultApp.clientJSON);
                     $scope.galleryOffset = 80;
+                    $scope.selected.selectedApp.clientJSON = JSON.parse(resultApp.clientJSON);
                     $scope.clientJSON = $scope.selected.selectedApp.clientJSON;
-                    if ($scope.selected.selectedApp.clientJSON){
-                        if ($scope.selected.selectedApp.clientJSON.tokenEndpointAuthMethod === "SECRET_BASIC") {
-                            $scope.clientJSON.clientType = "Confidential Client";
-                        } else {
-                            $scope.clientJSON.clientType = "Public Client";
-                        }
+                    if (resultApp.logoUri) {
+                        $scope.clientJSON.logoUri = resultApp.logoUri + "?" + new Date().getTime();
+                    }
+                    if ($scope.selected.selectedApp.clientJSON.tokenEndpointAuthMethod === "SECRET_BASIC") {
+                        $scope.clientJSON.clientType = "Confidential Client";
+                    } else {
+                        $scope.clientJSON.clientType = "Public Client";
                     }
                     $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
                     $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
                     $scope.clientJSON.scope = $scope.clientJSON.scope.join(" ");
-                    if (resultApp.logoUri) {
-                        $scope.clientJSON.logoUri = resultApp.logoUri + "?" + new Date().getTime();
-                    }
                     $rootScope.$digest();
                 });
             }
