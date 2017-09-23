@@ -12,28 +12,29 @@ Welcome to the HSPC Sandbox Manager!
 
 #### Build and Deploy ####
     mvn clean install
-    copy target/hspc-sandbox-manager.war to a web container
+    ./run_local.sh
+
+#### Verify
+
+* http://localhost:8080/
 
 #### Configuration ####
-HSPC Sandbox Manager is a tools for helping developers of SMART on FHIR applications test their launch their apps, manage their app's registration with the auth server and create/manage data in a FHIR server.
 
-#### Running in a local Tomcat container ####
-Sandbox Manager uses url rewriting as part of it's implementation. To configure Tomcat to rewrite you need to: 
+Various property files configure the sandbox manager:
 
-1) Copy sandbox-manager/src/main/resources/ebextensions/context.xml to <tomcat-root>/conf directory
+ * src/main/resources/application.yml
+ * src/main/resources/urlrewrite.xml
+ * src/main/webapp/static/js/config/*
 
-OR
+#### System Dependencies ####
+When run locally, the sandbox manager has dependencies on the following systems/projects.  Each of these projects contains a "run_local" script in the root folder.
 
-Add the **rewrite valve** to the individual host in <tomcat-root>/conf/server.xml
-
-Example:
-
-    <Host name="localhost" appBase="webapps" unpackWARs="true" autoDeploy="false">
-        <Valve className="org.apache.catalina.valves.rewrite.RewriteValve" />
-        ...
-    </Host>
-
-2) Replace src/main/webapp/WEB-INF/rewrite.config with src/main/webapp/WEB-INF/rewrite-local.config 
+ * [HSPC Reference Auth](https://bitbucket.org/hspconsortium/reference-auth)
+ * [HSPC Reference API](https://bitbucket.org/hspconsortium/reference-api) in DSTU2 or STU3 mode
+ * [HSPC Reference Messaging](https://bitbucket.org/hspconsortium/reference-messaging)
+ * [HSPC Account](https://bitbucket.org/hspconsortium/account)
+ * [HSPC Patient Data Manager](https://bitbucket.org/hspconsortium/patient-data-manager)
+ * [HSPC Sandbox Manager API](https://bitbucket.org/hspconsortium/sandbox-manager-api)
 
 ### Where to go from here ###
 https://healthservices.atlassian.net/wiki/display/HSPC/Healthcare+Services+Platform+Consortium
