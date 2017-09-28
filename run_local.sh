@@ -3,4 +3,4 @@
 java \
   -Xms32M \
   -Xmx128M \
-  -jar target/hspc-sandbox-manager*.jar
+  -jar target/hspc-sandbox-manager*.war
