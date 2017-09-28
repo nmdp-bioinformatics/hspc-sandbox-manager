@@ -3196,6 +3196,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             clientJSON.requireAuthTime = false;
         }
 
+        // add some default timeouts
+        clientJSON.accessTokenValiditySeconds = 3600; // one hour
+        clientJSON.idTokenValiditySeconds = 3600; // one hour
+        clientJSON.refreshTokenValiditySeconds = 31557600; // one year
+
         var authClient = {
             clientName: clientJSON.clientName
         };
