@@ -6,11 +6,11 @@
     "portMappings": [
       {
         "containerPort": 8080,
-        "hostPort": 8080,
+        "hostPort": 0,
         "protocol": "tcp"
       }
     ],
-    "memory": 300,
+    "memory": 800,
     "essential": true,
     "environment": [
       {
