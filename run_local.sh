@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-java \
-  -Xms32M \
-  -Xmx128M \
-  -jar target/hspc-sandbox-manager*.war
+echo "starting sandbox manager..."
+npm install
+npm run serve

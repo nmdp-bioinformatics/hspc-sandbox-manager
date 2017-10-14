@@ -11,7 +11,6 @@ Welcome to the HSPC Sandbox Manager!
 ### How do I get set up? ###
 
 #### Build and Deploy ####
-    mvn clean install
     ./run_local.sh
 
 #### Verify
@@ -22,9 +21,9 @@ Welcome to the HSPC Sandbox Manager!
 
 Various property files configure the sandbox manager:
 
- * src/main/resources/application.yml
- * src/main/resources/urlrewrite.xml
- * src/main/webapp/static/js/config/*
+ * package.json
+ * Server.js
+ * src/static/js/config/*
 
 #### System Dependencies ####
 When run locally, the sandbox manager has dependencies on the following systems/projects.  Each of these projects contains a "run_local" script in the root folder.
