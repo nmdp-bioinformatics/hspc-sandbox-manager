@@ -12,36 +12,19 @@ pipelines:
     develop:
       - step:
           caches:
-            - maven
+            - node
           script:
-            # Deploy to maven central
-            - openssl aes-256-cbc -pass pass:$OPENSSL_PWD -in private-key.gpg.enc -out private-key.gpg -d
-            - gpg --import private-key.gpg
-#            - mvn -V -B -s settings.xml deploy -P DEPLOY,ossrh
-            # Deploy to hspc-nexus
-            - mvn -V -B -s settings.xml deploy -P DEPLOY-HSPC,hspc-nexus
-            # install ASW CLI and jq library
-            - curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-            - unzip awscli-bundle.zip
-            - ./awscli-bundle/install -b ~/bin/aws
-            - export PATH=~/bin:$PATH
+            # install ASW CLI, jq library, node
+            - npm install
+            - apk --no-cache update && apk --no-cache add python py-pip py-setuptools ca-certificates curl groff less && pip --no-cache-dir install awscli && rm -rf /var/cache/apk/*
             - curl -o /usr/local/bin/jq -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && chmod +x /usr/local/bin/jq
-            # clear out the other jar files
-            - rm target/*-sources.jar
-            - rm target/*-javadoc.jar
-            # build docker image and push to nexus.hspconsortium.com:18083
-            - export CONTAINER_NAME=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.artifactId}' --non-recursive exec:exec)
-            - export PROJECT_VERSION=$(mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec)
-            - sed -i -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" -e "s/{{PROJECT_VERSION}}/$PROJECT_VERSION/g" container-definitions-test.json
-            - cat container-definitions-test.json
-            - export IMAGE_NAME=$(cat container-definitions-test.json | jq --raw-output '.[0].image')
+            # build docker image and push to nexus.interopion.com:18083 (docker-interopion)
+            - export IMAGE_NAME=$(cat container-definitions_test.json | jq --raw-output '.[0].image')
             - docker login -u $NEXUS_USR -p $NEXUS_PWD nexus.hspconsortium.org:18083
             - docker build -t $IMAGE_NAME .
             - docker push $IMAGE_NAME
-            # Add jasypt pw to container definition
-            - jq '.[].environment += [{"name":"JASYPT_ENCRYPTOR_PASSWORD", "value":"'$ENC_PW_TEST'"}]' container-definitions-test.json > tmp.json && mv tmp.json container-definitions-test.json
             # register the ECS task definition and capture the version
-            - export TASK_VERSION=$(aws ecs register-task-definition --family hspc-sandbox-manager --container-definitions $(cat container-definitions-test.json | jq -c '.')  | jq --raw-output '.taskDefinition.revision')
+            - export TASK_VERSION=$(aws ecs register-task-definition --family hspc-sandbox-manager --container-definitions $(cat container-definitions_test.json | jq -c '.')  | jq --raw-output '.taskDefinition.revision')
             # update the service to use the latest task definition
             - aws ecs update-service --cluster $TARGET_AWS_CLUSTER --service $TARGET_AWS_SERVICE --task-definition $CONTAINER_NAME:$TASK_VERSION
     feature/*:
@@ -78,7 +61,7 @@ pipelines:
             - export PATH=~/bin:$PATH
             - curl -o /usr/local/bin/jq -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && chmod +x /usr/local/bin/jq
             # build docker image and push to nexus.interopion.com:18083 (docker-interopion)
-            - export IMAGE_NAME=$(cat container-definitions-test.json | jq --raw-output '.[0].image')
+            - export IMAGE_NAME=$(cat container-definitions_test.json | jq --raw-output '.[0].image')
             - docker login -u $NEXUS_USR -p $NEXUS_PWD nexus.hspconsortium.org:18083
             - docker build -t $IMAGE_NAME .
             - docker push $IMAGE_NAME
