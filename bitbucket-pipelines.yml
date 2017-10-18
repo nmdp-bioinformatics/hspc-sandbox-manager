@@ -24,7 +24,8 @@ pipelines:
             - docker build -t $IMAGE_NAME .
             - docker push $IMAGE_NAME
             # register the ECS task definition and capture the version
-            - export TASK_VERSION=$(aws ecs register-task-definition --family hspc-sandbox-manager --container-definitions $(cat container-definitions_test.json | jq -c '.')  | jq --raw-output '.taskDefinition.revision')
+            - export TASK_VERSION=$(aws ecs register-task-definition --family hspc-account-manager --container-definitions $(cat container-definitions_test.json.json | jq -c '.')  | jq --raw-output '.taskDefinition.revision')
+            - echo "Registered ECS Task Definition - " $TASK_VERSION
             # update the service to use the latest task definition
             - aws ecs update-service --cluster $TARGET_AWS_CLUSTER --service $TARGET_AWS_SERVICE --task-definition $CONTAINER_NAME:$TASK_VERSION
     feature/*:
