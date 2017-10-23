@@ -2449,7 +2449,16 @@ angular.module('sandManApp.services', [])
         },
         loadSettings: function () {
             var deferred = $.Deferred();
-            $http.get('static/js/config/sandbox-manager.json').success(function (result) {
+            var env_properties_file;
+            try{
+                if(process.env.ACTIVE_ENV_SM == 'test'){
+                    env_properties_file = 'static/js/config/sandbox-manager_test.json';
+                }
+            }catch (err){
+                env_properties_file = 'static/js/config/sandbox-manager.json';
+            }
+
+            $http.get(env_properties_file).success(function (result) {
                 settings = result;
                 deferred.resolve(settings);
             });
