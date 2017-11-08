@@ -14,7 +14,7 @@
     "authClient": {
       "clientName": "Patient Data Manager",
       "clientId": "patient_data_manager",
-      "redirectUri": "https://lpatient-data-manager-test.hspconsortium.org/index.html"
+      "redirectUri": "https://patient-data-manager-test.hspconsortium.org/index.html"
     },
     "appUri": "https://patient-data-manager-test.hspconsortium.org/",
     "launchUri": "https://patient-data-manager-test.hspconsortium.org/launch.html",
