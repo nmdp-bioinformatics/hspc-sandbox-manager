@@ -34,13 +34,17 @@ angular.module('sandManApp.services', [])
 
                 var serviceUrl = s.defaultServiceUrl;
                 if (sandboxId !== undefined && sandboxId !== "") {
-                    serviceUrl = s.baseServiceUrl_1 + sandboxId + "/data";
+                    serviceUrl = s.baseServiceUrl_1 + "/" + sandboxId + "/data";
                     if (sandboxApiEndpointIndex !== undefined && sandboxApiEndpointIndex !== "" && sandboxApiEndpointIndex === "2") {
-                        serviceUrl = s.baseServiceUrl_2 + sandboxId + "/data";
+                        serviceUrl = s.baseServiceUrl_2 + "/" + sandboxId + "/data";
                     } else if (sandboxApiEndpointIndex !== undefined && sandboxApiEndpointIndex !== "" && sandboxApiEndpointIndex === "3") {
-                        serviceUrl = s.baseServiceUrl_3 + sandboxId + "/data";
+                        serviceUrl = s.baseServiceUrl_3 + "/" + sandboxId + "/data";
                     } else if (sandboxApiEndpointIndex !== undefined && sandboxApiEndpointIndex !== "" && sandboxApiEndpointIndex === "4") {
-                        serviceUrl = s.baseServiceUrl_4 + sandboxId + "/data";
+                        serviceUrl = s.baseServiceUrl_4 + "/" + sandboxId + "/data";
+                    } else if (sandboxApiEndpointIndex !== undefined && sandboxApiEndpointIndex !== "" && sandboxApiEndpointIndex === "5") {
+                        serviceUrl = s.baseServiceUrl_5  + "/" + sandboxId + "/data";
+                    } else if (sandboxApiEndpointIndex !== undefined && sandboxApiEndpointIndex !== "" && sandboxApiEndpointIndex === "6") {
+                        serviceUrl = s.baseServiceUrl_6 + "/" + sandboxId + "/data";
                     }
                 }
                 FHIR.oauth2.authorize({

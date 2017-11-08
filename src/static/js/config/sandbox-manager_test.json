@@ -1,13 +1,15 @@
 {
-  "defaultServiceUrl": "https://api-dstu2-test.hspconsortium.org/hspc4/data",
-  "baseServiceUrl_1": "http://localhost:8071/",
-  "baseServiceUrl_2": "http://localhost:8072/",
-  "baseServiceUrl_3": "http://localhost:8073/",
-  "baseServiceUrl_4": "http://localhost:8074/",
-  "oauthLogoutUrl": "http://localhost:8060/logout",
-  "oauthUserInfoUrl": "http://localhost:8060/userinfo",
+  "defaultServiceUrl": "https://api-stu3-test.hspconsortium.org/hspc4/data",
+  "baseServiceUrl_1": "http://api-test.hspconsortium.org/",
+  "baseServiceUrl_2": "http://api2-test.hspconsortium.org/",
+  "baseServiceUrl_3": "http://api3-test.hspconsortium.org/",
+  "baseServiceUrl_4": "http://api-stu3-test.hspconsortium.org/",
+  "baseServiceUrl_5": "https://api-dstu2-test.hspconsortium.org",
+  "baseServiceUrl_6": "https://api-stu3-test.hspconsortium.org",
+  "oauthLogoutUrl": "http://auth-test.hspconsortium.org/logout",
+  "oauthUserInfoUrl": "http://auth-test.hspconsortium.org/userinfo",
   "sbmUrlHasContextPath": "false",
-  "userManagementUrl": "http://localhost:8065",
+  "userManagementUrl": "http://account-test.hspconsortium.org",
   "reservedEndpoints": [
     "this",
     "hspc",
@@ -46,5 +48,5 @@
   "personaCookieName": "hspc-persona-token",
   "personaCookieTimeout": 180000,
   "personaCookieDomain": "localhost",
-  "sandboxManagerApiUrl": "http://localhost:12000"
+  "sandboxManagerApiUrl": "http://sandbox-api-test.hspconsortium.org"
 }
