@@ -1336,7 +1336,7 @@ angular.module('sandManApp.services', [])
                 appsSettings.getSettings().then(function (settings) {
                     $.ajax({
                         url: settings.oauthUserInfoUrl,
-                        type: 'GET',
+                        type: 'POST',
                         contentType: "application/json",
                         beforeSend: function (xhr) {
                             xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
