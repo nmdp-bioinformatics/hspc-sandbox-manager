@@ -7,7 +7,7 @@
   "baseServiceUrl_5": "https://api-dstu2-test.hspconsortium.org",
   "baseServiceUrl_6": "https://api-stu3-test.hspconsortium.org",
   "oauthLogoutUrl": "https://auth-test.hspconsortium.org/logout",
-  "oauthUserInfoUrl": "https://auth-test.hspconsortium.org/userinfo",
+  "oauthUserInfoUrl": "https://auth-test.hspconsortium.org/userinfo/",
   "sbmUrlHasContextPath": "false",
   "userManagementUrl": "https://account-test.hspconsortium.org",
   "reservedEndpoints": [
