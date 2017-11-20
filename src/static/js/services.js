@@ -2482,31 +2482,7 @@ angular.module('sandManApp.services', [])
             return settings;
         }
     };
-}]).factory('newsService', function ($rootScope, $http, fhirApiServices, userServices,
-                                     appsSettings) {
-
-    return {
-        getAllNews: function () {
-            var deferred = $.Deferred();
-            var that = this;
-            appsSettings.getSettings().then(function (settings) {
-                $.ajax({
-                    url: settings.sandboxManagerApiUrl + "/notification/all",
-                    type: 'GET',
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                    }
-                }).done(function (results) {
-                    deferred.resolve(results);
-                    $rootScope.$digest();
-                }).fail(function () {
-                    deferred.reject();
-                });
-            });
-            return deferred;
-        }
-    };
-}).factory('cookieService', function ($cookies, appsSettings, $log) {
+}]).factory('cookieService', function ($cookies, appsSettings, $log) {
     return {
         addPersonaCookie: function (cookieJwtValue) {
             appsSettings.getSettings().then(function (settings) {

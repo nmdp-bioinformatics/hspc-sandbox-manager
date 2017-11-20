@@ -56,36 +56,6 @@
                             </div>
                         </div>
                     </div>
-                    <div ng-show="showNews()">
-                        <div class="sub-header" style="margin-top: 30px">News and Tips</div>
-                        <div class="box">
-                            <div class="scrollableContainer" >
-                                <div class="headerSpacer"></div>
-                                <div class="scrollArea">
-                                    <table class="invite-table table table-striped">
-                                        <thead class="fixedHeader">
-                                        <tr>
-                                            <th><div class="th-inner" table-header-inner>Title</div></th>
-                                            <th><div class="th-inner" table-header-inner>Description</div></th>
-                                            <th><div class="th-inner" style="width: 150px" resize table-fixed-width-column></div></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody class="scrollContent">
-                                        <tr ng-repeat="x in newsItems" style="cursor: pointer;">
-                                            <td>{{x.title}}</td>
-                                            <td>{{x.description}}</td>
-                                            <td style="width:33.33%">
-                                                <a href={{x.link}}>
-                                                <button class="btn btn-accept" style="float: right"> Open </button>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
