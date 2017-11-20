@@ -1,6 +1,6 @@
 {
   "name": "sandbox-manager",
-  "version": "2.5.1",
+  "version": "2.5.0",
   "scripts": {
     "serve": "node Server.js"
   },
