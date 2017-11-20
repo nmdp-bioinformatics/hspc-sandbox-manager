@@ -1,6 +1,6 @@
 [
   {
-    "name": "hspc-sandbox-manager-prod",
+    "name": "hspc-sandbox-manager",
     "image": "nexus.hspconsortium.org:18083/hspc/hspc-sandbox-manager:2.6.0",
     "cpu": 0,
     "portMappings": [
