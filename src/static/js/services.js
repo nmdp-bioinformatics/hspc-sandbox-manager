@@ -2460,6 +2460,9 @@ angular.module('sandManApp.services', [])
             if( active_env == 'test'){
                 env_properties_file = 'static/js/config/sandbox-manager_test.json';
             }
+            if( active_env == 'prod'){
+                env_properties_file = 'static/js/config/sandbox-manager_prod.json';
+            }
 
             $http.get(env_properties_file).success(function (result) {
                 settings = result;
