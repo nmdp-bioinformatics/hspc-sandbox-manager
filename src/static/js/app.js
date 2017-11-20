@@ -22,6 +22,12 @@ angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootst
                 authenticate: true
             })
 
+            .state('manage-news', {
+                url: '/manage-news',
+                templateUrl: 'static/js/templates/manageNews.html',
+                authenticate: true
+            })
+
             .state('progress', {
                 url: '/progress',
                 templateUrl: 'static/js/templates/createProgress.html',
