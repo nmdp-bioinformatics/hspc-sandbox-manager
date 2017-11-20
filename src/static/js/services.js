@@ -34,13 +34,17 @@ angular.module('sandManApp.services', [])
 
                 var serviceUrl = s.defaultServiceUrl;
                 if (sandboxId !== undefined && sandboxId !== "") {
-                    serviceUrl = s.baseServiceUrl_1 + sandboxId + "/data";
+                    serviceUrl = s.baseServiceUrl_1 + "/" + sandboxId + "/data";
                     if (sandboxApiEndpointIndex !== undefined && sandboxApiEndpointIndex !== "" && sandboxApiEndpointIndex === "2") {
-                        serviceUrl = s.baseServiceUrl_2 + sandboxId + "/data";
+                        serviceUrl = s.baseServiceUrl_2 + "/" + sandboxId + "/data";
                     } else if (sandboxApiEndpointIndex !== undefined && sandboxApiEndpointIndex !== "" && sandboxApiEndpointIndex === "3") {
-                        serviceUrl = s.baseServiceUrl_3 + sandboxId + "/data";
+                        serviceUrl = s.baseServiceUrl_3 + "/" + sandboxId + "/data";
                     } else if (sandboxApiEndpointIndex !== undefined && sandboxApiEndpointIndex !== "" && sandboxApiEndpointIndex === "4") {
-                        serviceUrl = s.baseServiceUrl_4 + sandboxId + "/data";
+                        serviceUrl = s.baseServiceUrl_4 + "/" + sandboxId + "/data";
+                    } else if (sandboxApiEndpointIndex !== undefined && sandboxApiEndpointIndex !== "" && sandboxApiEndpointIndex === "5") {
+                        serviceUrl = s.baseServiceUrl_5  + "/" + sandboxId + "/data";
+                    } else if (sandboxApiEndpointIndex !== undefined && sandboxApiEndpointIndex !== "" && sandboxApiEndpointIndex === "6") {
+                        serviceUrl = s.baseServiceUrl_6 + "/" + sandboxId + "/data";
                     }
                 }
                 FHIR.oauth2.authorize({
@@ -1332,7 +1336,7 @@ angular.module('sandManApp.services', [])
                 appsSettings.getSettings().then(function (settings) {
                     $.ajax({
                         url: settings.oauthUserInfoUrl,
-                        type: 'GET',
+                        type: 'POST',
                         contentType: "application/json",
                         beforeSend: function (xhr) {
                             xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
@@ -2449,7 +2453,15 @@ angular.module('sandManApp.services', [])
         },
         loadSettings: function () {
             var deferred = $.Deferred();
-            $http.get('static/js/config/sandbox-manager.json').success(function (result) {
+            var env_properties_file = 'static/js/config/sandbox-manager.json';
+
+            // the active_env is set in the pipeline. Otherwise it will run with default
+            var active_env = 'replacethiswithcurrentenvironment';
+            if( active_env == 'test'){
+                env_properties_file = 'static/js/config/sandbox-manager_test.json';
+            }
+
+            $http.get(env_properties_file).success(function (result) {
                 settings = result;
                 deferred.resolve(settings);
             });

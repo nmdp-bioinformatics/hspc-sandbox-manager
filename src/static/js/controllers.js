@@ -580,6 +580,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 $scope.openFhirUrl = settings.baseServiceUrl_3 + $scope.sandbox.sandboxId + "/open";
             } else if ($scope.sandbox.apiEndpointIndex === "4") {
                 $scope.openFhirUrl = settings.baseServiceUrl_4 + $scope.sandbox.sandboxId + "/open";
+            } else if ($scope.sandbox.apiEndpointIndex === "5") {
+                $scope.openFhirUrl = settings.baseServiceUrl_5 + $scope.sandbox.sandboxId + "/open";
+            } else if ($scope.sandbox.apiEndpointIndex === "6") {
+                $scope.openFhirUrl = settings.baseServiceUrl_6 + $scope.sandbox.sandboxId + "/open";
             }
             $scope.secureFhirUrl = settings.baseServiceUrl_1 + $scope.sandbox.sandboxId + "/data";
             if ($scope.sandbox.apiEndpointIndex === "2") {
@@ -588,6 +592,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 $scope.secureFhirUrl = settings.baseServiceUrl_3 + $scope.sandbox.sandboxId + "/data";
             } else if ($scope.sandbox.apiEndpointIndex === "4") {
                 $scope.secureFhirUrl = settings.baseServiceUrl_4 + $scope.sandbox.sandboxId + "/data";
+            } else if ($scope.sandbox.apiEndpointIndex === "5") {
+                $scope.secureFhirUrl = settings.baseServiceUrl_5 + $scope.sandbox.sandboxId + "/data";
+            } else if ($scope.sandbox.apiEndpointIndex === "6") {
+                $scope.secureFhirUrl = settings.baseServiceUrl_6 + $scope.sandbox.sandboxId + "/data";
             }
         });
 
