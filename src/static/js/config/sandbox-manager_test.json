@@ -1,8 +1,8 @@
 {
   "defaultServiceUrl": "https://api-stu3-test.hspconsortium.org/hspc5/data",
-  "baseServiceUrl_1": "https://api-test.hspconsortium.org/",
-  "baseServiceUrl_2": "https://api2-test.hspconsortium.org/",
-  "baseServiceUrl_3": "https://api3-test.hspconsortium.org/",
+  "baseServiceUrl_1": "http://api-test.hspconsortium.org/",
+  "baseServiceUrl_2": "http://api2-test.hspconsortium.org/",
+  "baseServiceUrl_3": "http://api3-test.hspconsortium.org/",
   "baseServiceUrl_4": "https://api-stu3-test.hspconsortium.org/",
   "baseServiceUrl_5": "https://api-dstu2-test.hspconsortium.org",
   "baseServiceUrl_6": "https://api-stu3-test.hspconsortium.org",
