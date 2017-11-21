@@ -2458,7 +2458,7 @@ angular.module('sandManApp.services', [])
             // the active_env is set in the pipeline. Otherwise it will run with default
             var active_env = 'replacethiswithcurrentenvironment';
             if( active_env == 'testone'){
-                env_properties_file = 'static/js/config/sandbox-manager_test.json';
+                env_properties_file = 'static/js/config/sandbox-manager_testone.json';
             }
             if( active_env == 'prod'){
                 env_properties_file = 'static/js/config/sandbox-manager_prod.json';
