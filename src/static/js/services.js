@@ -1022,7 +1022,7 @@ angular.module('sandManApp.services', [])
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
                     url: settings.sandboxManagerApiUrl + "/sandbox?userId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId),
-                    type: 'GET',
+                    type: 'POST',
                     contentType: "application/json",
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
@@ -1363,7 +1363,7 @@ angular.module('sandManApp.services', [])
                 appsSettings.getSettings().then(function (settings) {
                     $.ajax({
                         url: settings.sandboxManagerApiUrl + "/user?sbmUserId=" + encodeURIComponent(sbmUserId),
-                        type: 'GET',
+                        type: 'POST',
                         contentType: "application/json",
                         beforeSend: function (xhr) {
                             xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
@@ -1559,7 +1559,7 @@ angular.module('sandManApp.services', [])
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
                     url: settings.sandboxManagerApiUrl + "/userPersona?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
-                    type: 'GET',
+                    type: 'POST',
                     contentType: "application/json",
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
@@ -1579,7 +1579,7 @@ angular.module('sandManApp.services', [])
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
                     url: settings.sandboxManagerApiUrl + "/userPersona/default?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
-                    type: 'GET',
+                    type: 'POST',
                     contentType: "application/json",
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
@@ -1597,7 +1597,7 @@ angular.module('sandManApp.services', [])
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
                     url: settings.sandboxManagerApiUrl + "/userPersona?lookUpId=" + userPersonaId,
-                    type: 'GET'
+                    type: 'POST'
                 }).done(function (persona) {
                     if (persona !== undefined && persona !== "") {
                         deferred.resolve(persona);
@@ -1858,7 +1858,7 @@ angular.module('sandManApp.services', [])
                 $.ajax({
                     url: settings.sandboxManagerApiUrl + "/sandboxinvite?sbmUserId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId) +
                     "&status=" + status,
-                    type: 'GET',
+                    type: 'POST',
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
                     }
