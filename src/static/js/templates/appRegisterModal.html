@@ -11,7 +11,7 @@
             <div class="detail-form-label-input with-info">
                 <select ng-model="clientType" ng-options="option for option in clientTypes" class="form-control" data-toggle="tooltip" data-placement="right" title="Type of client to create" />
             </div>
-            <a href='http://docs.smarthealthit.org/authorization/' target="_blank" class='float-right-dark-btn'>
+            <a href='https://docs.smarthealthit.org/authorization/' target="_blank" class='float-right-dark-btn'>
                 <img src="static/images/circle_info-128.png" class="info-btn">
             </a>
         </div>
@@ -26,14 +26,14 @@
         <div class="form-group">
             <label class="detail-form-label">App Launch URI<span class="required">*</span></label>
             <div class="detail-form-label-input">
-                <input ng-model="clientJSON.launchUri" class="form-control" placeholder="e.g.: http://mydomain.com/growth-chart/launch.html"/>
+                <input ng-model="clientJSON.launchUri" class="form-control" placeholder="e.g.: https://mydomain.com/growth-chart/launch.html"/>
             </div>
         </div>
 
         <div class="form-group">
             <label class="detail-form-label">App Redirect URIs</label>
             <div class="detail-form-label-input">
-                <input ng-model="clientJSON.redirectUris" class="form-control" placeholder="e.g.: http://mydomain.com/growth-chart/index.html"/>
+                <input ng-model="clientJSON.redirectUris" class="form-control" placeholder="e.g.: https://mydomain.com/growth-chart/index.html"/>
                 <p>Note: If you provide one or more redirect URIs, your client code must send one of the provided values when performing OAuth2 authorization or you will receive an "Invalid redirect" error.</p>
             </div>
         </div>
