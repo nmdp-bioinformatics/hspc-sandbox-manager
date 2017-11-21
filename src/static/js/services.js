@@ -1017,26 +1017,26 @@ angular.module('sandManApp.services', [])
             return deferred;
         },
         getUserSandboxesByUserId: function () {
-            var that = this;
-            var deferred = $.Deferred();
-            appsSettings.getSettings().then(function (settings) {
-                $.ajax({
-                    url: settings.sandboxManagerApiUrl + "/sandbox?userId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId),
-                    type: 'POST',
-                    contentType: "application/json",
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                    }
-                }).done(function (sandboxResult) {
-                    if (sandboxResult.length > 0) {
-                        that.setHasSandbox(true);
-                        sandboxes = sandboxResult;
-                        deferred.resolve(true);
-                    } else {
-                        that.clearSandboxes();
-                        deferred.resolve(false);
-                    }
-                }).fail(function () {
+                    var that = this;
+                    var deferred = $.Deferred();
+                    appsSettings.getSettings().then(function (settings) {
+                        $.ajax({
+                            url: settings.sandboxManagerApiUrl + "/sandbox?userId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId),
+                            type: 'POST',
+                            contentType: "application/json",
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                            }
+                        }).done(function (sandboxResult) {
+                            if (sandboxResult.length > 0) {
+                                that.setHasSandbox(true);
+                                sandboxes = sandboxResult;
+                                deferred.resolve(true);
+                            } else {
+                                that.clearSandboxes();
+                                deferred.resolve(false);
+                            }
+                        }).fail(function () {
                     that.clearSandboxes();
                     deferred.resolve(false);
                 });
@@ -2457,7 +2457,7 @@ angular.module('sandManApp.services', [])
 
             // the active_env is set in the pipeline. Otherwise it will run with default
             var active_env = 'replacethiswithcurrentenvironment';
-            if( active_env == 'test'){
+            if( active_env == 'testone'){
                 env_properties_file = 'static/js/config/sandbox-manager_test.json';
             }
             if( active_env == 'prod'){
