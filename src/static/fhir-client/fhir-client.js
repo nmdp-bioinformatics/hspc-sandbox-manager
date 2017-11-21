@@ -2713,7 +2713,7 @@ function error () {
   throw new Error([
     m,
     'we accept pull requests',
-    'http://github.com/dominictarr/crypto-browserify'
+    'https://github.com/dominictarr/crypto-browserify'
     ].join('\n'))
 }
 
