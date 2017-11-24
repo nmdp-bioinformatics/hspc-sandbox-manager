@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 echo 'starting prepare_build.sh...'
 
 echo 'capture build definitions...'
