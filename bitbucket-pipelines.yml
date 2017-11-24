@@ -20,8 +20,14 @@ pipelines:
 #            - curl -o /usr/local/bin/jq -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && chmod +x /usr/local/bin/jq
             # set active_env with current environment
             - sed -i -e 's/replacethiswithcurrentenvironment/test/g' ./src/static/js/services.js
+            - . prepare-build.sh
+#            # build dynamic container-definitions
+#            - export CONTAINER_NAME=$(cat package.json | jq --raw-output '.name')
+#            - export PROJECT_VERSION=$(cat package.json | jq --raw-output '.version')
+#            - export INTERNAL_PORT=$(cat package.json | jq --raw-output '.config.port')
+#            - sed -i -e "s/{{CONTAINER_NAME}}/$CONTAINER_NAME/g" -e "s/{{PROJECT_VERSION}}/$PROJECT_VERSION/g" -e "s/{{PROJECT_VERSION}}/$PROJECT_VERSION/g" container-definitions_test.json
             # build docker image and push to nexus.interopion.com:18083 (docker-interopion)
-            - export IMAGE_NAME=$(cat container-definitions_test.json | jq --raw-output '.[0].image')
+#            - export IMAGE_NAME=$(cat container-definitions_test.json | jq --raw-output '.[0].image')
             - docker login -u $NEXUS_USR -p $NEXUS_PWD nexus.hspconsortium.org:18083
             - docker build -t $IMAGE_NAME .
             - docker push $IMAGE_NAME

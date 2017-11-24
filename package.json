@@ -1,10 +1,11 @@
 {
-  "name": "sandbox-manager",
+  "name": "hspc-sandbox-manager",
   "version": "2.5.8",
   "scripts": {
     "serve": "node Server.js"
   },
   "dependencies": {
     "express": "^4.11.0"
-  }
+  },
+  "config" : { "port" : "8080" }
 }
