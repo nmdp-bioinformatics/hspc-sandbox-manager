@@ -25,6 +25,9 @@ echo 'dynamically fix the JavaScript references to bypass cache on new deploymen
 cat src/index.html | sed -E -e "s/.js\?r=[0-9.]+/.js\?r=$PROJECT_VERSION/g" 2>&1 | tee src/index.html
 
 echo 'dynamically fix the container-definitions_prod.json'
+echo 'BEFORE'
+cat container-definitions_prod.json
+echo 'AFTER'
 cat container-definitions_prod.json | jq --arg container_name $PROJECT_NAME '.[0].name=$container_name' 2>&1 | tee container-definitions_prod.json
 cat container-definitions_prod.json | jq --arg image_name $IMAGE_NAME '.[0].image=$image_name' 2>&1 | tee container-definitions_prod.json
 cat container-definitions_prod.json | jq --arg container_port $PROJECT_PORT '.[0].portMappings[0].containerPort=($container_port | tonumber)' 2>&1 | tee container-definitions_prod.json
