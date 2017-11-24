@@ -13,6 +13,9 @@ Welcome to the HSPC Sandbox Manager!
 #### Build and Deploy ####
     ./run_local.sh
 
+#### Build and Deploy Using Docker ####
+    ./run_local_docker.sh
+
 #### Verify
 
 * http://localhost:8080/
