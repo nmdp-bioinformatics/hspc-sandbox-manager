@@ -5,6 +5,7 @@ echo "testing ci scripts..."
 echo "pinning to the 'test' environment..."
 sed -i -e 's/replacethiswithcurrentenvironment/test/g' ./src/static/js/services.js
 
+# for ci-dev, fix on the develop branch with test deployment
 echo "BITBUCKET_BRANCH: $BITBUCKET_BRANCH"
 export BITBUCKET_BRANCH="develop"
 
