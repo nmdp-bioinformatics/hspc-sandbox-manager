@@ -18,7 +18,7 @@ echo "PROJECT_VERSION: $PROJECT_VERSION"
 export PROJECT_PORT=$(cat package.json | jq --raw-output '.config.port')
 echo "PROJECT_PORT: $PROJECT_PORT"
 
-export IMAGE_NAME=$PROJECT_REPO/$PROJECT_NAME:$PROJECT_VERSION
+export IMAGE_NAME="$PROJECT_REPO/$PROJECT_NAME:$PROJECT_VERSION"
 echo "IMAGE_NAME: $IMAGE_NAME"
 
 . ci-1-prepare-sources.sh

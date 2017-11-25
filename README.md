@@ -25,11 +25,11 @@ Welcome to the HSPC Sandbox Manager!
 Various property files configure the sandbox manager:
 
  * package.json
- * Server.js
+ * services.js
  * src/static/js/config/*
 
 #### System Dependencies ####
-When run locally, the sandbox manager has dependencies on the following systems/projects.  Each of these projects contains a "run_local" script in the root folder.
+When run locally, the sandbox manager has dependencies on the following systems/projects.  Each of these projects contains a "run-local" script in the root folder.
 
  * [HSPC Reference Auth](https://bitbucket.org/hspconsortium/reference-auth)
  * [HSPC Reference API](https://bitbucket.org/hspconsortium/reference-api) in DSTU2 or STU3 mode
