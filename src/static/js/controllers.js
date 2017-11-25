@@ -261,6 +261,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $state.go('create-sandbox', {});
         };
 
+        $scope.manageNews = function () {
+            $state.go('manage-news', {});
+        };
+
         $scope.canCreateSandbox = function () {
             return $scope.isSystemAdmin() || (userServices.sandboxManagerUser() !== undefined && (userServices.hasSystemRole("CREATE_SANDBOX")));
         };
@@ -398,16 +402,18 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
     }).controller("DashboardViewController",
-    function ($scope, $rootScope, $state, userServices, sandboxManagement, sandboxInviteServices, appsSettings, branded) {
+    function ($scope, $rootScope, $state, userServices, sandboxManagement, sandboxInviteServices, appsSettings, branded, newsService) {
         $scope.showing.navBar = true;
         $scope.showing.footer = true;
         $scope.showing.sideNavBar = false;
         $scope.sandboxInvites = [];
+        $scope.newsItems = [];
         $scope.title.blueBarTitle = branded.dashboardTitle;
 
         $rootScope.$on('user-loaded', function () {
             if (userServices.sandboxManagerUser() !== undefined && userServices.sandboxManagerUser() !== "") {
                 getSandboxInvites();
+                getNewsItems();
                 if ($scope.isSystemAdmin()) {
                     $rootScope.$digest();
                 }
@@ -416,6 +422,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         $scope.showInvitations = function () {
             return branded.showEmptyInviteList || $scope.sandboxInvites.length > 0;
+        };
+
+        $scope.showNews = function () {
+            return branded.showEmptyInviteList || $scope.newsItems.length > 0;
         };
 
         $scope.selectSandbox = function (sandbox) {
@@ -434,6 +444,12 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         function getSandboxInvites() {
             sandboxInviteServices.getSandboxInvitesBySbmUserId("PENDING").then(function (results) {
                 $scope.sandboxInvites = results;
+            });
+        }
+
+        function getNewsItems() {
+            newsService.getAllNews().then(function(results){
+                $scope.newsItems = results;
             });
         }
 
@@ -3439,5 +3455,52 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.cancel = function () {
             $uibModalInstance.dismiss();
         };
+    }).controller("ManageNewsController",
+    function ($rootScope, $scope, $state, tools, appsSettings, branded, docLinks) {
+
+        $scope.showing.navBar = true;
+        $scope.showing.footer = true;
+        $scope.showing.sideNavBar = false;
+        $scope.isIdValid = false;
+        $scope.showError = false;
+        $scope.isNameValid = true;
+        $scope.newsTitle = "";
+        $scope.newsDesc = "";
+        $scope.newsId = "";
+        $scope.newsLink = "";
+        $scope.createEnabled = true;
+
+        $scope.title.blueBarTitle = "Manage News";
+        $scope.docLink = docLinks.docLink;
+
+        $scope.baseUrl = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl;
+
+        $scope.$watch("apiEndpointIndex", function () {
+            $scope.selectedSandboxApiEndpointIndex = apiEndpointIndexServices.getSandboxApiEndpointIndexDetails($scope.apiEndpointIndex);
+        });
+
+        $scope.cancel = function () {
+            $rootScope.$emit('signed-in', 'manage-news');
+        };
+
+        $scope.createNewsItem= function () {
+            sandboxManagement.createSandbox({
+                id: $scope.newsId,
+                title: $scope.newsTitle,
+                description: $scope.newsDesc,
+                link: $scope.newsLink,
+
+            }).then(function (sandbox) {
+                sandboxManagement.setCreatingSandbox(false);
+                $scope.showing.progress = false;
+                $rootScope.$emit('sandbox-created', $scope.sandboxId);
+            }).fail(function () {
+                sandboxManagement.setCreatingSandbox(false);
+                $state.go('error', {});
+            });
+
+            $state.go('progress', {});
+        };
+
     });
 

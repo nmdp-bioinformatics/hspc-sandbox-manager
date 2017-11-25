@@ -1,7 +1,7 @@
 [
   {
     "name": "hspc-sandbox-manager",
-    "image": "nexus.hspconsortium.org:18083/hspc/hspc-sandbox-manager:2.5.7",
+    "image": "hspconsortium/hspc-sandbox-manager:2.5.8",
     "cpu": 0,
     "portMappings": [
       {
@@ -10,12 +10,12 @@
         "protocol": "tcp"
       }
     ],
-    "memory": 800,
+    "memory": 200,
     "essential": true,
     "environment": [
       {
         "name": "ACTIVE_ENV_SM",
-        "value": "test"
+        "value": "prod"
       }
     ]
   }
