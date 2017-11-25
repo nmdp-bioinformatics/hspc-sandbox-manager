@@ -2,6 +2,10 @@
 
 echo "capture build definitions..."
 
+# push the build image
+export DOCKER_PUSH=true
+echo "DOCKER_PUSH: $DOCKER_PUSH"
+
 export PROJECT_REPO="hspconsortium"
 echo "PROJECT_REPO: $PROJECT_REPO"
 
@@ -17,8 +21,8 @@ echo "PROJECT_PORT: $PROJECT_PORT"
 export IMAGE_NAME=$PROJECT_REPO/$PROJECT_NAME:$PROJECT_VERSION
 echo "IMAGE_NAME: $IMAGE_NAME"
 
-. ci-1*
+. ci-1-prepare-sources.sh
 
-. ci-2*
+. ci-2-docker-image.sh
 
-. ci-3*
+. ci-3-aws-update.sh

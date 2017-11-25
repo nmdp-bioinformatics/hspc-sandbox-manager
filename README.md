@@ -11,10 +11,10 @@ Welcome to the HSPC Sandbox Manager!
 ### How do I get set up? ###
 
 #### Build and Deploy ####
-    ./run_local.sh
+    ./run-local.sh
 
 #### Build and Deploy Using Docker ####
-    ./run_local_docker.sh
+    ./run-local-docker.sh
 
 #### Verify
 
