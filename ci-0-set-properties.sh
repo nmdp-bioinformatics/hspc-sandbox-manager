@@ -20,9 +20,3 @@ echo "PROJECT_PORT: $PROJECT_PORT"
 
 export IMAGE_NAME=$PROJECT_REPO/$PROJECT_NAME:$PROJECT_VERSION
 echo "IMAGE_NAME: $IMAGE_NAME"
-
-. ci-1-prepare-sources.sh
-
-. ci-2-docker-image.sh
-
-. ci-3-aws-update.sh
