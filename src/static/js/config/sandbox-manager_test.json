@@ -47,6 +47,6 @@
   "hspcAccountCookieName": "hspc-token",
   "personaCookieName": "hspc-persona-token",
   "personaCookieTimeout": 180000,
-  "personaCookieDomain": "sandbox-api-test",
+  "personaCookieDomain": "hspconsortium.org",
   "sandboxManagerApiUrl": "https://sandbox-api-test.hspconsortium.org"
 }
