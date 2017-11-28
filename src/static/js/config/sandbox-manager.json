@@ -5,7 +5,7 @@
   "baseServiceUrl_3": "http://localhost:8073",
   "baseServiceUrl_4": "http://localhost:8074",
   "baseServiceUrl_5": "http://localhost:8075",
-  "baseServiceUrl_6": "http://localhost:8075",
+  "baseServiceUrl_6": "http://localhost:8076",
   "oauthLogoutUrl": "http://localhost:8060/logout",
   "oauthUserInfoUrl": "http://localhost:8060/userinfo",
   "sbmUrlHasContextPath": "false",
