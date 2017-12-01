@@ -48,7 +48,15 @@
             window.location.hash = newHash;
         }
     </script>
-
+    <script>
+        var withoutLastChar = window.location.href.substr(0, window.location.href.length - 1);
+        var final = withoutLastChar + "#/"
+        var lastChar = window.location.href.substr(window.location.href.length -1);
+        console.log("current: " + window.location.host)
+        if (lastChar == "/" && window.location.href != window.location.host) {
+            window.location.replace(final);
+        }
+    </script>
 </head>
 
 <!-- apply our angular app to our site -->
