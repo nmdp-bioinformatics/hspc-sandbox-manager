@@ -16,7 +16,7 @@ pipelines:
           caches:
             - node
           script:
-            - echo "BITBUCKET_BRANCH: $BITBUCKET_BRANCH"
+            - echo "BITBUCKET_BRANCH= $BITBUCKET_BRANCH"
             # set active_env with current environment
             - sed -i -e 's/replacethiswithcurrentenvironment/test/g' ./src/static/js/services.js
             - . ci-0-set-properties.sh
