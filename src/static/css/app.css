@@ -768,7 +768,7 @@ span.title,
 .navbar-sandboxes {
     position: absolute;
     top: 21px;
-    left: 290px;
+    left: 200px;
     /*height: 60px;*/
 }
 
@@ -835,7 +835,7 @@ span.title,
 .navbar-admin-dashboard {
     position: absolute;
     top: 21px;
-    left: 400px;
+    left: 360px;
     /*height: 60px;*/
 }
 
