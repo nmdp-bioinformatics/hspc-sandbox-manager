@@ -22,8 +22,6 @@ hs_err_pid*
 node_modules/
 
 # these are build on the target environment
-container-definitions_prod.json
-container-definitions_test.json
 src/static/js/services.js-e
 
 package-lock.json
