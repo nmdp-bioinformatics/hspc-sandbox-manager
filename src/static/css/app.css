@@ -1072,6 +1072,7 @@ span.title,
     padding: 4px 0 4px 5px;
     font-size: 14px;
     text-decoration: none;
+    word-wrap: break-word;
 }
 
 .sandboxes-content .sandbox-item.sandbox:hover {
