@@ -13,9 +13,9 @@
                     </div>
                     <div class="create-form-group">
                         <label class="create-form-label">Sandbox Name</label>
-                        <input ng-model="sandboxName" class="create-form-input-box"/>
+                        <input ng-model="sandboxName" class="create-form-input-box" maxlength="{{selecteddata.Type.MaxLength}}"/>
                         <i ng-show="!isNameValid" class='create-form-input-icon fa fa-close fa-lg'></i>
-                        <label class="create-form-description">e.g., NewCo Sandbox</label>
+                        <label class="create-form-description">e.g., NewCo Sandbox. Must be less than 50 characters.</label>
                     </div>
                     <div class="create-form-group">
                         <label class="create-form-label">Sandbox Version</label>

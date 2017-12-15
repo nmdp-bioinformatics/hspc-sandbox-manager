@@ -1398,7 +1398,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
     }).controller("CreateSandboxController",
     function ($rootScope, $scope, $state, sandboxManagement, tools, appsSettings, branded, apiEndpointIndexServices, docLinks) {
-
+        $scope.selecteddata={
+            'Type':{
+                'MaxLength':50
+            }
+        }
         $scope.showing.navBar = true;
         $scope.showing.footer = true;
         $scope.showing.sideNavBar = false;
