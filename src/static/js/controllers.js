@@ -460,6 +460,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.newUserEmail = "";
         $scope.validEmail = false;
         $scope.isSending = false;
+        $scope.twoOrMoreAdmin = false;
 
         getSandboxInvites();
         getUsers();
@@ -473,9 +474,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             // Only Sandbox Admin can delete users
             if (userServices.getOAuthUser() !== undefined &&
                 userServices.userHasSandboxRole(userServices.getOAuthUser().sbmUserId, sandboxManagement.getSandbox().userRoles, "ADMIN")) {
-                // Don't allow deleting self or Sandbox creator
-                return ((sandboxManagement.getSandbox().createdBy.sbmUserId.toLowerCase() !== sbmUserId.toLowerCase()) &&
-                    (userServices.getOAuthUser().sbmUserId.toLowerCase() !== sbmUserId.toLowerCase()));
+                //only allow deleting when two or more ADMIN users exist
+                return $scope.twoOrMoreAdmin;
             }
             return false;
         };
@@ -497,7 +497,12 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                                 if (result === true) {
                                     sandboxManagement.removeUserFromSandboxByUserId(user.sbmUserId).then(function () {
                                         sandboxManagement.getSandboxById().then(function () {
-                                            getUsers();
+                                            //are we removing ourselves?
+                                            if(user.sbmUserId == $scope.oauthUser.sbmUserId){
+                                                $scope.goToDashboard();
+                                            } else {
+                                                getUsers();
+                                            }
                                         });
                                     });
                                 }
@@ -560,14 +565,19 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         function getUsers() {
             $scope.users = [];
             var userRoles = sandboxManagement.getSandbox().userRoles;
+            var adminCount = 0;
             userRoles.forEach(function (userRole) {
                 if (!contains($scope.users, userRole.user)) {
                     if (userServices.userHasSandboxRole(userRole.user.sbmUserId, sandboxManagement.getSandbox().userRoles, "ADMIN")) {
                         userRole.user.isAdmin = true;
+                        adminCount++;
                     }
                     $scope.users.push(userRole.user);
                 }
             });
+            if (adminCount > 1){
+                $scope.twoOrMoreAdmin = true;
+            }
         }
 
         function contains(array, item) {
