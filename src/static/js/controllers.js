@@ -448,7 +448,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         }
 
         function getNewsItems() {
-            newsService.getAllNews().then(function(results){
+            newsService.getAllNews().then(function (results) {
                 $scope.newsItems = results;
             });
         }
@@ -1784,15 +1784,18 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $rootScope.$emit('patient-search-start');
             var modalProgress = openModalProgressDialog("Searching...");
 
-            fhirApiServices.getNextOrPrevPage(direction, lastQueryResult).then(function (p, queryResult) {
-                lastQueryResult = queryResult;
-                $scope.patients = p;
-                $scope.showing.searchloading = false;
-                $scope.count = fhirApiServices.calculateResultSet(queryResult);
-                $rootScope.$digest();
+            fhirApiServices.getNextOrPrevPage(direction, lastQueryResult)
+                .then(function (p, queryResult) {
+                    lastQueryResult = queryResult;
+                    $scope.patients = p;
+                    $scope.showing.searchloading = false;
+                    $scope.count = fhirApiServices.calculateResultSet(queryResult);
+                    $rootScope.$digest();
 
-                modalProgress.dismiss();
-                $rootScope.$emit('patient-search-complete');
+                    modalProgress.dismiss();
+                    $rootScope.$emit('patient-search-complete');
+                }).catch(function(err){
+
             });
         };
 
@@ -1823,6 +1826,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             }
         });
 
+        $scope.patientSearchInputDisabled = false;
         var loadCount = 0;
         var search = _.debounce(function (thisLoad) {
             var sortDefs = $scope.sortMap.get($scope.sortSelected);
@@ -1842,6 +1846,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $rootScope.$emit('patient-search-start');
             $scope.shouldBeOpen = false;
             var modalProgress = openModalProgressDialog("Searching...");
+            $scope.patientSearchInputDisabled = true;
 
             fhirApiServices.queryResourceInstances("Patient", $scope.patientQuery, $scope.tokens, sortValues, $scope.resultCount !== undefined ? $scope.resultCount : 50)
                 .then(function (p, queryResult) {
@@ -1854,6 +1859,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     $rootScope.$digest();
                     $scope.count = fhirApiServices.calculateResultSet(queryResult);
 
+                    $scope.patientSearchInputDisabled = false;
                     modalProgress.dismiss();
                     $rootScope.$emit('patient-search-complete');
                     $scope.shouldBeOpen = true;
@@ -2279,7 +2285,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         $scope.delete = function () {
             $scope.selectedScenario.contextParams = $scope.selectedScenario.contextParams.filter(function (obj) {
-                return (obj !== $scope.selectedContext );
+                return (obj !== $scope.selectedContext);
             });
             sandboxManagement.updateLaunchScenario($scope.selectedScenario);
             $scope.selectedContext = {};
@@ -2859,7 +2865,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.isInbound = app.appManifestUri !== null;
         $scope.selected.selectedApp = app;
         $scope.showing.appDetail = true;
-        if($scope.clientJSON){
+        if ($scope.clientJSON) {
             delete $scope.clientJSON.logo;
         }
         $scope.myFile = undefined;
@@ -2875,7 +2881,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
             $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri + "?" + new Date().getTime();
         } else {
-            if(app.id){
+            if (app.id) {
                 appRegistrationServices.getSandboxApp(app.id).then(function (resultApp) {
                     $scope.galleryOffset = 80;
                     $scope.selected.selectedApp.clientJSON = JSON.parse(resultApp.clientJSON);
@@ -2899,7 +2905,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
     function canDeleteApp(app) {
         $scope.canDelete = false;
-        if(app.id) {
+        if (app.id) {
             sandboxManagement.getLaunchScenarioByApp(app.id).then(function (launchScenarios) {
                 if (!(launchScenarios.length > 0)) {
                     $scope.canDelete = userServices.canModify(app, sandboxManagement.getSandbox());
@@ -3483,7 +3489,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $rootScope.$emit('signed-in', 'manage-news');
         };
 
-        $scope.createNewsItem= function () {
+        $scope.createNewsItem = function () {
             sandboxManagement.createSandbox({
                 id: $scope.newsId,
                 title: $scope.newsTitle,
