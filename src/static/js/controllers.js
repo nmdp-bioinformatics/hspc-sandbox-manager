@@ -2014,7 +2014,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         });
 
         var loadCount = 0;
+        $scope.practitionerSearchInputDisabled = false;
+        $scope.practitionerFocus = false;
         var search = _.debounce(function (thisLoad) {
+            $scope.practitionerSearchInputDisabled = true;
             var modalProgress = openModalProgressDialog("Searching...");
             fhirApiServices.queryResourceInstances("Practitioner", undefined, $scope.tokens, [['family', 'asc'], ['given', 'asc']])
                 .then(function (p, queryResult) {
@@ -2026,6 +2029,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     $scope.showing.searchloading = false;
                     $scope.count = fhirApiServices.calculateResultSet(queryResult);
                     modalProgress.dismiss();
+                    $scope.practitionerSearchInputDisabled = false;
+                    $scope.practitionerFocus = true;
                     $rootScope.$digest();
                 });
         }, 600);
