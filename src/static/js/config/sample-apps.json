@@ -14,10 +14,10 @@
     "authClient": {
       "clientName": "Patient Data Manager",
       "clientId": "patient_data_manager",
-      "redirectUri": "https://patient-data-manager-test.hspconsortium.org/index.html"
+      "redirectUri": "https://patient-data-manager.hspconsortium.org/index.html"
     },
-    "appUri": "https://patient-data-manager-test.hspconsortium.org/",
-    "launchUri": "https://patient-data-manager-test.hspconsortium.org/launch.html",
+    "appUri": "https://patient-data-manager.hspconsortium.org/",
+    "launchUri": "https://patient-data-manager.hspconsortium.org/launch.html",
     "logoUri": "https://content.hspconsortium.org/images/hspc-patient-data-manager/logo/pdm.png"
   },
   {

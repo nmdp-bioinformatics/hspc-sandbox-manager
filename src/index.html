@@ -48,7 +48,15 @@
             window.location.hash = newHash;
         }
     </script>
-
+    <script>
+        var withoutLastChar = window.location.href.substr(0, window.location.href.length - 1);
+        var final = withoutLastChar + "#/"
+        var lastChar = window.location.href.substr(window.location.href.length -1);
+        console.log("current: " + window.location.host)
+        if (lastChar == "/" && window.location.href != window.location.host) {
+            window.location.replace(final);
+        }
+    </script>
 </head>
 
 <!-- apply our angular app to our site -->
@@ -57,7 +65,6 @@
 <!-- NAVIGATION -->
 <nav class="navbar" role="navigation" ng-show="showing.navBar">
     <div class="navbar-img" style="cursor: pointer" ng-click="goToDashboard()" ng-cloak><img ng-style="imgStyle()" ng-src="{{whiteImage}}" ng-srcset="{{whiteImage2x}}" ng-cloak /><div ng-style="imgTextStyle()" ng-cloak> {{sandboxText}}</div></div>
-    <div class="navbar-sandboxes" ng-show="showing.signout && dashboard.sandboxes.length > 0" ng-cloak><a tabindex="1" style="cursor: pointer"  href="#" uib-popover-template="'static/js/templates/sandboxPopover.html'" popover-trigger="'focus'" popover-placement="bottom">Sandboxes <i class="fa fa-sort-desc fa-lg"></i></a></div>
     <div class="navbar-admin-dashboard" ng-show="showing.signout && isSystemAdmin() && !showing.sideNavBar" ui-sref="admin-dashboard" ng-cloak><a tabindex="2" style="cursor: pointer" href="#">Admin Dashboard<i class="fa fa-tachometer fa-lg"></i></a></div>
 
     <div class="navbar-title" ng-cloak>{{title.blueBarTitle}}</div>
@@ -70,6 +77,8 @@
         </div>
         <div class="navbar-stack-apps" ng-show="showing.apps && showing.moreLinks"><a tabindex="0" href="#" uib-popover-template="'static/js/templates/navPopover.html'" popover-trigger="'focus'" popover-placement="bottom"><i class="fa fa-th fa-lg"></i></a></div>
     </div>
+    <div class="navbar-sandboxes" ng-show="showing.signout && dashboard.sandboxes.length > 0" ng-cloak><a tabindex="1" style="cursor: pointer"  href="#" uib-popover-template="'static/js/templates/sandboxPopover.html'" popover-trigger="'focus'" popover-placement="bottom">Sandboxes <i class="fa fa-sort-desc fa-lg"></i></a></div>
+
 </nav>
 <!--<div class="blue-bar" ng-show="showing.progress">-->
     <!--<div class="blue-bar-title" ng-show="!showing.progress" ng-cloak>{{title.blueBarTitle}}</div>-->
