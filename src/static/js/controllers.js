@@ -83,7 +83,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 });
                 event.preventDefault();
             } else if (toState.name === "progress" && !sandboxManagement.creatingSandbox()) {
-//                $scope.signin();
                 event.preventDefault();
             } else if (toState.scenarioBuilderStep && sandboxManagement.getScenarioBuilder().userPersona === "") {
                 if ($scope.showing.defaultLaunchScenario) {
@@ -460,6 +459,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.newUserEmail = "";
         $scope.validEmail = false;
         $scope.isSending = false;
+        $scope.twoOrMoreAdmin = false;
 
         getSandboxInvites();
         getUsers();
@@ -473,9 +473,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             // Only Sandbox Admin can delete users
             if (userServices.getOAuthUser() !== undefined &&
                 userServices.userHasSandboxRole(userServices.getOAuthUser().sbmUserId, sandboxManagement.getSandbox().userRoles, "ADMIN")) {
-                // Don't allow deleting self or Sandbox creator
-                return ((sandboxManagement.getSandbox().createdBy.sbmUserId.toLowerCase() !== sbmUserId.toLowerCase()) &&
-                    (userServices.getOAuthUser().sbmUserId.toLowerCase() !== sbmUserId.toLowerCase()));
+                //only allow deleting when two or more ADMIN users exist
+                return $scope.twoOrMoreAdmin;
             }
             return false;
         };
@@ -497,7 +496,12 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                                 if (result === true) {
                                     sandboxManagement.removeUserFromSandboxByUserId(user.sbmUserId).then(function () {
                                         sandboxManagement.getSandboxById().then(function () {
-                                            getUsers();
+                                            //are we removing ourselves?
+                                            if(user.sbmUserId == $scope.oauthUser.sbmUserId){
+                                                $scope.goToDashboard();
+                                            } else {
+                                                getUsers();
+                                            }
                                         });
                                     });
                                 }
@@ -560,14 +564,19 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         function getUsers() {
             $scope.users = [];
             var userRoles = sandboxManagement.getSandbox().userRoles;
+            var adminCount = 0;
             userRoles.forEach(function (userRole) {
                 if (!contains($scope.users, userRole.user)) {
                     if (userServices.userHasSandboxRole(userRole.user.sbmUserId, sandboxManagement.getSandbox().userRoles, "ADMIN")) {
                         userRole.user.isAdmin = true;
+                        adminCount++;
                     }
                     $scope.users.push(userRole.user);
                 }
             });
+            if (adminCount > 1){
+                $scope.twoOrMoreAdmin = true;
+            }
         }
 
         function contains(array, item) {
@@ -655,7 +664,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                                 if (result === true) {
                                     var modalProgress = openModalProgressDialog("Deleting...");
                                     sandboxManagement.deleteSandbox().then(function () {
-                                        window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/#/dashboard-view";
+                                        $scope.goToDashboard();
                                         modalProgress.dismiss();
                                     }, function () {
                                         //TODO display error
@@ -1006,27 +1015,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 });
                 $rootScope.$digest();
             });
-
-            // var temp = {};
-            // $uibModal.open({
-            //     animation: true,
-            //     templateUrl: 'static/js/templates/resourceDetailModal.html',
-            //     controller: 'ResourceDetailModalInstanceCtrl',
-            //     resolve: {
-            //         getSettings: function () {
-            //             return {
-            //                 title:"Details",
-            //                 ok:"OK",
-            //                 cancel:"Cancel",
-            //                 type:"confirm-error",
-            //                 text:resource.resource,
-            //                 patient: $scope.getDynamicModel(resource.resource, $scope.settings.selectedResourceType.patient, temp),
-            //                 callback:function(result){ //setting callback
-            //                 }
-            //             };
-            //         }
-            //     }
-            // });
         };
 
         function getPatientId(resource, patientIDs) {
@@ -1035,10 +1023,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             } else if (typeOf(resource) === "object") {
                 if (resource.hasOwnProperty("reference")) {
                     var resourceAndId = resource.reference.split("/");
-                    if (resourceAndId.length === 2) {
-                        if (resourceAndId[0] === "Patient") {
-                            patientIDs.push(resourceAndId[1]);
-                        }
+                    if (resourceAndId.length === 2 && resourceAndId[0] === "Patient") {
+                        patientIDs.push(resourceAndId[1]);
                     }
                 } else {
                     for (var key in resource) {
@@ -1466,10 +1452,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
         $scope.validateName = function (name) {
-            if (name !== undefined && name !== "") {
-                if (name.length > 50) {
-                    return false;
-                }
+            if (name !== undefined && name !== "" && name.length > 50) {
+                return false;
             }
             return true;
         };
@@ -3264,7 +3248,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.createProgress = 100;
             $timeout(function () {
                 window.location.href = appsSettings.getSandboxUrlSettings().sandboxManagerRootUrl + "/" + sandboxId;
-                // $rootScope.$emit('signed-in', sandboxId);
             }, 500);
         });
 
@@ -3460,7 +3443,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $uibModalInstance.dismiss();
         };
     }).controller("ManageNewsController",
-    function ($rootScope, $scope, $state, tools, appsSettings, branded, docLinks) {
+    function ($rootScope, $scope, $state, tools, appsSettings, branded, docLinks, apiEndpointIndexServices, sandboxManagement) {
 
         $scope.showing.navBar = true;
         $scope.showing.footer = true;
