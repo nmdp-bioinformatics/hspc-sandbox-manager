@@ -2968,6 +2968,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             templateUrl: 'static/js/templates/patientPickerModal.html',
             controller: 'PatientPickerModalCtrl',
             size: 'md',
+            backdrop: 'static',
             resolve: {
                 getSettings: function () {
                     return {
