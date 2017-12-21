@@ -1,6 +1,6 @@
 {
   "name": "hspc-sandbox-manager",
-  "version": "2.6.7",
+  "version": "2.6.8",
   "scripts": {
     "serve": "node Server.js"
   },

@@ -23,5 +23,3 @@ node_modules/
 
 # these are build on the target environment
 src/static/js/services.js-e
-
-package-lock.json
