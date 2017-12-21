@@ -80,5 +80,10 @@ angular.module('sandManApp.filters', []).filter('formatAttribute', function ($fi
     return function (input) {
         return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
     }
+}).filter('array', function() {
+    return function(input) {
+        //console.log(input);
+        return input.join(', ');
+    };
 });
 

@@ -1,8 +1,34 @@
 'use strict';
 
 angular.module('sandManApp.controllers', []).controller('navController', [
-    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "personaServices", "$location", "$state", "branded", "$timeout", "$window", "$uibModal", "cookieService",
-    function ($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, personaServices, $location, $state, branded, $timeout, $window, $uibModal, cookieService) {
+    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "sandboxInviteServices", "personaServices", "$location", "$state", "branded", "$timeout", "$window", "$uibModal", "ngAlertsMngr", "cookieService",
+    function ($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, sandboxInviteServices, personaServices, $location, $state, branded, $timeout, $window, $uibModal, cookieService, ngAlertsMngr) {
+
+        $scope.manageSandboxInvitesNav = function () {
+
+            $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/sandboxInviteModal.html',
+                controller: 'SandboxInviteModalInstanceCtrl',
+                resolve: {
+                    getSettings: function () {
+                        return {
+                            title: "Sandbox Invites",
+                            cancel: "Cancel",
+                            type: "confirm-error",
+                            callback: function (result) { //setting callback
+                                if (result == true) {
+                                    modalProgress.dismiss();
+                                }
+                            }
+                        };
+                    }
+                }
+            });
+        };
+
+        $rootScope.records = [];
+        $rootScope.badgecount = 30;
 
         $scope.size = {
             navBarHeight: 64,
@@ -170,6 +196,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     $scope.showing.signin = false;
                     $scope.showing.signout = true;
                     getSandboxes();
+                    getSandboxInvites();
 
                     if (canceledSandboxCreate) {
                         $scope.goToDashboard();
@@ -299,7 +326,25 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         $rootScope.$on('refresh-sandboxes', function () {
             getSandboxes();
+            getSandboxInvites();
         });
+
+        $scope.showInvitationsNav = function () {
+            return branded.showEmptyInviteList || $scope.sandboxInvites.length > 0;
+        };
+
+        $rootScope.refreshSandboxInvites = function (ngAlertsMngr) {
+            getSandboxInvites(ngAlertsMngr);
+        };
+
+        function getSandboxInvites(ngAlertsMngr) {
+            sandboxInviteServices.getSandboxInvitesBySbmUserId("PENDING").then(function (results) {
+                $scope.sandboxInvites = results;
+                $rootScope.records = results;
+                $rootScope.badgecount = results.length;
+            });
+
+        }
 
         function getSandboxes() {
             sandboxManagement.getUserSandboxesByUserId().then(function (sandboxesExists) {
@@ -402,7 +447,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
     }).controller("DashboardViewController",
-    function ($scope, $rootScope, $state, userServices, sandboxManagement, sandboxInviteServices, appsSettings, branded, newsService) {
+    function ($scope, $rootScope, $state, userServices, sandboxManagement, sandboxInviteServices, appsSettings, branded, newsService, ngAlertsMngr) {
         $scope.showing.navBar = true;
         $scope.showing.footer = true;
         $scope.showing.sideNavBar = false;
@@ -444,6 +489,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         function getSandboxInvites() {
             sandboxInviteServices.getSandboxInvitesBySbmUserId("PENDING").then(function (results) {
                 $scope.sandboxInvites = results;
+                $rootScope.records = results;
+                $rootScope.badgecount = results.length;
             });
         }
 
@@ -3365,6 +3412,33 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.ok = (getSettings.ok !== undefined) ? getSettings.ok : "Yes";
         $scope.cancel = (getSettings.cancel !== undefined) ? getSettings.cancel : "No";
         $scope.text = (getSettings.text !== undefined) ? getSettings.text : "Continue?";
+        var callback = (getSettings.callback !== undefined) ? getSettings.callback : null;
+
+        $scope.confirm = function (result) {
+            $uibModalInstance.close(result);
+            callback(result);
+        };
+    }]).controller('SandboxInviteModalInstanceCtrl', ['$scope', '$rootScope', '$uibModalInstance', 'getSettings', 'sandboxInviteServices', 'ngAlertsMngr',
+    function ($scope, $rootScope, $uibModalInstance, getSettings, sandboxInviteServices, ngAlertsMngr) {
+
+        function getSandboxInvites() {
+            sandboxInviteServices.getSandboxInvitesBySbmUserId("PENDING").then(function (results) {
+                $rootScope.records = results;
+            });
+        }
+
+        $scope.updateSandboxInviteModal = function (record, status) {
+            $rootScope.badgecount = $rootScope.badgecount - 1;
+            sandboxInviteServices.updateSandboxInvite(record, status).then(function () {
+                getSandboxInvites();
+                $rootScope.records.push($rootScope.records);
+            });
+
+        };
+
+        $scope.records;
+        $scope.title = (getSettings.title !== undefined) ? getSettings.title : "";
+        $scope.cancel = (getSettings.cancel !== undefined) ? getSettings.cancel : "No";
         var callback = (getSettings.callback !== undefined) ? getSettings.callback : null;
 
         $scope.confirm = function (result) {

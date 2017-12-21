@@ -5,7 +5,8 @@
     "serve": "node Server.js"
   },
   "dependencies": {
-    "express": "^4.11.0"
+    "express": "^4.11.0",
+    "ng-alerts": "^1.0.6"
   },
   "config": {
     "port": "8080"
