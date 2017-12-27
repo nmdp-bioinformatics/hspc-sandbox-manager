@@ -29,6 +29,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         $rootScope.records = [];
         $rootScope.badgecount = 30;
+        $scope.noInvites = false;
 
         $scope.size = {
             navBarHeight: 64,
@@ -341,6 +342,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 $scope.sandboxInvites = results;
                 $rootScope.records = results;
                 $rootScope.badgecount = results.length;
+                if(results.length==0){
+                    $scope.noInvites = true;
+                }
             });
 
         }
