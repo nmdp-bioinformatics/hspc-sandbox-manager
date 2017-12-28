@@ -15,7 +15,7 @@ pipelines:
       - step:
           script:
             - DOCKER_PUSH=true
-            - echo "DOCKER_PUSH: " $DOCKER_PUSH
+            - echo "DOCKER_PUSH: $DOCKER_PUSH"
     feature/*:
       - step:
           caches:
