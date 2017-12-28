@@ -9,7 +9,6 @@
 *.ear
 
 # intellij
-*.iml
 .DS_Store
 .idea
 
@@ -23,3 +22,7 @@ node_modules/
 
 # these are build on the target environment
 src/static/js/services.js-e
+
+# these are generated
+container-definitions_prod.json
+container-definitions_test.json
