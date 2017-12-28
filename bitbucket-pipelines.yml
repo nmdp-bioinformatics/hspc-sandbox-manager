@@ -14,20 +14,14 @@ pipelines:
     develop:
       - step:
           script:
-            - export DOCKER_PUSH=true
-            - echo "DOCKER_PUSH - " $DOCKER_PUSH
-            - export PROJECT_REPO="nexus.hspconsortium.org:18083/hspc"
-            - echo "PROJECT_REPO - " $PROJECT_REPO
-            - export PROJECT_NAME=$(cat package.json | jq --raw-output '.name')
-            - echo "PROJECT_NAME - " $PROJECT_NAME
-            - export PROJECT_VERSION=$(cat package.json | jq --raw-output '.version')
-            - echo "PROJECT_VERSION - " $PROJECT_VERSION
-            - export PROJECT_PORT=$(cat package.json | jq --raw-output '.config.port')
-            - echo "PROJECT_PORT - " $PROJECT_PORT
-            - export IMAGE_NAME=$PROJECT_REPO/$PROJECT_NAME:$PROJECT_VERSION
-            - echo "IMAGE_NAME - " $IMAGE_NAME
-            - export CURRENT_ENV=local
-            - echo "CURRENT_ENV - " $CURRENT_ENV
+            - export DOCKER_PUSH=true; echo "DOCKER_PUSH - " $DOCKER_PUSH
+            - export PROJECT_REPO="nexus.hspconsortium.org:18083/hspc"; echo "PROJECT_REPO - " $PROJECT_REPO
+            - export PROJECT_NAME=$(cat package.json | jq --raw-output '.name'); echo "PROJECT_NAME - " $PROJECT_NAME
+            - export PROJECT_VERSION=$(cat package.json | jq --raw-output '.version'); echo "PROJECT_VERSION - " $PROJECT_VERSION
+            - export PROJECT_PORT=$(cat package.json | jq --raw-output '.config.port'); echo "PROJECT_PORT - " $PROJECT_PORT
+            - export IMAGE_NAME=$PROJECT_REPO/$PROJECT_NAME:$PROJECT_VERSION; echo "IMAGE_NAME - " $IMAGE_NAME
+            - export CURRENT_ENV=local; echo "CURRENT_ENV - " $CURRENT_ENV
+            - export FAMILY_NAME=$PROJECT_NAME
             - . ci-1-prepare-sources.sh
             - . ci-2-docker-image.sh
             - . ci-3-aws-update.sh
@@ -54,6 +48,17 @@ pipelines:
           caches:
             - node
           script:
+            - export DOCKER_PUSH=true; echo "DOCKER_PUSH - " $DOCKER_PUSH
+            - export PROJECT_REPO="nexus.hspconsortium.org:18083/hspc"; echo "PROJECT_REPO - " $PROJECT_REPO
+            - export PROJECT_NAME=$(cat package.json | jq --raw-output '.name'); echo "PROJECT_NAME - " $PROJECT_NAME
+            - export PROJECT_VERSION=$(cat package.json | jq --raw-output '.version'); echo "PROJECT_VERSION - " $PROJECT_VERSION
+            - export PROJECT_PORT=$(cat package.json | jq --raw-output '.config.port'); echo "PROJECT_PORT - " $PROJECT_PORT
+            - export IMAGE_NAME=$PROJECT_REPO/$PROJECT_NAME:$PROJECT_VERSION; echo "IMAGE_NAME - " $IMAGE_NAME
+            - export CURRENT_ENV=local; echo "CURRENT_ENV - " $CURRENT_ENV
+            - export FAMILY_NAME="$PROJECT_NAME-prod"
+            - . ci-1-prepare-sources.sh
+            - . ci-2-docker-image.sh
+            - . ci-3-aws-update.sh
             # install ASW CLI, jq library, node
 #            - npm install
 #            - apk --no-cache update && apk --no-cache add python py-pip py-setuptools ca-certificates curl groff less && pip --no-cache-dir install awscli && rm -rf /var/cache/apk/*
