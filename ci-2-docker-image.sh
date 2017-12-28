@@ -16,7 +16,7 @@ then
     [[ -z "$NEXUS_USR" ]] && { echo "Error: NEXUS_USR is not provided"; exit 1; }
     [[ -z "$NEXUS_PWD" ]] && { echo "Error: NEXUS_PWD is not provided"; exit 1; }
     echo "docker login..."
-    docker login -u $NEXUS_USR -p $NEXUS_PWD
+    docker login -u $NEXUS_USR -p $NEXUS_PWD nexus.hspconsortium.org:18083
 
     echo "docker push..."
     docker push $IMAGE_NAME
