@@ -20,9 +20,6 @@ overlays
 hs_err_pid*
 node_modules/
 
-# these are build on the target environment
-src/static/js/services.js-e
-
 # these are generated
 container-definitions_prod.json
 container-definitions_test.json
