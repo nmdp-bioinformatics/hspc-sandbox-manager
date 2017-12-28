@@ -8,7 +8,7 @@ echo "PROJECT_NAME: $PROJECT_NAME"
 echo "CURRENT_ENV: $CURRENT_ENV"
 
 echo "dynamically fix the JavaScript references to bypass cache on new deployments"
-cat src/index.html | sed -E -e "s/.js\?r=[0-9.]+/.js\?r=$PROJECT_VERSION/g" 2>&1 | tee src/index.html
+sed -i -e "s/.js\?r=[0-9.]+/.js\?r=$PROJECT_VERSION/g" src/index.html
 if ! [ -s src/index.html ]
 then
   echo "src/index.html is empty!"
