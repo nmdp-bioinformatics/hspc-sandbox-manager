@@ -2456,12 +2456,12 @@ angular.module('sandManApp.services', [])
             var env_properties_file = 'static/js/config/sandbox-manager.json';
 
             // the active_env is set in the pipeline. Otherwise it will run with default
-            var active_env = 'replacethiswithcurrentenvironment';
-            if( active_env == 'test'){
-                env_properties_file = 'static/js/config/sandbox-manager_test.json';
+          var active_env = 'replacethiswithcurrentenvironment';
+            if (active_env === 'test') {
+              env_properties_file = 'static/js/config/sandbox-manager_test.json';
             }
-            if( active_env == 'prod'){
-                env_properties_file = 'static/js/config/sandbox-manager_prod.json';
+            if (active_env === 'prod') {
+              env_properties_file = 'static/js/config/sandbox-manager_prod.json';
             }
 
             $http.get(env_properties_file).success(function (result) {
