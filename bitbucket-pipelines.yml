@@ -28,9 +28,9 @@ pipelines:
             - echo "IMAGE_NAME: $IMAGE_NAME"
             - export CURRENT_ENV=local
             - echo "CURRENT_ENV: $CURRENT_ENV"
-            - source ci-1-prepare-sources.sh
-            - source ci-2-docker-image.sh
-            - source ci-3-aws-update.sh
+#            - source ci-1-prepare-sources.sh
+#            - source ci-2-docker-image.sh
+#            - source ci-3-aws-update.sh
     feature/*:
       - step:
           caches:
