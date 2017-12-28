@@ -16,7 +16,8 @@ pipelines:
           caches:
             - node
           script:
-            - echo "Registered ECS Task Definition - " $TASK_VERSION
+            - export DOCKER_PUSH=true
+            - echo "DOCKER_PUSH - " $DOCKER_PUSH
     feature/*:
       - step:
           caches:
