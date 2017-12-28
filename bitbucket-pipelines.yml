@@ -13,8 +13,10 @@ pipelines:
   branches:
     develop:
       - step:
+          caches:
+            - node
           script:
-            - echo "DOCKER_PUSH: $DOCKER_PUSH"
+            - echo "Registered ECS Task Definition - " $TASK_VERSION
     feature/*:
       - step:
           caches:
