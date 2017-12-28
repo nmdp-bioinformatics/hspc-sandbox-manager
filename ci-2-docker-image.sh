@@ -13,13 +13,13 @@ docker build -t "$IMAGE_NAME" .
 
 if [ $DOCKER_PUSH = "true" ]
 then
-    [[ -z "$DOCKER_ID" ]] && { echo "Error: DOCKER_ID is not provided"; exit 1; } || echo "DOCKER_ID: $DOCKER_ID"
-    [[ -z "$DOCKER_PASSWORD" ]] && { echo "Error: DOCKER_PASSWORD is not provided"; exit 1; } || echo "DOCKER_PASSWORD: $DOCKER_PASSWORD"
+    [[ -z "$NEXUS_USR" ]] && { echo "Error: NEXUS_USR is not provided"; exit 1; }
+    [[ -z "$NEXUS_PWD" ]] && { echo "Error: NEXUS_PWD is not provided"; exit 1; }
     echo "docker login..."
-    docker login -u $DOCKER_ID -p $DOCKER_PASSWORD
+    docker login -u $NEXUS_USR -p $NEXUS_PWD
 
     echo "docker push..."
-    docker push "$IMAGE_NAME"
+    docker push $IMAGE_NAME
 else
     echo "docker push skipped"
 fi
