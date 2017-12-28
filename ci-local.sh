@@ -5,7 +5,7 @@ echo "testing ci scripts..."
 echo "capture build definitions..."
 
 # push the build image
-export DOCKER_PUSH=true
+export DOCKER_PUSH=false
 echo "DOCKER_PUSH: $DOCKER_PUSH"
 
 export PROJECT_REPO="nexus.hspconsortium.org:18083/hspc"
