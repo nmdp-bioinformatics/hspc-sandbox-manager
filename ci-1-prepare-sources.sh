@@ -13,7 +13,8 @@ if ! [ -s src/index.html ]
 then
   echo "src/index.html is empty!"
   exit 1
-end
+else
+  cat src/index.html
 fi
 
 echo "dynamically fix the container-definitions_prod.json"
@@ -23,7 +24,6 @@ if ! [ -s container-definitions_prod.json ]
 then
   echo "container-definitions_prod.json is empty!"
   exit 1
-end
 fi
 
 echo "dynamically fix the container-definitions_test.json"
@@ -33,7 +33,6 @@ if ! [ -s container-definitions_test.json ]
 then
   echo "container-definitions_test.json is empty!"
   exit 1
-end
 fi
 
 echo "dynamically configuring the services.js"
