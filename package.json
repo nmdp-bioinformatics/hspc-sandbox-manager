@@ -1,18 +1,18 @@
 {
   "name": "hspc-sandbox-manager",
-  "version": "2.6.8",
+  "version": "2.6.9-SNAPSHOT",
   "license": "Apache-2.0",
-  "repository": "https://bitbucket.org/hspconsortium/sandbox-manager",
-
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/hspconsortium/sandbox-manager.git"
+  },
   "scripts": {
     "serve": "node Server.js"
   },
-
   "dependencies": {
     "express": "^4.16.2",
     "ng-alerts": "^1.0.6"
   },
-
   "config": {
     "port": "8080"
   }
