@@ -2292,7 +2292,6 @@ angular.module('sandManApp.services', [])
             if (active_env === 'prod') {
                 sample_properties_file = 'static/js/config/sample-apps_prod.json';
             }
-            console.log("You are using the sample-apps file: " + sample_properties_file);
             $http.get(sample_properties_file).success(function (result) {
                 sampleApps = result;
                 deferred.resolve(sampleApps);
