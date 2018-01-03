@@ -32,6 +32,7 @@
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="static/css/app.css">
+    <link rel="stylesheet" href="static/libs/ng-alerts/ng-alerts.min.css">
     <style>
     </style>
 
@@ -65,9 +66,9 @@
 <!-- NAVIGATION -->
 <nav class="navbar" role="navigation" ng-show="showing.navBar">
     <div class="navbar-img" style="cursor: pointer" ng-click="goToDashboard()" ng-cloak><img ng-style="imgStyle()" ng-src="{{whiteImage}}" ng-srcset="{{whiteImage2x}}" ng-cloak /><div ng-style="imgTextStyle()" ng-cloak> {{sandboxText}}</div></div>
-    <div class="navbar-admin-dashboard" ng-show="showing.signout && isSystemAdmin() && !showing.sideNavBar" ui-sref="admin-dashboard" ng-cloak><a tabindex="2" style="cursor: pointer" href="#">Admin Dashboard<i class="fa fa-tachometer fa-lg"></i></a></div>
 
     <div class="navbar-title" ng-cloak>{{title.blueBarTitle}}</div>
+
     <div class="navbar-stack-box">
         <div class="navbar-stack-name" ng-show="showing.signout" ng-cloak>
             <a id="welcome" tabindex="2" href="#" uib-popover-template="'static/js/templates/settingsPopover.html'" popover-trigger="'focus'" popover-placement="bottom" ><span style="font-weight: 500;">{{oauthUser.name.toUpperCase()}}</span></a>
@@ -76,10 +77,17 @@
             <a id="signin" ng-click="signin()"><i class="fa fa-sign-in"></i> Sign In</a>
         </div>
         <div class="navbar-stack-apps" ng-show="showing.apps && showing.moreLinks"><a tabindex="0" href="#" uib-popover-template="'static/js/templates/navPopover.html'" popover-trigger="'focus'" popover-placement="bottom"><i class="fa fa-th fa-lg"></i></a></div>
+        <div style="float: right; padding-right: 15px;">
+            <a href="#" ng-show="showing.signout && !showing.sideNavBar" ng-click="manageSandboxInvitesNav()" onclick="this.blur()" style="color: white; max-width: 100%">
+                <span class="badge badge-light" ng-hide="noInvites">{{badgecount}}</span> Invites
+            </a>
+        </div>
+        <div class="navbar-admin-dashboard" ng-show="showing.signout && isSystemAdmin() && !showing.sideNavBar" ui-sref="admin-dashboard" ng-cloak><a tabindex="2" style="cursor: pointer" href="#"><i class="fa fa-tachometer fa-lg"></i></a></div>
     </div>
-    <div class="navbar-sandboxes" ng-show="showing.signout && dashboard.sandboxes.length > 0" ng-cloak><a tabindex="1" style="cursor: pointer"  href="#" uib-popover-template="'static/js/templates/sandboxPopover.html'" popover-trigger="'focus'" popover-placement="bottom">Sandboxes <i class="fa fa-sort-desc fa-lg"></i></a></div>
 
+    <div class="navbar-sandboxes" ng-show="showing.signout && showing.sideNavBar && dashboard.sandboxes.length > 0" ng-cloak><a tabindex="1" style="cursor: pointer"  href="#" uib-popover-template="'static/js/templates/sandboxPopover.html'" popover-trigger="'focus'" popover-placement="bottom">Sandboxes <i class="fa fa-sort-desc fa-lg"></i></a></div>
 </nav>
+
 <!--<div class="blue-bar" ng-show="showing.progress">-->
     <!--<div class="blue-bar-title" ng-show="!showing.progress" ng-cloak>{{title.blueBarTitle}}</div>-->
     <!--<div class="blue-bar-img" ng-show="showing.progress && whiteImage !== ''" ng-cloak><img ng-src="{{whiteImage}}" ng-srcset="{{whiteImage2x}}"/></div>-->
@@ -101,7 +109,7 @@
     <div notification ng-repeat="message in messages"></div>
 </div>
 
-<footer ng-show="showing.footer" ng-cloak>
+<footer ng-show="showing.footer" ng-cloak class="navbar-fixed-bottom">
     <div class="container">
         <div class="copyright" ng-cloak resize ng-style="{textAlign: scrollWidth(750) ? 'left' : 'center', marginLeft: showCert ? '100px' : '0px'}">
             {{copyright}}<div ng-show="showTermsLink" style="display: inline"> • <a ng-click="showTerms()">Terms of Use & Privacy Statement</a></div>
@@ -119,6 +127,7 @@
 <script src="static/libs/angularjs/angular-cookies.js"></script>
 <script src="static/libs/moment/moment.min.js"></script>
 <script src="static/libs/bootstrap/2.5/ui-bootstrap-tpls-2.5.0.min.js"></script>
+<script src="static/libs/ng-alerts/ng-alerts.min.js"></script>
 <script src="static/css/bootstrap/bootstrap-filestyle.min.js"></script>
 
 <script src="static/fhir-client/underscore-min.js"></script>
@@ -126,12 +135,12 @@
 <script src="static/highcharts/highcharts.js"></script>
 <script src="static/highcharts/highcharts-more.js"></script>
 <script src="static/highcharts/highcharts-ng.min.js"></script>
-<script src="static/js/app.js?r=2.6.0"></script>
-<script src="static/js/controllers.js?r=2.6.0"></script>
-<script src="static/js/services.js?r=2.6.0"></script>
-<script src="static/js/filters.js?r=2.6.0"></script>
-<script src="static/js/directives.js?r=2.6.0"></script>
-<script src="static/js/branding/branded_text.js?r=2.6.0"></script>
+<script src="static/js/app.js?r=2.6.8"></script>
+<script src="static/js/controllers.js?r=2.6.8"></script>
+<script src="static/js/services.js?r=2.6.8"></script>
+<script src="static/js/filters.js?r=2.6.8"></script>
+<script src="static/js/directives.js?r=2.6.8"></script>
+<script src="static/js/branding/branded_text.js?r=2.6.8"></script>
 
 </body>
 </html>

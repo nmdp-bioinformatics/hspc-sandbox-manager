@@ -9,7 +9,6 @@
 *.ear
 
 # intellij
-*.iml
 .DS_Store
 .idea
 
@@ -21,7 +20,8 @@ overlays
 hs_err_pid*
 node_modules/
 
-# these are build on the target environment
+# these are generated
+container-definitions_prod.json
+container-definitions_test.json
+src/index.html-e
 src/static/js/services.js-e
-
-package-lock.json

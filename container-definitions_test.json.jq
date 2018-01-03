@@ -1,16 +1,16 @@
 [
   {
-    "name": "hspc-sandbox-manager",
-    "image": "hspconsortium/hspc-sandbox-manager:2.5.8",
+    "name": "",
+    "image": "",
     "cpu": 0,
     "portMappings": [
       {
-        "containerPort": 8080,
+        "containerPort": 0,
         "hostPort": 0,
         "protocol": "tcp"
       }
     ],
-    "memory": 500,
+    "memoryReservation": 100,
     "essential": true,
     "environment": [
       {

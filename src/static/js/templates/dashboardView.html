@@ -1,12 +1,10 @@
 <div class="container-fluid" ng-controller="DashboardViewController">
-    <div class="row" ng-show="!showing.start">
-        <div class="content-column">
+    <div ng-show="!showing.start">
             <!--<div class="slim-page-header">Dashboard</div>-->
-            <div class="horizontal-scroll dashboard-container" resize ng-style="scrollHeight(size.screenH) ? '' : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+10)">
-                <div class="col-lg-12">
-                    <div class="sub-header">My Sandboxes</div>
+            <div class="col-md-6" style="padding-top: 20px">
+                <div class="sub-header">My Sandboxes</div>
                     <div class="box">
-                        <div class="scrollableContainer" resize ng-style="showInvitations() ? redrawTable(225, 560) : redrawTable(525, 560)">
+                        <div class="scrollableContainer">
                             <div class="headerSpacer"></div>
                             <div class="scrollArea">
                                 <table class="dashboard-table table table-striped">
@@ -26,68 +24,70 @@
                             </div>
                         </div>
                     </div>
-                    <div ng-show="canCreateSandbox()" style="float: right"><button ng-click="createSandbox()" class="btn btn-basic">Create Sandbox</button></div>
-                    <div ng-show="showInvitations()">
-                        <div class="sub-header" style="margin-top: 30px">Sandbox Invitations</div>
-                        <div class="box">
-                            <div class="scrollableContainer" resize ng-style="redrawTable(225, 560)">
-                                <div class="headerSpacer"></div>
-                                <div class="scrollArea">
-                                    <table class="invite-table table table-striped">
-                                        <thead class="fixedHeader">
-                                        <tr>
-                                            <th><div class="th-inner" table-header-inner>Invited By</div></th>
-                                            <th><div class="th-inner" table-header-inner>Sandbox Name</div></th>
-                                            <th><div class="th-inner" style="width: 150px" resize table-fixed-width-column></div></th>
-                                        </tr>
-                                        </thead>
-                                        <tbody class="scrollContent">
-                                        <tr ng-repeat="sandboxInvite in sandboxInvites">
-                                            <td style="width:33.33%">{{sandboxInvite.invitedBy.name}}</td>
-                                            <td style="width:33.33%">{{sandboxInvite.sandbox.name}}</td>
-                                            <td style="width:33.33%">
-                                                <button ng-click="updateSandboxInvite(sandboxInvite, 'REJECTED')" class="btn btn-cancel" style="float: right"><i class="fa fa-remove"></i> Reject</button>
-                                                <button ng-click="updateSandboxInvite(sandboxInvite, 'ACCEPTED')" class="btn btn-accept" style="float: right"><i class="fa fa-check"></i> Accept</button>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!--<div ng-show="showNews()">-->
-                        <!--<div class="sub-header" style="margin-top: 30px">News and Tips</div>-->
-                        <!--<div class="box">-->
-                            <!--<div class="scrollableContainer" >-->
-                                <!--<div class="headerSpacer"></div>-->
-                                <!--<div class="scrollArea">-->
-                                    <!--<table class="invite-table table table-striped">-->
-                                        <!--<thead class="fixedHeader">-->
-                                        <!--<tr>-->
-                                            <!--<th><div class="th-inner" table-header-inner>Title</div></th>-->
-                                            <!--<th><div class="th-inner" table-header-inner>Description</div></th>-->
-                                            <!--<th><div class="th-inner" style="width: 150px" resize table-fixed-width-column></div></th>-->
-                                        <!--</tr>-->
-                                        <!--</thead>-->
-                                        <!--<tbody class="scrollContent">-->
-                                        <!--<tr ng-repeat="x in newsItems" style="cursor: pointer;">-->
-                                            <!--<td>{{x.title}}</td>-->
-                                            <!--<td>{{x.description}}</td>-->
-                                            <!--<td style="width:33.33%">-->
-                                                <!--<a href={{x.link}}>-->
-                                                <!--<button class="btn btn-accept" style="float: right"> Open </button>-->
-                                                <!--</a>-->
-                                            <!--</td>-->
-                                        <!--</tr>-->
-                                        <!--</tbody>-->
-                                    <!--</table>-->
-                                <!--</div>-->
+                <div ng-show="canCreateSandbox()" style="float: right"><button ng-click="createSandbox()" class="btn btn-basic">Create Sandbox</button></div>
+            </div>
+            <!--<div class="col-lg-6">-->
+                <!--<div ng-show="showInvitations()">-->
+                    <!--<div class="sub-header" style="margin-top: 30px">Sandbox Invitations</div>-->
+                    <!--<div class="box">-->
+                        <!--<div class="scrollableContainer">-->
+                            <!--<div class="headerSpacer"></div>-->
+                            <!--<div class="scrollArea">-->
+                                <!--<table class="invite-table table table-striped">-->
+                                    <!--<thead class="fixedHeader">-->
+                                    <!--<tr>-->
+                                        <!--<th><div class="th-inner" table-header-inner>Invited By</div></th>-->
+                                        <!--<th><div class="th-inner" table-header-inner>Sandbox Name</div></th>-->
+                                        <!--<th><div class="th-inner" style="width: 150px" resize table-fixed-width-column></div></th>-->
+                                    <!--</tr>-->
+                                    <!--</thead>-->
+                                    <!--<tbody class="scrollContent">-->
+                                    <!--<tr ng-repeat="sandboxInvite in sandboxInvites">-->
+                                        <!--<td style="width:33.33%">{{sandboxInvite.invitedBy.name}}</td>-->
+                                        <!--<td style="width:33.33%">{{sandboxInvite.sandbox.name}}</td>-->
+                                        <!--<td style="width:33.33%">-->
+                                            <!--<button ng-click="updateSandboxInvite(sandboxInvite, 'REJECTED')" class="btn btn-cancel" style="float: right"><i class="fa fa-remove"></i> Reject</button>-->
+                                            <!--<button ng-click="updateSandboxInvite(sandboxInvite, 'ACCEPTED')" class="btn btn-accept" style="float: right"><i class="fa fa-check"></i> Accept</button>-->
+                                        <!--</td>-->
+                                    <!--</tr>-->
+                                    <!--</tbody>-->
+                                <!--</table>-->
                             <!--</div>-->
                         <!--</div>-->
                     <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <div class="col-md-6">
+                <div ng-show="showNews()">
+                    <div class="sub-header" style="margin-top: 30px">News and Tips</div>
+                        <div class="box">
+                            <div class="scrollableContainer" >
+                                <div class="headerSpacer"></div>
+                                    <div class="scrollArea">
+                                        <table class="invite-table table table-striped">
+                                            <thead class="fixedHeader">
+                                        <tr>
+                                        <th><div class="th-inner" table-header-inner>Title</div></th>
+                                        <th><div class="th-inner" table-header-inner>Description</div></th>
+                                        <th><div class="th-inner" style="width: 150px" resize table-fixed-width-column></div></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="scrollContent">
+                                                <tr ng-repeat="x in newsItems" style="cursor: pointer;">
+                                                <td>{{x.title}}</td>
+                                                <td>{{x.description}}</td>
+                                                <td style="width:33.33%">
+                                                    <a href={{x.link}}>
+                                                    <button class="btn btn-accept" style="float: right"> Open </button>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
     </div>
 </div>

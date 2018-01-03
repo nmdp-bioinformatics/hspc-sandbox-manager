@@ -2284,7 +2284,15 @@ angular.module('sandManApp.services', [])
         },
         loadSettings: function () {
             var deferred = $.Deferred();
-            $http.get('static/js/config/sample-apps.json').success(function (result) {
+            var sample_properties_file = 'static/js/config/sample-apps.json';
+            var active_env = 'replacethiswithcurrentenvironment';
+            if (active_env === 'test') {
+                sample_properties_file = 'static/js/config/sample-apps_test.json';
+            }
+            if (active_env === 'prod') {
+                sample_properties_file = 'static/js/config/sample-apps_prod.json';
+            }
+            $http.get(sample_properties_file).success(function (result) {
                 sampleApps = result;
                 deferred.resolve(sampleApps);
             });
@@ -2457,11 +2465,11 @@ angular.module('sandManApp.services', [])
 
             // the active_env is set in the pipeline. Otherwise it will run with default
             var active_env = 'replacethiswithcurrentenvironment';
-            if( active_env == 'test'){
-                env_properties_file = 'static/js/config/sandbox-manager_test.json';
+            if (active_env === 'test') {
+              env_properties_file = 'static/js/config/sandbox-manager_test.json';
             }
-            if( active_env == 'prod'){
-                env_properties_file = 'static/js/config/sandbox-manager_prod.json';
+            if (active_env === 'prod') {
+              env_properties_file = 'static/js/config/sandbox-manager_prod.json';
             }
 
             $http.get(env_properties_file).success(function (result) {

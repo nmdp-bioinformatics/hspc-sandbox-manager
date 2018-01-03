@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootstrap', 'highcharts-ng', 'sandManApp.filters', 'sandManApp.services',
+angular.module('sandManApp', ['ui.router', 'ngSanitize', 'ngAnimate', 'ui.bootstrap', 'highcharts-ng', 'sandManApp.filters', 'sandManApp.services', 'ngAlerts',
         'sandManApp.controllers', 'sandManApp.directives', "sandManApp.branding", "ngCookies"],
     function ($stateProvider, $urlRouterProvider, $locationProvider) {
 

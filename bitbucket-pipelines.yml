@@ -13,25 +13,18 @@ pipelines:
   branches:
     develop:
       - step:
-          caches:
-            - node
           script:
-            # install ASW CLI, jq library, node
-#            - npm install
-#            - apk --no-cache update && apk --no-cache add python py-pip py-setuptools ca-certificates curl groff less && pip --no-cache-dir install awscli && rm -rf /var/cache/apk/*
-#            - curl -o /usr/local/bin/jq -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && chmod +x /usr/local/bin/jq
-            # set active_env with current environment
-            - sed -i -e 's/replacethiswithcurrentenvironment/test/g' ./src/static/js/services.js
-            # build docker image and push to nexus.interopion.com:18083 (docker-interopion)
-            - export IMAGE_NAME=$(cat container-definitions_test.json | jq --raw-output '.[0].image')
-            - docker login -u $NEXUS_USR -p $NEXUS_PWD nexus.hspconsortium.org:18083
-            - docker build -t $IMAGE_NAME .
-            - docker push $IMAGE_NAME
-            # register the ECS task definition and capture the version
-            - export TASK_VERSION=$(aws ecs register-task-definition --family hspc-sandbox-manager --container-definitions $(cat container-definitions_test.json | jq -c '.')  | jq --raw-output '.taskDefinition.revision')
-            - echo "Registered ECS Task Definition - " $TASK_VERSION
-            # update the service to use the latest task definition
-            - aws ecs update-service --cluster $TARGET_AWS_CLUSTER --service $TARGET_AWS_SERVICE --task-definition hspc-sandbox-manager:$TASK_VERSION
+            - export DOCKER_PUSH=true; echo "DOCKER_PUSH - " $DOCKER_PUSH
+            - export PROJECT_REPO="nexus.hspconsortium.org:18083/hspc"; echo "PROJECT_REPO - " $PROJECT_REPO
+            - export PROJECT_NAME=$(cat package.json | jq --raw-output '.name'); echo "PROJECT_NAME - " $PROJECT_NAME
+            - export PROJECT_VERSION=$(cat package.json | jq --raw-output '.version'); echo "PROJECT_VERSION - " $PROJECT_VERSION
+            - export PROJECT_PORT=$(cat package.json | jq --raw-output '.config.port'); echo "PROJECT_PORT - " $PROJECT_PORT
+            - export IMAGE_NAME=$PROJECT_REPO/$PROJECT_NAME:$PROJECT_VERSION; echo "IMAGE_NAME - " $IMAGE_NAME
+            - export CURRENT_ENV=test; echo "CURRENT_ENV - " $CURRENT_ENV
+            - export FAMILY_NAME=$PROJECT_NAME
+            - . ci-1-prepare-sources.sh
+            - . ci-2-docker-image.sh
+            - . ci-3-aws-update.sh
     feature/*:
       - step:
           caches:
@@ -55,19 +48,16 @@ pipelines:
           caches:
             - node
           script:
-            # install ASW CLI, jq library, node
-#            - npm install
-#            - apk --no-cache update && apk --no-cache add python py-pip py-setuptools ca-certificates curl groff less && pip --no-cache-dir install awscli && rm -rf /var/cache/apk/*
-#            - curl -o /usr/local/bin/jq -L https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 && chmod +x /usr/local/bin/jq
-            # set active_env with current environment
-            - sed -i -e 's/replacethiswithcurrentenvironment/prod/g' ./src/static/js/services.js
-            # build docker image and push to nexus.interopion.com:18083 (docker-interopion)
-            - export IMAGE_NAME=$(cat container-definitions_prod.json | jq --raw-output '.[0].image')
-            - docker login -u $NEXUS_USR -p $NEXUS_PWD nexus.hspconsortium.org:18083
-            - docker build -t $IMAGE_NAME .
-            - docker push $IMAGE_NAME
-            # register the ECS task definition and capture the version
-            - export TASK_VERSION=$(aws ecs register-task-definition --family hspc-sandbox-manager-prod --container-definitions $(cat container-definitions_prod.json | jq -c '.')  | jq --raw-output '.taskDefinition.revision')
-            - echo "Registered ECS Task Definition - " $TASK_VERSION
+            - export DOCKER_PUSH=true; echo "DOCKER_PUSH - " $DOCKER_PUSH
+            - export PROJECT_REPO="nexus.hspconsortium.org:18083/hspc"; echo "PROJECT_REPO - " $PROJECT_REPO
+            - export PROJECT_NAME=$(cat package.json | jq --raw-output '.name'); echo "PROJECT_NAME - " $PROJECT_NAME
+            - export PROJECT_VERSION=$(cat package.json | jq --raw-output '.version'); echo "PROJECT_VERSION - " $PROJECT_VERSION
+            - export PROJECT_PORT=$(cat package.json | jq --raw-output '.config.port'); echo "PROJECT_PORT - " $PROJECT_PORT
+            - export IMAGE_NAME=$PROJECT_REPO/$PROJECT_NAME:$PROJECT_VERSION; echo "IMAGE_NAME - " $IMAGE_NAME
+            - export CURRENT_ENV=prod; echo "CURRENT_ENV - " $CURRENT_ENV
+            - export FAMILY_NAME="$PROJECT_NAME-prod"
+            - . ci-1-prepare-sources.sh
+            - . ci-2-docker-image.sh
+            - . ci-3-aws-update.sh
 options:
   docker: true

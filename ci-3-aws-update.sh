@@ -4,7 +4,8 @@ set -e
 
 echo "starting ci-3-aws-update.sh..."
 
-export TASK_VERSION=$(aws ecs register-task-definition --family $1 --container-definitions $(cat container-definitions_test.json | jq -c '.')  | jq --raw-output '.taskDefinition.revision')
+echo "FAMILY_NAME: $FAMILY_NAME"
+export TASK_VERSION=$(aws ecs register-task-definition --family $FAMILY_NAME --container-definitions $(cat container-definitions_test.json | jq -c '.')  | jq --raw-output '.taskDefinition.revision')
 echo "TASK_VERSION: $TASK_VERSION"
 
 echo "BITBUCKET_BRANCH: $BITBUCKET_BRANCH"
@@ -14,7 +15,7 @@ then
     [[ -z "$TARGET_AWS_SERVICE" ]] && { echo "Error: TARGET_AWS_SERVICE is not provided"; exit 1; } || echo "TARGET_AWS_SERVICE: $TARGET_AWS_SERVICE"
 
     echo "updating aws esc service..."
-    aws ecs update-service --cluster $TARGET_AWS_CLUSTER --service $TARGET_AWS_SERVICE --task-definition $1:$TASK_VERSION
+    aws ecs update-service --cluster $TARGET_AWS_CLUSTER --service $TARGET_AWS_SERVICE --task-definition $FAMILY_NAME:$TASK_VERSION
 else
     echo "skipping deployment"
 fi
