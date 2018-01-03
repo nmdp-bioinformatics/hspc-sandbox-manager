@@ -2,7 +2,7 @@
 
 angular.module('sandManApp.controllers', []).controller('navController', [
     "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "sandboxInviteServices", "personaServices", "$location", "$state", "branded", "$timeout", "$window", "$uibModal", "ngAlertsMngr", "cookieService",
-    function ($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, sandboxInviteServices, personaServices, $location, $state, branded, $timeout, $window, $uibModal, cookieService, ngAlertsMngr) {
+    function ($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, sandboxInviteServices, personaServices, $location, $state, branded, $timeout, $window, $uibModal, ngAlertsMngr, cookieService) {
 
         $scope.manageSandboxInvitesNav = function () {
 
