@@ -1418,7 +1418,7 @@ a.selected {
     display: block;
     padding: 10px 15px;
     font-weight: bold;
-    color: #58585A;
+    color: #666666;
 }
 
 .btn {
@@ -1700,8 +1700,11 @@ fieldset[disabled] .btn-cancel.active {
 .thumb-holder {
     /*height: 240px;   !* 30px to contain the button below the image *!*/
     /*width: 210px;    !* 10px are used for border and padding leaving 200px for the thumbnail *!*/
-    height: 215px;   /* 30px to contain the button below the image */
+    height: 190px;   /* 30px to contain the button below the image */
     width: 220px;    /* 10px are used for border and padding leaving 200px for the thumbnail */
+    /*border: 1px solid #ddd;*/
+    background-color: #fafafa;
+    /*background-color: #f2f2f2;*/
     border-radius: 4px;
     padding: 4px;
     text-align: center;
@@ -1709,54 +1712,34 @@ fieldset[disabled] .btn-cancel.active {
 }
 
 .thumb-holder.selected {
-    background-color: #FAFAFA;
+    background-color: #fafafa;
+    /*border: 2px solid #f4f4f4;*/
     border-radius: 6px;
+    /*background-color: #cccccc;*/
+    /*background-color: #e6e6e6;*/
+}
+
+
+.thumb-holder .thumbnail {
+    background-color: #fafafa;
+    /*background-color: #f2f2f2;*/
 }
 
 .thumb-holder.selected .thumbnail {
-    background-color: #FAFAFA;
-}
-
-.thumb-holder .custom-app {
-    background-color: #FAFAFA;
-}
-
-.thumb-holder .thumbnail .custom-app {
-    background-color: #FAFAFA;
+    background-color: #fafafa;
+    /*background-color: #cccccc;*/
+    /*background-color: #e6e6e6;*/
 }
 
 .thumb-holder a {
     font-weight: 300;
-    font-size: 18px;
+    font-size: 20px;
     position: absolute;
-    bottom: 45px;
+    bottom: 15px;
     left: 20px;
     text-align: center;
     width: 210px;
-    overflow: hidden;
-    color: #58585A;
-    text-decoration: none;
-}
-
-.thumb-holder a:hover {
-    color: #005778;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-
-.thumb-holder .btn-holder  {
-    position: absolute;
-    bottom: 15px;
-    /*right: 20px;*/
-    text-align: center;
-    width: 210px;
-}
-
-.thumb-holder .btn  {
-    font-weight: 300;
-    padding: 2px 5px;
-    font-size: 12px;
+    text-decoration: underline;
 }
 
 .thumb-holder .thumbnail {
@@ -1779,11 +1762,27 @@ fieldset[disabled] .btn-cancel.active {
     max-height: 150px;
 }
 
-.thumb-holder button {
+.thumb-holder .caption {
     position: absolute;
-    bottom: 15px;
-    /*width: 200px;   !* 200px button width matches thumbnail width *!*/
-    width: 210px;   /* 200px button width matches thumbnail width */
+    bottom: 18px;
+    left: 27px;
+    color: #333;
+}
+
+.thumb-holder .caption button {
+    position: absolute;
+    left: 20px;
+    width: 170px;
+}
+
+.thumb-holder .caption button {
+    position: absolute;
+    left: 22px;
+    width: 160px;
+}
+
+.thumbnail input {
+    width: 205px;
 }
 
 .title-box .thumbnail {

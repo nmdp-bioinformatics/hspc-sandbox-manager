@@ -1,7 +1,6 @@
 <div class="container-fluid" ng-controller="AppsController">
     <div class="row">
-        <div class="content-column"
-             ng-class="showing.appDetail ? 'col-lg-8 right-border' : 'col-lg-12'">
+        <div class="content-column col-lg-12">
             <div style="margin-bottom: 10px">
                 <div class="slim-page-header">Registered Sandbox Apps
                     <a href={{docLink('registerAnApp')}} target="_blank"><i class="fa fa-question-circle-o"></i></a>
@@ -11,7 +10,7 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <div ng-class="showing.appDetail ? 'app-gallery-container-slim' : 'app-gallery-container'" resize
+                    <div class="app-gallery-container"
                          ng-style="scrollScreen(size.screenH, size.screenW) ? '' : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+120)">
                         <br style="clear: both;" />
                         <div  class="row-fluid">
