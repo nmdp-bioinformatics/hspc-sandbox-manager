@@ -74,10 +74,10 @@
                                         </thead>
                                         <tbody class="scrollContent">
                                                 <tr ng-repeat="x in newsItems" style="cursor: pointer;">
-                                                <td>{{x.title}}</td>
-                                                <td>{{x.description}}</td>
+                                                <td style="width: 35%;">{{x.title}}</td>
+                                                <td style="width: 90%;">{{x.description}}</td>
                                                 <td style="width:33.33%">
-                                                    <a href={{x.link}}>
+                                                    <a target="_blank" href={{x.link}}>
                                                     <button class="btn btn-accept" style="float: right"> Open </button>
                                                     </a>
                                                 </td>
