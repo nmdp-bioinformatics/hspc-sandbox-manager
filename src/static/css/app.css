@@ -2844,3 +2844,26 @@ a[ng-click]{
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
 	display: none !important;
 }
+
+.appsDetailModal {
+    border: 1px black;
+    width: 900px;
+}
+
+.appsDetailModalHeader {
+    padding: 15px;
+    background-color: #005778;
+    color: white;
+    font-weight: 600;
+}
+
+.appsDetailModalBody.container {
+    width: 900px;
+    background-color: white;
+    font-weight: 400;
+    color: black;
+}
+
+.appsDetailModalBody.container .content-column {
+    padding: 15px;    
+}

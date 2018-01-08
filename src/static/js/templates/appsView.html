@@ -9,7 +9,7 @@
                             <img ng-show="!app.logoUri" src="static/images/HSPCSandboxNoIconApp-512.png">
                         </div>
                         <div class="caption">
-                            <input type="image" src="static/images/circle_info-128.png" ng-click="info(app)" class="image-btn"/>
+                            <input type="image" src="static/images/circle_info-128.png" ng-click="appDetail(app)" class="image-btn"/>
                             <button ng-click="quickLaunch(app)" class="btn btn-basic btn-block">{{app.authClient.clientName}}</button>
                         </div>
                     </div>
@@ -22,7 +22,7 @@
                             <input type="text" ng-model="customapp.url" placeholder="Launch URL" required />
                         </div>
                         <div class="caption">
-                            <input type="image" src="static/images/circle_info-128.png" ng-click="info(app)" class="image-btn"/>
+                            <input type="image" src="static/images/circle_info-128.png" ng-click="appDetail(app)" class="image-btn"/>
                             <button ng-click="launchCustom()" class="btn btn-basic btn-block">Custom App</button>
                         </div>
                     </div>
