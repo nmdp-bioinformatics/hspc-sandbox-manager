@@ -38,7 +38,8 @@ if (code === null) {
                 .done(function (patientResult) {
                     $('#patient-details').show();
                     document.getElementById("patient-name").innerHTML = patientResult.name;
-                    document.getElementById("patient-mrn").innerHTML = patientResult.details.identifier.value;
+                    var moreDetails = patientResult.details.identifier[0];
+                    document.getElementById("patient-mrn").innerHTML = moreDetails.value;
                     document.getElementById("patient-gender").innerHTML = patientResult.details.gender;
 
                     // Check for the patient-birthTime Extension
