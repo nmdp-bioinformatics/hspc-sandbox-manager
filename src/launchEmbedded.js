@@ -38,6 +38,8 @@ if (code === null) {
                 .done(function (patientResult) {
                     $('#patient-details').show();
                     document.getElementById("patient-name").innerHTML = patientResult.name;
+                    var moreDetails = patientResult.details.identifier[0];
+                    document.getElementById("patient-mrn").innerHTML = moreDetails.value;
                     document.getElementById("patient-gender").innerHTML = patientResult.details.gender;
 
                     // Check for the patient-birthTime Extension
@@ -89,7 +91,7 @@ function onStorage() {
 
     var thisUri = window.location.origin + window.location.pathname;
     var thisUrl = thisUri.replace(/\/+$/, "/");
-
+    console.log("thisurl: " + thisUrl);
     var client = {
         "client_id": "sand_man",
         "redirect_uri": thisUrl,
