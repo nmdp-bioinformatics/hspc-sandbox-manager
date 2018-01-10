@@ -38,8 +38,8 @@ if (code === null) {
                 .done(function (patientResult) {
                     $('#patient-details').show();
                     document.getElementById("patient-name").innerHTML = patientResult.name;
-                    var moreDetails = patientResult.details.identifier[0];
                     try {
+                        var moreDetails = patientResult.details.identifier[0];
                         document.getElementById("patient-mrn").innerHTML = moreDetails.value;                    }
                     catch(err) {
                         console.log("This patient does not have an mrn");
