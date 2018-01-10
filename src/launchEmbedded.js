@@ -39,7 +39,12 @@ if (code === null) {
                     $('#patient-details').show();
                     document.getElementById("patient-name").innerHTML = patientResult.name;
                     var moreDetails = patientResult.details.identifier[0];
-                    document.getElementById("patient-mrn").innerHTML = moreDetails.value;
+                    try {
+                        document.getElementById("patient-mrn").innerHTML = moreDetails.value;                    }
+                    catch(err) {
+                        console.log("This patient does not have an mrn");
+                    }
+
                     document.getElementById("patient-gender").innerHTML = patientResult.details.gender;
 
                     // Check for the patient-birthTime Extension
