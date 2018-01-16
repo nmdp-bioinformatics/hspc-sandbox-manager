@@ -10,8 +10,7 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <div class="app-gallery-container">
-                        <br style="clear: both;" />
+                    <div class="app-gallery-container" resize ng-style="resizeWithOffset(220)">
                         <div  class="row-fluid">
                             <div ng-include="'static/js/templates/appsView.html'"></div>
                         </div>
@@ -19,13 +18,6 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="col-lg-4 content-column left-border" ng-show="showing.appDetail">
-            <div class="details-header" resize ng-class="scrollWidth(size.screenW) ? 'details-vertical-scroll' : ''">
-                <div class="slim-page-header">Registered App Details</div>
-            </div>
-
-            <div ng-include="'static/js/templates/appsDetail.html'"></div>
-        </div> -->
     </div>
 </div>
 
