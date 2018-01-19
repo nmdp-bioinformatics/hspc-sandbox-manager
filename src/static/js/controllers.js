@@ -2540,8 +2540,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
         };
-    }]).controller('AppDetailInstanceCtrl', ['$scope', '$uibModalInstance', 'getApp',
-    function ($scope, $uibModalInstance, getApp) {
+    }]).controller('AppDetailInstanceCtrl', ['$scope', '$rootScope', '$uibModalInstance', 'getApp', 'appRegistrationServices',
+    function ($scope, $rootScope, $uibModalInstance, getApp, appRegistrationServices) {
         $scope.app = getApp.app;
         $scope.selected = {};
         $scope.showing = {};
@@ -2567,7 +2567,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri + "?" + new Date().getTime();
         } else {
             if ($scope.app.id) {
-                appRegistrationServices.getSandboxApp(app.id).then(function (resultApp) {
+                appRegistrationServices.getSandboxApp($scope.app.id).then(function (resultApp) {
                     $scope.galleryOffset = 80;
                     $scope.selected.selectedApp.clientJSON = JSON.parse(resultApp.clientJSON);
                     $scope.clientJSON = $scope.selected.selectedApp.clientJSON;
@@ -2830,7 +2830,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     }).controller("AppsController", function ($scope, $rootScope, $state, appRegistrationServices, sandboxManagement,
                                               userServices, tools, fhirApiServices, appsService, personaServices, launchApp, $uibModal, docLinks,
                                               customFhirApp) {
-
     $scope.all_user_apps = [];
     $scope.default_apps = [];
     $scope.galleryOffset = 246;
@@ -2867,13 +2866,37 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     $scope.launchCustom = function launchCustom() {
         //set localStorage
         customFhirApp.set($scope.customapp);
-        $scope.select({
+
+        const app = {
             launchUri: $scope.customapp.url,
             authClient: {
                 clientName: "Custom App",
                 clientId: $scope.customapp.id,
                 isCustom: true
+            },
+            isDefault: false,
+            logoUri: null,
+        };
+
+        $scope.select(app);
+        $scope.modalOpen = true;
+        var modalInstance = $uibModal.open({
+            animation: true,
+            templateUrl: 'static/js/templates/appsDetail.html',
+            controller: 'AppDetailInstanceCtrl',
+            size: 'lg',
+            resolve: {
+                getApp: function () {
+                    return {
+                        app: app
+                    }
+                }
             }
+        });
+
+        modalInstance.result.then(function (app) {
+            $scope.quickLaunch(app)
+        }, function () {
         });
     };
 
@@ -2960,6 +2983,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     }
 
     $scope.select = function (app) {
+        console.log('app: ', app);
         canDeleteApp(app);
         $scope.isInbound = app.appManifestUri !== null;
         $scope.selected.selectedApp = app;
