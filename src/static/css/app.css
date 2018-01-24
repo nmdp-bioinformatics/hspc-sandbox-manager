@@ -1431,7 +1431,7 @@ a.selected {
     background-color: #005778;
     border-color: #005778;
     font-weight: 300;
-    font-size: 12px;
+    font-size: 16px;
     padding: 3px 6px 3px 6px;
 }
 
@@ -1468,7 +1468,7 @@ fieldset[disabled] .btn-basic.active {
     background-color: #F82219;
     border-color: #F82219;
     font-weight: 300;
-    font-size: 12px;
+    font-size: 16px;
     padding: 3px 6px 3px 6px;
 }
 
@@ -1698,39 +1698,19 @@ fieldset[disabled] .btn-cancel.active {
 }
 
 .thumb-holder {
-    /*height: 240px;   !* 30px to contain the button below the image *!*/
-    /*width: 210px;    !* 10px are used for border and padding leaving 200px for the thumbnail *!*/
     min-height: 190px;   /* 30px to contain the button below the image */
     width: 220px;    /* 10px are used for border and padding leaving 200px for the thumbnail */
-    /*border: 1px solid #ddd;*/
-    background-color: #fafafa;
-    /*background-color: #f2f2f2;*/
+    background-color: #f0f0f0;
     border-radius: 4px;
     padding: 4px;
     text-align: center;
-    cursor: pointer;
-}
-
-.thumb-holder.selected {
-    background-color: #fafafa;
-    /*border: 2px solid #f4f4f4;*/
-    border-radius: 6px;
-    /*background-color: #cccccc;*/
-    /*background-color: #e6e6e6;*/
 }
 
 
 .thumb-holder .thumbnail {
     height: 150px;
-    background-color: #fafafa;
-    /*background-color: #f2f2f2;*/
 }
 
-.thumb-holder.selected .thumbnail {
-    background-color: #fafafa;
-    /*background-color: #cccccc;*/
-    /*background-color: #e6e6e6;*/
-}
 
 .thumb-holder a {
     font-weight: 300;
@@ -2847,7 +2827,13 @@ a[ng-click]{
     background-color: #005778;
     color: white;
     font-weight: 600;
+    text-align: center;
 }
+
+.appButtons {
+    text-align: center;
+}
+
 
 .appsDetailModalBody.container {
     width: 900px;
@@ -2875,6 +2861,7 @@ a[ng-click]{
     position: absolute;
     top: 130px;
     left: 10px;
+    cursor: pointer;    
 }
 
 .appLaunchIcon {
@@ -2891,6 +2878,7 @@ a[ng-click]{
     width: 36px;
     padding-top: 7px;
     padding-left: 5px;
+    cursor: pointer;
 }
 
 .appTitle {

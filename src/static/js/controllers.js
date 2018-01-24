@@ -2983,11 +2983,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     }
 
     $scope.select = function (app) {
-        console.log('app: ', app);
-        canDeleteApp(app);
         $scope.isInbound = app.appManifestUri !== null;
         $scope.selected.selectedApp = app;
         $scope.showing.appDetail = true;
+
         if ($scope.clientJSON) {
             delete $scope.clientJSON.logo;
         }
@@ -3060,8 +3059,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     };
 
     $scope.appDetail = function (app) {
-        $scope.select(app);
+        $scope.select(app);        
         $scope.modalOpen = true;
+        canDeleteApp(app);
+        $scope.canModify = $scope.canModifyApp(app);
         var modalInstance = $uibModal.open({
             animation: true,
             templateUrl: 'static/js/templates/appsDetail.html',
@@ -3073,7 +3074,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                         app: app
                     }
                 }
-            }
+            },
+            scope: $scope,
         });
 
         modalInstance.result.then(function (app) {

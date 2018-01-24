@@ -2,7 +2,7 @@
     <div class="appsDetailModalHeader">Registered App Details</div>
     <div class="appsDetailModalBody container">
         <div class="row">
-            <div class="col content-column">
+            <div class="col content-column appButtons">
                 <div class="btn btn-basic btn-md" ng-click="quickLaunch(selected.selectedApp, clientJSON.samplePatients)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
                 <div class="btn btn-basic btn-md" ng-show="canModify && !isInbound" ng-click="save()"><i class="fa fa-save fa-lg"></i> Save</div>
                 <div class="btn btn-delete btn-md" ng-show="canModify" ng-disabled="!canDelete" ng-click="delete()"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
@@ -72,21 +72,6 @@
                 </div>
 
                 <div class="detail-form">
-                    <label class="detail-form-label">App Logo</label>
-                    <div class="detail-form-label-input">
-                        <label ng-disabled="!canModify || isInbound" class="btn btn-basic btn-md"><input type="file" name="file" onchange="angular.element(this).scope().updateFile(this.files)" required/><i class="fa fa-upload fa-lg"></i><span> Upload Image</span></label>
-                        <!--<input ng-disabled="!canModify" type="file" name="file" style="margin-bottom: 5px" onchange="angular.element(this).scope().updateFile(this.files)"/>-->
-                        <label style="margin-top: 5px">(Display size 210px W X 150px H)</label>
-                        <div class="thumbnail">
-                            <img ng-show="clientJSON.logo" ng-src="{{clientJSON.logo}}">
-                            <img ng-hide="clientJSON.logo || !clientJSON.logoUri" ng-src="{{clientJSON.logoUri}}">
-                            <label ng-hide="clientJSON.logoUri || clientJSON.logo" style="margin-top: 5px">No Image</label>
-                            <img ng-hide="clientJSON.logoUri || clientJSON.logo" src="static/images/HSPCSandboxNoIconApp-512.png">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="detail-form">
                     <label class="detail-form-label">Scopes</label>
                     <div class="detail-form-label-input with-info">
                         <input ng-disabled="!canModify || isInbound" ng-model="clientJSON.scope" class="form-control"/>
@@ -123,6 +108,21 @@
                     <div class="detail-form-label-input">
                         <input ng-disabled="!canModify" ng-model="clientJSON.samplePatients" class="form-control"  placeholder="e.g.: Patient?_id=SMART-1032702,SMART-621799"/>
                         <label class="create-form-description" style="font-style: italic">This is a FHIR query to limit the Patient Picker on launch.</label>
+                    </div>
+                </div>
+
+                <div class="detail-form">
+                    <label class="detail-form-label">App Logo</label>
+                    <div class="detail-form-label-input">
+                        <label ng-disabled="!canModify || isInbound" class="btn btn-basic btn-md"><input type="file" name="file" onchange="angular.element(this).scope().updateFile(this.files)" required/><i class="fa fa-upload fa-lg"></i><span> Upload Image</span></label>
+                        <!--<input ng-disabled="!canModify" type="file" name="file" style="margin-bottom: 5px" onchange="angular.element(this).scope().updateFile(this.files)"/>-->
+                        <label style="margin-top: 5px">(Display size 210px W X 150px H)</label>
+                        <div class="thumbnail">
+                            <img ng-show="clientJSON.logo" ng-src="{{clientJSON.logo}}">
+                            <img ng-hide="clientJSON.logo || !clientJSON.logoUri" ng-src="{{clientJSON.logoUri}}">
+                            <label ng-hide="clientJSON.logoUri || clientJSON.logo" style="margin-top: 5px">No Image</label>
+                            <img ng-hide="clientJSON.logoUri || clientJSON.logo" src="static/images/HSPCSandboxNoIconApp-512.png">
+                        </div>
                     </div>
                 </div>
 
