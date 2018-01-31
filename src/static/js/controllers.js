@@ -14,7 +14,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     getSettings: function () {
                         return {
                             title: "Sandbox Invites",
-                            cancel: "Cancel",
+                            cancel: "Close",
                             type: "confirm-error",
                             callback: function (result) { //setting callback
                                 if (result == true) {
