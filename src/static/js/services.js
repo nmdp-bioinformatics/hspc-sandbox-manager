@@ -71,7 +71,6 @@ angular.module('sandManApp.services', [])
                 });
             },
             login: function (sandboxId) {
-
                 var that = this;
                 appsSettings.getSettings().then(function (settings) {
                     tools.validateSandboxIdFromUrl().then(function (resultSandboxId, apiEndpointIndex) {
@@ -1310,7 +1309,7 @@ angular.module('sandManApp.services', [])
             return deferred;
         }
     };
-}).factory('userServices', function ($rootScope, fhirApiServices, $filter, appsSettings) {
+}).factory('userServices', function ($rootScope, fhirApiServices, $filter, appsSettings, cookieService, oauth2) {
     var oauthUser;
     var sandboxManagerUser;
 
@@ -1451,7 +1450,8 @@ angular.module('sandManApp.services', [])
         createUser: function () {
             var that = this;
             appsSettings.getSettings().then(function (settings) {
-                window.location.href = settings.userManagementUrl + "/public/newuser/"
+                //window.location.href = settings.userManagementUrl + "/public/newuser/";
+                window.location.href = settings.userManagementUrl + "/public/newuser/?afterAuth=" + settings.sandboxManagerUrl;
             });
         }
     };
