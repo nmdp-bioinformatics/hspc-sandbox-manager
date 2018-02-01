@@ -3,8 +3,8 @@
     <div class="appsDetailModalBody container">
         <div class="row">
             <div class="col content-column appButtons">
-                <div class="btn btn-basic btn-md" ng-click="quickLaunch(selected.selectedApp, clientJSON.samplePatients)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
-                <div class="btn btn-basic btn-md" ng-show="canModify && !isInbound" ng-click="save()"><i class="fa fa-save fa-lg"></i> Save</div>
+                <div class="btn btn-basic btn-md" ng-click="launch(selected.selectedApp, clientJSON.samplePatients)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
+                <div class="btn btn-basic btn-md" ng-show="canModify && !isInbound" ng-click="save(clientJSON)"><i class="fa fa-save fa-lg"></i> Save</div>
                 <div class="btn btn-delete btn-md" ng-show="canModify" ng-disabled="!canDelete" ng-click="delete()"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
             </div>
         </div>
