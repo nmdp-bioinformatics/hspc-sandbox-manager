@@ -49,7 +49,7 @@
             </div>
             <div style="padding-right: 10px; padding-left: 0" ng-show="!hasError">
                 <div class="slim-page-header" style="padding:0 0 5px 0" >Summary</div>
-                <div class="summaryBox" resize ng-style="scrollScreen(size.screenH, size.screenW) ? {'min-height': '380px', 'margin-bottom': '10px'} : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+180)">
+                <div class="summaryBox" resize ng-style="scrollScreen(size.screenH, size.screenW) ? {'min-height': '360px', 'margin-bottom': '10px'} : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+180)">
                     <div ng-repeat="resource in settings.externalResourceList" ng-click="selectExternalResource(resource)" ng-class="{selected : resource === settings.selected.externalResource}">
                         <div class="row summaryRow" style="border-bottom: 1px solid #ccc; cursor: pointer">
                             <div ng-repeat="attribute in settings.selectedResourceType.displayValues">
@@ -64,7 +64,7 @@
             </div>
             <div style="padding-right: 10px; padding-left: 0" ng-show="hasError">
                 <div class="slim-page-header" style="padding:0 0 5px 0" >Error</div>
-                <textarea class="summaryBox" style="width: 100%; resize: none" readonly resize ng-style="scrollScreen(size.screenH, size.screenW) ? {'min-height': '380px', 'margin-bottom': '10px'} : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+180)">
+                <textarea class="summaryBox" style="width: 100%; resize: none" readonly resize ng-style="scrollScreen(size.screenH, size.screenW) ? {'min-height': '360px', 'margin-bottom': '10px'} : resizeWithOffset(size.navBarHeight+size.footerHeight+size.sandboxBarHeight+180)">
                     {{queryError}}
                 </textarea>
             </div>
