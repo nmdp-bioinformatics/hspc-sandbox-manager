@@ -1435,6 +1435,10 @@ a.selected {
     padding: 3px 6px 3px 6px;
 }
 
+.btn-basic.justlaunch {
+    width: 150px;
+}
+
 .btn-basic:hover,
 .btn-basic:focus,
 .btn-basic:active,
@@ -1542,7 +1546,7 @@ fieldset[disabled] .btn-accept.active {
     background-color: #58585A;
     border-color: #58585A;
     font-weight: 300;
-    font-size: 12px;
+    font-size: 16px;
     padding: 3px 6px 3px 6px;
 }
 

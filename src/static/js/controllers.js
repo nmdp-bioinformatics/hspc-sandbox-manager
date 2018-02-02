@@ -2414,6 +2414,18 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         })
     });
 
+    $scope.appDetail = function (app) {
+        sandboxManagement.getScenarioBuilder().app = app;
+        openModalDialog(sandboxManagement.getScenarioBuilder());
+    };
+
+    $scope.quickLaunch = function (app) {
+        sandboxManagement.getScenarioBuilder().app = app;
+        var scenario = sandboxManagement.getScenarioBuilder();
+        launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
+        $state.go('launch-scenarios', {});
+    };
+
     $scope.select = function launch(app) {
 
         // choose for the launch scenario
