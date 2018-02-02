@@ -2414,6 +2414,18 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         })
     });
 
+    $scope.appDetail = function (app) {
+        sandboxManagement.getScenarioBuilder().app = app;
+        openModalDialog(sandboxManagement.getScenarioBuilder());
+    };
+
+    $scope.quickLaunch = function (app) {
+        sandboxManagement.getScenarioBuilder().app = app;
+        var scenario = sandboxManagement.getScenarioBuilder();
+        launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
+        $state.go('launch-scenarios', {});
+    };
+
     $scope.select = function launch(app) {
 
         // choose for the launch scenario
@@ -2540,7 +2552,185 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
         };
-    }]).controller('ProgressModalCtrl', ['$scope', '$uibModalInstance', "getTitle",
+    }]).controller('AppDetailInstanceCtrl', ['$scope', '$rootScope', '$uibModal', '$uibModalInstance', 'getApp', 'appRegistrationServices',
+    function ($scope, $rootScope, $uibModal, $uibModalInstance, getApp, appRegistrationServices) {
+        $scope.app = getApp.app;
+        $scope.selected = {};
+        $scope.showing = {};
+        $scope.clientJSON = {};
+
+        $scope.isInbound = $scope.app.appManifestUri !== null;
+        $scope.selected.selectedApp = $scope.app;
+        $scope.showing.appDetail = true;
+        if ($scope.clientJSON) {
+            delete $scope.clientJSON.logo;
+        }
+        $scope.myFile = undefined;
+        if ($scope.app.clientJSON) {
+            $scope.clientJSON = $scope.app.clientJSON;
+        } else if ($scope.clientJSON) {
+            delete $scope.clientJSON.logoUri;
+        }
+        if ($scope.app.isDefault === true) {
+            $scope.clientJSON.clientName = $scope.selected.selectedApp.authClient.clientName;
+            $scope.clientJSON.redirectUri = $scope.selected.selectedApp.authClient.redirectUri;
+            $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
+            $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+            $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri + "?" + new Date().getTime();
+        } else {
+            if ($scope.app.id) {
+                appRegistrationServices.getSandboxApp($scope.app.id).then(function (resultApp) {
+                    $scope.galleryOffset = 80;
+                    $scope.selected.selectedApp.clientJSON = JSON.parse(resultApp.clientJSON);
+                    $scope.clientJSON = $scope.selected.selectedApp.clientJSON;
+                    if (resultApp.logoUri) {
+                        $scope.clientJSON.logoUri = resultApp.logoUri + "?" + new Date().getTime();
+                    }
+                    if ($scope.selected.selectedApp.clientJSON.tokenEndpointAuthMethod === "SECRET_BASIC") {
+                        $scope.clientJSON.clientType = "Confidential Client";
+                    } else {
+                        $scope.clientJSON.clientType = "Public Client";
+                    }
+                    $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
+                    $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+                    $scope.clientJSON.scope = $scope.clientJSON.scope.join(" ");
+                    $rootScope.$digest();
+                });
+            }
+        }
+
+        function openModalProgressDialog() {
+            return $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/progressModal.html',
+                controller: 'ProgressModalCtrl',
+                size: 'sm',
+                resolve: {
+                    getTitle: function () {
+                        return "Saving...";
+                    }
+                }
+            });
+        }
+    
+        $scope.updateFile = function (files) {
+            $scope.clientJSON.myFile = files[0];
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $scope.clientJSON.logo = e.target.result;
+                $rootScope.$digest();
+            };
+            var url = reader.readAsDataURL(files[0]);
+        };
+
+        $scope.save = function (clientJSON) {
+            if (clientJSON.myFile !== undefined) {
+                $scope.selected.selectedApp.logo = clientJSON.myFile;
+            }
+            var updateClientJSON = angular.copy(clientJSON);
+            delete updateClientJSON.logo;
+            delete updateClientJSON.myFile;
+    
+            if (updateClientJSON.logoUri) {
+                var i = updateClientJSON.logoUri.lastIndexOf("?");
+                if (i > -1) {
+                    updateClientJSON.logoUri = updateClientJSON.logoUri.substr(0, i);
+                }
+            }
+    
+            if ($scope.clientJSON.clientType !== "Public Client") {
+                updateClientJSON.tokenEndpointAuthMethod = "SECRET_BASIC";
+            } else {
+                updateClientJSON.tokenEndpointAuthMethod = "NONE";
+            }
+    
+            if (Object.prototype.toString.call(updateClientJSON.redirectUris) !== '[object Array]' &&
+                typeof updateClientJSON.redirectUris !== 'undefined') {
+                updateClientJSON.redirectUris = updateClientJSON.redirectUris.split(',');
+            }
+    
+            if (Object.prototype.toString.call(updateClientJSON.scope) !== '[object Array]' &&
+                typeof updateClientJSON.scope !== 'undefined') {
+                updateClientJSON.scope = updateClientJSON.scope.split(' ');
+                if (!contains(updateClientJSON.scope, "launch")) {
+                    updateClientJSON.scope.push("launch");
+                }
+            }
+    
+            if (!contains(updateClientJSON.scope, "offline_access")) {
+                var index = updateClientJSON.grantTypes.indexOf("refresh_token");
+                if (index > -1) {
+                    updateClientJSON.grantTypes.splice(index, 1);
+                }
+            } else {
+                if (!contains(updateClientJSON.grantTypes, "refresh_token")) {
+                    updateClientJSON.grantTypes.push("refresh_token");
+                }
+                updateClientJSON.requireAuthTime = false;
+            }
+    
+            function contains(array, item) {
+                var found = false;
+                array.forEach(function (cur) {
+                    if (cur === item) {
+                        found = true;
+                    }
+                });
+                return found;
+            }
+    
+            $scope.selected.selectedApp.clientJSON = updateClientJSON;
+            $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
+            $scope.selected.selectedApp.samplePatients = updateClientJSON.samplePatients;
+            var modalProgress = openModalProgressDialog();
+            appRegistrationServices.updateSandboxApp($scope.selected.selectedApp).then(function (result) {
+                $scope.select(result);
+                modalProgress.dismiss();
+            }, function (err) {
+                modalProgress.dismiss();
+                $state.go('error', {});
+            });
+            $uibModalInstance.dismiss();
+        };
+    
+        $scope.delete = function () {
+            $scope.showing.appDetail = false;
+            $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/confirmModal.html',
+                controller: 'ConfirmModalInstanceCtrl',
+                resolve: {
+                    getSettings: function () {
+                        return {
+                            title: "Delete " + $scope.selected.selectedApp.authClient.clientName,
+                            ok: "Yes",
+                            cancel: "Cancel",
+                            type: "confirm-error",
+                            text: "Are you sure you want to delete?",
+                            callback: function (result) { //setting callback
+                                if (result == true) {
+                                    appRegistrationServices.deleteSandboxApp($scope.selected.selectedApp.id).then(function () {
+                                        $scope.selected.selectedApp = {};
+                                    });
+                                }
+                            }
+                        };
+                    }
+                }
+            });
+            $uibModalInstance.dismiss();
+        };
+    
+        $scope.launch = function (app) {
+            console.log('launch:', app);
+            $uibModalInstance.close(app);
+        };
+
+        $scope.close = function () {
+            $uibModalInstance.dismiss();
+        };
+    }])
+    .controller('ProgressModalCtrl', ['$scope', '$uibModalInstance', "getTitle",
     function ($scope, $uibModalInstance, getTitle) {
 
         $scope.title = getTitle;
@@ -2775,7 +2965,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     }).controller("AppsController", function ($scope, $rootScope, $state, appRegistrationServices, sandboxManagement,
                                               userServices, tools, fhirApiServices, appsService, personaServices, launchApp, $uibModal, docLinks,
                                               customFhirApp) {
-
     $scope.all_user_apps = [];
     $scope.default_apps = [];
     $scope.galleryOffset = 246;
@@ -2812,13 +3001,37 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     $scope.launchCustom = function launchCustom() {
         //set localStorage
         customFhirApp.set($scope.customapp);
-        $scope.select({
+
+        const app = {
             launchUri: $scope.customapp.url,
             authClient: {
                 clientName: "Custom App",
                 clientId: $scope.customapp.id,
                 isCustom: true
+            },
+            isDefault: false,
+            logoUri: null,
+        };
+
+        $scope.select(app);
+        $scope.modalOpen = true;
+        var modalInstance = $uibModal.open({
+            animation: true,
+            templateUrl: 'static/js/templates/appsDetail.html',
+            controller: 'AppDetailInstanceCtrl',
+            size: 'lg',
+            resolve: {
+                getApp: function () {
+                    return {
+                        app: app
+                    }
+                }
             }
+        });
+
+        modalInstance.result.then(function (app) {
+            $scope.quickLaunch(app)
+        }, function () {
         });
     };
 
@@ -2905,10 +3118,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     }
 
     $scope.select = function (app) {
-        canDeleteApp(app);
         $scope.isInbound = app.appManifestUri !== null;
         $scope.selected.selectedApp = app;
         $scope.showing.appDetail = true;
+
         if ($scope.clientJSON) {
             delete $scope.clientJSON.logo;
         }
@@ -2969,7 +3182,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     };
 
     $scope.updateFile = function (files) {
-
         $scope.myFile = files[0];
 
         var reader = new FileReader();
@@ -2980,6 +3192,32 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         var url = reader.readAsDataURL(files[0]);
     };
 
+    $scope.appDetail = function (app) {
+        $scope.select(app);
+        $scope.modalOpen = true;
+        canDeleteApp(app);
+        $scope.canModify = $scope.canModifyApp(app);
+        var modalInstance = $uibModal.open({
+            animation: true,
+            templateUrl: 'static/js/templates/appsDetail.html',
+            controller: 'AppDetailInstanceCtrl',
+            size: 'lg',
+            resolve: {
+                getApp: function () {
+                    return {
+                        app: app
+                    }
+                }
+            },
+            scope: $scope,
+        });
+
+        modalInstance.result.then(function (app) {
+            $scope.quickLaunch(app)
+        }, function () {
+        });
+    };    
+    
     $scope.quickLaunch = function (app, sample) {
         var patientQuery;
         if (sample !== undefined) {
@@ -3042,12 +3280,13 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         });
     }
 
-    $scope.save = function () {
-        if ($scope.myFile !== undefined) {
-            $scope.selected.selectedApp.logo = $scope.myFile;
+    $scope.save = function (clientJSON) {
+        if (clientJSON.myFile !== undefined) {
+            $scope.selected.selectedApp.logo = clientJSON.myFile;
         }
-        var updateClientJSON = angular.copy($scope.clientJSON);
+        var updateClientJSON = angular.copy(clientJSON);
         delete updateClientJSON.logo;
+        delete updateClientJSON.myFile;
 
         if (updateClientJSON.logoUri) {
             var i = updateClientJSON.logoUri.lastIndexOf("?");
