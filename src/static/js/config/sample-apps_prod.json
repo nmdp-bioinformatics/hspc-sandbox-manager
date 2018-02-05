@@ -5,7 +5,7 @@
       "clientName": "Bilirubin Chart",
       "clientId": "bilirubin_chart",
       "redirectUri": "https://bilirubin-risk-chart.hspconsortium.org/index.html",
-      "briefDescription": "Highlights the concept of the HSPC model, which creates a method of sharing clinical applications currently locked up in a single organization or EHR vendor and make it available to all healthcare providers."
+      "briefDescription": "The HSPC Bilirubin Risk Chart is a sample app that demonstrates many of the features of the SMART on FHIR app launch specification and HL7 FHIR standard."
     },
     "appUri": "https://bilirubin-risk-chart.hspconsortium.org/",
     "launchUri": "https://bilirubin-risk-chart.hspconsortium.org/launch.html",
@@ -28,7 +28,7 @@
       "clientName": "My Web App",
       "clientId": "my_web_app",
       "redirectUri": "http://localhost:8000/fhir-app/",
-      "briefDescription": "Base for adding your app to the Sandbox."
+      "briefDescription": "Perform a SMART launch at http://localhost:8000/fhir-app/launch.html using the client: my_web_app"
     },
     "launchUri": "http://localhost:8000/fhir-app/launch.html",
     "logoUri": "https://content.hspconsortium.org/images/my-web-app/logo/my.png"
