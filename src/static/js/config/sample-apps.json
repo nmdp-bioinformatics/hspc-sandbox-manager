@@ -4,7 +4,8 @@
     "authClient": {
       "clientName": "Bilirubin Chart",
       "clientId": "bilirubin_chart",
-      "redirectUri": "https://bilirubin-risk-chart-test.hspconsortium.org/index.html"
+      "redirectUri": "https://bilirubin-risk-chart-test.hspconsortium.org/index.html",
+      "briefDescription": "Highlights the concept of the HSPC model, which creates a method of sharing clinical applications currently locked up in a single organization or EHR vendor and make it available to all healthcare providers."
     },
     "appUri": "https://bilirubin-risk-chart-test.hspconsortium.org/",
     "launchUri": "https://bilirubin-risk-chart-test.hspconsortium.org/launch.html",
@@ -14,7 +15,9 @@
     "authClient": {
       "clientName": "Patient Data Manager",
       "clientId": "patient_data_manager",
-      "redirectUri": "https://patient-data-manager.hspconsortium.org/index.html"
+      "redirectUri": "https://patient-data-manager.hspconsortium.org/index.html",
+      "briefDescription": "The HSPC Patient Data Manager app is a SMART on FHIR application that is used for managing the data of a single patient."
+
     },
     "appUri": "https://patient-data-manager.hspconsortium.org/",
     "launchUri": "https://patient-data-manager.hspconsortium.org/launch.html",
@@ -25,7 +28,9 @@
     "authClient": {
       "clientName": "My Web App",
       "clientId": "my_web_app",
-      "redirectUri": "http://localhost:8000/fhir-app/"
+      "redirectUri": "http://localhost:8000/fhir-app/",
+      "briefDescription": "Base for adding your app to the Sandbox."
+
     },
     "launchUri": "http://localhost:8000/fhir-app/launch.html",
     "logoUri": "https://content.hspconsortium.org/images/my-web-app/logo/my.png"
@@ -35,7 +40,8 @@
     "authClient": {
       "clientName": "CDS Hooks Sandbox",
       "clientId": "48163c5e-88b5-4cb3-92d3-23b800caa927",
-      "redirectUri": "http://sandbox.cds-hooks.org/launch.html"
+      "redirectUri": "http://sandbox.cds-hooks.org/launch.html",
+      "briefDescription": "The CDS Hooks Sandbox is a tool that allows users to simulate the workflow of the CDS Hooks standard."
     },
     "appUri": "http://sandbox.cds-hooks.org/",
     "launchUri": "http://sandbox.cds-hooks.org/launch.html",

@@ -1706,8 +1706,8 @@ fieldset[disabled] .btn-cancel.active {
     width: 220px;    /* 10px are used for border and padding leaving 200px for the thumbnail */
     background-color: #f0f0f0;
     border-radius: 4px;
-    padding: 4px;
     text-align: center;
+    border: 3px solid #ddd;
 }
 
 
@@ -1739,8 +1739,8 @@ fieldset[disabled] .btn-cancel.active {
 }
 
 .thumb-holder .thumbnail img {
-    width: 210px;
-    height: 150px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px
 }
 
 .modal-form .thumbnail {
@@ -1752,7 +1752,7 @@ fieldset[disabled] .btn-cancel.active {
     clear: both;
     color: #333;
     text-align: left;
-    height: 100px;
+    height: 130px;
     overflow-x: hidden;
     overflow-y: auto;
 }
@@ -2880,8 +2880,8 @@ a[ng-click]{
     border-radius: 36px;
     height: 36px;
     width: 36px;
-    padding-top: 7px;
-    padding-left: 5px;
+    padding-top: 6px;
+    padding-left: 4px;
     cursor: pointer;
 }
 
@@ -2893,7 +2893,7 @@ a[ng-click]{
 }
 
 .appDescription {
-    margin-top: 2px;
+    margin-top: 10px;
     margin-left: 10px;
     font-size: 12px;
 }
