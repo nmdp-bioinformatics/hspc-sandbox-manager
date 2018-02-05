@@ -1739,6 +1739,8 @@ fieldset[disabled] .btn-cancel.active {
 }
 
 .thumb-holder .thumbnail img {
+    width: 210px;
+    height: 150px;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px
 }
