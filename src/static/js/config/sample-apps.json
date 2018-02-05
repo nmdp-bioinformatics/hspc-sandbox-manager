@@ -17,7 +17,6 @@
       "clientId": "patient_data_manager",
       "redirectUri": "https://patient-data-manager.hspconsortium.org/index.html",
       "briefDescription": "The HSPC Patient Data Manager app is a SMART on FHIR application that is used for managing the data of a single patient."
-
     },
     "appUri": "https://patient-data-manager.hspconsortium.org/",
     "launchUri": "https://patient-data-manager.hspconsortium.org/launch.html",
@@ -30,7 +29,6 @@
       "clientId": "my_web_app",
       "redirectUri": "http://localhost:8000/fhir-app/",
       "briefDescription": "Base for adding your app to the Sandbox."
-
     },
     "launchUri": "http://localhost:8000/fhir-app/launch.html",
     "logoUri": "https://content.hspconsortium.org/images/my-web-app/logo/my.png"
