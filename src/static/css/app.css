@@ -1311,8 +1311,6 @@ a.selected {
 
 .invite-form button {
     border: none;
-    width: 85px;
-    height: 25px;
     margin-left: 5px;
 }
 
@@ -1422,7 +1420,7 @@ a.selected {
 
 .btn {
     font-weight: 300;
-    font-size: 12px;
+    font-size: 16px;
     padding: 3px 6px 3px 6px;
 }
 
@@ -1509,7 +1507,7 @@ fieldset[disabled] .btn-delete.active {
     background-color: #00B359;
     border-color: #00B359;
     font-weight: 300;
-    font-size: 12px;
+    font-size: 16px;
     padding: 3px 6px 3px 6px;
 }
 
@@ -1621,6 +1619,7 @@ fieldset[disabled] .btn-cancel.active {
 .form-group {
     /*margin-bottom: 15px;*/
     margin-bottom: 2px;
+    clear: both;
 }
 
 .form-control {
@@ -2455,6 +2454,8 @@ td {
     width: 100%;
     padding-right: 60px;
     background-color:transparent;
+    margin-top: 5px;
+    margin-left: 10px;
 }
 
 .search-bar .search-field .undo-icon,
@@ -2474,7 +2475,7 @@ td {
     right:0;
     width: 30px;
     display: block;
-    padding-top: 3px;
+    padding-top: 5px;
 }
 
 .search-bar .externalQuery .search-label {
