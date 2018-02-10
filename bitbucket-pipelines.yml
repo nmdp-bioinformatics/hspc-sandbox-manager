@@ -13,51 +13,104 @@ pipelines:
   branches:
     develop:
       - step:
+          name: build jar and upload to nexus
+          caches:
+            - node
           script:
-            - export DOCKER_PUSH=true; echo "DOCKER_PUSH - " $DOCKER_PUSH
-            - export PROJECT_REPO="nexus.hspconsortium.org:18083/hspc"; echo "PROJECT_REPO - " $PROJECT_REPO
-            - export PROJECT_NAME=$(cat package.json | jq --raw-output '.name'); echo "PROJECT_NAME - " $PROJECT_NAME
-            - export PROJECT_VERSION=$(cat package.json | jq --raw-output '.version'); echo "PROJECT_VERSION - " $PROJECT_VERSION
-            - export PROJECT_PORT=$(cat package.json | jq --raw-output '.config.port'); echo "PROJECT_PORT - " $PROJECT_PORT
-            - export IMAGE_NAME=$PROJECT_REPO/$PROJECT_NAME:$PROJECT_VERSION; echo "IMAGE_NAME - " $IMAGE_NAME
-            - export CURRENT_ENV=test; echo "CURRENT_ENV - " $CURRENT_ENV
-            - export FAMILY_NAME=$PROJECT_NAME
-            - . ci-1-prepare-sources.sh
-            - . ci-2-docker-image.sh
-            - . ci-3-aws-update.sh
+            # get the ci scripts
+            - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
+            # build the set-env.sh script
+            - . sandbox-ci/bitbucket-pipeline-scripts/build-set-env-for-npm.sh test 8080 100
+            - ./ci-1-prepare-sources.sh
+            - npm install
+            # clear out the other jar files
+            - rm target/*-sources.jar
+            - rm target/*-javadoc.jar
+          artifacts:
+            - set-env.sh
+            - src/index.html
+            - src/static/js/services.js
+      - step:
+          name: build docker and upload to docker hub
+          script:
+            - . set-env.sh
+            - echo $IMAGE_COORDINATES
+            # build docker image and push
+            - docker login -u $DOCKER_ID -p $DOCKER_PASSWORD
+            - docker build -t $IMAGE_COORDINATES .
+            - docker push $IMAGE_COORDINATES
+      - step:
+          name: AUTOMATICALLY update the aws test service
+          script:
+            - . set-env.sh
+            # get the ci scripts
+            - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
+            # build the container-definition.json
+            - . sandbox-ci/bitbucket-pipeline-scripts/build-container-definition.sh $ENC_PW_TEST
+            # register the ECS task definition and capture the version
+            - export TASK_VERSION=$(aws ecs register-task-definition --family "$AWS_CONTAINER_NAME" --container-definitions $(cat sandbox-ci/bitbucket-pipeline-scripts/container-definitions.json | jq -c '.')  | jq --raw-output '.taskDefinition.revision')
+            - echo "Registered ECS Task Definition - $AWS_CONTAINER_NAME:$TASK_VERSION"
+            # update the service to use the latest task definition
+            - aws ecs update-service --cluster hspc-test --service "$AWS_SERVICE_NAME" --task-definition $AWS_CONTAINER_NAME:$TASK_VERSION
+    master:
+      - step:
+          name: build jar and upload to nexus
+          caches:
+            - node
+          script:
+            # get the ci scripts
+            - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
+            # build the set-env.sh script
+            - . sandbox-ci/bitbucket-pipeline-scripts/build-set-env-for-npm.sh prod 8080 100
+            - ./ci-1-prepare-sources.sh
+            - npm install
+            # clear out the other jar files
+            - rm target/*-sources.jar
+            - rm target/*-javadoc.jar
+          artifacts:
+            - set-env.sh
+            - src/index.html
+            - src/static/js/services.js
+      - step:
+          name: build docker and upload to docker hub
+          script:
+            - . set-env.sh
+            - echo $IMAGE_COORDINATES
+            # build docker image and push
+            - docker login -u $DOCKER_ID -p $DOCKER_PASSWORD
+            - docker build -t $IMAGE_COORDINATES .
+            - docker push $IMAGE_COORDINATES
+      - step:
+          name: MANUALLY update the aws prod service
+          trigger: manual
+          script:
+            - . set-env.sh
+            # get the ci scripts
+            - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
+            # build the container-definition.json
+            - . sandbox-ci/bitbucket-pipeline-scripts/build-container-definition.sh $ENC_PW_PROD
+            # register the ECS task definition and capture the version
+            - export TASK_VERSION=$(aws ecs register-task-definition --family "$AWS_CONTAINER_NAME" --container-definitions $(cat sandbox-ci/bitbucket-pipeline-scripts/container-definitions.json | jq -c '.')  | jq --raw-output '.taskDefinition.revision')
+            - echo "Registered ECS Task Definition - $AWS_CONTAINER_NAME:$TASK_VERSION"
+            # update the service to use the latest task definition
+            - aws ecs update-service --cluster hspc-prod --service "$AWS_SERVICE_NAME" --task-definition $AWS_CONTAINER_NAME:$TASK_VERSION
     feature/*:
       - step:
           caches:
-            - node
+            - maven
           script:
-            - npm install
+            - mvn -B verify
     release/*:
       - step:
           caches:
-            - node
+            - maven
           script:
-            - npm install
+            - mvn -B verify
     hotfix/*:
       - step:
           caches:
-            - node
+            - maven
           script:
-            - npm install
-    master:
-      - step:
-          caches:
-            - node
-          script:
-            - export DOCKER_PUSH=true; echo "DOCKER_PUSH - " $DOCKER_PUSH
-            - export PROJECT_REPO="nexus.hspconsortium.org:18083/hspc"; echo "PROJECT_REPO - " $PROJECT_REPO
-            - export PROJECT_NAME=$(cat package.json | jq --raw-output '.name'); echo "PROJECT_NAME - " $PROJECT_NAME
-            - export PROJECT_VERSION=$(cat package.json | jq --raw-output '.version'); echo "PROJECT_VERSION - " $PROJECT_VERSION
-            - export PROJECT_PORT=$(cat package.json | jq --raw-output '.config.port'); echo "PROJECT_PORT - " $PROJECT_PORT
-            - export IMAGE_NAME=$PROJECT_REPO/$PROJECT_NAME:$PROJECT_VERSION; echo "IMAGE_NAME - " $IMAGE_NAME
-            - export CURRENT_ENV=prod; echo "CURRENT_ENV - " $CURRENT_ENV
-            - export FAMILY_NAME="$PROJECT_NAME-prod"
-            - . ci-1-prepare-sources.sh
-            - . ci-2-docker-image.sh
-            - . ci-3-aws-update.sh
+            - mvn -B verify
 options:
   docker: true
