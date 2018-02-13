@@ -21,6 +21,7 @@ pipelines:
             - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
             # build the set-env.sh script
             - . sandbox-ci/bitbucket-pipeline-scripts/build-set-env-for-npm.sh test 8080 100
+            - export CURRENT_ENV=test
             - ./ci-1-prepare-sources.sh
             - npm install
           artifacts:
@@ -40,6 +41,7 @@ pipelines:
           name: AUTOMATICALLY update the aws test service
           script:
             - . set-env.sh
+            - export ACTIVE_ENV_SM=test
             # get the ci scripts
             - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
             # build the container-definition.json
@@ -61,6 +63,7 @@ pipelines:
             - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
             # build the set-env.sh script
             - . sandbox-ci/bitbucket-pipeline-scripts/build-set-env-for-npm.sh prod 8080 100
+            - export CURRENT_ENV=prod
             - ./ci-1-prepare-sources.sh
             - npm install
           artifacts:
@@ -81,6 +84,7 @@ pipelines:
           trigger: manual
           script:
             - . set-env.sh
+            - export ACTIVE_ENV_SM=prod
             # get the ci scripts
             - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
             # build the container-definition.json
@@ -94,21 +98,15 @@ pipelines:
             - aws ecs update-service --cluster hspc-prod --service "$AWS_SERVICE_NAME" --task-definition $AWS_CONTAINER_NAME:$TASK_VERSION
     feature/*:
       - step:
-          caches:
-            - maven
           script:
-            - mvn -B verify
+            - npm install
     release/*:
       - step:
-          caches:
-            - maven
           script:
-            - mvn -B verify
+            - npm install
     hotfix/*:
       - step:
-          caches:
-            - maven
           script:
-            - mvn -B verify
+            - npm install
 options:
   docker: true
