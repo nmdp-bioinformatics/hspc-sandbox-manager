@@ -47,6 +47,8 @@ pipelines:
             # register the ECS task definition and capture the version
             - export TASK_VERSION=$(aws ecs register-task-definition --family "$AWS_CONTAINER_NAME" --container-definitions $(cat sandbox-ci/bitbucket-pipeline-scripts/container-definitions.json | jq -c '.')  | jq --raw-output '.taskDefinition.revision')
             - echo "Registered ECS Task Definition - $AWS_CONTAINER_NAME:$TASK_VERSION"
+            # override the service name
+            - export AWS_SERVICE_NAME=hspc-sandbox-manager-service
             # update the service to use the latest task definition
             - aws ecs update-service --cluster hspc-test --service "$AWS_SERVICE_NAME" --task-definition $AWS_CONTAINER_NAME:$TASK_VERSION
     master:
@@ -86,6 +88,8 @@ pipelines:
             # register the ECS task definition and capture the version
             - export TASK_VERSION=$(aws ecs register-task-definition --family "$AWS_CONTAINER_NAME" --container-definitions $(cat sandbox-ci/bitbucket-pipeline-scripts/container-definitions.json | jq -c '.')  | jq --raw-output '.taskDefinition.revision')
             - echo "Registered ECS Task Definition - $AWS_CONTAINER_NAME:$TASK_VERSION"
+            # override the service name
+            - export AWS_SERVICE_NAME=hspc-sandbox-manager-service
             # update the service to use the latest task definition
             - aws ecs update-service --cluster hspc-prod --service "$AWS_SERVICE_NAME" --task-definition $AWS_CONTAINER_NAME:$TASK_VERSION
     feature/*:
