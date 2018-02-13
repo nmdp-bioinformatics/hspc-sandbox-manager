@@ -21,6 +21,7 @@ pipelines:
             - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
             # build the set-env.sh script
             - . sandbox-ci/bitbucket-pipeline-scripts/build-set-env-for-npm.sh test 8080 100
+            - export CURRENT_ENV=test
             - ./ci-1-prepare-sources.sh
             - npm install
           artifacts:
@@ -62,6 +63,7 @@ pipelines:
             - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
             # build the set-env.sh script
             - . sandbox-ci/bitbucket-pipeline-scripts/build-set-env-for-npm.sh prod 8080 100
+            - export CURRENT_ENV=prod
             - ./ci-1-prepare-sources.sh
             - npm install
           artifacts:
