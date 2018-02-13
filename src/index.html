@@ -109,7 +109,8 @@
     <div notification ng-repeat="message in messages"></div>
 </div>
 
-<footer ng-show="showing.footer" ng-cloak class="navbar-fixed-bottom">
+<footer ng-show="showing.footer" ng-style="showing.sideNavBar ? { 'position':'relative' } : { 'position': 'fixed' }"
+        ng-cloak class="navbar-fixed-bottom">
     <div class="container">
         <div class="copyright" ng-cloak resize ng-style="{textAlign: scrollWidth(750) ? 'left' : 'center', marginLeft: showCert ? '100px' : '0px'}">
             {{copyright}}<div ng-show="showTermsLink" style="display: inline"> • <a ng-click="showTerms()">Terms of Use & Privacy Statement</a></div>

@@ -1311,8 +1311,6 @@ a.selected {
 
 .invite-form button {
     border: none;
-    width: 85px;
-    height: 25px;
     margin-left: 5px;
 }
 
@@ -1417,13 +1415,12 @@ a.selected {
     position: relative;
     display: block;
     padding: 10px 15px;
-    font-weight: bold;
-    color: #58585A;
+    color: #666666;
 }
 
 .btn {
     font-weight: 300;
-    font-size: 12px;
+    font-size: 16px;
     padding: 3px 6px 3px 6px;
 }
 
@@ -1432,8 +1429,12 @@ a.selected {
     background-color: #005778;
     border-color: #005778;
     font-weight: 300;
-    font-size: 12px;
+    font-size: 16px;
     padding: 3px 6px 3px 6px;
+}
+
+.btn-basic.justlaunch {
+    width: 150px;
 }
 
 .btn-basic:hover,
@@ -1469,7 +1470,7 @@ fieldset[disabled] .btn-basic.active {
     background-color: #F82219;
     border-color: #F82219;
     font-weight: 300;
-    font-size: 12px;
+    font-size: 16px;
     padding: 3px 6px 3px 6px;
 }
 
@@ -1506,7 +1507,7 @@ fieldset[disabled] .btn-delete.active {
     background-color: #00B359;
     border-color: #00B359;
     font-weight: 300;
-    font-size: 12px;
+    font-size: 16px;
     padding: 3px 6px 3px 6px;
 }
 
@@ -1543,7 +1544,7 @@ fieldset[disabled] .btn-accept.active {
     background-color: #58585A;
     border-color: #58585A;
     font-weight: 300;
-    font-size: 12px;
+    font-size: 16px;
     padding: 3px 6px 3px 6px;
 }
 
@@ -1589,6 +1590,7 @@ fieldset[disabled] .btn-cancel.active {
     border-radius: 4px;
     -webkit-transition: all .2s ease-in-out;
     transition: all .2s ease-in-out;
+    clear: both;
 }
 
 .app-gallery-container-slim {
@@ -1617,6 +1619,7 @@ fieldset[disabled] .btn-cancel.active {
 .form-group {
     /*margin-bottom: 15px;*/
     margin-bottom: 2px;
+    clear: both;
 }
 
 .form-control {
@@ -1698,65 +1701,29 @@ fieldset[disabled] .btn-cancel.active {
 }
 
 .thumb-holder {
-    /*height: 240px;   !* 30px to contain the button below the image *!*/
-    /*width: 210px;    !* 10px are used for border and padding leaving 200px for the thumbnail *!*/
-    height: 215px;   /* 30px to contain the button below the image */
+    min-height: 190px;   /* 30px to contain the button below the image */
     width: 220px;    /* 10px are used for border and padding leaving 200px for the thumbnail */
+    background-color: #f0f0f0;
     border-radius: 4px;
-    padding: 4px;
     text-align: center;
-    cursor: pointer;
+    border: 3px solid #ddd;
 }
 
-.thumb-holder.selected {
-    background-color: #FAFAFA;
-    border-radius: 6px;
+
+.thumb-holder .thumbnail {
+    height: 150px;
 }
 
-.thumb-holder.selected .thumbnail {
-    background-color: #FAFAFA;
-}
-
-.thumb-holder .custom-app {
-    background-color: #FAFAFA;
-}
-
-.thumb-holder .thumbnail .custom-app {
-    background-color: #FAFAFA;
-}
 
 .thumb-holder a {
     font-weight: 300;
-    font-size: 18px;
+    font-size: 20px;
     position: absolute;
-    bottom: 45px;
+    bottom: 15px;
     left: 20px;
     text-align: center;
     width: 210px;
-    overflow: hidden;
-    color: #58585A;
-    text-decoration: none;
-}
-
-.thumb-holder a:hover {
-    color: #005778;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-
-.thumb-holder .btn-holder  {
-    position: absolute;
-    bottom: 15px;
-    /*right: 20px;*/
-    text-align: center;
-    width: 210px;
-}
-
-.thumb-holder .btn  {
-    font-weight: 300;
-    padding: 2px 5px;
-    font-size: 12px;
+    text-decoration: underline;
 }
 
 .thumb-holder .thumbnail {
@@ -1767,11 +1734,14 @@ fieldset[disabled] .btn-cancel.active {
     margin-right: auto;
     -webkit-transition: none;
     transition: none;
+    position: relative;
 }
 
 .thumb-holder .thumbnail img {
-    max-width: 210px;
-    max-height: 150px;
+    width: 210px;
+    height: 150px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px
 }
 
 .modal-form .thumbnail {
@@ -1779,11 +1749,17 @@ fieldset[disabled] .btn-cancel.active {
     max-height: 150px;
 }
 
-.thumb-holder button {
-    position: absolute;
-    bottom: 15px;
-    /*width: 200px;   !* 200px button width matches thumbnail width *!*/
-    width: 210px;   /* 200px button width matches thumbnail width */
+.thumb-holder .caption {
+    clear: both;
+    color: #333;
+    text-align: left;
+    height: 130px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.thumbnail input {
+    width: 205px;
 }
 
 .title-box .thumbnail {
@@ -2478,6 +2454,8 @@ td {
     width: 100%;
     padding-right: 60px;
     background-color:transparent;
+    margin-top: 5px;
+    margin-left: 10px;
 }
 
 .search-bar .search-field .undo-icon,
@@ -2497,7 +2475,7 @@ td {
     right:0;
     width: 30px;
     display: block;
-    padding-top: 3px;
+    padding-top: 5px;
 }
 
 .search-bar .externalQuery .search-label {
@@ -2844,4 +2822,81 @@ a[ng-click]{
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
 	display: none !important;
+}
+
+.appsDetailModal {
+    border: 1px black;
+    width: 900px;
+}
+
+.appsDetailModalHeader {
+    padding: 15px;
+    background-color: #005778;
+    color: white;
+    font-weight: 600;
+    text-align: center;
+}
+
+.appButtons {
+    text-align: center;
+}
+
+
+.appsDetailModalBody.container {
+    width: 900px;
+    background-color: white;
+    font-weight: 400;
+    color: black;
+}
+
+.appsDetailModalBody.container .content-column {
+    padding: 15px;    
+}
+
+#sandboxAppsViewContainer.content-column {
+    max-height: 610px;
+}
+
+.appDetailIcon {
+    float: left;
+    color: #fff;
+    background-color: #4BAAD7;
+    padding: 5px 7px;
+    border-radius: 10px;
+    font-size: 25px;
+    z-index: 1000;
+    position: absolute;
+    top: 130px;
+    left: 10px;
+    cursor: pointer;    
+}
+
+.appLaunchIcon {
+    float: right;
+    color: #FFF;
+    font-size: 22px;
+    z-index: 1000;
+    position: absolute;
+    top: 130px;
+    right: 10px;
+    background-color: #CF604D;
+    border-radius: 36px;
+    height: 36px;
+    width: 36px;
+    padding-top: 6px;
+    padding-left: 4px;
+    cursor: pointer;
+}
+
+.appTitle {
+    margin-top: 10px;
+    margin-left: 10px;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.appDescription {
+    margin-top: 10px;
+    margin-left: 10px;
+    font-size: 12px;
 }

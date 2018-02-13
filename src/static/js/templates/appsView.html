@@ -1,32 +1,39 @@
 <div class="row">
-    <div class="col-md-12 content-column">
-        <div  class="row-fluid">
-            <ul class="list-unstyled">
-                <li ng-class="showing.appDetail ? 'col-md-4' : 'col-md-3'" ng-repeat="app in all_user_apps|filter:{launchUri:'!!'}">
-                    <div ng-class="{selected: selected.selectedApp === app}"  class="thumb-holder" ng-click="select(app)" >
-                        <div class="thumbnail">
-                            <img ng-show="app.logoUri" ng-src="{{app.logoUri}}">
-                            <img ng-show="!app.logoUri" src="static/images/HSPCSandboxNoIconApp-512.png">
+        <div id="sandboxAppsViewContainer" class="col-md-12 content-column">
+            <div  class="row-fluid">
+                <ul class="list-unstyled">
+                    <li class="col-md-3" ng-repeat="app in all_user_apps|filter:{launchUri:'!!'}">
+                        <div ng-class="{selected: selected.selectedApp === app}"  class="thumb-holder">
+                            <div class="thumbnail">
+                                <img ng-show="app.logoUri" ng-src="{{app.logoUri}}">
+                                <img ng-show="!app.logoUri" src="static/images/HSPCSandboxNoIconApp-512.png">
+                                <div ng-click="appDetail(app)" class="fa fa-cog appDetailIcon" ></div>
+                                <div ng-click="quickLaunch(app)" class="fa fa-play appLaunchIcon"></div>
+                            </div>
+                            <div class="caption">
+                                <div class="appTitle">{{app.authClient.clientName}}</div>
+                                <div class="appDescription">{{app.authClient.briefDescription}}</div>
+                            </div>
                         </div>
-                        <a>{{app.authClient.clientName}}</a>
-                        <div class="btn-holder">
-                            <div ng-show="!isAppsPicker && canModifyApp(app)" class="btn btn-basic btn-sm" style="width: 70px; margin-right: 5px" ng-click="edit(app)"><i class='fa fa-pencil fa-lg'></i> Edit</div>
-                            <div ng-show="!isAppsPicker" class="btn btn-basic btn-sm" style="width: 70px" ng-click="quickLaunch(app)"><i class='fa fa-external-link fa-lg'></i> Launch</div>
+                    </li>
+                    <li ng-show="isAppsPicker" class="col-md-3">
+                        <div class="thumb-holder custom-app">
+                            <div class="thumbnail">
+                                <label style="margin-top: 30px">Custom Values</label><br/>
+                                <input type="text" ng-model="customapp.id" placeholder="Client ID" required /><br/>
+                                <input type="text" ng-model="customapp.url" placeholder="Launch URL" required />
+                                <div ng-click="launchCustom()" class="fa fa-play appLaunchIcon"></div>
+                            </div>
+                            <div class="caption">
+                                    <div class="appTitle">Custom App</div>
+                                    <div class="appDescription">
+                                        This is a custom app configuration.
+                                    </div>
+                                </div>
                         </div>
-                    </div>
-                </li>
-                <li ng-show="isAppsPicker" ng-class="showing.appDetail ? 'col-md-4' : 'col-md-3'">
-                    <div class="thumb-holder custom-app">
-                    <div class="thumbnail">
-                        <label>Custom Values</label><br/>
-                        <input type="text" ng-model="customapp.id" placeholder="Client ID" required /><br/>
-                        <input type="text" ng-model="customapp.url" placeholder="Launch URL" required />
-                    </div>
-                        <!--<button ng-click="launchCustom()" ng-disabled="!customapp.id || !customapp.url" class="btn btn-basic btn-block">Custom App</button>-->
-                        <a ng-disabled="!customapp.id || !customapp.url" ng-click="launchCustom()">Custom App</a>
-                    </div>
-                </li>
-            </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
-</div>
+    
