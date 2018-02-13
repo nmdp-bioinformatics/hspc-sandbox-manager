@@ -40,6 +40,7 @@ pipelines:
           name: AUTOMATICALLY update the aws test service
           script:
             - . set-env.sh
+            - export ACTIVE_ENV_SM=test
             # get the ci scripts
             - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
             # build the container-definition.json
@@ -81,6 +82,7 @@ pipelines:
           trigger: manual
           script:
             - . set-env.sh
+            - export ACTIVE_ENV_SM=prod
             # get the ci scripts
             - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
             # build the container-definition.json
