@@ -1,6 +1,6 @@
 {
   "name": "hspc-sandbox-manager",
-  "version": "2.6.16-SNAPSHOT",
+  "version": "2.6.16",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
