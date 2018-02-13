@@ -94,21 +94,15 @@ pipelines:
             - aws ecs update-service --cluster hspc-prod --service "$AWS_SERVICE_NAME" --task-definition $AWS_CONTAINER_NAME:$TASK_VERSION
     feature/*:
       - step:
-          caches:
-            - maven
           script:
-            - mvn -B verify
+            - npm install
     release/*:
       - step:
-          caches:
-            - maven
           script:
-            - mvn -B verify
+            - npm install
     hotfix/*:
       - step:
-          caches:
-            - maven
           script:
-            - mvn -B verify
+            - npm install
 options:
   docker: true
