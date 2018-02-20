@@ -49,5 +49,6 @@
   "personaCookieTimeout": 180000,
   "personaCookieDomain": "localhost",
   "sandboxManagerApiUrl": "http://localhost:12000",
-  "sandboxManagerUrl": "https://sandbox-test.hspconsortium.org"
+  "sandboxManagerUrl": "https://sandbox-test.hspconsortium.org",
+  "ehrApp": "http://localhost:3000/launch/"
 }
