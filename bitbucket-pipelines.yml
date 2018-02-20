@@ -15,14 +15,16 @@ pipelines:
       - step:
           name: build the source code
           caches:
-            - maven
+            - node
           script:
-#            - mvn -V -B -s settings.xml deploy -P DEPLOY-HSPC,hspc-nexus
-            - mvn -B package
-#            - rm target/*-sources.jar
-#            - rm target/*-javadoc.jar
+            - export CURRENT_ENV=test
+            - export PROJECT_VERSION="2.8.0-SNAPSHOT"
+            - ./ci-1-prepare-sources.sh
+            - npm install
           artifacts:
-            - target/*.jar
+            - set-env.sh
+            - src/index.html
+            - src/static/js/services.js
       - step:
           name: build docker and upload to docker hub
           script:
@@ -34,7 +36,6 @@ pipelines:
           name: update the aws task definition
           script:
             - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
-            - export SPRING_PROFILES_ACTIVE=test
             - . bitbucket-pipelines-env.sh sandbox-manager test
             - export TEMPLATE_FILE="sandbox-ci/aws/templates/task-definition-template.json"
             - ./sandbox-ci/aws/scripts/env-substitution.sh $TEMPLATE_FILE
