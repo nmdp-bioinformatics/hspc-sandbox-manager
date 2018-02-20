@@ -2,9 +2,10 @@
 
 set -e
 
+
+
 echo "starting prepare_build.sh..."
 echo "PROJECT_VERSION: $PROJECT_VERSION"
-echo "PROJECT_NAME: $PROJECT_NAME"
 echo "CURRENT_ENV: $CURRENT_ENV"
 
 echo "dynamically fix the JavaScript references to bypass cache on new deployments"
