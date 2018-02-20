@@ -49,5 +49,7 @@
   "personaCookieTimeout": 180000,
   "personaCookieDomain": "hspconsortium.org",
   "sandboxManagerApiUrl": "https://sandbox-api.hspconsortium.org",
-  "sandboxManagerUrl": "https://sandbox.hspconsortium.org"
+  "sandboxManagerUrl": "https://sandbox.hspconsortium.org",
+  "ehrApp": "https://ehr-app.hspconsortium.org"
+
 }
