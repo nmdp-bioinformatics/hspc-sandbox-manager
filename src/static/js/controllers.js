@@ -2576,6 +2576,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.clientJSON.redirectUri = $scope.selected.selectedApp.authClient.redirectUri;
             $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
             $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+            $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
             $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri + "?" + new Date().getTime();
         } else {
             if ($scope.app.id) {
@@ -2593,6 +2594,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     }
                     $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
                     $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+                    $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
                     $scope.clientJSON.scope = $scope.clientJSON.scope.join(" ");
                     $rootScope.$digest();
                 });
@@ -2624,6 +2626,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
         $scope.save = function (clientJSON) {
+
             if (clientJSON.myFile !== undefined) {
                 $scope.selected.selectedApp.logo = clientJSON.myFile;
             }
@@ -2682,9 +2685,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.selected.selectedApp.clientJSON = updateClientJSON;
             $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
             $scope.selected.selectedApp.samplePatients = updateClientJSON.samplePatients;
-            $scope.selected.selectedApp.authClient.briefDescription = updateClientJSON.briefDescription;
             $scope.selected.selectedApp.briefDescription = updateClientJSON.briefDescription;
-            
+
             var modalProgress = openModalProgressDialog();
             appRegistrationServices.updateSandboxApp($scope.selected.selectedApp).then(function (result) {
                 $scope.select(result);
@@ -3139,6 +3141,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.clientJSON.redirectUri = $scope.selected.selectedApp.authClient.redirectUri;
             $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
             $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+            $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
             $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri + "?" + new Date().getTime();
         } else {
             if (app.id) {
@@ -3156,6 +3159,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     }
                     $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
                     $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+                    $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
                     $scope.clientJSON.scope = $scope.clientJSON.scope.join(" ");
                     $rootScope.$digest();
                 });
@@ -3284,6 +3288,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     }
 
     $scope.save = function (clientJSON) {
+        console.log(clientJSON);
+        console.log("above is clientJSON");
         if (clientJSON.myFile !== undefined) {
             $scope.selected.selectedApp.logo = clientJSON.myFile;
         }
@@ -3342,7 +3348,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.selected.selectedApp.clientJSON = updateClientJSON;
         $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
         $scope.selected.selectedApp.samplePatients = updateClientJSON.samplePatients;
-        $scope.selected.selectedApp.authClient.briefDescription = updateClientJSON.briefDescription;
         $scope.selected.selectedApp.briefDescription = updateClientJSON.briefDescription;
         var modalProgress = openModalProgressDialog();
         appRegistrationServices.updateSandboxApp($scope.selected.selectedApp).then(function (result) {
