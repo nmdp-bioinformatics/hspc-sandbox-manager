@@ -2682,6 +2682,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.selected.selectedApp.clientJSON = updateClientJSON;
             $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
             $scope.selected.selectedApp.samplePatients = updateClientJSON.samplePatients;
+            $scope.selected.selectedApp.authClient.briefDescription = updateClientJSON.briefDescription;
+            $scope.selected.selectedApp.briefDescription = updateClientJSON.briefDescription;
+            
             var modalProgress = openModalProgressDialog();
             appRegistrationServices.updateSandboxApp($scope.selected.selectedApp).then(function (result) {
                 $scope.select(result);
@@ -3339,6 +3342,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.selected.selectedApp.clientJSON = updateClientJSON;
         $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
         $scope.selected.selectedApp.samplePatients = updateClientJSON.samplePatients;
+        $scope.selected.selectedApp.authClient.briefDescription = updateClientJSON.briefDescription;
+        $scope.selected.selectedApp.briefDescription = updateClientJSON.briefDescription;
         var modalProgress = openModalProgressDialog();
         appRegistrationServices.updateSandboxApp($scope.selected.selectedApp).then(function (result) {
             $scope.select(result);

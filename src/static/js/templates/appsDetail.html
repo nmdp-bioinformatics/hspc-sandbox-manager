@@ -57,6 +57,13 @@
                 </div>
 
                 <div class="detail-form">
+                    <label class="detail-form-label">Brief Description</label>
+                    <div class="detail-form-label-input">
+                        <textarea style="resize: none; background-color: #fff; cursor: text; border-color:#f4f4f4" class="form-control" ng-model="clientJSON.briefDescription">{{clientJSON.briefDescription}}</textarea>
+                    </div>
+                </div>
+
+                <div class="detail-form">
                     <label class="detail-form-label">App Launch URI</label>
                     <div class="detail-form-label-input">
                         <input ng-disabled="!canModify || isInbound" ng-model="clientJSON.launchUri" class="form-control"/>
