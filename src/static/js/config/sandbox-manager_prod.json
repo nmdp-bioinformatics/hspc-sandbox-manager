@@ -1,11 +1,11 @@
 {
-  "defaultServiceUrl": "https://api-v5-stu3.hspconsortium.org/hspc5/data",
+  "defaultServiceUrl": "https://api-v5-stu32.hspconsortium.org/hspc6/data",
   "baseServiceUrl_1": "https://api.hspconsortium.org",
   "baseServiceUrl_2": "https://api2.hspconsortium.org",
   "baseServiceUrl_3": "https://api3.hspconsortium.org",
   "baseServiceUrl_4": "https://api-stu3.hspconsortium.org",
-  "baseServiceUrl_5": "https://api-v5-dstu2.hspconsortium.org",
-  "baseServiceUrl_6": "https://api-v5-stu3.hspconsortium.org",
+  "baseServiceUrl_5": "https://api-v5-dstu22.hspconsortium.org",
+  "baseServiceUrl_6": "https://api-v5-stu32.hspconsortium.org",
   "oauthLogoutUrl": "https://auth.hspconsortium.org/logout",
   "oauthUserInfoUrl": "https://auth.hspconsortium.org/userinfo",
   "sbmUrlHasContextPath": "false",
@@ -51,5 +51,4 @@
   "sandboxManagerApiUrl": "https://sandbox-api.hspconsortium.org",
   "sandboxManagerUrl": "https://sandbox.hspconsortium.org",
   "ehrApp": "https://ehr-app.hspconsortium.org"
-
 }
