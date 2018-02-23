@@ -17,87 +17,97 @@ pipelines:
           caches:
             - node
           script:
-            - export CURRENT_ENV=test
-            - export PROJECT_VERSION="2.8.0-SNAPSHOT"
-            - ./ci-1-prepare-sources.sh
+            - export PROJECT_VERSION=$(cat package.json | jq --raw-output '.version'); echo "PROJECT_VERSION - " $PROJECT_VERSION
+            - ./bitbucket-pipelines-prepare-sources.sh $PROJECT_VERSION test
             - npm install
           artifacts:
-            - set-env.sh
             - src/index.html
             - src/static/js/services.js
       - step:
           name: build docker and upload to docker hub
           script:
-            - . bitbucket-pipelines-env.sh sandbox-manager test
+            - export DOCKER_PROJECT_VERSION=$(cat package.json | jq --raw-output '.version');
+            - echo $DOCKER_PROJECT_VERSION
+            - export DOCKER_IMAGE_COORDINATES="hspconsortium/sandbox-manager:${DOCKER_PROJECT_VERSION}"
+            - echo $DOCKER_IMAGE_COORDINATES
             - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
-            - docker build -t $IMAGE_COORDINATES .
-            - docker push $IMAGE_COORDINATES
+            - docker build -t $DOCKER_IMAGE_COORDINATES .
+            - docker push $DOCKER_IMAGE_COORDINATES
       - step:
           name: update the aws task definition
           script:
-            - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
-            - . bitbucket-pipelines-env.sh sandbox-manager test
-            - export TEMPLATE_FILE="sandbox-ci/aws/templates/task-definition-template.json"
-            - ./sandbox-ci/aws/scripts/env-substitution.sh $TEMPLATE_FILE
+            - export TEMPLATE_FILE="aws/task-definition-test.json"
+            - export DOCKER_PROJECT_VERSION=$(cat package.json | jq --raw-output '.version');
+            - export DOCKER_IMAGE_COORDINATES="hspconsortium/sandbox-manager:${DOCKER_PROJECT_VERSION}"
+            - jq ".containerDefinitions[0].image = \"$DOCKER_IMAGE_COORDINATES\"" ${TEMPLATE_FILE} > tmp.json && mv tmp.json ${TEMPLATE_FILE}
             - cat $(echo "$TEMPLATE_FILE")
-            - jq '.containerDefinitions[0].environment += [{"name":"JASYPT_ENCRYPTOR_PASSWORD", "value":"'$ENC_PW_TEST'"}]' ${TEMPLATE_FILE} > tmp.json && mv tmp.json ${TEMPLATE_FILE}
-            - cat $(echo "$TEMPLATE_FILE")
-            - export TASK_RESPONSE=$(aws ecs register-task-definition --region $AWS_REGION --cli-input-json file://$TEMPLATE_FILE)
-            - echo $TASK_RESPONSE
+            - echo $(aws ecs register-task-definition --region us-east-1 --cli-input-json file://$TEMPLATE_FILE)
+      - step:
+          name: Update the aws service
+          deployment: test
+          script:
+            - export AWS_TASK_DEFINITION=$(aws ecs describe-task-definition --region us-east-1 --task-definition sandbox-manager-test)
+            - echo $AWS_TASK_DEFINITION
+            - export AWS_TASK_VERSION=$(echo $AWS_TASK_DEFINITION | jq --raw-output '.taskDefinition.revision')
+            - echo $AWS_TASK_VERSION
+            - echo $(aws ecs update-service --region us-east-1 --cluster sandbox-test --service sandbox-manager-test --task-definition sandbox-manager-test:${AWS_TASK_VERSION})
     master:
       - step:
-          name: build jar and upload to nexus
+          name: build the source code
           caches:
             - node
           script:
-            # get the ci scripts
-            - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
-            # build the set-env.sh script
-            - . sandbox-ci/bitbucket-pipeline-scripts/build-set-env-for-npm.sh prod 8080 100
-            - export CURRENT_ENV=prod
-            - ./ci-1-prepare-sources.sh
+            - export PROJECT_VERSION=$(cat package.json | jq --raw-output '.version'); echo "PROJECT_VERSION - " $PROJECT_VERSION
+            - ./bitbucket-pipelines-prepare-sources.sh $PROJECT_VERSION prod
             - npm install
           artifacts:
-            - set-env.sh
             - src/index.html
             - src/static/js/services.js
       - step:
           name: build docker and upload to docker hub
           script:
-            - . set-env.sh
-            - echo $IMAGE_COORDINATES
-            # build docker image and push
+            - export DOCKER_PROJECT_VERSION=$(cat package.json | jq --raw-output '.version');
+            - echo $DOCKER_PROJECT_VERSION
+            - export DOCKER_IMAGE_COORDINATES="hspconsortium/sandbox-manager:${DOCKER_PROJECT_VERSION}"
+            - echo $DOCKER_IMAGE_COORDINATES
             - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
-            - docker build -t $IMAGE_COORDINATES .
-            - docker push $IMAGE_COORDINATES
+            - docker build -t $DOCKER_IMAGE_COORDINATES .
+            - docker push $DOCKER_IMAGE_COORDINATES
       - step:
-          name: MANUALLY update the aws prod service
-          trigger: manual
+          name: update the aws task definition
           script:
-            - . set-env.sh
-            - export ACTIVE_ENV_SM=prod
-            # get the ci scripts
-            - git clone https://bitbucket.org/hspconsortium/sandbox-ci.git
-            # build the container-definition.json
-            - . sandbox-ci/bitbucket-pipeline-scripts/build-container-definition.sh $ENC_PW_PROD
-            # register the ECS task definition and capture the version
-            - export TASK_VERSION=$(aws ecs register-task-definition --family "$AWS_CONTAINER_NAME" --container-definitions $(cat sandbox-ci/bitbucket-pipeline-scripts/container-definitions.json | jq -c '.')  | jq --raw-output '.taskDefinition.revision')
-            - echo "Registered ECS Task Definition - $AWS_CONTAINER_NAME:$TASK_VERSION"
-            # override the service name
-            - export AWS_SERVICE_NAME=hspc-sandbox-manager-prod-service
-            # update the service to use the latest task definition
-            - aws ecs update-service --cluster hspc-prod --service "$AWS_SERVICE_NAME" --task-definition $AWS_CONTAINER_NAME:$TASK_VERSION
+            - export TEMPLATE_FILE="aws/task-definition-prod.json"
+            - export DOCKER_PROJECT_VERSION=$(cat package.json | jq --raw-output '.version');
+            - export DOCKER_IMAGE_COORDINATES="hspconsortium/sandbox-manager:${DOCKER_PROJECT_VERSION}"
+            - jq ".containerDefinitions[0].image = \"$DOCKER_IMAGE_COORDINATES\"" ${TEMPLATE_FILE} > tmp.json && mv tmp.json ${TEMPLATE_FILE}
+            - cat $(echo "$TEMPLATE_FILE")
+            - echo $(aws ecs register-task-definition --region us-east-1 --cli-input-json file://$TEMPLATE_FILE)
+      - step:
+          name: Update the aws service
+          deployment: production
+          script:
+            - export AWS_TASK_DEFINITION=$(aws ecs describe-task-definition --region us-east-1 --task-definition sandbox-manager-prod)
+            - echo $AWS_TASK_DEFINITION
+            - export AWS_TASK_VERSION=$(echo $AWS_TASK_DEFINITION | jq --raw-output '.taskDefinition.revision')
+            - echo $AWS_TASK_VERSION
+            - echo $(aws ecs update-service --region us-east-1 --cluster sandbox-prod --service sandbox-manager-prod --task-definition sandbox-manager-prod:${AWS_TASK_VERSION})
     feature/*:
       - step:
+          caches:
+            - maven
           script:
-            - npm install
+            - mvn -B verify
     release/*:
       - step:
+          caches:
+            - maven
           script:
-            - npm install
+            - mvn -B verify
     hotfix/*:
       - step:
+          caches:
+            - maven
           script:
-            - npm install
+            - mvn -B verify
 options:
   docker: true
