@@ -40,6 +40,7 @@ pipelines:
             - export DOCKER_PROJECT_VERSION=$(cat package.json | jq --raw-output '.version');
             - export DOCKER_IMAGE_COORDINATES="hspconsortium/sandbox-manager:${DOCKER_PROJECT_VERSION}"
             - jq ".containerDefinitions[0].image = \"$DOCKER_IMAGE_COORDINATES\"" ${TEMPLATE_FILE} > tmp.json && mv tmp.json ${TEMPLATE_FILE}
+            - jq '.containerDefinitions[0].environment += [{"name":"ACTIVE_ENV", "value":"test"}]' ${TEMPLATE_FILE} > tmp.json && mv tmp.json ${TEMPLATE_FILE}
             - cat $(echo "$TEMPLATE_FILE")
             - echo $(aws ecs register-task-definition --region us-east-1 --cli-input-json file://$TEMPLATE_FILE)
       - step:
@@ -80,11 +81,13 @@ pipelines:
             - export DOCKER_PROJECT_VERSION=$(cat package.json | jq --raw-output '.version');
             - export DOCKER_IMAGE_COORDINATES="hspconsortium/sandbox-manager:${DOCKER_PROJECT_VERSION}"
             - jq ".containerDefinitions[0].image = \"$DOCKER_IMAGE_COORDINATES\"" ${TEMPLATE_FILE} > tmp.json && mv tmp.json ${TEMPLATE_FILE}
+            - jq '.containerDefinitions[0].environment += [{"name":"ACTIVE_ENV", "value":"prod"}]' ${TEMPLATE_FILE} > tmp.json && mv tmp.json ${TEMPLATE_FILE}
             - cat $(echo "$TEMPLATE_FILE")
             - echo $(aws ecs register-task-definition --region us-east-1 --cli-input-json file://$TEMPLATE_FILE)
       - step:
           name: Update the aws service
           deployment: production
+          trigger: manual
           script:
             - export AWS_TASK_DEFINITION=$(aws ecs describe-task-definition --region us-east-1 --task-definition sandbox-manager-prod)
             - echo $AWS_TASK_DEFINITION

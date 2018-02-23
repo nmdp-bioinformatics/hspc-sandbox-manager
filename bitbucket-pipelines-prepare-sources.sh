@@ -19,10 +19,10 @@ else
   cat src/index.html
 fi
 
-echo "dynamically configuring the services.js"
-sed -i -e "s/replacethiswithcurrentenvironment/$2/g" src/static/js/services.js
-
-echo "active_env:"
-cat ./src/static/js/services.js | grep "var active_env ="
+#echo "dynamically configuring the services.js"
+#sed -i -e "s/replacethiswithcurrentenvironment/$2/g" src/static/js/services.js
+#
+#echo "active_env:"
+#cat ./src/static/js/services.js | grep "var active_env ="
 
 echo "finished prepare_build.sh"
