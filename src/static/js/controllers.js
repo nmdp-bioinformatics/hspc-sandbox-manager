@@ -1588,7 +1588,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
                 appsSettings.getSettings().then(function (settings) {
                     sandboxApiUrl = settings.sandboxManagerApiUrl;
-                    sandboxApiUrl = sandboxApiUrl.substring(7);
+                    sandboxApiUrl = sandboxApiUrl.substring(8);
                     ehrApp = settings.ehrApp;
 
                     fhirUrl = settings.baseServiceUrl_1 + "/" + $scope.sandbox.sandboxId + "/open";
@@ -1617,7 +1617,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     //     alert("match found at " + match.index);
                     //     console.log(test);
                     // }
-                    fhirUrl = fhirUrl.substring(7,index);
+                    fhirUrl = fhirUrl.substring(8,index);
                 });
 
                 var launchUrl = ehrApp + sandboxId + "/" + sandboxApiUrl + "/" + fhirUrl + "/"+ bearer;
