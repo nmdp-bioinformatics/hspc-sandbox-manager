@@ -1,0 +1,36 @@
+{
+  "executionRoleArn": "arn:aws:iam::657600230790:role/ecsTaskExecutionRole",
+  "family": "sandbox-manager-test",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "sandbox-manager-test",
+      "image": "TBD",
+      "cpu": 256,
+      "memoryReservation": 512,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/sandbox-manager-test",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "portMappings": [
+        {
+          "hostPort": 8080,
+          "protocol": "tcp",
+          "containerPort": 8080
+        }
+      ],
+      "environment": [
+      ],
+      "essential": true
+    }
+  ],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512"
+}

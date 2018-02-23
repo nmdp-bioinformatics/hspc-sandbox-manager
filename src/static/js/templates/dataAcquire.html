@@ -3,10 +3,7 @@
         <div style="padding-right: 0; padding-left: 0" ng-class="showing.patientDetail ? 'col-lg-8 right-border' : 'col-lg-12'">
             <div class="fhir-endpoint-bar">
                 <div class="fhir-endpoint-label"><label>FHIR Endpoint</label></div>
-                <div id="apiSourceDropdown" class="btn-group" uib-dropdown>
-                    <button type="button" class="btn btn-default" uib-dropdown-toggle>
-                        <i class="fa fa-caret-down"></i>
-                    </button>
+                <div id="apiSourceDropdown" class="btn-group" uib-dropdown style="margin-bottom: 8px">
                     <ul class="dropdown-menu" uib-dropdown-menu role="menu">
                         <li role="menuitem" ng-repeat="endpoint in fhirEndpoints" ng-click="selectEndpoint(endpoint)" ><a href="#">{{endpoint.name}}
                             <!--For some reason ng-class wouldn't work here. Used ng-show instead.-->
@@ -16,11 +13,15 @@
                         <!--<li class="divider"></li>-->
                         <!--<li role="menuitem"><a href="#">Custom</a></li>-->
                     </ul>
+                    <button type="button" class="btn btn-default" uib-dropdown-toggle style="width: unset">
+                        Select FHIR Endpoint
+                        <i class="fa fa-caret-down"></i>
+                    </button>
                 </div>
 
                 <div id="apiSourceInput" class="form-group fhir-endpoint-field">
-                    <input type="text" ng-disabled="true" class="form-control" ng-model="selected.fhirEndpoint.endpoint">
-                    <p class="help-block">
+                    <input type="text" ng-disabled="true" class="form-control" ng-model="selected.fhirEndpoint.endpoint" style="margin-left: -33px; margin-bottom: 5px;">
+                    <p class="help-block" style="margin-left: -30px; margin-bottom: 5px">
                         {{selected.fhirEndpoint.name}}
                         <!--For some reason ng-class wouldn't work here. Used ng-show instead.-->
                         <span tooltip-placement="bottom" class="label label-success" ng-show="selected.fhirEndpoint.match">{{selected.fhirEndpoint.version}}</span>
@@ -28,19 +29,19 @@
                     </p>
                 </div>
             </div>
-            <div class="search-bar externalQuery">
+            <div class="search-bar externalQuery" style="margin-top: 40px">
                 <div class="search-label"><label>FHIR Query</label></div>
                 <div class="search-field typeahead">
                     <input enter-key="queryExternalFhirServer(settings.externalFhirQuery)" type="text" class="input-box form-control" ng-model="settings.externalFhirQuery"
                            uib-typeahead="item for item in filterExternalQuery($viewValue)"
-                           typeahead-on-select="settings.externalFhirQuery = $item; queryExternalFhirServer(settings.externalFhirQuery)" typeahead-min-length="0">
+                           typeahead-on-select="settings.externalFhirQuery = $item; queryExternalFhirServer(settings.externalFhirQuery)" typeahead-min-length="0" style="margin-left: 0px;">
 
-                    <a href='#' class='undo-icon' ng-show="settings.externalFhirQuery != ''" ng-click="settings.externalFhirQuery = ''; queryExternalFhirServer('clear')"><i class='fa fa-remove fa-lg'></i></a>
+                    <a href='#' class='undo-icon' ng-show="settings.externalFhirQuery != ''" ng-click="settings.externalFhirQuery = ''; queryExternalFhirServer('clear')"><i class='fa fa-remove fa-lg' style="padding-top: 7px;"></i></a>
                     <a href='#' class='search-icon' ng-click="queryExternalFhirServer(settings.externalFhirQuery)"><i class='fa fa-search fa-lg'></i></a>
                 </div>
             </div>
             <div class="row">
-                <div class="query-input">
+                <div class="query-input" style="margin: 10px 0px 10px 200px">
                     <label class="query-result-label" style="width: 40px; margin-left: 32px;">Total </label>
                     <label ng-show="settings.showing.results" class="query-result-label" style="width: 60px; font-weight: 600">{{settings.externalResultTotal}}</label>
                     <label class="query-result-label" style="width: 80px">Current Set </label>

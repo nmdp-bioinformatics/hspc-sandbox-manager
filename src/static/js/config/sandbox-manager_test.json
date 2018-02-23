@@ -1,11 +1,11 @@
 {
-  "defaultServiceUrl": "https://api-stu3-test.hspconsortium.org/hspc5/data",
+  "defaultServiceUrl": "https://api-v5-stu3-test.hspconsortium.org/hspc6/data",
   "baseServiceUrl_1": "https://api-test.hspconsortium.org",
   "baseServiceUrl_2": "https://api2-test.hspconsortium.org",
   "baseServiceUrl_3": "https://api3-test.hspconsortium.org",
   "baseServiceUrl_4": "https://api-stu3-test.hspconsortium.org",
-  "baseServiceUrl_5": "https://api-dstu2-test.hspconsortium.org",
-  "baseServiceUrl_6": "https://api-stu3-test.hspconsortium.org",
+  "baseServiceUrl_5": "https://api-v5-dstu2-test.hspconsortium.org",
+  "baseServiceUrl_6": "https://api-v5-stu3-test.hspconsortium.org",
   "oauthLogoutUrl": "https://auth-test.hspconsortium.org/logout",
   "oauthUserInfoUrl": "https://auth-test.hspconsortium.org/userinfo",
   "sbmUrlHasContextPath": "false",
@@ -49,5 +49,6 @@
   "personaCookieTimeout": 180000,
   "personaCookieDomain": "hspconsortium.org",
   "sandboxManagerApiUrl": "https://sandbox-api-test.hspconsortium.org",
-  "sandboxManagerUrl": "https://sandbox-test.hspconsortium.org"
+  "sandboxManagerUrl": "https://sandbox-test.hspconsortium.org",
+  "ehrApp": "https://ehr-app-test.hspconsortium.org"
 }

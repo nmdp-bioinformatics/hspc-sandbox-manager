@@ -1550,9 +1550,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         }
 
     }).controller("SideBarController",
-    function ($rootScope, $scope, docLinks) {
+    function ($rootScope, $scope, $window, docLinks, fhirApiServices, appsSettings, sandboxManagement) {
 
         $scope.docLink = docLinks.docLink;
+        $scope.sandbox = angular.copy(sandboxManagement.getSandbox());
 
         var sideBarStates = ['launch-scenarios', 'users', 'personas', 'patients', 'practitioners', 'manage-apps'];
 
@@ -1573,6 +1574,61 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         $scope.toggleSize = function () {
             $scope.showing.largeSidebar = !$scope.showing.largeSidebar;
+        };
+
+        $scope.redirectToEhrApp = function () {
+
+            try{
+                var bearer = fhirApiServices.fhirClient().server.auth.token;
+                var sandboxApiUrl = "";
+                var ehrApp = "";
+                var fhirUrl = "";
+                var sandboxId = appsSettings.getSandboxUrlSettings().sandboxId;
+                var apiEndpointIndex = sandboxManagement.getSandbox().apiEndpointIndex;
+
+                appsSettings.getSettings().then(function (settings) {
+                    sandboxApiUrl = settings.sandboxManagerApiUrl;
+                    sandboxApiUrl = sandboxApiUrl.substring(7);
+                    ehrApp = settings.ehrApp;
+
+                    fhirUrl = settings.baseServiceUrl_1 + "/" + $scope.sandbox.sandboxId + "/open";
+                    if (apiEndpointIndex === "2") {
+                        fhirUrl = settings.baseServiceUrl_2 + "/" + $scope.sandbox.sandboxId + "/open";
+                    } else if (apiEndpointIndex === "3") {
+                        fhirUrl = settings.baseServiceUrl_3 + "/" + $scope.sandbox.sandboxId + "/open";
+                    } else if (apiEndpointIndex === "4") {
+                        fhirUrl = settings.baseServiceUrl_4 + "/" + $scope.sandbox.sandboxId + "/open";
+                    } else if (apiEndpointIndex === "5") {
+                        fhirUrl = settings.baseServiceUrl_5 + "/" + $scope.sandbox.sandboxId + "/open";
+                    } else if (apiEndpointIndex === "6") {
+                        fhirUrl = settings.baseServiceUrl_6 + "/" + $scope.sandbox.sandboxId + "/open";
+                    }
+
+                    var reg = /\//g;
+                    var match,i=0,index;
+                    while ((match = reg.exec(fhirUrl)) != null) {
+                        i++
+                        if(i==3){
+                            index = match.index;
+                        }
+                    }
+
+                    // while ((match = pattern.exec(fhirUrl)) != null) {
+                    //     alert("match found at " + match.index);
+                    //     console.log(test);
+                    // }
+                    fhirUrl = fhirUrl.substring(7,index);
+                });
+
+                var launchUrl = ehrApp + sandboxId + "/" + sandboxApiUrl + "/" + fhirUrl + "/"+ bearer;
+
+                $window.open(launchUrl, '_blank');
+            } catch(error){
+                console.log("There was an error opening ehr-app");
+                console.log(error);
+            }
+
+
         };
 
     }).controller("PatientViewController",
@@ -2576,6 +2632,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.clientJSON.redirectUri = $scope.selected.selectedApp.authClient.redirectUri;
             $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
             $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+            $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
             $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri + "?" + new Date().getTime();
         } else {
             if ($scope.app.id) {
@@ -2593,6 +2650,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     }
                     $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
                     $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+                    $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
                     $scope.clientJSON.scope = $scope.clientJSON.scope.join(" ");
                     $rootScope.$digest();
                 });
@@ -2624,6 +2682,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
         $scope.save = function (clientJSON) {
+
             if (clientJSON.myFile !== undefined) {
                 $scope.selected.selectedApp.logo = clientJSON.myFile;
             }
@@ -2682,6 +2741,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.selected.selectedApp.clientJSON = updateClientJSON;
             $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
             $scope.selected.selectedApp.samplePatients = updateClientJSON.samplePatients;
+            $scope.selected.selectedApp.briefDescription = updateClientJSON.briefDescription;
+
             var modalProgress = openModalProgressDialog();
             appRegistrationServices.updateSandboxApp($scope.selected.selectedApp).then(function (result) {
                 $scope.select(result);
@@ -3136,6 +3197,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.clientJSON.redirectUri = $scope.selected.selectedApp.authClient.redirectUri;
             $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
             $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+            $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
             $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri + "?" + new Date().getTime();
         } else {
             if (app.id) {
@@ -3153,6 +3215,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     }
                     $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
                     $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+                    $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
                     $scope.clientJSON.scope = $scope.clientJSON.scope.join(" ");
                     $rootScope.$digest();
                 });
@@ -3281,6 +3344,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     }
 
     $scope.save = function (clientJSON) {
+        console.log(clientJSON);
+        console.log("above is clientJSON");
         if (clientJSON.myFile !== undefined) {
             $scope.selected.selectedApp.logo = clientJSON.myFile;
         }
@@ -3339,6 +3404,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.selected.selectedApp.clientJSON = updateClientJSON;
         $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
         $scope.selected.selectedApp.samplePatients = updateClientJSON.samplePatients;
+        $scope.selected.selectedApp.briefDescription = updateClientJSON.briefDescription;
         var modalProgress = openModalProgressDialog();
         appRegistrationServices.updateSandboxApp($scope.selected.selectedApp).then(function (result) {
             $scope.select(result);

@@ -7,13 +7,13 @@
                        uib-typeahead="item for item in filterQuery($viewValue)"
                        typeahead-on-select="settings.fhirQuery = $item; runQuery(settings.fhirQuery)" typeahead-min-length="0">
 
-                <a href='#' class='undo-icon' ng-show="settings.fhirQuery != ''" ng-click="settings.fhirQuery = ''; runQuery('clear')"><i class='fa fa-remove fa-lg'></i></a>
+                <a href='#' class='undo-icon' ng-show="settings.fhirQuery != ''" ng-click="settings.fhirQuery = ''; runQuery('clear')"><i class='fa fa-remove fa-lg' style="padding-top: 7px;"></i></a>
                 <a href='#' class='search-icon' ng-click="runQuery(settings.fhirQuery)"><i class='fa fa-search fa-lg'></i></a>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="query-input">
+        <div class="query-input" style="margin-left: 125px">
             <label class="query-result-label" style="width: 40px; margin-left: 123px;">Total </label>
             <label ng-show="settings.showing.results" class="query-result-label" style="width: 60px; font-weight: 600">{{settings.resultTotal}}</label>
             <label class="query-result-label" style="width: 80px">Current Set </label>

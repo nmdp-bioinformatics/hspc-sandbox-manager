@@ -1,5 +1,5 @@
 {
-  "defaultServiceUrl": "http://localhost:8076/stu3/data",
+  "defaultServiceUrl": "http://localhost:8076/hspc6/data",
   "baseServiceUrl_1": "http://localhost:8071",
   "baseServiceUrl_2": "http://localhost:8072",
   "baseServiceUrl_3": "http://localhost:8073",
@@ -49,5 +49,6 @@
   "personaCookieTimeout": 180000,
   "personaCookieDomain": "localhost",
   "sandboxManagerApiUrl": "http://localhost:12000",
-  "sandboxManagerUrl": "https://sandbox-test.hspconsortium.org"
+  "sandboxManagerUrl": "https://sandbox-test.hspconsortium.org",
+  "ehrApp": "http://localhost:3000/launch/"
 }
