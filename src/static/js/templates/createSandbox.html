@@ -6,16 +6,17 @@
             <div class="columns-group">
                 <div class="single-column">
                     <div class="create-form-group">
-                        <label class="create-form-label">Sandbox ID<span class="required">*</span></label>
-                        <input ng-model="sandboxId" class="create-form-input-box red-popover" popover-enable="showError" popover-is-open="showError" popover-trigger="none" popover-placement="right" uib-popover="{{invalidMessage}}" required/>
-                        <i ng-show="!isIdValid" class='create-form-input-icon fa fa-close fa-lg'></i>
-                        <label class="create-form-description">Your sandbox will be available at {{baseUrl}}/{{tempSandboxId}}</label>
-                    </div>
-                    <div class="create-form-group">
-                        <label class="create-form-label">Sandbox Name</label>
-                        <input ng-model="sandboxName" class="create-form-input-box" maxlength="{{selecteddata.Type.MaxLength}}"/>
+                        <label class="create-form-label">Sandbox Name<span class="required">*</span></label>
+                        <input ng-model="sandboxName" ng-blur="createUniqueId()" class="create-form-input-box" maxlength="{{selecteddata.Type.MaxLength}}"/>
                         <i ng-show="!isNameValid" class='create-form-input-icon fa fa-close fa-lg'></i>
                         <label class="create-form-description">e.g., NewCo Sandbox. Must be less than 50 characters.</label>
+                    </div>
+                    <div class="create-form-group">
+                        <label class="create-form-label">Sandbox ID<span class="required">*</span></label>
+                        <input ng-model="sandboxId" tabindex="-1" class="create-form-input-box red-popover" popover-enable="showError" popover-is-open="showError" popover-trigger="none" popover-placement="right" uib-popover="{{invalidMessage}}" required/>
+                        <i ng-show="!isIdValid" class='create-form-input-icon fa fa-close fa-lg'></i>
+                        <label class="create-form-description">Letters and numbers only. Must be less than 20 characters.</label>
+                        <label class="create-form-description">Your sandbox will be available at {{baseUrl}}/{{tempSandboxId}}</label>
                     </div>
                     <div class="create-form-group">
                         <label class="create-form-label">Sandbox Version</label>

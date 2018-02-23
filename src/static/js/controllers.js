@@ -1480,27 +1480,58 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.selectedSandboxApiEndpointIndex = apiEndpointIndexServices.getSandboxApiEndpointIndexDetails($scope.apiEndpointIndex);
         });
 
-        $scope.validateId = function (id) {
-            var deferred = $.Deferred();
+      $scope.createUniqueId = function() {
+        $scope.sandboxId = $scope.sandboxName.split(/[^A-Za-z0-9]/).join("").substr(0,20);
+        $scope.incrementId($scope.sandboxId, 0);
+      };
 
-            $scope.invalidMessage = "ID Not Available";
-            if ($scope.tempSandboxId !== id) {
-                $scope.tempSandboxId = id;
-                if (id !== undefined && id !== "" && id.length <= 20 && /^[a-zA-Z0-9]*$/.test(id)) {
-                    tools.checkForSandboxById(id).then(function (sandbox) {
-                        deferred.resolve(sandbox === undefined || sandbox === "");
-                    });
-                } else {
-                    $scope.tempSandboxId = "<sandbox id>";
-                    $scope.invalidMessage = "ID Is Invalid";
-                    deferred.resolve(false);
-                }
-            } else {
-                deferred.resolve($scope.isIdValid);
+      $scope.incrementId = function (id, count) {
+        $scope.validateId(id).then(function (valid) {
+          var tempId = $scope.sandboxId;
+          if(valid === false && $scope.sandboxId !== "") {
+            count += 1;
+            tempId = id + count.toString();
+            $scope.incrementId(tempId, count);
+          }
+          else {
+            if(count !== 0) {
+              $scope.sandboxId += count.toString();
             }
-            return deferred;
+            $scope.isIdValid = true;
+            return;
+          }
+        })
+      };
 
-        };
+      $scope.validateId = function (id) {
+        var deferred = $.Deferred();
+
+        $scope.invalidMessage = "ID Not Available";
+        if ($scope.tempSandboxId !== id) {
+          $scope.tempSandboxId = id;
+          if (id !== undefined && id !== "" && id.length <= 20 && /^[a-zA-Z0-9]*$/.test(id)) {
+            tools.checkForSandboxById(id).then(function (sandbox) {
+              deferred.resolve(sandbox === undefined || sandbox === "");
+            });
+          } else {
+            $scope.tempSandboxId = "<sandbox id>";
+            if(!/^[a-zA-Z0-9]*$/.test(id)) {
+              $scope.invalidMessage = "Invalid character(s)";
+            }
+            else if(id.length > 20) {
+              $scope.invalidMessage = "More than 20 characters";
+            }
+            else {
+              $scope.invalidMessage = "ID Is Invalid";
+            }
+            deferred.resolve(false);
+          }
+        } else {
+          deferred.resolve($scope.isIdValid);
+        }
+        return deferred;
+
+      };
 
         $scope.validateName = function (name) {
             if (name !== undefined && name !== "" && name.length > 50) {
@@ -3541,6 +3572,20 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     function valueSet(value) {
         return (typeof value !== 'undefined' && value !== '');
     }
+
+  $scope.changeRedirectUri = function () {
+    if($scope.clientJSON.launchUri.substring(0,4) === 'http') {
+      var pathArray = $scope.clientJSON.launchUri.split( '/' );
+      var protocol = pathArray[0];
+      var host = pathArray[2];
+      var url = protocol + '//' + host;
+      $scope.clientJSON.redirectUris = url + '/';
+    }
+    else {
+      var pathArray = $scope.clientJSON.launchUri.split( '/' );
+      $scope.clientJSON.redirectUris = pathArray[0] + '/';
+    }
+  }
 
     $scope.registerApp = function (clientJSON) {
 
