@@ -50,5 +50,5 @@
   "personaCookieDomain": "hspconsortium.org",
   "sandboxManagerApiUrl": "https://sandbox-api.hspconsortium.org",
   "sandboxManagerUrl": "https://sandbox.hspconsortium.org",
-  "ehrApp": "https://ehr-app.hspconsortium.org"
+  "ehrApp": "https://ehr-app.hspconsortium.org/launch/"
 }
