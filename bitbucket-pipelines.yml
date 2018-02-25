@@ -96,21 +96,24 @@ pipelines:
             - echo $(aws ecs update-service --region us-east-1 --cluster sandbox-prod --service sandbox-manager-prod --task-definition sandbox-manager-prod:${AWS_TASK_VERSION})
     feature/*:
       - step:
+          name: build the source code
           caches:
-            - maven
+            - node
           script:
-            - mvn -B verify
+            - npm install
     release/*:
       - step:
+          name: build the source code
           caches:
-            - maven
+            - node
           script:
-            - mvn -B verify
+            - npm install
     hotfix/*:
       - step:
+          name: build the source code
           caches:
-            - maven
+            - node
           script:
-            - mvn -B verify
+            - npm install
 options:
   docker: true
