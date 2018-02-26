@@ -1,6 +1,6 @@
 FROM node:alpine
 
 COPY . .
-ENV ACTIVE_ENV="test"
+ENV TARGET_ENV="test"
 RUN npm install
 CMD [ "npm", "run", "serve" ]
