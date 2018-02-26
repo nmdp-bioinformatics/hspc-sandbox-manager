@@ -16,10 +16,10 @@ echo "dynamically fix the JavaScript references to bypass cache on new deploymen
 sed -E -i -e "s/.js\?r=[0-9.]+(-SNAPSHOT|-latest)?/.js\?r=${PROJECT_VERSION}/g" ../src/index.html
 if ! [ -s ../src/index.html ]
 then
-  echo "src/index.html is empty!"
+  echo "../src/index.html is empty!"
   exit 1
 else
-  cat src/index.html
+  cat ../src/index.html
 fi
 
 echo "dynamically configuring the services.js"
