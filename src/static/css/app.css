@@ -238,6 +238,14 @@
     width: 100%;
 }
 
+.tool-tip {
+    position: absolute;
+    width: 82px;
+    height: 30px;
+    top: 65px;
+    left: 496px;
+}
+
 .settings-container {
     overflow: auto;
     padding: 5px 5px 10px 0;
