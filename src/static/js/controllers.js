@@ -1618,8 +1618,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 var apiEndpointIndex = sandboxManagement.getSandbox().apiEndpointIndex;
 
                 appsSettings.getSettings().then(function (settings) {
+                    var protocolLength = window.location.protocol.length + 2;
                     sandboxApiUrl = settings.sandboxManagerApiUrl;
-                    sandboxApiUrl = sandboxApiUrl.substring(8);
+                    sandboxApiUrl = sandboxApiUrl.substring(protocolLength);
                     ehrApp = settings.ehrApp;
 
                     fhirUrl = settings.baseServiceUrl_1 + "/" + $scope.sandbox.sandboxId + "/open";
@@ -1648,7 +1649,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     //     alert("match found at " + match.index);
                     //     console.log(test);
                     // }
-                    fhirUrl = fhirUrl.substring(8,index);
+                    fhirUrl = fhirUrl.substring(protocolLength,index);
                 });
 
                 var launchUrl = ehrApp + sandboxId + "/" + sandboxApiUrl + "/" + fhirUrl + "/"+ bearer;
@@ -2701,7 +2702,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 }
             });
         }
-    
+
         $scope.updateFile = function (files) {
             $scope.clientJSON.myFile = files[0];
             var reader = new FileReader();
@@ -2720,25 +2721,25 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             var updateClientJSON = angular.copy(clientJSON);
             delete updateClientJSON.logo;
             delete updateClientJSON.myFile;
-    
+
             if (updateClientJSON.logoUri) {
                 var i = updateClientJSON.logoUri.lastIndexOf("?");
                 if (i > -1) {
                     updateClientJSON.logoUri = updateClientJSON.logoUri.substr(0, i);
                 }
             }
-    
+
             if ($scope.clientJSON.clientType !== "Public Client") {
                 updateClientJSON.tokenEndpointAuthMethod = "SECRET_BASIC";
             } else {
                 updateClientJSON.tokenEndpointAuthMethod = "NONE";
             }
-    
+
             if (Object.prototype.toString.call(updateClientJSON.redirectUris) !== '[object Array]' &&
                 typeof updateClientJSON.redirectUris !== 'undefined') {
                 updateClientJSON.redirectUris = updateClientJSON.redirectUris.split(',');
             }
-    
+
             if (Object.prototype.toString.call(updateClientJSON.scope) !== '[object Array]' &&
                 typeof updateClientJSON.scope !== 'undefined') {
                 updateClientJSON.scope = updateClientJSON.scope.split(' ');
@@ -2746,7 +2747,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     updateClientJSON.scope.push("launch");
                 }
             }
-    
+
             if (!contains(updateClientJSON.scope, "offline_access")) {
                 var index = updateClientJSON.grantTypes.indexOf("refresh_token");
                 if (index > -1) {
@@ -2758,7 +2759,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 }
                 updateClientJSON.requireAuthTime = false;
             }
-    
+
             function contains(array, item) {
                 var found = false;
                 array.forEach(function (cur) {
@@ -2768,7 +2769,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 });
                 return found;
             }
-    
+
             $scope.selected.selectedApp.clientJSON = updateClientJSON;
             $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
             $scope.selected.selectedApp.samplePatients = updateClientJSON.samplePatients;
@@ -2784,7 +2785,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             });
             $uibModalInstance.dismiss();
         };
-    
+
         $scope.delete = function () {
             $scope.showing.appDetail = false;
             $uibModal.open({
@@ -2812,7 +2813,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             });
             $uibModalInstance.dismiss();
         };
-    
+
         $scope.launch = function (app) {
             console.log('launch:', app);
             $uibModalInstance.close(app);
@@ -3310,8 +3311,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.quickLaunch(app)
         }, function () {
         });
-    };    
-    
+    };
+
     $scope.quickLaunch = function (app, sample) {
         var patientQuery;
         if (sample !== undefined) {
