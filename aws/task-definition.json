@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "sandbox-manager-test",
-      "image": "hspconsortium/sandbox-manager:2.9.1",
+      "image": "hspconsortium/sandbox-manager:2.9.2-SNAPSHOT",
       "cpu": 0,
       "portMappings": [
         {
