@@ -9,6 +9,7 @@
     "appUri": "https://bilirubin-risk-chart.hspconsortium.org/",
     "launchUri": "https://bilirubin-risk-chart.hspconsortium.org/launch.html",
     "logoUri": "https://content.hspconsortium.org/images/bilirubin/logo/bilirubin.png",
+    "samplePatients": "Patient?_id=BILIBABY,SMART-1288992",
     "briefDescription": "The HSPC Bilirubin Risk Chart is a sample app that demonstrates many of the features of the SMART on FHIR app launch specification and HL7 FHIR standard."
   },
   {
