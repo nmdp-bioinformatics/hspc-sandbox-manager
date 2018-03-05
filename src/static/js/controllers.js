@@ -52,7 +52,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             moreLinks: false,
             apps: true,
             start: false,
-            defaultLaunchScenario: true
+            defaultLaunchScenario: false
         };
 
         $scope.title = {blueBarTitle: branded.mainTitle};
@@ -1586,7 +1586,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.docLink = docLinks.docLink;
         $scope.sandbox = angular.copy(sandboxManagement.getSandbox());
 
-        var sideBarStates = ['launch-scenarios', 'users', 'personas', 'patients', 'practitioners', 'manage-apps'];
+        var sideBarStates = ['manage-apps', 'launch-scenarios', 'users', 'personas', 'patients', 'practitioners'];
 
         $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
             if (sideBarStates.indexOf(toState.name) > -1) {
