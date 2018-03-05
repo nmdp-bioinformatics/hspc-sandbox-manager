@@ -776,14 +776,13 @@ span.title,
 
 .navbar-sandboxes {
     position: absolute;
-    top: 21px;
-    left: 200px;
+    top: 20px;
+    left: 220px;
     /*height: 60px;*/
 }
 
 .navbar-sandboxes .navbar-button {
     position: absolute;
-    top: 20px;
     left: 265px;
 }
 
@@ -798,7 +797,7 @@ span.title,
 }
 
 .navbar-sandboxes > a>i {
-    font-size: 14px;
+    font-size: 18px;
     position: absolute;
     top: 4px;
     right: -11px;
@@ -2127,7 +2126,7 @@ td {
 }
 
 .scrollableContainer {
-    height: 200px;
+    height: 400px;
     position: relative;
     padding-top: 37px;
     /*margin-bottom: 10px;*/
