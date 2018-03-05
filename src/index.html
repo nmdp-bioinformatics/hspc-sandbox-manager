@@ -31,7 +31,7 @@
 
     <!-- CSS (load bootstrap) -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="static/css/app.css">
     <link rel="stylesheet" href="static/libs/ng-alerts/ng-alerts.min.css">
     <style>
@@ -72,7 +72,7 @@
 
     <div class="navbar-stack-box">
         <div class="navbar-stack-name" ng-show="showing.signout" ng-cloak>
-            <a id="welcome" tabindex="2" href="#" uib-popover-template="'static/js/templates/settingsPopover.html'" popover-trigger="'focus'" popover-placement="bottom" ><span style="font-weight: 500;">{{oauthUser.name.toUpperCase()}}</span></a>
+            <a id="welcome" tabindex="2" href="#" uib-popover-template="'static/js/templates/settingsPopover.html'" popover-trigger="'focus'" popover-placement="bottom" ><span style="font-weight: 300;">{{oauthUser.name.toUpperCase()}}</span></a>
         </div>
         <div class="navbar-stack-sign-in" ng-show="showing.signin" ng-cloak>
             <a id="signin" ng-click="signin()"><i class="fa fa-sign-in"></i> Sign In</a>
@@ -86,7 +86,7 @@
         <div class="navbar-admin-dashboard" ng-show="showing.signout && isSystemAdmin() && !showing.sideNavBar" ui-sref="admin-dashboard" ng-cloak><a tabindex="2" style="cursor: pointer" href="#"><i class="fa fa-tachometer fa-lg"></i></a></div>
     </div>
 
-    <div class="navbar-sandboxes" ng-show="showing.signout && showing.sideNavBar && dashboard.sandboxes.length > 0" ng-cloak><a tabindex="1" style="cursor: pointer"  href="#" uib-popover-template="'static/js/templates/sandboxPopover.html'" popover-trigger="'focus'" popover-placement="bottom">Sandboxes <i class="fa fa-sort-desc fa-lg"></i></a></div>
+    <div class="navbar-sandboxes" ng-show="showing.signout && showing.sideNavBar && dashboard.sandboxes.length > 0" ng-cloak><a tabindex="1" style="cursor: pointer"  href="#" uib-popover-template="'static/js/templates/sandboxPopover.html'" popover-trigger="'focus'" popover-placement="bottom">Sandboxes&nbsp;<i class="fa fa-sort-desc fa-lg"></i></a></div>
 </nav>
 
 <!--<div class="blue-bar" ng-show="showing.progress">-->
