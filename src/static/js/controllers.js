@@ -3783,7 +3783,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 getSandboxInvites();
                 $rootScope.records.push($rootScope.records);
             });
-
+            $rootScope.$emit('refresh-sandboxes');
         };
 
         $scope.records;
