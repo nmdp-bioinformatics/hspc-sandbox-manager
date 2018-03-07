@@ -16,14 +16,12 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                             title: "Sandbox Invites",
                             cancel: "Close",
                             type: "confirm-error",
-                            callback: function (result) { //setting callback
-                                if (result == true) {
-                                    modalProgress.dismiss();
-                                }
-                            }
+
                         };
                     }
                 }
+            }).closed.then(function(){
+                $state.reload();
             });
         };
 
@@ -3783,7 +3781,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 getSandboxInvites();
                 $rootScope.records.push($rootScope.records);
             });
-            $rootScope.$emit('refresh-sandboxes');
         };
 
         $scope.records;
