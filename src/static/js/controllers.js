@@ -21,6 +21,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     }
                 }
             }).closed.then(function(){
+                getSandboxes();
                 $state.reload();
             });
         };
