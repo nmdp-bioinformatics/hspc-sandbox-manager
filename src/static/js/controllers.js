@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('sandManApp.controllers', []).controller('navController', [
-    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "sandboxInviteServices", "personaServices", "$location", "$state", "branded", "$timeout", "$window", "$uibModal", "ngAlertsMngr", "cookieService",
-    function ($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, sandboxInviteServices, personaServices, $location, $state, branded, $timeout, $window, $uibModal, ngAlertsMngr, cookieService) {
+    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "sandboxInviteServices", "personaServices", "$location", "$state", "branded", "$timeout", "$window", "$uibModal", "ngAlertsMngr", "newsService", "cookieService",
+    function ($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, sandboxInviteServices, personaServices, $location, $state, branded, $timeout, $window, $uibModal, ngAlertsMngr, cookieService, newsService) {
 
         $scope.manageSandboxInvitesNav = function () {
 
@@ -31,7 +31,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             newsService.getAllNews().then(function (results) {
                 $scope.newsItems = results;
             });
-        }
+        };
+
         $rootScope.records = [];
         $rootScope.badgecount = 0;
         $scope.noInvites = false;
@@ -3797,7 +3798,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         $scope.confirm = function (result) {
             $uibModalInstance.close(result);
-            callback(result);
         };
     }]).controller('ResourceDetailModalInstanceCtrl', ['$scope', '$rootScope', '$filter', '$uibModalInstance', 'getSettings', 'fhirApiServices', 'launchApp',
     function ($scope, $rootScope, $filter, $uibModalInstance, getSettings, fhirApiServices, launchApp) {
