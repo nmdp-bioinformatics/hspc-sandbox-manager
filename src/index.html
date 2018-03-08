@@ -79,8 +79,8 @@
         </div>
         <div class="navbar-stack-apps" ng-show="showing.apps && showing.moreLinks"><a tabindex="0" href="#" uib-popover-template="'static/js/templates/navPopover.html'" popover-trigger="'focus'" popover-placement="bottom"><i class="fa fa-th fa-lg"></i></a></div>
         <div style="float: right; padding-right: 15px;">
-            <a href="#" ng-show="showing.signout && !showing.sideNavBar" ng-click="manageSandboxInvitesNav()" onclick="this.blur()" style="color: white; max-width: 100%">
-                <span class="badge badge-light" ng-hide="noInvites">{{badgecount}}</span> Invites
+            <a href="#" ng-show="showing.signout && !showing.sideNavBar" ng-click="manageSandboxInvitesNav()" onclick="this.blur()" style="color: white; max-width: 100%; font-size: 15px;">
+                <span class="badge badge-light" ng-hide="noInvites" style="background-color: #00B359; font-size: 15px;">{{badgecount}}</span> Invites
             </a>
         </div>
         <div class="navbar-admin-dashboard" ng-show="showing.signout && isSystemAdmin() && !showing.sideNavBar" ui-sref="admin-dashboard" ng-cloak><a tabindex="2" style="cursor: pointer" href="#"><i class="fa fa-tachometer fa-lg"></i></a></div>
