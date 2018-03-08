@@ -1904,6 +1904,8 @@ angular.module('sandManApp.services', [])
                 }).done(function (results) {
                     deferred.resolve(results);
                     $rootScope.$digest();
+                }).fail(function () {
+                    deferred.reject();
                 });
             });
             return deferred;
