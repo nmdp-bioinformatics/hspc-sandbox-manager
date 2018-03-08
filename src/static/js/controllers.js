@@ -33,7 +33,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             });
         }
         $rootScope.records = [];
-        $rootScope.badgecount = 30;
+        $rootScope.badgecount = 0;
         $scope.noInvites = false;
         $scope.newsItems = [];
         $scope.size = {

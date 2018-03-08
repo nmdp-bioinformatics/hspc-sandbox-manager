@@ -1844,9 +1844,6 @@ angular.module('sandManApp.services', [])
                 }).done(function () {
                     notification.message("Invite Sent");
                     deferred.resolve();
-                }).fail(function (error) {
-                    // notification.message({ type:"error", text: "Failed to Send Invite" });
-                    deferred.reject();
                 });
             });
             return deferred;
