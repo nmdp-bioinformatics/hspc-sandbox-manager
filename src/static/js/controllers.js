@@ -22,14 +22,20 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 }
             }).closed.then(function(){
                 getSandboxes();
+                getNewsItems();
                 $state.reload();
             });
         };
 
+        function getNewsItems() {
+            newsService.getAllNews().then(function (results) {
+                $scope.newsItems = results;
+            });
+        }
         $rootScope.records = [];
         $rootScope.badgecount = 30;
         $scope.noInvites = false;
-
+        $scope.newsItems = [];
         $scope.size = {
             navBarHeight: 64,
             footerHeight: 60,
@@ -87,6 +93,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.messages = messages;
             $rootScope.$digest();
         });
+
+        $scope.showNews = function () {
+            return branded.showEmptyInviteList || $scope.newsItems.length > 0;
+        };
 
         $rootScope.$on("$stateChangeStart", function (event, toState, toParams, fromState, fromParams) {
             if (toState.authenticate && typeof fhirApiServices.fhirClient() === "undefined") {
@@ -454,7 +464,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.showing.footer = true;
         $scope.showing.sideNavBar = false;
         $scope.sandboxInvites = [];
-        $scope.newsItems = [];
+
         $scope.title.blueBarTitle = branded.dashboardTitle;
 
         $rootScope.$on('user-loaded', function () {
@@ -469,10 +479,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         $scope.showInvitations = function () {
             return branded.showEmptyInviteList || $scope.sandboxInvites.length > 0;
-        };
-
-        $scope.showNews = function () {
-            return branded.showEmptyInviteList || $scope.newsItems.length > 0;
         };
 
         $scope.selectSandbox = function (sandbox) {
