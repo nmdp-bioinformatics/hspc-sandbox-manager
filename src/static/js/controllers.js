@@ -3382,7 +3382,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 sandboxManagement.getScenarioBuilder().app = app;
                 sandboxManagement.getScenarioBuilder().createdBy = userServices.getOAuthUser();
                 sandboxManagement.getScenarioBuilder().owner = userServices.getOAuthUser();
-                sandboxManagement.getScenarioBuilder().patient = result.patient;
                 sandboxManagement.getScenarioBuilder().patient =
                     {
                         id: 1,
