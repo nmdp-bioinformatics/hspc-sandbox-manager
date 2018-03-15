@@ -1482,6 +1482,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             });
         }, 400));
 
+        $scope.$watch("sandboxName", function (sandboxName) {
+            $scope.sandboxId = sandboxName;
+        });
+
         $scope.$watch("apiEndpointIndex", function () {
             $scope.selectedSandboxApiEndpointIndex = apiEndpointIndexServices.getSandboxApiEndpointIndexDetails($scope.apiEndpointIndex);
         });
