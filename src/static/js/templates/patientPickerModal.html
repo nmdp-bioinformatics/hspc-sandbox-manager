@@ -3,6 +3,10 @@
   <a href='#' class='float-right-white-btn' ng-click="cancel()"><i class='fa fa-remove fa-lg'></i></a>
 </div>
 <div class="modal-body">
+  <label style="display: block; padding-left: 15px; text-indent: -15px;">
+      <input style="height: 30px; padding: 0; margin:0; vertical-align: bottom; position: relative; top: 6px;" type="checkbox" ng-model="saveScenario"/> 
+      Create Launch Scenario
+  </label>
   <div ng-include="'static/js/templates/patientSearch.html'"></div>
 </div>
 <div class="modal-footer" style="margin-top: -20px;
