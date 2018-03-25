@@ -1482,6 +1482,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             });
         }, 400));
 
+        $scope.$watch("sandboxName", function (sandboxName) {
+            $scope.sandboxId = sandboxName;
+        });
+
         $scope.$watch("apiEndpointIndex", function () {
             $scope.selectedSandboxApiEndpointIndex = apiEndpointIndexServices.getSandboxApiEndpointIndexDetails($scope.apiEndpointIndex);
         });
@@ -2481,6 +2485,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         $rootScope.$on('launch-scenario-list-update', function () {
             $scope.launchScenarioList = sandboxManagement.getFullLaunchScenarioList();
+            console.log('launchScenarioList', $scope.launchScenarioList);
             $rootScope.$digest();
         });
 
@@ -3061,7 +3066,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     });
             }
         };
-    }).controller("AppsController", function ($scope, $rootScope, $state, appRegistrationServices, sandboxManagement,
+    }).controller("AppsController", function ($scope, $rootScope, $state, appRegistrationServices, sandboxManagement, $filter,
                                               userServices, tools, fhirApiServices, appsService, personaServices, launchApp, $uibModal, docLinks,
                                               customFhirApp) {
     $scope.all_user_apps = [];
@@ -3376,8 +3381,30 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         });
 
-        modalInstance.result.then(function (patient) {
-            launchApp.launchFromApp(app, patient, defaultPersona);
+        modalInstance.result.then(function (result) {
+            if (result.saveScenario) {
+                sandboxManagement.getScenarioBuilder().app = app;
+                sandboxManagement.getScenarioBuilder().createdBy = userServices.getOAuthUser();
+                sandboxManagement.getScenarioBuilder().owner = userServices.getOAuthUser();
+                sandboxManagement.getScenarioBuilder().patient =
+                    {
+                        id: 1,
+                        fhirId: result.patient.id,
+                        resource: result.patient.resourceType,
+                        name: $filter('nameGivenFamily')(result.patient)
+                    };
+
+                sandboxManagement.getScenarioBuilder().userPersona = sandboxManagement.getScenarioBuilder().patient;
+                if (result.patient) {
+                    sandboxManagement.getScenarioBuilder().description = app.authClient.clientName + ' app with patient ' + $filter('nameGivenFamily')(result.patient);
+                } else {
+                    sandboxManagement.getScenarioBuilder().description = app.authClient.clientName + ' app with no patient';
+                }
+                var scenario = sandboxManagement.getScenarioBuilder();
+                console.log('scenario', scenario);
+                sandboxManagement.addLaunchScenario(scenario, true);
+            }
+            launchApp.launchFromApp(app, result.patient, defaultPersona);
         });
     }
 
@@ -3833,7 +3860,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
     }]).controller('PatientPickerModalCtrl',
     function ($scope, $rootScope, $uibModalInstance, getSettings) {
-
+        $scope.saveScenario = false;
         $scope.shouldBeOpen = false;
 
         $scope.showing = {
@@ -3868,12 +3895,19 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.$watch('selected.selectedPatient', function () {
             if ($scope.selected.selectedPatient !== undefined) {
                 $scope.selected.selectedPatient.fhirId = $scope.selected.selectedPatient.id;
-                $uibModalInstance.close($scope.selected.selectedPatient);
+                const result = {
+                    patient: $scope.selected.selectedPatient,
+                    saveScenario: $scope.saveScenario,
+                };
+                $uibModalInstance.close(result);
             }
         });
 
         $scope.skipPatient = function () {
-            $uibModalInstance.close();
+            const result = {
+                saveScenario: $scope.saveScenario,
+            };
+            $uibModalInstance.close(result);
         };
 
         $rootScope.$on('patient-search-start', function () {

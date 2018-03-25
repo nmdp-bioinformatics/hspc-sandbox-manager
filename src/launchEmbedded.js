@@ -12,25 +12,25 @@ if (code === null) {
         $('#patient-details').hide();
         $('#relaunch-message').show();
     } else {
-        window.localStorage['embeddedLaunchKey'] = key;
+        window.localStorage[ 'embeddedLaunchKey' ] = key;
         onStorage();
         window.addEventListener('storage', onStorage, false);
     }
 
 } else {
     // window.history.replaceState = false;
-    FHIR.oauth2.ready(function(newSmart){
+    FHIR.oauth2.ready(function (newSmart) {
         fhirClient = newSmart;
 
-        var savedKey = window.localStorage['embeddedLaunchKey'];
+        var savedKey = window.localStorage[ 'embeddedLaunchKey' ];
         window.localStorage.removeItem('embeddedLaunchKey');
         $('#patient-details').hide();
 
-        var details = JSON.parse(window.localStorage[savedKey]);
+        var details = JSON.parse(window.localStorage[ savedKey ]);
         getFhirUserResource(fhirClient, details.launchDetails.userPersona.resourceUrl)
-            .done(function(profileResult){
+            .done(function (profileResult) {
                 document.getElementById("user-name").innerHTML = profileResult.name;
-            }).fail(function(){
+            }).fail(function () {
         });
 
         if (details.launchDetails.patientContext) {
@@ -39,9 +39,10 @@ if (code === null) {
                     $('#patient-details').show();
                     document.getElementById("patient-name").innerHTML = patientResult.name;
                     try {
-                        var moreDetails = patientResult.details.identifier[0];
-                        document.getElementById("patient-mrn").innerHTML = moreDetails.value;                    }
-                    catch(err) {
+                        var moreDetails = patientResult.details.identifier[ 0 ];
+                        document.getElementById("patient-mrn").innerHTML = moreDetails.value;
+                    }
+                    catch (err) {
                         console.log("This patient does not have an mrn");
                     }
 
@@ -60,11 +61,10 @@ if (code === null) {
                         patientResult.details.dob = patientResult.details.birthDate;
                     }
                     patientResult.details.dob = new Date(patientResult.details.dob);
-
-                    document.getElementById("patient-dob").innerHTML = moment(patientResult.details.dob).format('D MMM YYYY HH:mm');
+                    document.getElementById("patient-dob").innerHTML = moment.utc(patientResult.details.dob).format('D MMM YYYY');
                     document.getElementById("patient-age").innerHTML = ageFilter(patientResult.details.dob);
                 }).fail(function (error) {
-                    console.log(error);
+                console.log(error);
             });
         }
 
@@ -73,17 +73,17 @@ if (code === null) {
     });
 }
 
-function onStorage() {
+function onStorage () {
 
-    var key = window.localStorage['embeddedLaunchKey'];
+    var key = window.localStorage[ 'embeddedLaunchKey' ];
     console.log("key " + key);
 
-    if (key === "" || launched || window.localStorage[key] === 'requested-launch') {
+    if (key === "" || launched || window.localStorage[ key ] === 'requested-launch') {
         return;
     }
 
     launched = true;
-    var details = JSON.parse(window.localStorage[key]);
+    var details = JSON.parse(window.localStorage[ key ]);
 
     delete sessionStorage.tokenResponse;
 
@@ -111,30 +111,30 @@ function onStorage() {
     });
 }
 
-function getFhirUserResource(fhirClient, userId) {
+function getFhirUserResource (fhirClient, userId) {
     var deferred = $.Deferred();
     var userIdSections = userId.split("/");
 
-    $.when(fhirClient.api.read({type: userIdSections[userIdSections.length-2], id: userIdSections[userIdSections.length-1]}))
-        .done(function(userResult){
+    $.when(fhirClient.api.read({ type: userIdSections[ userIdSections.length - 2 ], id: userIdSections[ userIdSections.length - 1 ] }))
+        .done(function (userResult) {
 
-            var user = {name:""};
+            var user = { name: "" };
             user.name = nameGivenFamily(userResult.data);
-            user.id  = userResult.data.id;
+            user.id = userResult.data.id;
             user.details = userResult.data;
             deferred.resolve(user);
-        }).fail(function(){
+        }).fail(function () {
         deferred.reject();
     });
     return deferred;
 }
 
-function nameGivenFamily(p){
-    var isArrayName = p && p.name && p.name[0];
+function nameGivenFamily (p) {
+    var isArrayName = p && p.name && p.name[ 0 ];
     var personName;
 
     if (isArrayName) {
-        personName = p && p.name && p.name[0];
+        personName = p && p.name && p.name[ 0 ];
         if (!personName) return null;
 
     } else {
@@ -154,7 +154,7 @@ function nameGivenFamily(p){
     return user;
 }
 
-function ageFilter(date) {
+function ageFilter (date) {
     var yearNow = new Date().getYear();
     var monthNow = new Date().getMonth();
     var dateNow = new Date().getDate();
@@ -187,31 +187,31 @@ function ageFilter(date) {
 
     var hours = (new Date().getTime() - new Date(date).getTime()) / 36e5;
     if (dateAge > 1) {
-        hours = hours/(24 * dateAge);
+        hours = hours / (24 * dateAge);
     }
 
-    if ( (yearAge > 0) && (monthAge > 0) && (dateAge > 0) )
+    if ((yearAge > 0) && (monthAge > 0) && (dateAge > 0))
         return yearAge + "y " + monthAge + "m " + dateAge + "d";
-    else if ( (yearAge > 0) && (monthAge > 0) && (dateAge == 0) )
+    else if ((yearAge > 0) && (monthAge > 0) && (dateAge == 0))
         return yearAge + "y " + monthAge + "m";
-    else if ( (yearAge > 0) && (monthAge == 0) && (dateAge > 0) )
+    else if ((yearAge > 0) && (monthAge == 0) && (dateAge > 0))
         return yearAge + "y " + dateAge + "d";
-    else if ( (yearAge > 0) && (monthAge == 0) && (dateAge == 0) )
+    else if ((yearAge > 0) && (monthAge == 0) && (dateAge == 0))
         return yearAge + "y";
-    else if ( (yearAge == 0) && (monthAge > 0) && (dateAge > 0) )
+    else if ((yearAge == 0) && (monthAge > 0) && (dateAge > 0))
         return monthAge + "m " + dateAge + "d";
-    else if ( (yearAge == 0) && (monthAge > 0) && (dateAge == 0) )
+    else if ((yearAge == 0) && (monthAge > 0) && (dateAge == 0))
         return monthAge + "m";
-    else if ( (yearAge == 0) && (monthAge == 0) && (dateAge > 1) )
+    else if ((yearAge == 0) && (monthAge == 0) && (dateAge > 1))
         return dateAge + "d";
-    else if ( (yearAge == 0) && (monthAge == 0) && (dateAge > 0) )
+    else if ((yearAge == 0) && (monthAge == 0) && (dateAge > 0))
         return $filter('number')(hours, 2) + "h";
     else return "Could not calculate age";
 }
 
-function getParameterByName(name) {
+function getParameterByName (name) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
         results = regex.exec(location.search);
-    return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, " "));
+    return results === null ? null : decodeURIComponent(results[ 1 ].replace(/\+/g, " "));
 }
