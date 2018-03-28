@@ -20,7 +20,7 @@
                                 <tr ng-repeat="user in users">
                                     <td>{{user.name}}</td>
                                     <td>{{user.email}}</td>
-                                    <td><input type="checkbox" ng-disabled="!isSandboxAdmin() || !showDelete(user.sbmUserId)" ng-click="updateRole(user,'ADMIN', user.isAdmin)" ng-model="user.isAdmin" style="margin-right: 5px"/>Admin</td>
+                                    <td><input type="checkbox" ng-disabled="!isSandboxAdmin()" ng-click="updateRole(user,'ADMIN', user.isAdmin)" ng-model="user.isAdmin" style="margin-right: 5px"/>Admin</td>
                                     <td><i ng-show="showDelete(user.sbmUserId)" ng-click="removeUser(user)" class="fa fa-times-circle"></i></td>
                                 </tbody>
                             </table>
