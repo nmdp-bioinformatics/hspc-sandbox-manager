@@ -2208,7 +2208,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         });
 
     }).controller("LaunchScenariosController",
-    function ($rootScope, $scope, $state, sandboxManagement, launchApp, userServices, descriptionBuilder, docLinks) {
+    function ($rootScope, $scope, $state, sandboxManagement, launchApp, userServices, descriptionBuilder, docLinks, $uibModal) {
         $scope.showing = {detail: false, addingContext: false};
         $scope.isCustom = false;
         $scope.canDelete = false;
@@ -2230,9 +2230,50 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.launch = function (scenario) {
             scenario.lastLaunchSeconds = new Date().getTime();
             sandboxManagement.launchScenarioLaunched(scenario);
-
-            launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
+            if(scenario.patient == null || scenario.patient == ''){
+                var modalProgress = openModalPatientDialog();
+                    modalProgress.dismiss();
+            }else if(scenario.userPersona.fhirName == null || scenario.userPersona.fhirName == ''){
+                var modalProgress = openModalPractitionerDialog();
+                modalProgress.dismiss();
+            }else {
+                launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
+            }
         };
+
+        function openModalPatientDialog() {
+            return $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/messageModal.html',
+                controller: 'MessageModalInstanceCtrl',
+                size: 'md',
+                resolve: {
+                    getSettings: function () {
+                        return {
+                            title: "Missing Patient",
+                            message: "The Persona is missing patient info. It may have been deleted.",
+                        }
+                    }
+                }
+            });
+        }
+
+        function openModalPractitionerDialog() {
+            return $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/messageModal.html',
+                controller: 'MessageModalInstanceCtrl',
+                size: 'md',
+                resolve: {
+                    getSettings: function () {
+                        return {
+                            title: "Missing Practitioner",
+                            message: "The Persona is missing practitioner info. It may have been deleted.",
+                        }
+                    }
+                }
+            });
+        }
 
         $scope.launchPatientDataManager = function (patient) {
             launchApp.launchPatientDataManager(patient);
