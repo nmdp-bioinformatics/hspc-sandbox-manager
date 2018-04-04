@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('sandManApp.controllers', []).controller('navController', [
-    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "sandboxInviteServices", "personaServices", "$location", "$state", "branded", "$timeout", "$window", "$uibModal", "ngAlertsMngr", "cookieService",
-    function ($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, sandboxInviteServices, personaServices, $location, $state, branded, $timeout, $window, $uibModal, ngAlertsMngr, cookieService) {
+    "$rootScope", "$scope", "appsSettings", "fhirApiServices", "userServices", "oauth2", "sandboxManagement", "sandboxInviteServices", "personaServices", "$location", "$state", "branded", "$timeout", "$window", "$uibModal", "ngAlertsMngr", "newsService", "cookieService",
+    function ($rootScope, $scope, appsSettings, fhirApiServices, userServices, oauth2, sandboxManagement, sandboxInviteServices, personaServices, $location, $state, branded, $timeout, $window, $uibModal, ngAlertsMngr, cookieService, newsService) {
 
         $scope.manageSandboxInvitesNav = function () {
 
@@ -31,9 +31,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             newsService.getAllNews().then(function (results) {
                 $scope.newsItems = results;
             });
-        }
+        };
+
         $rootScope.records = [];
-        $rootScope.badgecount = 30;
+        $rootScope.badgecount = 0;
         $scope.noInvites = false;
         $scope.newsItems = [];
         $scope.size = {
@@ -1481,6 +1482,10 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             });
         }, 400));
 
+        $scope.$watch("sandboxName", function (sandboxName) {
+            $scope.sandboxId = sandboxName;
+        });
+
         $scope.$watch("apiEndpointIndex", function () {
             $scope.selectedSandboxApiEndpointIndex = apiEndpointIndexServices.getSandboxApiEndpointIndexDetails($scope.apiEndpointIndex);
         });
@@ -2203,7 +2208,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         });
 
     }).controller("LaunchScenariosController",
-    function ($rootScope, $scope, $state, sandboxManagement, launchApp, userServices, descriptionBuilder, docLinks) {
+    function ($rootScope, $scope, $state, sandboxManagement, launchApp, userServices, descriptionBuilder, docLinks, $uibModal) {
         $scope.showing = {detail: false, addingContext: false};
         $scope.isCustom = false;
         $scope.canDelete = false;
@@ -2225,9 +2230,50 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.launch = function (scenario) {
             scenario.lastLaunchSeconds = new Date().getTime();
             sandboxManagement.launchScenarioLaunched(scenario);
-
-            launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
+            if(scenario.patient == null || scenario.patient == ''){
+                var modalProgress = openModalPatientDialog();
+                    modalProgress.dismiss();
+            }else if(scenario.userPersona.fhirName == null || scenario.userPersona.fhirName == ''){
+                var modalProgress = openModalPractitionerDialog();
+                modalProgress.dismiss();
+            }else {
+                launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
+            }
         };
+
+        function openModalPatientDialog() {
+            return $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/messageModal.html',
+                controller: 'MessageModalInstanceCtrl',
+                size: 'md',
+                resolve: {
+                    getSettings: function () {
+                        return {
+                            title: "Missing Patient",
+                            message: "The Persona is missing patient info. It may have been deleted.",
+                        }
+                    }
+                }
+            });
+        }
+
+        function openModalPractitionerDialog() {
+            return $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/messageModal.html',
+                controller: 'MessageModalInstanceCtrl',
+                size: 'md',
+                resolve: {
+                    getSettings: function () {
+                        return {
+                            title: "Missing Practitioner",
+                            message: "The Persona is missing practitioner info. It may have been deleted.",
+                        }
+                    }
+                }
+            });
+        }
 
         $scope.launchPatientDataManager = function (patient) {
             launchApp.launchPatientDataManager(patient);
@@ -2480,6 +2526,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         $rootScope.$on('launch-scenario-list-update', function () {
             $scope.launchScenarioList = sandboxManagement.getFullLaunchScenarioList();
+            console.log('launchScenarioList', $scope.launchScenarioList);
             $rootScope.$digest();
         });
 
@@ -3060,7 +3107,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     });
             }
         };
-    }).controller("AppsController", function ($scope, $rootScope, $state, appRegistrationServices, sandboxManagement,
+    }).controller("AppsController", function ($scope, $rootScope, $state, appRegistrationServices, sandboxManagement, $filter,
                                               userServices, tools, fhirApiServices, appsService, personaServices, launchApp, $uibModal, docLinks,
                                               customFhirApp) {
     $scope.all_user_apps = [];
@@ -3375,8 +3422,30 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         });
 
-        modalInstance.result.then(function (patient) {
-            launchApp.launchFromApp(app, patient, defaultPersona);
+        modalInstance.result.then(function (result) {
+            if (result.saveScenario) {
+                sandboxManagement.getScenarioBuilder().app = app;
+                sandboxManagement.getScenarioBuilder().createdBy = userServices.getOAuthUser();
+                sandboxManagement.getScenarioBuilder().owner = userServices.getOAuthUser();
+                sandboxManagement.getScenarioBuilder().patient =
+                    {
+                        id: 1,
+                        fhirId: result.patient.id,
+                        resource: result.patient.resourceType,
+                        name: $filter('nameGivenFamily')(result.patient)
+                    };
+
+                sandboxManagement.getScenarioBuilder().userPersona = sandboxManagement.getScenarioBuilder().patient;
+                if (result.patient) {
+                    sandboxManagement.getScenarioBuilder().description = app.authClient.clientName + ' app with patient ' + $filter('nameGivenFamily')(result.patient);
+                } else {
+                    sandboxManagement.getScenarioBuilder().description = app.authClient.clientName + ' app with no patient';
+                }
+                var scenario = sandboxManagement.getScenarioBuilder();
+                console.log('scenario', scenario);
+                sandboxManagement.addLaunchScenario(scenario, true);
+            }
+            launchApp.launchFromApp(app, result.patient, defaultPersona);
         });
     }
 
@@ -3797,7 +3866,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         $scope.confirm = function (result) {
             $uibModalInstance.close(result);
-            callback(result);
         };
     }]).controller('ResourceDetailModalInstanceCtrl', ['$scope', '$rootScope', '$filter', '$uibModalInstance', 'getSettings', 'fhirApiServices', 'launchApp',
     function ($scope, $rootScope, $filter, $uibModalInstance, getSettings, fhirApiServices, launchApp) {
@@ -3833,7 +3901,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
     }]).controller('PatientPickerModalCtrl',
     function ($scope, $rootScope, $uibModalInstance, getSettings) {
-
+        $scope.saveScenario = false;
         $scope.shouldBeOpen = false;
 
         $scope.showing = {
@@ -3868,12 +3936,19 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.$watch('selected.selectedPatient', function () {
             if ($scope.selected.selectedPatient !== undefined) {
                 $scope.selected.selectedPatient.fhirId = $scope.selected.selectedPatient.id;
-                $uibModalInstance.close($scope.selected.selectedPatient);
+                const result = {
+                    patient: $scope.selected.selectedPatient,
+                    saveScenario: $scope.saveScenario,
+                };
+                $uibModalInstance.close(result);
             }
         });
 
         $scope.skipPatient = function () {
-            $uibModalInstance.close();
+            const result = {
+                saveScenario: $scope.saveScenario,
+            };
+            $uibModalInstance.close(result);
         };
 
         $rootScope.$on('patient-search-start', function () {

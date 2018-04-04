@@ -113,8 +113,8 @@
 <footer ng-show="showing.footer" ng-style="showing.sideNavBar ? { 'position':'relative' } : { 'position': 'fixed' }"
         ng-cloak class="navbar-fixed-bottom">
     <div class="container">
-        <div class="copyright" ng-cloak resize ng-style="{textAlign: scrollWidth(750) ? 'left' : 'center', marginLeft: showCert ? '100px' : '0px'}">
-            {{copyright}}<div ng-show="showTermsLink" style="display: inline"> • <a ng-click="showTerms()">Terms of Use & Privacy Statement</a></div>
+        <div class="copyright" ng-cloak resize ng-style="{textAlign: scrollWidth(750) ? 'left' : 'center', marginLeft: showCert ? '0px' : '0px'}">
+            {{copyright}}<div ng-show="showTermsLink" style="display: inline"> • <a ng-click="showTerms()">Terms of Use & Privacy Statement</a></div><a href="https://healthservices.atlassian.net/wiki/spaces/HSM/overview"> • Help</a>
             <div ng-show="showCert" class="site-seal" ng-include src="'static/js/templates/certificate.html'"></div>
         </div>
     </div>
