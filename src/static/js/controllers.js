@@ -3372,6 +3372,32 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         }
         var queryString = app.samplePatients;
 
+        var practitioner
+        if(defaultPersona == ''){
+            fhirApiServices.queryResourceInstances("Practitioner", undefined, '', [['family', 'asc'], ['given', 'asc']])
+                .then(function (p) {
+                    if(p != null){
+                        practitioner = p[0];
+                        personaServices.getUserPersonaBuilder().fhirId = practitioner.id;
+                        personaServices.getUserPersonaBuilder().resource = practitioner.resourceType;
+                        personaServices.getUserPersonaBuilder().resourceUrl = practitioner.resourceType + '/' + practitioner.id;
+                        personaServices.getUserPersonaBuilder().fhirName = $filter('nameGivenFamily')(practitioner);
+                        personaServices.getUserPersonaBuilder().personaName = $filter('nameGivenFamily')(practitioner);
+                        personaServices.getUserPersonaBuilder().sandbox = sandboxManagement.getSandbox();
+                        personaServices.getUserPersonaBuilder().createdBy = userServices.getOAuthUser();
+                        personaServices.getUserPersonaBuilder().password = 'example';
+                        personaServices.getUserPersonaBuilder().personaUserId = 'examplePersona@' + sandboxManagement.getSandbox().sandboxId;
+                        personaServices.createPersona(personaServices.getUserPersonaBuilder());
+                        personaServices.getPersonaListBySandbox(sandboxManagement.getSandbox().sandboxId).then(function (list) {
+                            defaultPersona = list[0];
+                            console.log(defaultPersona);
+                        });
+                    }else{
+                        openModalPersonaMissingDialog();
+                    }
+                });
+        }
+
         // Some parsing to see if there's exactly one patient id
         if (queryString !== null && queryString !== undefined && queryString.indexOf("_id=") > -1) {
             var i = queryString.indexOf("_id=");
@@ -3387,8 +3413,26 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         if (patientQuery !== undefined) {
             launchApp.launchFromApp(app, {fhirId: patientQuery}, defaultPersona);
-        } else {
+        }else {
             openPatientPicker(app);
+
+        }
+
+        function openModalPersonaMissingDialog() {
+            return $uibModal.open({
+                animation: true,
+                templateUrl: 'static/js/templates/messageModal.html',
+                controller: 'MessageModalInstanceCtrl',
+                size: 'md',
+                resolve: {
+                    getSettings: function () {
+                        return {
+                            title: "Missing Persona",
+                            message: "Please create a Persona before launching apps. Some apps will not work without a persona being created.",
+                        }
+                    }
+                }
+            });
         }
     };
 
@@ -3445,8 +3489,12 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 console.log('scenario', scenario);
                 sandboxManagement.addLaunchScenario(scenario, true);
             }
+
             launchApp.launchFromApp(app, result.patient, defaultPersona);
+
         });
+
+
     }
 
     $scope.save = function (clientJSON) {
