@@ -44,6 +44,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             screenH: 700,
             screenW: 1200
         };
+        $rootScope.endMessageCounter = 0;
 
         $scope.showing = {
             signout: false,
@@ -3109,7 +3110,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
     }).controller("AppsController", function ($scope, $rootScope, $state, appRegistrationServices, sandboxManagement, $filter,
                                               userServices, tools, fhirApiServices, appsService, personaServices, launchApp, $uibModal, docLinks,
-                                              customFhirApp) {
+                                              customFhirApp, appsSettings, apiEndpointIndexServices) {
     $scope.all_user_apps = [];
     $scope.default_apps = [];
     $scope.galleryOffset = 246;
@@ -3595,6 +3596,24 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             }
         });
     };
+
+    if(apiEndpointIndexServices.getSandboxApiEndpointIndex().lifeEnding && $rootScope.endMessageCounter === 0){
+        $rootScope.endMessageCounter = 1;
+        $uibModal.open({
+            animation: true,
+            templateUrl: 'static/js/templates/messageModal.html',
+            controller: 'MessageModalInstanceCtrl',
+            size: 'md',
+            resolve: {
+                getSettings: function () {
+                    return {
+                        title: "Sandbox End Date",
+                        message: "This sandbox will no longer be available after " + apiEndpointIndexServices.getSandboxApiEndpointIndex().lifeEndingDate,
+                    }
+                }
+            }
+        });
+    }
 
 }).controller('AppRegistrationInboundModalCtrl', function ($scope, $rootScope, sandboxManagement, appRegistrationServices, docLinks, tools, apiEndpointIndexServices, $uibModalInstance) {
 
