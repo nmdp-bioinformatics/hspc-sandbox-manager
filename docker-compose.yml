@@ -46,7 +46,7 @@ services:
   auth:
     depends_on:
       - auth-db
-    image: hspconsortium/hspc-reference-auth-server-webapp:latest
+    image: hspconsortium/hspc-reference-auth:latest
     restart: always
     mem_reservation: 512m
     environment:
@@ -68,7 +68,7 @@ services:
   api-dstu2:
     depends_on:
       - api-dstu2-db
-    image: hspconsortium/hspc-reference-api-webapp-multitenant:latest
+    image: hspconsortium/hspc-reference-api:latest
     restart: always
     mem_reservation: 512m
     environment:
@@ -87,7 +87,7 @@ services:
   api-stu3:
     depends_on:
       - api-stu3-db
-    image: hspconsortium/hspc-reference-api-webapp-multitenant:latest
+    image: hspconsortium/hspc-reference-api:latest
     restart: always
     mem_reservation: 512m
     environment:
