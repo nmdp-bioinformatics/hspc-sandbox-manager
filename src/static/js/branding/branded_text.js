@@ -19,12 +19,12 @@ angular.module("sandManApp.branding", [], ["$provide", function($provide) {
                 defaultApiEndpointIndex : "6",
                 defaultLaunchScenario: false,
                 sandboxApiEndpointIndexes : [
-                    {index: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", fhirTag: "1_0_2", altName: "FHIR v1.0.2", canCreate: false, supportsDataSets: false, lifeEnding: false, lifeEndingDate: "12/12/2018"},
-                    {index: "2", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", fhirTag: "1_0_2", altName: "FHIR v1.0.2", canCreate: false, supportsDataSets: false, lifeEnding: true, lifeEndingDate: "05/01/2018"},
-                    {index: "3", name: "FHIR STU 3 (v1.8.0)", fhirVersion: "1.8.0", fhirTag: "1_8_0", altName: "FHIR v1.8", canCreate: false, supportsDataSets: false, lifeEnding: false, lifeEndingDate: "12/12/2018"},
-                    {index: "4", name: "FHIR STU 3 (v3.0.1)", fhirVersion: "3.0.1", fhirTag: "3_0_1", altName: "FHIR v3.0.1", canCreate: false, supportsDataSets: true, lifeEnding: false, lifeEndingDate: "12/12/2018"},
-                    {index: "5", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", fhirTag: "1_0_2", altName: "FHIR v1.0.2", canCreate: true, supportsDataSets: true, lifeEnding: false, lifeEndingDate: "12/12/2018"},
-                    {index: "6", name: "FHIR STU 3 (v3.0.1)", fhirVersion: "3.0.1", fhirTag: "3_0_1", altName: "FHIR v3.0.1", canCreate: true, supportsDataSets: true, lifeEnding: false, lifeEndingDate: "12/12/2018"}
+                    {index: "1", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", fhirTag: "1_0_2", altName: "FHIR v1.0.2", canCreate: false, supportsDataSets: false, lifeEnding: true, lifeEndingDate: "07/01/2018"},
+                    {index: "2", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", fhirTag: "1_0_2", altName: "FHIR v1.0.2", canCreate: false, supportsDataSets: false, lifeEnding: true, lifeEndingDate: "06/08/2018"},
+                    {index: "3", name: "FHIR STU 3 (v1.8.0)", fhirVersion: "1.8.0", fhirTag: "1_8_0", altName: "FHIR v1.8", canCreate: false, supportsDataSets: false, lifeEnding: true, lifeEndingDate: "06/08/2018"},
+                    {index: "4", name: "FHIR STU 3 (v3.0.1)", fhirVersion: "3.0.1", fhirTag: "3_0_1", altName: "FHIR v3.0.1", canCreate: false, supportsDataSets: true, lifeEnding: true, lifeEndingDate: "07/01/2018"},
+                    {index: "5", name: "FHIR DSTU 2 (v1.0.2)", fhirVersion: "1.0.2", fhirTag: "1_0_2", altName: "FHIR v1.0.2", canCreate: true, supportsDataSets: true, lifeEnding: false, lifeEndingDate: ""},
+                    {index: "6", name: "FHIR STU 3 (v3.0.1)", fhirVersion: "3.0.1", fhirTag: "3_0_1", altName: "FHIR v3.0.1", canCreate: true, supportsDataSets: true, lifeEnding: false, lifeEndingDate: ""}
                 ],
                 sandboxDescription: {
                     title: "What is a sandbox?",
