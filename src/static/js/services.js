@@ -1976,12 +1976,11 @@ angular.module('sandManApp.services', [])
             // '?username=' + encodeURIComponent(userPersona.sbmUserId) +
             // '&password=' + encodeURIComponent(userPersona.password) +
             // '&redirect=' + encodeURIComponent(window.location.href + '/launch.html?key='+key ), '_blank');
-
             var params = {};
             var patientId = undefined;
-            if (patientContext !== undefined && patientContext.name !== 'None' && patientContext !== "") {
-                params = {patient: patientContext.fhirId};
-                patientId = patientContext.fhirId;
+            if (patientContext !== undefined && patientContext !== "") {
+                params = {patient: patientContext};
+                patientId = patientContext;
             }
 
             if (contextParams !== undefined) {
@@ -2027,9 +2026,9 @@ angular.module('sandManApp.services', [])
             }
         },
         launchPatientDataManager: function (patient) {
-            if (patient.fhirId === undefined) {
-                patient.fhirId = patient.id;
-            }
+            // if (patient.fhirId === undefined) {
+            //     patient.fhirId = patient.id;
+            // }
             this.launch(pdmService.getPatientDataManagerApp(), patient);
         },
         launchFromApp: function (app, patient, persona) {

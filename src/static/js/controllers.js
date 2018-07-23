@@ -2224,6 +2224,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         $scope.$watch('selectedScenario.launchEmbedded', function () {
             if ($scope.selectedScenario.launchEmbedded !== undefined && $scope.selectedScenario.launchEmbedded !== $scope.launchEmbedded) {
+                if ($scope.selectedScenario.launchEmbedded == true) {
+                    $scope.selectedScenario.needPatientBanner = 'F';
+                } else {
+                    $scope.selectedScenario.needPatientBanner = 'T';
+                }
                 $scope.launchEmbedded = $scope.selectedScenario.launchEmbedded;
                 sandboxManagement.updateLaunchScenario($scope.selectedScenario);
             }
@@ -2311,7 +2316,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $rootScope.$on('recent-selected', function (event, arg) {
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
-            $scope.launchEmbedded = arg.launchEmbedded;
+            if (arg.needPatientBanner == 'T') {
+                $scope.launchEmbedded = false;
+            } else {
+                $scope.launchEmbedded = true;
+            }
             $scope.canDelete = userServices.canModify($scope.selectedScenario, sandboxManagement.getSandbox());
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
@@ -2328,7 +2337,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $rootScope.$on('full-selected', function (event, arg) {
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
-            $scope.launchEmbedded = arg.launchEmbedded;
+            if (arg.needPatientBanner == 'T') {
+                $scope.launchEmbedded = false;
+            } else {
+                $scope.launchEmbedded = true;
+            }
             $scope.canDelete = userServices.canModify($scope.selectedScenario, sandboxManagement.getSandbox());
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
