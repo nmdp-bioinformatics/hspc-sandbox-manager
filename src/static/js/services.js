@@ -690,7 +690,13 @@ angular.module('sandManApp.services', [])
             newLaunchScenario.userPersona = launchScenario.userPersona;
         }
         if (launchScenario.patient !== undefined && launchScenario.patient !== '') {
-            newLaunchScenario.patient = launchScenario.patient;
+            newLaunchScenario.patient = launchScenario.patient.fhirId;
+            newLaunchScenario.patientName = launchScenario.patient.name;
+        }
+        if (launchScenario.launchEmbedded === true) {
+            newLaunchScenario.needPatientBanner = 'F';
+        } else {
+            newLaunchScenario.needPatientBanner = 'T';
         }
         return newLaunchScenario;
     }
