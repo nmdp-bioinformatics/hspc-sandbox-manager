@@ -44,6 +44,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             screenH: 700,
             screenW: 1200
         };
+        $rootScope.endMessageCounter = 0;
 
         $scope.showing = {
             signout: false,
@@ -2223,6 +2224,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         $scope.$watch('selectedScenario.launchEmbedded', function () {
             if ($scope.selectedScenario.launchEmbedded !== undefined && $scope.selectedScenario.launchEmbedded !== $scope.launchEmbedded) {
+                if ($scope.selectedScenario.launchEmbedded == true) {
+                    $scope.selectedScenario.needPatientBanner = 'F';
+                } else {
+                    $scope.selectedScenario.needPatientBanner = 'T';
+                }
                 $scope.launchEmbedded = $scope.selectedScenario.launchEmbedded;
                 sandboxManagement.updateLaunchScenario($scope.selectedScenario);
             }
@@ -2310,7 +2316,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $rootScope.$on('recent-selected', function (event, arg) {
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
-            $scope.launchEmbedded = arg.launchEmbedded;
+            if (arg.needPatientBanner == 'T') {
+                $scope.launchEmbedded = false;
+            } else {
+                $scope.launchEmbedded = true;
+            }
             $scope.canDelete = userServices.canModify($scope.selectedScenario, sandboxManagement.getSandbox());
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
@@ -2327,7 +2337,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $rootScope.$on('full-selected', function (event, arg) {
             $scope.showing.detail = true;
             $scope.selectedScenario = arg;
-            $scope.launchEmbedded = arg.launchEmbedded;
+            if (arg.needPatientBanner == 'T') {
+                $scope.launchEmbedded = false;
+            } else {
+                $scope.launchEmbedded = true;
+            }
             $scope.canDelete = userServices.canModify($scope.selectedScenario, sandboxManagement.getSandbox());
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
@@ -3109,7 +3123,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
     }).controller("AppsController", function ($scope, $rootScope, $state, appRegistrationServices, sandboxManagement, $filter,
                                               userServices, tools, fhirApiServices, appsService, personaServices, launchApp, $uibModal, docLinks,
-                                              customFhirApp) {
+                                              customFhirApp, appsSettings, apiEndpointIndexServices) {
     $scope.all_user_apps = [];
     $scope.default_apps = [];
     $scope.galleryOffset = 246;
@@ -3595,6 +3609,24 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             }
         });
     };
+
+    if(apiEndpointIndexServices.getSandboxApiEndpointIndex().lifeEnding && $rootScope.endMessageCounter === 0){
+        $rootScope.endMessageCounter = 1;
+        $uibModal.open({
+            animation: true,
+            templateUrl: 'static/js/templates/messageModal.html',
+            controller: 'MessageModalInstanceCtrl',
+            size: 'md',
+            resolve: {
+                getSettings: function () {
+                    return {
+                        title: "Sandbox End Date",
+                        message: "This sandbox will no longer be available after " + apiEndpointIndexServices.getSandboxApiEndpointIndex().lifeEndingDate,
+                    }
+                }
+            }
+        });
+    }
 
 }).controller('AppRegistrationInboundModalCtrl', function ($scope, $rootScope, sandboxManagement, appRegistrationServices, docLinks, tools, apiEndpointIndexServices, $uibModalInstance) {
 

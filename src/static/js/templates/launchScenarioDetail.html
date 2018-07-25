@@ -53,7 +53,7 @@
                     <div class="detail-form">
                         <label class="detail-form-label">Patient:</label>
                         <label class="detail-form-value" ng-show="canManageData() && showing.patientDataManager"><a ng-click="launchPatientDataManager(selectedScenario.patient)">{{selectedScenario.patient.name}}</a></label>
-                        <label class="detail-form-value" ng-show="!canManageData() || !showing.patientDataManager">{{selectedScenario.patient.name}}</label>
+                        <label class="detail-form-value" ng-show="!canManageData() || !showing.patientDataManager">{{selectedScenario.patientName}}</label>
                     </div>
                     <div class="detail-form">
                         <label class="detail-form-label">Encounter:</label>
