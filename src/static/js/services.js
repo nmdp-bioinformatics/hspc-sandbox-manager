@@ -1985,8 +1985,14 @@ angular.module('sandManApp.services', [])
             var params = {};
             var patientId = undefined;
             if (patientContext !== undefined && patientContext !== "") {
-                params = {patient: patientContext};
-                patientId = patientContext;
+                if (patientContext.fhirId !== undefined) {
+                    params = {patient: patientContext.fhirId};
+                    patientId = patientContext.fhirId;
+                } else {
+                    params = {patient: patientContext};
+                    patientId = patientContext;
+                }
+
             }
 
             if (contextParams !== undefined) {
