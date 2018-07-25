@@ -2038,9 +2038,9 @@ angular.module('sandManApp.services', [])
             }
         },
         launchPatientDataManager: function (patient) {
-            // if (patient.fhirId === undefined) {
-            //     patient.fhirId = patient.id;
-            // }
+            if (patient.fhirId === undefined) {
+                patient.fhirId = patient.id;
+            }
             this.launch(pdmService.getPatientDataManagerApp(), patient);
         },
         launchFromApp: function (app, patient, persona) {
