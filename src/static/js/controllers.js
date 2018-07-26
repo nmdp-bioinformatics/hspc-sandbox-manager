@@ -1901,9 +1901,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.skipPatient = function () {
             sandboxManagement.getScenarioBuilder().patient =
                 {
-                    fhirId: 0,
-                    resource: "None",
-                    name: "None"
+                    fhirId: null,
+                    resource: null,
+                    name: null
                 };
             $state.go('apps', {source: 'practitioner', action: 'choose'});
         };
@@ -2236,13 +2236,13 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.launch = function (scenario) {
             scenario.lastLaunchSeconds = new Date().getTime();
             sandboxManagement.launchScenarioLaunched(scenario);
-            if(scenario.patient == null || scenario.patient == ''){
+            if(scenario.patient == '') {
                 var modalProgress = openModalPatientDialog();
                     modalProgress.dismiss();
-            }else if(scenario.userPersona.fhirName == null || scenario.userPersona.fhirName == ''){
+            } else if(scenario.userPersona.fhirName == null || scenario.userPersona.fhirName == ''){
                 var modalProgress = openModalPractitionerDialog();
                 modalProgress.dismiss();
-            }else {
+            } else {
                 launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
             }
         };
