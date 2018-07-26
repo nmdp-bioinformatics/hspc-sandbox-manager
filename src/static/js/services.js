@@ -1984,13 +1984,15 @@ angular.module('sandManApp.services', [])
             // '&redirect=' + encodeURIComponent(window.location.href + '/launch.html?key='+key ), '_blank');
             var params = {};
             var patientId = undefined;
-            if (patientContext !== undefined && patientContext !== "") {
+            if (patientContext !== undefined && patientContext !== "" && patientContext !== null) {
                 if (patientContext.fhirId !== undefined) {
-                    params = {patient: patientContext.fhirId};
                     patientId = patientContext.fhirId;
                 } else {
-                    params = {patient: patientContext};
                     patientId = patientContext;
+                }
+
+                if (patientId !== null) {
+                    params = {patient: patientId};
                 }
 
             }
@@ -2015,11 +2017,14 @@ angular.module('sandManApp.services', [])
                 var userPersonaCopy = angular.copy(userPersona);
                 delete userPersonaCopy.createdBy;
                 delete userPersonaCopy.sandbox;
-
-                launchDetails = {
-                    userPersona: userPersonaCopy,
-                    patientContext: patientId
-                };
+                if (patientId === "0") {
+                    launchDetails = { userPersona: userPersonaCopy };
+                } else {
+                    launchDetails = {
+                        userPersona: userPersonaCopy,
+                        patientContext: patientId
+                    };
+                }
             }
 
             registerAppContext(app, params, launchDetails, key);
