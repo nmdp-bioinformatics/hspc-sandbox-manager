@@ -20,6 +20,7 @@ pipelines:
             - export TARGET_ENV=test
             - cd ci
             - . ci-0-set-properties.sh
+            - if [[ ! ${PROJECT_VERSION} =~ ${VERSION_SNAPSHOT_REGEX} ]]; then echo "not a snapshot version"; exit 1; fi
             - . ci-1-prepare-sources.sh
             - . ci-2-build-project.sh
             - . ci-3-docker-image.sh
@@ -53,6 +54,7 @@ pipelines:
             - export TARGET_ENV=prod
             - cd ci
             - . ci-0-set-properties.sh
+            - if [[ ! ${PROJECT_VERSION} =~ ${VERSION_RELEASE_REGEX} ]]; then echo "not a release version"; exit 1; fi
             - . ci-1-prepare-sources.sh
             - . ci-2-build-project.sh
             - . ci-3-docker-image.sh
