@@ -2327,7 +2327,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 $scope.selectedScenario.app.clientId !== "bilirubin_chart" &&
                 $scope.selectedScenario.app.clientId !== "my_web_app");
             if ($scope.selectedScenario.app.logoUri) {
-                $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
+                $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri;
             }
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
@@ -2348,7 +2348,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 $scope.selectedScenario.app.clientId !== "bilirubin_chart" &&
                 $scope.selectedScenario.app.clientId !== "my_web_app");
             if ($scope.selectedScenario.app.logoUri) {
-                $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
+                $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri;
             }
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
@@ -2794,12 +2794,12 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             delete updateClientJSON.logo;
             delete updateClientJSON.myFile;
 
-            if (updateClientJSON.logoUri) {
-                var i = updateClientJSON.logoUri.lastIndexOf("?");
-                if (i > -1) {
-                    updateClientJSON.logoUri = updateClientJSON.logoUri.substr(0, i);
-                }
-            }
+            // if (updateClientJSON.logoUri) {
+            //     var i = updateClientJSON.logoUri.lastIndexOf("?");
+            //     if (i > -1) {
+            //         updateClientJSON.logoUri = updateClientJSON.logoUri.substr(0, i);
+            //     }
+            // }
 
             if ($scope.clientJSON.clientType !== "Public Client") {
                 updateClientJSON.tokenEndpointAuthMethod = "SECRET_BASIC";
@@ -2841,13 +2841,19 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 });
                 return found;
             }
+            debugger
 
             $scope.selected.selectedApp.clientJSON = updateClientJSON;
             $scope.selected.selectedApp.launchUrl = updateClientJSON.launchUrl;
             $scope.selected.selectedApp.samplePatients = updateClientJSON.samplePatients;
             $scope.selected.selectedApp.briefDescription = updateClientJSON.briefDescription;
             $scope.selected.selectedApp.clientName = updateClientJSON.clientName;
-            $scope.selected.selectedApp.logoUri = updateClientJSON.logoUri;
+            if (updateClientJSON.logoUri.indexOf("?sandboxId=") === -1) {
+                $scope.selected.selectedApp.logoUri = updateClientJSON.logoUri + "?sandboxId=" + $scope.selected.selectedApp.sandboxId;
+            } else {
+                $scope.selected.selectedApp.logoUri = updateClientJSON.logoUri;
+            }
+
 
             var modalProgress = openModalProgressDialog();
             appRegistrationServices.updateSandboxApp($scope.selected.selectedApp).then(function (result) {
@@ -3532,12 +3538,12 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         delete updateClientJSON.logo;
         delete updateClientJSON.myFile;
 
-        if (updateClientJSON.logoUri) {
-            var i = updateClientJSON.logoUri.lastIndexOf("?");
-            if (i > -1) {
-                updateClientJSON.logoUri = updateClientJSON.logoUri.substr(0, i);
-            }
-        }
+        // if (updateClientJSON.logoUri) {
+        //     var i = updateClientJSON.logoUri.lastIndexOf("?");
+        //     if (i > -1) {
+        //         updateClientJSON.logoUri = updateClientJSON.logoUri.substr(0, i);
+        //     }
+        // }
 
         if ($scope.clientJSON.clientType !== "Public Client") {
             updateClientJSON.tokenEndpointAuthMethod = "SECRET_BASIC";
