@@ -2,7 +2,7 @@
         <div id="sandboxAppsViewContainer" class="col-md-12 content-column">
             <div  class="row-fluid">
                 <ul class="list-unstyled">
-                    <li class="col-md-3" ng-repeat="app in all_user_apps|filter:{launchUri:'!!'}">
+                    <li class="col-md-3" ng-repeat="app in all_user_apps">
                         <div ng-class="{selected: selected.selectedApp === app}"  class="thumb-holder">
                             <div class="thumbnail">
                                 <img ng-show="app.logoUri" ng-src="{{app.logoUri}}">
@@ -11,7 +11,7 @@
                                 <div ng-click="quickLaunch(app)" class="fa fa-play appLaunchIcon"></div>
                             </div>
                             <div class="caption">
-                                <div class="appTitle">{{app.authClient.clientName}}</div>
+                                <div class="appTitle">{{app.clientName}}</div>
                                 <div class="appDescription">{{app.briefDescription}}</div>
                             </div>
                         </div>

@@ -629,7 +629,7 @@ angular.module('sandManApp.services', [])
                 type: 'POST',
                 contentType: "application/json",
                 data: JSON.stringify({
-                    client_id: app.authClient.clientId,
+                    client_id: app.clientId,
                     parameters: params
                 })
             });
@@ -683,7 +683,9 @@ angular.module('sandManApp.services', [])
             description: launchScenario.description,
             lastLaunchSeconds: new Date().getTime(),
             launchEmbedded: launchScenario.launchEmbedded,
-            app: angular.copy(launchScenario.app)
+            app: angular.copy(launchScenario.app),
+            smartAppId: launchScenario.smartAppId,
+            smartApp: angular.copy(launchScenario.smartApp)
         };
         delete newLaunchScenario.app.clientJSON;
         if (launchScenario.userPersona !== undefined && launchScenario.userPersona !== '') {
@@ -740,7 +742,8 @@ angular.module('sandManApp.services', [])
                 description: '',
                 userPersona: '',
                 patient: '',
-                app: ''
+                app: '',
+                smartAppId: ''
             };
         },
         getScenarioBuilder: function () {
@@ -846,11 +849,11 @@ angular.module('sandManApp.services', [])
                 });
             });
         },
-        getLaunchScenarioByApp: function (appId) {
+        getLaunchScenarioByApp: function (app) {
             var deferred = $.Deferred();
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
-                    url: settings.sandboxManagerApiUrl + "/launchScenario?appId=" + appId,
+                    url: settings.sandboxManagerApiUrl + "/launchScenario?smartAppId=" + app.smartAppId + "&sandboxId=" + app.sandboxId,
                     type: 'GET',
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
@@ -1441,6 +1444,9 @@ angular.module('sandManApp.services', [])
                 }
             }
         },
+        canModifyApp: function (app) {
+            return app.copyType === "MASTER";
+        },
         canModifySandbox: function (sandbox) {
             if (sandbox.visibility === "PRIVATE") {
                 return !this.hasSandboxRole(sandbox.userRoles, "READ_ONLY");
@@ -1641,6 +1647,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             var that = this;
             app.sandbox = sandboxManagement.getSandbox();
+            app.sandboxId = sandboxManagement.getSandbox().sandboxId;
             app.createdBy = userServices.getOAuthUser();
 
             var logo = app.logo;
@@ -1649,7 +1656,7 @@ angular.module('sandManApp.services', [])
             app.clientJSON = JSON.stringify(app.clientJSON);
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
-                    url: settings.sandboxManagerApiUrl + "/app",
+                    url: settings.sandboxManagerApiUrl + "/smartapp?sandboxId=" + app.sandbox.sandboxId,
                     type: 'POST',
                     data: JSON.stringify(app),
                     contentType: "application/json",
@@ -1658,7 +1665,7 @@ angular.module('sandManApp.services', [])
                     }
                 }).done(function (result) {
                     if (logo) {
-                        that.uploadAppImage(result.id, logo).then(function () {
+                        that.uploadSmartAppImage(result.smartAppId, logo).then(function () {
                             that.getSandboxApps();
                             notification.message("App Created");
                             deferred.resolve(result);
@@ -1688,7 +1695,7 @@ angular.module('sandManApp.services', [])
 
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
-                    url: settings.sandboxManagerApiUrl + "/app/" + newApp.id,
+                    url: settings.sandboxManagerApiUrl + "/smartapp/" + newApp.smartAppId + "?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
                     type: 'PUT',
                     data: JSON.stringify(newApp),
                     contentType: "application/json",
@@ -1697,7 +1704,7 @@ angular.module('sandManApp.services', [])
                     }
                 }).done(function (result) {
                     if (logo) {
-                        that.uploadAppImage(result.id, logo).then(function () {
+                        that.uploadSmartAppImage(result.smartAppId, logo).then(function () {
                             that.getSandboxApps();
                             notification.message("App Updated");
                             deferred.resolve(result);
@@ -1722,7 +1729,7 @@ angular.module('sandManApp.services', [])
             var that = this;
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
-                    url: settings.sandboxManagerApiUrl + "/app/" + appId,
+                    url: settings.sandboxManagerApiUrl + "/smartapp/" + appId + "?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
                     type: 'DELETE',
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
@@ -1744,7 +1751,7 @@ angular.module('sandManApp.services', [])
             var that = this;
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
-                    url: settings.sandboxManagerApiUrl + "/app/" + appId,
+                    url: settings.sandboxManagerApiUrl + "/smartapp/" + appId + "?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
                     type: 'GET',
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
@@ -1764,7 +1771,7 @@ angular.module('sandManApp.services', [])
             var that = this;
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
-                    url: settings.sandboxManagerApiUrl + "/app?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
+                    url: settings.sandboxManagerApiUrl + "/smartapp?sandboxId=" + sandboxManagement.getSandbox().sandboxId,
                     type: 'GET',
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
@@ -1785,12 +1792,12 @@ angular.module('sandManApp.services', [])
             });
             return deferred;
         },
-        uploadAppImage: function (id, file) {
+        uploadSmartAppImage: function (smartAppId, file) {
             var deferred = $.Deferred();
             var formData = new FormData();
             formData.append("file", file);
             appsSettings.getSettings().then(function (settings) {
-                $http.post(settings.sandboxManagerApiUrl + "/app/" + id + "/image", formData, {
+                $http.post(settings.sandboxManagerApiUrl + "/smartapp/" + smartAppId + "/image?sandboxId=" + sandboxManagement.getSandbox().sandboxId, formData, {
                     transformRequest: angular.identity,
                     headers: {
                         'Content-Type': undefined,
@@ -1941,20 +1948,22 @@ angular.module('sandManApp.services', [])
         settings = results;
     });
 
-    function registerAppContext(app, params, launchDetails, key) {
+    function registerAppContext(app, smartApp, params, launchDetails, key) {
         var appToLaunch = angular.copy(app);
+        var smartAppToLaunch = angular.copy(smartApp);
         delete appToLaunch.clientJSON;
         delete appToLaunch.createdBy;
         delete appToLaunch.sandbox;
-        callRegisterContext(appToLaunch, params, fhirApiServices.fhirClient().server.serviceUrl, launchDetails, key);
+        callRegisterContext(appToLaunch, smartAppToLaunch, params, fhirApiServices.fhirClient().server.serviceUrl, launchDetails, key);
     }
 
-    function callRegisterContext(appToLaunch, params, issuer, launchDetails, key) {
+    function callRegisterContext(appToLaunch, smartAppToLaunch, params, issuer, launchDetails, key) {
         fhirApiServices
             .registerContext(appToLaunch, params, issuer)
             .done(function (c) {
                 window.localStorage[key] = JSON.stringify({
                     app: appToLaunch,
+                    smartApp: smartAppToLaunch,
                     iss: issuer,
                     launchDetails: launchDetails,
                     context: c
@@ -1974,7 +1983,7 @@ angular.module('sandManApp.services', [])
          (The window.open needs to be synchronous with the click event to
          avoid triggering  popup blockers. */
 
-        launch: function (app, patientContext, contextParams, userPersona, launchMode) {
+        launch: function (app, patientContext, contextParams, userPersona, launchMode, smartApp) {
             var key = random(32);
             window.localStorage[key] = "requested-launch";
             // var appWindow;
@@ -2027,7 +2036,7 @@ angular.module('sandManApp.services', [])
                 }
             }
 
-            registerAppContext(app, params, launchDetails, key);
+            registerAppContext(app, smartApp, params, launchDetails, key);
             if (userPersona !== null && userPersona !== undefined && userPersona) {
                 appsSettings.getSettings().then(function (settings) {
                     $http.post(settings.sandboxManagerApiUrl + "/userPersona/authenticate", {
