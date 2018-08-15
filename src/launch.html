@@ -14,7 +14,6 @@
       window.addEventListener('storage', onStorage, false);
 
       function onStorage(){
-
         if (launched || window.localStorage[key] === 'requested-launch') {
           return;
         }
@@ -22,21 +21,41 @@
         launched = true;
         var details = JSON.parse(window.localStorage[key]);
         window.localStorage.removeItem(key);
-
         // Session storage is inherited from opening window, so
         // we need to purge the tokenResponse here to avoid passing
         // the Sandbox Manager's token credentials to the app
         delete sessionStorage.tokenResponse;
-
-        if (details.app.launchUri.lastIndexOf("?") > -1) {
-            details.app.launchUri = details.app.launchUri + "&"
+        if (details.app.launchUri !== null && details.app.launchUri !== undefined) {
+            if (details.app.launchUri.lastIndexOf("?") > -1) {
+                details.app.launchUri = details.app.launchUri + "&"
+            } else {
+                details.app.launchUri = details.app.launchUri + "?"
+            }
+            window.location = details.app.launchUri +
+                'iss=' + encodeURIComponent(details.iss) +
+                '&launch=' + encodeURIComponent(details.context.launch_id);
         } else {
-            details.app.launchUri = details.app.launchUri + "?"
-        }
+            if (details.smartApp !== undefined) {
+                if (details.smartApp.launchUrl.lastIndexOf("?") > -1) {
+                    details.smartApp.launchUrl = details.smartApp.launchUrl + "&"
+                } else {
+                    details.smartApp.launchUrl = details.smartApp.launchUrl + "?"
+                }
+                window.location = details.smartApp.launchUrl +
+                    'iss=' + encodeURIComponent(details.iss) +
+                    '&launch=' + encodeURIComponent(details.context.launch_id);
+            } else {
+                if (details.app.launchUrl.lastIndexOf("?") > -1) {
+                    details.app.launchUrl = details.app.launchUrl + "&"
+                } else {
+                    details.app.launchUrl = details.app.launchUrl + "?"
+                }
+                window.location = details.app.launchUrl +
+                    'iss=' + encodeURIComponent(details.iss) +
+                    '&launch=' + encodeURIComponent(details.context.launch_id);
+            }
 
-        window.location = details.app.launchUri +
-        'iss=' + encodeURIComponent(details.iss) +
-        '&launch=' + encodeURIComponent(details.context.launch_id);
+        }
       }
 
     </script>

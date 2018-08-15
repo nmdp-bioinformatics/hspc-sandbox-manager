@@ -1719,7 +1719,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         });
 
         $scope.setPatient = function (p) {
-
             if (source === 'persona') {
                 personaServices.getUserPersonaBuilder().fhirId = p.id;
                 personaServices.getUserPersonaBuilder().resource = p.resourceType;
@@ -2216,7 +2215,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.selectedScenario = {};
         $scope.launchEmbedded = false;
         $scope.editDesc = {new: "", showEdit: false};
-        $scope.editLaunchUri = {new: "", showEdit: false};
+        $scope.editlaunchUrl = {new: "", showEdit: false};
         sandboxManagement.getSandboxLaunchScenarios();
         sandboxManagement.clearScenarioBuilder();
         sandboxManagement.getScenarioBuilder().owner = userServices.getOAuthUser();
@@ -2243,7 +2242,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 var modalProgress = openModalPractitionerDialog();
                 modalProgress.dismiss();
             } else {
-                launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
+                launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded, scenario.smartApp);
             }
         };
 
@@ -2303,14 +2302,14 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         };
 
         $scope.updateUri = function (scenario) {
-            scenario.app.launchUri = $scope.editLaunchUri.new;
+            scenario.app.launchUrl = $scope.editlaunchUrl.new;
             sandboxManagement.updateLaunchScenario(scenario);
-            $scope.editLaunchUri.showEdit = false;
+            $scope.editlaunchUrl.showEdit = false;
         };
 
         $scope.cancelUri = function (scenario) {
-            $scope.editLaunchUri.new = angular.copy(scenario.app.launchUri);
-            $scope.editLaunchUri.showEdit = false;
+            $scope.editlaunchUrl.new = angular.copy(scenario.app.launchUrl);
+            $scope.editlaunchUrl.showEdit = false;
         };
 
         $rootScope.$on('recent-selected', function (event, arg) {
@@ -2323,12 +2322,12 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             }
             $scope.canDelete = userServices.canModify($scope.selectedScenario, sandboxManagement.getSandbox());
             $scope.editDesc.new = angular.copy(arg.description);
-            $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
+            $scope.editlaunchUrl.new = angular.copy(arg.app.launchUrl);
             $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
-                $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
-                $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
+                $scope.selectedScenario.app.clientId !== "bilirubin_chart" &&
+                $scope.selectedScenario.app.clientId !== "my_web_app");
             if ($scope.selectedScenario.app.logoUri) {
-                $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
+                $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri;
             }
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
@@ -2344,12 +2343,12 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             }
             $scope.canDelete = userServices.canModify($scope.selectedScenario, sandboxManagement.getSandbox());
             $scope.editDesc.new = angular.copy(arg.description);
-            $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
+            $scope.editlaunchUrl.new = angular.copy(arg.app.launchUrl);
             $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
-                $scope.selectedScenario.app.authClient.clientId !== "bilirubin_chart" &&
-                $scope.selectedScenario.app.authClient.clientId !== "my_web_app");
+                $scope.selectedScenario.app.clientId !== "bilirubin_chart" &&
+                $scope.selectedScenario.app.clientId !== "my_web_app");
             if ($scope.selectedScenario.app.logoUri) {
-                $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
+                $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri;
             }
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
@@ -2533,7 +2532,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         $scope.fullTable = true;
 
         $scope.scenarioSelected = function (scenario) {
-
             $scope.selectedScenario = scenario;
             $rootScope.$emit('full-selected', $scope.selectedScenario);
         };
@@ -2559,17 +2557,18 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     appsService.getSampleApps().done(function (patientApps) {
         appRegistrationServices.getSandboxApps().done(function () {
             $scope.all_user_apps = angular.copy(appRegistrationServices.getAppList());
-            for (var i = 0; i < patientApps.length; i++) {
-                if (patientApps[i]["isDefault"] !== undefined) {
-                    $scope.all_user_apps.push(angular.copy(patientApps[i]));
-                }
-            }
+            // for (var i = 0; i < patientApps.length; i++) {
+            //     if (patientApps[i]["isDefault"] !== undefined) {
+            //         $scope.all_user_apps.push(angular.copy(patientApps[i]));
+            //     }
+            // }
             $rootScope.$digest();
         })
     });
 
     $scope.appDetail = function (app) {
         sandboxManagement.getScenarioBuilder().app = app;
+        sandboxManagement.getScenarioBuilder().smartAppId = app.smartAppId;
         openModalDialog(sandboxManagement.getScenarioBuilder());
     };
 
@@ -2612,8 +2611,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
         modalInstance.result.then(function (result) {
             var scenario = result.scenario;
+            scenario.smartApp = result.scenario.app.smartApp;
             if (result.launch) {
-                launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded);
+                launchApp.launch(scenario.app, scenario.patient, scenario.contextParams, scenario.userPersona, scenario.launchEmbedded, scenario.smartApp);
             } else {
                 sandboxManagement.addFullLaunchScenarioList(scenario);
             }
@@ -2630,9 +2630,15 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         customFhirApp.set($scope.customapp);
         $scope.select({
             launchUri: $scope.customapp.url,
-            authClient: {
-                clientName: "Custom App",
+            launchUrl: $scope.customapp.url,
+            smartApp: {
                 clientId: $scope.customapp.id,
+                launchUrl: $scope.customapp.url,
+                clientName: "Custom App"
+            },
+            authClient: {
+                clientId: $scope.customapp.id,
+                clientName: "Custom App",
                 isCustom: true
             }
         });
@@ -2725,35 +2731,35 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         } else if ($scope.clientJSON) {
             delete $scope.clientJSON.logoUri;
         }
-        if ($scope.app.isDefault === true) {
-            $scope.clientJSON.clientName = $scope.selected.selectedApp.authClient.clientName;
-            $scope.clientJSON.redirectUri = $scope.selected.selectedApp.authClient.redirectUri;
-            $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
-            $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
-            $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
-            $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri + "?" + new Date().getTime();
-        } else {
-            if ($scope.app.id) {
-                appRegistrationServices.getSandboxApp($scope.app.id).then(function (resultApp) {
+        // if ($scope.app.isDefault === true) {
+        //     $scope.clientJSON.clientName = $scope.selected.selectedApp.authClient.clientName;
+        //     $scope.clientJSON.redirectUri = $scope.selected.selectedApp.authClient.redirectUri;
+        //     $scope.clientJSON.launchUrl = $scope.selected.selectedapp.launchUrl;
+        //     $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+        //     $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
+        //     $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri + "?" + new Date().getTime();
+        // } else {
+            if ($scope.app.smartAppId) {
+                appRegistrationServices.getSandboxApp($scope.app.smartAppId).then(function (resultApp) {
                     $scope.galleryOffset = 80;
                     $scope.selected.selectedApp.clientJSON = JSON.parse(resultApp.clientJSON);
                     $scope.clientJSON = $scope.selected.selectedApp.clientJSON;
                     if (resultApp.logoUri) {
-                        $scope.clientJSON.logoUri = resultApp.logoUri + "?" + new Date().getTime();
+                        $scope.clientJSON.logoUri = resultApp.logoUri;
                     }
                     if ($scope.selected.selectedApp.clientJSON.tokenEndpointAuthMethod === "SECRET_BASIC") {
                         $scope.clientJSON.clientType = "Confidential Client";
                     } else {
                         $scope.clientJSON.clientType = "Public Client";
                     }
-                    $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
+                    $scope.clientJSON.launchUrl = $scope.selected.selectedApp.launchUrl;
                     $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
                     $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
                     $scope.clientJSON.scope = $scope.clientJSON.scope.join(" ");
                     $rootScope.$digest();
                 });
             }
-        }
+        // }
 
         function openModalProgressDialog() {
             return $uibModal.open({
@@ -2788,12 +2794,12 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             delete updateClientJSON.logo;
             delete updateClientJSON.myFile;
 
-            if (updateClientJSON.logoUri) {
-                var i = updateClientJSON.logoUri.lastIndexOf("?");
-                if (i > -1) {
-                    updateClientJSON.logoUri = updateClientJSON.logoUri.substr(0, i);
-                }
-            }
+            // if (updateClientJSON.logoUri) {
+            //     var i = updateClientJSON.logoUri.lastIndexOf("?");
+            //     if (i > -1) {
+            //         updateClientJSON.logoUri = updateClientJSON.logoUri.substr(0, i);
+            //     }
+            // }
 
             if ($scope.clientJSON.clientType !== "Public Client") {
                 updateClientJSON.tokenEndpointAuthMethod = "SECRET_BASIC";
@@ -2835,11 +2841,19 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 });
                 return found;
             }
+            debugger
 
             $scope.selected.selectedApp.clientJSON = updateClientJSON;
-            $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
+            $scope.selected.selectedApp.launchUrl = updateClientJSON.launchUrl;
             $scope.selected.selectedApp.samplePatients = updateClientJSON.samplePatients;
             $scope.selected.selectedApp.briefDescription = updateClientJSON.briefDescription;
+            $scope.selected.selectedApp.clientName = updateClientJSON.clientName;
+            if (updateClientJSON.logoUri.indexOf("?sandboxId=") === -1) {
+                $scope.selected.selectedApp.logoUri = updateClientJSON.logoUri + "?sandboxId=" + $scope.selected.selectedApp.sandboxId;
+            } else {
+                $scope.selected.selectedApp.logoUri = updateClientJSON.logoUri;
+            }
+
 
             var modalProgress = openModalProgressDialog();
             appRegistrationServices.updateSandboxApp($scope.selected.selectedApp).then(function (result) {
@@ -2861,14 +2875,14 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                 resolve: {
                     getSettings: function () {
                         return {
-                            title: "Delete " + $scope.selected.selectedApp.authClient.clientName,
+                            title: "Delete " + $scope.selected.selectedApp.clientName,
                             ok: "Yes",
                             cancel: "Cancel",
                             type: "confirm-error",
                             text: "Are you sure you want to delete?",
                             callback: function (result) { //setting callback
                                 if (result == true) {
-                                    appRegistrationServices.deleteSandboxApp($scope.selected.selectedApp.id).then(function () {
+                                    appRegistrationServices.deleteSandboxApp($scope.selected.selectedApp.smartAppId).then(function () {
                                         $scope.selected.selectedApp = {};
                                     });
                                 }
@@ -3162,12 +3176,15 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         customFhirApp.set($scope.customapp);
 
         const app = {
+            launchUrl: $scope.customapp.url,
             launchUri: $scope.customapp.url,
             authClient: {
                 clientName: "Custom App",
                 clientId: $scope.customapp.id,
                 isCustom: true
             },
+            clientName: "Custom App",
+            clientId: $scope.customapp.id,
             isDefault: false,
             logoUri: null,
         };
@@ -3197,7 +3214,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
     $rootScope.$on('app-list-update', function () {
         $scope.all_user_apps = angular.copy(appRegistrationServices.getAppList());
-        $scope.all_user_apps = $scope.all_user_apps.concat($scope.default_apps);
+        // $scope.all_user_apps = $scope.all_user_apps.concat($scope.default_apps);
         $scope.isAppsPicker = true;
         $rootScope.$digest();
     });
@@ -3215,7 +3232,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             var modalProgress = openModalProgressDialog();
             appRegistrationServices.createSandboxApp(app).then(function (result) {
                 modalProgress.dismiss();
-                showClientId(result.authClient.clientId);
+                showClientId(result.clientId);
             }, function (err) {
                 modalProgress.dismiss();
                 $state.go('error', {});
@@ -3236,7 +3253,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             var modalProgress = openModalProgressDialog();
             appRegistrationServices.createSandboxApp(app).then(function (result) {
                 modalProgress.dismiss();
-                showClientId(result.authClient.clientId);
+                showClientId(result.clientId);
             }, function (err) {
                 modalProgress.dismiss();
                 $state.go('error', {});
@@ -3290,45 +3307,45 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         } else if ($scope.clientJSON) {
             delete $scope.clientJSON.logoUri;
         }
-        if (app.isDefault === true) {
-            $scope.clientJSON.clientName = $scope.selected.selectedApp.authClient.clientName;
-            $scope.clientJSON.redirectUri = $scope.selected.selectedApp.authClient.redirectUri;
-            $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
-            $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
-            $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
-            $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri + "?" + new Date().getTime();
-        } else {
-            if (app.id) {
-                appRegistrationServices.getSandboxApp(app.id).then(function (resultApp) {
+        // if (app.isDefault === true) {
+        //     $scope.clientJSON.clientName = $scope.selected.selectedApp.authClient.clientName;
+        //     $scope.clientJSON.redirectUri = $scope.selected.selectedApp.authClient.redirectUri;
+        //     $scope.clientJSON.launchUrl = $scope.selected.selectedapp.launchUrl;
+        //     $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
+        //     $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
+        //     $scope.clientJSON.logoUri = $scope.selected.selectedApp.logoUri + "?" + new Date().getTime();
+        // } else {
+            if (app.smartAppId) {
+                appRegistrationServices.getSandboxApp(app.smartAppId).then(function (resultApp) {
                     $scope.galleryOffset = 80;
                     $scope.selected.selectedApp.clientJSON = JSON.parse(resultApp.clientJSON);
                     $scope.clientJSON = $scope.selected.selectedApp.clientJSON;
                     if (resultApp.logoUri) {
-                        $scope.clientJSON.logoUri = resultApp.logoUri + "?" + new Date().getTime();
+                        $scope.clientJSON.logoUri = resultApp.logoUri;
                     }
                     if ($scope.selected.selectedApp.clientJSON.tokenEndpointAuthMethod === "SECRET_BASIC") {
                         $scope.clientJSON.clientType = "Confidential Client";
                     } else {
                         $scope.clientJSON.clientType = "Public Client";
                     }
-                    $scope.clientJSON.launchUri = $scope.selected.selectedApp.launchUri;
+                    $scope.clientJSON.launchUrl = $scope.selected.selectedApp.launchUrl;
                     $scope.clientJSON.samplePatients = $scope.selected.selectedApp.samplePatients;
                     $scope.clientJSON.briefDescription = $scope.selected.selectedApp.briefDescription;
                     $scope.clientJSON.scope = $scope.clientJSON.scope.join(" ");
                     $rootScope.$digest();
                 });
             }
-        }
+        // }
     };
 
     function canDeleteApp(app) {
         $scope.canDelete = false;
-        if (app.id) {
-            sandboxManagement.getLaunchScenarioByApp(app.id).then(function (launchScenarios) {
+        if (app.smartAppId) {
+            sandboxManagement.getLaunchScenarioByApp(app).then(function (launchScenarios) {
                 if (!(launchScenarios.length > 0)) {
-                    $scope.canDelete = userServices.canModify(app, sandboxManagement.getSandbox());
+                    $scope.canDelete = true;
                 }
-                $scope.canModify = userServices.canModify(app, sandboxManagement.getSandbox());
+                // $scope.canModify = userServices.canModifyApp(app, sandboxManagement.getSandbox());
                 $rootScope.$digest();
             });
         }
@@ -3338,7 +3355,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         if (app.isDefault === true || app.appManifestUri) {
             return false;
         } else {
-            return userServices.canModify(app, sandboxManagement.getSandbox());
+            return userServices.canModifyApp(app);
         }
     };
 
@@ -3495,9 +3512,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
                 sandboxManagement.getScenarioBuilder().userPersona = sandboxManagement.getScenarioBuilder().patient;
                 if (result.patient) {
-                    sandboxManagement.getScenarioBuilder().description = app.authClient.clientName + ' app with patient ' + $filter('nameGivenFamily')(result.patient);
+                    sandboxManagement.getScenarioBuilder().description = app.clientName + ' app with patient ' + $filter('nameGivenFamily')(result.patient);
                 } else {
-                    sandboxManagement.getScenarioBuilder().description = app.authClient.clientName + ' app with no patient';
+                    sandboxManagement.getScenarioBuilder().description = app.clientName + ' app with no patient';
                 }
                 var scenario = sandboxManagement.getScenarioBuilder();
                 console.log('scenario', scenario);
@@ -3521,12 +3538,12 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         delete updateClientJSON.logo;
         delete updateClientJSON.myFile;
 
-        if (updateClientJSON.logoUri) {
-            var i = updateClientJSON.logoUri.lastIndexOf("?");
-            if (i > -1) {
-                updateClientJSON.logoUri = updateClientJSON.logoUri.substr(0, i);
-            }
-        }
+        // if (updateClientJSON.logoUri) {
+        //     var i = updateClientJSON.logoUri.lastIndexOf("?");
+        //     if (i > -1) {
+        //         updateClientJSON.logoUri = updateClientJSON.logoUri.substr(0, i);
+        //     }
+        // }
 
         if ($scope.clientJSON.clientType !== "Public Client") {
             updateClientJSON.tokenEndpointAuthMethod = "SECRET_BASIC";
@@ -3570,7 +3587,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         }
 
         $scope.selected.selectedApp.clientJSON = updateClientJSON;
-        $scope.selected.selectedApp.launchUri = updateClientJSON.launchUri;
+        $scope.selected.selectedApp.launchUrl = updateClientJSON.launchUrl;
         $scope.selected.selectedApp.samplePatients = updateClientJSON.samplePatients;
         $scope.selected.selectedApp.briefDescription = updateClientJSON.briefDescription;
         var modalProgress = openModalProgressDialog();
@@ -3592,14 +3609,14 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             resolve: {
                 getSettings: function () {
                     return {
-                        title: "Delete " + $scope.selected.selectedApp.authClient.clientName,
+                        title: "Delete " + $scope.selected.selectedApp.clientName,
                         ok: "Yes",
                         cancel: "Cancel",
                         type: "confirm-error",
                         text: "Are you sure you want to delete?",
                         callback: function (result) { //setting callback
                             if (result == true) {
-                                appRegistrationServices.deleteSandboxApp($scope.selected.selectedApp.id).then(function () {
+                                appRegistrationServices.deleteSandboxApp($scope.selected.selectedApp.smartAppId).then(function () {
                                     $scope.selected.selectedApp = {};
                                 });
                             }
@@ -3684,7 +3701,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             appManifestUri: $scope.manifestUrl + "/.well-known/smart/manifest.json",
             softwareId: appManifest.software_id,
             fhirVersions: appManifest.fhir_versions.join(","),
-            launchUri: appManifest.launch_url,
+            launchUrl: appManifest.launch_url,
             logoUri: appManifest.logo_uri,
             authClient: authClient
         };
@@ -3720,8 +3737,8 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         var url = reader.readAsDataURL(files[0]);
     };
 
-    $scope.$watchGroup(['clientJSON.clientName', 'clientJSON.launchUri', 'clientJSON.redirectUris'], function () {
-        $scope.createEnabled = valueSet($scope.clientJSON.launchUri) && valueSet($scope.clientJSON.clientName);
+    $scope.$watchGroup(['clientJSON.clientName', 'clientJSON.launchUrl', 'clientJSON.redirectUris'], function () {
+        $scope.createEnabled = valueSet($scope.clientJSON.launchUrl) && valueSet($scope.clientJSON.clientName);
     });
 
     function valueSet(value) {
@@ -3729,21 +3746,20 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     }
 
   $scope.changeRedirectUri = function () {
-    if($scope.clientJSON.launchUri.substring(0,4) === 'http') {
-      var pathArray = $scope.clientJSON.launchUri.split( '/' );
+    if($scope.clientJSON.launchUrl.substring(0,4) === 'http') {
+      var pathArray = $scope.clientJSON.launchUrl.split( '/' );
       var protocol = pathArray[0];
       var host = pathArray[2];
       var url = protocol + '//' + host;
       $scope.clientJSON.redirectUris = url + '/';
     }
     else {
-      var pathArray = $scope.clientJSON.launchUri.split( '/' );
+      var pathArray = $scope.clientJSON.launchUrl.split( '/' );
       $scope.clientJSON.redirectUris = pathArray[0] + '/';
     }
   }
 
     $scope.registerApp = function (clientJSON) {
-
         if (Object.prototype.toString.call(clientJSON.redirectUris) !== '[object Array]' &&
             typeof clientJSON.redirectUris !== 'undefined') {
             clientJSON.redirectUris = clientJSON.redirectUris.split(',');
@@ -3781,15 +3797,11 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         clientJSON.idTokenValiditySeconds = 3600; // one hour
         clientJSON.refreshTokenValiditySeconds = 31557600; // one year
 
-        var authClient = {
-            clientName: clientJSON.clientName
-        };
-
         var newApp = {
-            launchUri: clientJSON.launchUri,
+            launchUrl: clientJSON.launchUrl,
             samplePatients: $scope.samplePatients,
             logo: $scope.myFile,
-            authClient: authClient
+            clientName: clientJSON.clientName
         };
         delete clientJSON.logo;
         newApp.clientJSON = clientJSON;

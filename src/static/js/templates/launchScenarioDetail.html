@@ -78,7 +78,7 @@
                 <div ng-show="isCustom" class="title">Custom App</div>
                 <div ng-show="!isCustom" class="content">
                     <div class="detail-form">
-                        <label class="detail-form-label full-line">{{selectedScenario.app.authClient.clientName}}</label>
+                        <label class="detail-form-label full-line">{{selectedScenario.smartApp.clientName}}</label>
                     </div>
                     <div class="thumbnail">
                         <img ng-show="selectedScenario.app.logoUri" ng-src="{{selectedScenario.app.logoUri}}">
@@ -87,19 +87,19 @@
                 </div>
                 <div ng-show="isCustom" class="content">
                     <div class="detail-form">
-                        <label class="detail-form-label full-line">Client ID:  <b>{{selectedScenario.app.authClient.clientId}}</b></label>
+                        <label class="detail-form-label full-line">Client ID:  <b>{{selectedScenario.app.clientId || selectedScenario.app.authClient.clientId}}</b></label>
                     </div>
                     <div class="detail-form-line-inline">
                         <label class="detail-form-label-inline">Launch URI: </label>
-                        <label ng-hide="editLaunchUri.showEdit" class="detail-form-value-inline">{{selectedScenario.app.launchUri}}</label>
-                        <a ng-hide="editLaunchUri.showEdit" ng-click="editLaunchUri.showEdit = true" class='float-right-dark-btn'>
+                        <label ng-hide="editlaunchUrl.showEdit" class="detail-form-value-inline">{{selectedScenario.app.launchUrl || selectedScenario.app.launchUri}}</label>
+                        <a ng-hide="editlaunchUrl.showEdit" ng-click="editlaunchUrl.showEdit = true" class='float-right-dark-btn'>
                             <i class='fa fa-pencil fa-lg'></i>
                         </a>
-                        <input ng-show="editLaunchUri.showEdit" class="detail-form-label-input-inline" ng-model="editLaunchUri.new"/>
-                        <a ng-show="editLaunchUri.showEdit" ng-click="cancelUri(selectedScenario)" class='float-right-dark-btn'>
+                        <input ng-show="editlaunchUrl.showEdit" class="detail-form-label-input-inline" ng-model="editlaunchUrl.new"/>
+                        <a ng-show="editlaunchUrl.showEdit" ng-click="cancelUri(selectedScenario)" class='float-right-dark-btn'>
                             <i class='fa fa-remove fa-lg'></i>
                         </a>
-                        <a ng-show="editLaunchUri.showEdit" ng-click="updateUri(selectedScenario)" class='float-right-dark-btn'>
+                        <a ng-show="editlaunchUrl.showEdit" ng-click="updateUri(selectedScenario)" class='float-right-dark-btn'>
                             <i class='fa fa-check fa-lg'></i>
                         </a>
                     </div>
