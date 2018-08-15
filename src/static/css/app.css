@@ -2907,3 +2907,11 @@ a[ng-click]{
     margin-left: 10px;
     font-size: 12px;
 }
+
+.beta-title {
+    background-color: #FFDE03;
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+    color: black;
+}

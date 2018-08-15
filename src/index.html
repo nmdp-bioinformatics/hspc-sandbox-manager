@@ -63,7 +63,9 @@
 
 <!-- apply our angular app to our site -->
 <body ng-app="sandManApp" ng-class="scrollScreen(size.screenH, size.screenW) ? 'full-screen-scroll' : 'full-screen'" screen-size ng-controller="navController">
-
+<div class="beta-title">
+    A public beta of our new version is available. You can try it out <a href="https://sandbox-beta.hspconsortium.org/">here</a>.
+</div>
 <!-- NAVIGATION -->
 <nav class="navbar" role="navigation" ng-show="showing.navBar">
     <div class="navbar-img" style="cursor: pointer" ng-click="goToDashboard()" ng-cloak><img ng-style="imgStyle()" ng-src="{{whiteImage}}" ng-srcset="{{whiteImage2x}}" ng-cloak /><div ng-style="imgTextStyle()" ng-cloak> {{sandboxText}}</div></div>
