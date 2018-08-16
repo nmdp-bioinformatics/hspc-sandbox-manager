@@ -81,8 +81,8 @@
                         <label class="detail-form-label full-line">{{selectedScenario.smartApp.clientName}}</label>
                     </div>
                     <div class="thumbnail">
-                        <img ng-show="selectedScenario.app.logoUri" ng-src="{{selectedScenario.app.logoUri}}">
-                        <img ng-hide="selectedScenario.app.logoUri" src="https://content.hspconsortium.org/images/hspc/icon/HSPCSandboxNoIconApp-512.png">
+                        <img ng-show="selectedScenario.app.logoUri || selectedScenario.smartApp.logoUri" ng-src="{{selectedScenario.app.logoUri || selectedScenario.smartApp.logoUri}}">
+                        <img ng-hide="selectedScenario.app.logoUri || selectedScenario.smartApp.logoUri" src="https://content.hspconsortium.org/images/hspc/icon/HSPCSandboxNoIconApp-512.png">
                     </div>
                 </div>
                 <div ng-show="isCustom" class="content">

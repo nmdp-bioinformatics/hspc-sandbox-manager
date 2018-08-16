@@ -2233,6 +2233,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             }
         });
         $scope.launch = function (scenario) {
+            debugger
             scenario.lastLaunchSeconds = new Date().getTime();
             sandboxManagement.launchScenarioLaunched(scenario);
             if(scenario.patient == '') {
@@ -2322,12 +2323,14 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             }
             $scope.canDelete = userServices.canModify($scope.selectedScenario, sandboxManagement.getSandbox());
             $scope.editDesc.new = angular.copy(arg.description);
-            $scope.editlaunchUrl.new = angular.copy(arg.app.launchUrl);
-            $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
-                $scope.selectedScenario.app.clientId !== "bilirubin_chart" &&
-                $scope.selectedScenario.app.clientId !== "my_web_app");
-            if ($scope.selectedScenario.app.logoUri) {
-                $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri;
+            $scope.editlaunchUrl.new = angular.copy(arg.smartApp.launchUrl);
+            if ($scope.selectedScenario.app !== null) {
+                $scope.isCustom = ($scope.selectedScenario.app.authClient.authDatabaseId === null &&
+                    $scope.selectedScenario.smartApp.clientId !== "bilirubin_chart" &&
+                    $scope.selectedScenario.smartApp.clientId !== "my_web_app");
+            }
+            if ($scope.selectedScenario.smartApp.logoUri) {
+                $scope.selectedScenario.smartApp.logoUri = $scope.selectedScenario.smartApp.logoUri;
             }
             $scope.desc = descriptionBuilder.launchScenarioDescription($scope.selectedScenario);
             sandboxManagement.setSelectedScenario(arg);
@@ -2567,8 +2570,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     });
 
     $scope.appDetail = function (app) {
-        sandboxManagement.getScenarioBuilder().app = app;
+        sandboxManagement.getScenarioBuilder().smartApp = app;
         sandboxManagement.getScenarioBuilder().smartAppId = app.smartAppId;
+        sandboxManagement.get
         openModalDialog(sandboxManagement.getScenarioBuilder());
     };
 

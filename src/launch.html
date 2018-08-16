@@ -10,6 +10,7 @@
       if (!(key in window.localStorage)) {
         console.log('Failed to launch app -- no launch key.');
       }
+      debugger;
       onStorage();
       window.addEventListener('storage', onStorage, false);
 
@@ -25,37 +26,39 @@
         // we need to purge the tokenResponse here to avoid passing
         // the Sandbox Manager's token credentials to the app
         delete sessionStorage.tokenResponse;
-        if (details.app.launchUri !== null && details.app.launchUri !== undefined) {
-            if (details.app.launchUri.lastIndexOf("?") > -1) {
-                details.app.launchUri = details.app.launchUri + "&"
-            } else {
-                details.app.launchUri = details.app.launchUri + "?"
-            }
-            window.location = details.app.launchUri +
-                'iss=' + encodeURIComponent(details.iss) +
-                '&launch=' + encodeURIComponent(details.context.launch_id);
-        } else {
-            if (details.smartApp !== undefined) {
-                if (details.smartApp.launchUrl.lastIndexOf("?") > -1) {
-                    details.smartApp.launchUrl = details.smartApp.launchUrl + "&"
-                } else {
-                    details.smartApp.launchUrl = details.smartApp.launchUrl + "?"
-                }
-                window.location = details.smartApp.launchUrl +
-                    'iss=' + encodeURIComponent(details.iss) +
-                    '&launch=' + encodeURIComponent(details.context.launch_id);
-            } else {
-                if (details.app.launchUrl.lastIndexOf("?") > -1) {
-                    details.app.launchUrl = details.app.launchUrl + "&"
-                } else {
-                    details.app.launchUrl = details.app.launchUrl + "?"
-                }
-                window.location = details.app.launchUrl +
-                    'iss=' + encodeURIComponent(details.iss) +
-                    '&launch=' + encodeURIComponent(details.context.launch_id);
-            }
+          if (details.smartApp !== null && details.smartApp !== undefined) {
+              if (details.smartApp.launchUrl.lastIndexOf("?") > -1) {
+                  details.smartApp.launchUrl = details.smartApp.launchUrl + "&"
+              } else {
+                  details.smartApp.launchUrl = details.smartApp.launchUrl + "?"
+              }
+              window.location = details.smartApp.launchUrl +
+                  'iss=' + encodeURIComponent(details.iss) +
+                  '&launch=' + encodeURIComponent(details.context.launch_id);
+          } else {
+              if (details.app !== null && details.app !== undefined) {
+                  if (details.app.launchUri !== null && details.app.launchUri !== undefined) {
+                      if (details.app.launchUri.lastIndexOf("?") > -1) {
+                          details.app.launchUri = details.app.launchUri + "&"
+                      } else {
+                          details.app.launchUri = details.app.launchUri + "?"
+                      }
+                      window.location = details.app.launchUri +
+                          'iss=' + encodeURIComponent(details.iss) +
+                          '&launch=' + encodeURIComponent(details.context.launch_id);
+                  } else {
+                      if (details.app.launchUrl.lastIndexOf("?") > -1) {
+                          details.app.launchUrl = details.app.launchUrl + "&"
+                      } else {
+                          details.app.launchUrl = details.app.launchUrl + "?"
+                      }
+                      window.location = details.app.launchUrl +
+                          'iss=' + encodeURIComponent(details.iss) +
+                          '&launch=' + encodeURIComponent(details.context.launch_id);
+                  }
+              }
 
-        }
+          }
       }
 
     </script>

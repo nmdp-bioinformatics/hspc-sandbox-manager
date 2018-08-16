@@ -815,8 +815,14 @@ angular.module('sandManApp.services', [])
         launchScenarioLaunched: function (launchScenario) {
             var that = this;
             var updatedLaunchScenario = angular.copy(launchScenario);
-            updatedLaunchScenario.app = angular.copy(updatedLaunchScenario.app);
-            delete updatedLaunchScenario.app.clientJSON;
+            if (updatedLaunchScenario.app !== null) {
+                updatedLaunchScenario.app = angular.copy(updatedLaunchScenario.app);
+                delete updatedLaunchScenario.app.clientJSON;
+            } else {
+                updatedLaunchScenario.smartApp = angular.copy(updatedLaunchScenario.smartApp);
+                delete updatedLaunchScenario.smartApp.clientJSON;
+            }
+
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
                     url: settings.sandboxManagerApiUrl + "/launchScenario/" + updatedLaunchScenario.id + "/launched",
@@ -912,22 +918,38 @@ angular.module('sandManApp.services', [])
         createSandbox: function (newSandbox) {
             var that = this;
             var deferred = $.Deferred();
+            debugger
             var createSandbox = {
                 createdBy: userServices.getOAuthUser(),
                 name: newSandbox.sandboxName,
                 sandboxId: newSandbox.sandboxId,
                 description: newSandbox.description,
                 dataSet: newSandbox.dataSet,
+                apps: "DEFAULT",
                 apiEndpointIndex: newSandbox.apiEndpointIndex,
                 allowOpenAccess: newSandbox.allowOpenAccess,
                 users: [userServices.getOAuthUser()]
             };
+            var clonedSandbox = {};
+            if (newSandbox.dataSet  === "NONE") {
+                clonedSandbox.sandboxId = "MasterEmpty";
+            } else if (newSandbox.apiEndpointIndex  === "6") {
+                clonedSandbox.sandboxId = "MasterStu3SMART";
+            } else if (newSandbox.apiEndpointIndex  === "7") {
+                clonedSandbox.sandboxId = "MasterR4SMART";
+            } else if (newSandbox.apiEndpointIndex  === "5") {
+                clonedSandbox.sandboxId = "MasterDstu2SMART";
+            }
+            var cloneBody = {
+                "clonedSandbox": clonedSandbox,
+                "newSandbox": createSandbox
+            }
 
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
-                    url: settings.sandboxManagerApiUrl + "/sandbox",
+                    url: settings.sandboxManagerApiUrl + "/sandbox/clone",
                     type: 'POST',
-                    data: JSON.stringify(createSandbox),
+                    data: JSON.stringify(cloneBody),
                     contentType: "application/json",
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
@@ -1951,30 +1973,58 @@ angular.module('sandManApp.services', [])
     function registerAppContext(app, smartApp, params, launchDetails, key) {
         var appToLaunch = angular.copy(app);
         var smartAppToLaunch = angular.copy(smartApp);
-        delete appToLaunch.clientJSON;
-        delete appToLaunch.createdBy;
-        delete appToLaunch.sandbox;
+        if (appToLaunch !== null) {
+            delete appToLaunch.clientJSON;
+            delete appToLaunch.createdBy;
+            delete appToLaunch.sandbox;
+        } else {
+            delete smartAppToLaunch.clientJSON;
+            delete smartAppToLaunch.createdBy;
+            delete smartAppToLaunch.sandbox;
+        }
+
         callRegisterContext(appToLaunch, smartAppToLaunch, params, fhirApiServices.fhirClient().server.serviceUrl, launchDetails, key);
     }
 
     function callRegisterContext(appToLaunch, smartAppToLaunch, params, issuer, launchDetails, key) {
-        fhirApiServices
-            .registerContext(appToLaunch, params, issuer)
-            .done(function (c) {
-                window.localStorage[key] = JSON.stringify({
-                    app: appToLaunch,
-                    smartApp: smartAppToLaunch,
-                    iss: issuer,
-                    launchDetails: launchDetails,
-                    context: c
-                });
-            }).fail(function (err) {
-            console.log("Could not register launch context: ", err);
-            appWindow.close();
-            //                    $rootScope.$emit('reconnect-request');
-            $rootScope.$emit('error', 'Could not register launch context (see console)');
-            $rootScope.$digest();
-        });
+        if (smartAppToLaunch !== null) {
+            fhirApiServices
+                .registerContext(smartAppToLaunch, params, issuer)
+                .done(function (c) {
+                    window.localStorage[key] = JSON.stringify({
+                        app: null,
+                        smartApp: smartAppToLaunch,
+                        iss: issuer,
+                        launchDetails: launchDetails,
+                        context: c
+                    });
+                }).fail(function (err) {
+                console.log("Could not register launch context: ", err);
+                appWindow.close();
+                //                    $rootScope.$emit('reconnect-request');
+                $rootScope.$emit('error', 'Could not register launch context (see console)');
+                $rootScope.$digest();
+            });
+        } else {
+            fhirApiServices
+                .registerContext(appToLaunch, params, issuer)
+                .done(function (c) {
+                    window.localStorage[key] = JSON.stringify({
+                        app: appToLaunch,
+                        smartApp: null,
+                        iss: issuer,
+                        launchDetails: launchDetails,
+                        context: c
+                    });
+                }).fail(function (err) {
+                console.log("Could not register launch context: ", err);
+                appWindow.close();
+                //                    $rootScope.$emit('reconnect-request');
+                $rootScope.$emit('error', 'Could not register launch context (see console)');
+                $rootScope.$digest();
+            });
+        }
+
 
     }
 
@@ -1984,6 +2034,7 @@ angular.module('sandManApp.services', [])
          avoid triggering  popup blockers. */
 
         launch: function (app, patientContext, contextParams, userPersona, launchMode, smartApp) {
+            debugger;
             var key = random(32);
             window.localStorage[key] = "requested-launch";
             // var appWindow;
