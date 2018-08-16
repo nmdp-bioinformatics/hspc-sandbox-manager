@@ -945,6 +945,21 @@ angular.module('sandManApp.services', [])
                 "newSandbox": createSandbox
             }
 
+            var clonedSandbox = {};
+            if (newSandbox.dataSet  === "NONE") {
+                clonedSandbox.sandboxId = "MasterEmpty";
+            } else if (newSandbox.apiEndpointIndex  === "6") {
+                clonedSandbox.sandboxId = "MasterStu3SMART";
+            } else if (newSandbox.apiEndpointIndex  === "7") {
+                clonedSandbox.sandboxId = "MasterR4SMART";
+            } else if (newSandbox.apiEndpointIndex  === "5") {
+                clonedSandbox.sandboxId = "MasterDstu2SMART";
+            }
+            var cloneBody = {
+                "clonedSandbox": clonedSandbox,
+                "newSandbox": createSandbox
+            }
+
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
                     url: settings.sandboxManagerApiUrl + "/sandbox/clone",
@@ -1799,6 +1814,7 @@ angular.module('sandManApp.services', [])
                         xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
                     }
                 }).done(function (results) {
+                    debugger
                     fullAppList = [];
                     if (results) {
                         results.forEach(function (app) {
@@ -2037,6 +2053,7 @@ angular.module('sandManApp.services', [])
             debugger;
             var key = random(32);
             window.localStorage[key] = "requested-launch";
+            debugger
             // var appWindow;
             // = window.open('launch.html' + "" +
             // '?username=' + encodeURIComponent(userPersona.sbmUserId) +
@@ -2122,6 +2139,7 @@ angular.module('sandManApp.services', [])
 
     function initPatientDataManagerApp() {
         appsService.getSampleApps().done(function (patientApps) {
+            debugger;
             var pdm;
             for (var i = 0; i < patientApps.length; i++) {
                 if (patientApps[i]["authClient"]["clientId"] == "patient_data_manager") {
