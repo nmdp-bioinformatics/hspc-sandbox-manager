@@ -16,7 +16,7 @@
                 <td><i ng-click="launch(scenario)" class="btn-image fa fa-external-link fa-lg"></i> {{scenario.description}}</td>
                 <td><i class='fa' ng-show="scenario.userPersona" ng-class="scenario.userPersona.resource == 'Patient' ? 'fa-bed' : 'fa-user-md'"></i> {{scenario.userPersona.fhirName}}</td>
                 <td>{{scenario.patientName||"None"}}</td>
-                <td>{{scenario.app.authClient.clientName}}</td>
+                <td>{{scenario.app.clientName}}</td>
             </tr>
             </tbody>
         </table>

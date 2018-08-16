@@ -78,7 +78,7 @@
                 <div ng-show="isCustom" class="title">Custom App</div>
                 <div ng-show="!isCustom" class="content">
                     <div class="detail-form">
-                        <label class="detail-form-label full-line">{{selectedScenario.app.authClient.clientName}}</label>
+                        <label class="detail-form-label full-line">{{selectedScenario.app.clientName}}</label>
                     </div>
                     <div class="thumbnail">
                         <img ng-show="selectedScenario.app.logoUri" ng-src="{{selectedScenario.app.logoUri}}">
@@ -87,7 +87,7 @@
                 </div>
                 <div ng-show="isCustom" class="content">
                     <div class="detail-form">
-                        <label class="detail-form-label full-line">Client ID:  <b>{{selectedScenario.app.authClient.clientId}}</b></label>
+                        <label class="detail-form-label full-line">Client ID:  <b>{{selectedScenario.app.clientId}}</b></label>
                     </div>
                     <div class="detail-form-line-inline">
                         <label class="detail-form-label-inline">Launch URI: </label>

@@ -629,7 +629,7 @@ angular.module('sandManApp.services', [])
                 type: 'POST',
                 contentType: "application/json",
                 data: JSON.stringify({
-                    client_id: app.authClient.clientId,
+                    client_id: app.clientId,
                     parameters: params
                 })
             });
@@ -915,16 +915,32 @@ angular.module('sandManApp.services', [])
                 sandboxId: newSandbox.sandboxId,
                 description: newSandbox.description,
                 dataSet: newSandbox.dataSet,
+                apps: "DEFAULT",
                 apiEndpointIndex: newSandbox.apiEndpointIndex,
                 allowOpenAccess: newSandbox.allowOpenAccess,
                 users: [userServices.getOAuthUser()]
             };
 
+            var clonedSandbox = {};
+            if (newSandbox.dataSet  === "NONE") {
+                clonedSandbox.sandboxId = "MasterEmpty";
+            } else if (newSandbox.apiEndpointIndex  === "6") {
+                clonedSandbox.sandboxId = "MasterStu3SMART";
+            } else if (newSandbox.apiEndpointIndex  === "7") {
+                clonedSandbox.sandboxId = "MasterR4SMART";
+            } else if (newSandbox.apiEndpointIndex  === "5") {
+                clonedSandbox.sandboxId = "MasterDstu2SMART";
+            }
+            var cloneBody = {
+                "clonedSandbox": clonedSandbox,
+                "newSandbox": createSandbox
+            }
+
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
-                    url: settings.sandboxManagerApiUrl + "/sandbox",
+                    url: settings.sandboxManagerApiUrl + "/sandbox/clone",
                     type: 'POST',
-                    data: JSON.stringify(createSandbox),
+                    data: JSON.stringify(cloneBody),
                     contentType: "application/json",
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
@@ -1770,6 +1786,7 @@ angular.module('sandManApp.services', [])
                         xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
                     }
                 }).done(function (results) {
+                    debugger
                     fullAppList = [];
                     if (results) {
                         results.forEach(function (app) {
@@ -1977,6 +1994,7 @@ angular.module('sandManApp.services', [])
         launch: function (app, patientContext, contextParams, userPersona, launchMode) {
             var key = random(32);
             window.localStorage[key] = "requested-launch";
+            debugger
             // var appWindow;
             // = window.open('launch.html' + "" +
             // '?username=' + encodeURIComponent(userPersona.sbmUserId) +
@@ -2062,6 +2080,7 @@ angular.module('sandManApp.services', [])
 
     function initPatientDataManagerApp() {
         appsService.getSampleApps().done(function (patientApps) {
+            debugger;
             var pdm;
             for (var i = 0; i < patientApps.length; i++) {
                 if (patientApps[i]["authClient"]["clientId"] == "patient_data_manager") {
