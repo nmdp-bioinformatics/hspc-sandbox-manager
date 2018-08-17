@@ -1663,9 +1663,9 @@ angular.module('sandManApp.controllers', []).controller('navController', [
                     fhirUrl = fhirUrl.substring(protocolLength,index);
                 });
 
-                var launchUrl = ehrApp + sandboxId + "/" + sandboxApiUrl + "/" + fhirUrl + "/"+ bearer;
+                var launchUri = ehrApp + sandboxId + "/" + sandboxApiUrl + "/" + fhirUrl + "/"+ bearer;
 
-                $window.open(launchUrl, '_blank');
+                $window.open(launchUri, '_blank');
             } catch(error){
                 console.log("There was an error opening ehr-app");
                 console.log(error);
@@ -3337,11 +3337,7 @@ angular.module('sandManApp.controllers', []).controller('navController', [
     }
 
     $scope.canModifyApp = function (app) {
-        if (app.isDefault === true || app.appManifestUri) {
-            return false;
-        } else {
-            return userServices.canModify(app, sandboxManagement.getSandbox());
-        }
+        return app.copyType === "MASTER";
     };
 
     $scope.updateFile = function (files) {

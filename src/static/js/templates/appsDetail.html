@@ -5,7 +5,7 @@
             <div class="col content-column appButtons">
                 <div class="btn btn-basic btn-md" ng-click="launch(selected.selectedApp, selected.selectedApp.samplePatients)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
                 <div class="btn btn-basic btn-md" ng-show="canModify" ng-click="save(clientJSON)"><i class="fa fa-save fa-lg"></i> Save</div>
-                <div class="btn btn-delete btn-md"  ng-show="canDelete" ng-disabled="!canDelete" ng-click="delete()"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
+                <div class="btn btn-delete btn-md" ng-disabled="!canDelete" ng-click="delete()"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
                 <div class="tool-tip" ng-if="!canDelete" tooltip-placement="right" uib-tooltip="Must remove all app's launch scenarios before deleting" >&nbsp;</div>
             </div>
         </div>
@@ -60,14 +60,14 @@
                 <div class="detail-form">
                     <label class="detail-form-label">Brief Description</label>
                     <div class="detail-form-label-input">
-                        <textarea style="resize: none; background-color: #fff; cursor: text; border-color:#f4f4f4" class="form-control" ng-model="clientJSON.briefDescription">{{clientJSON.briefDescription}}</textarea>
+                        <textarea style="resize: none; background-color: #fff; cursor: text; border-color:#f4f4f4" ng-disabled="!canModify" class="form-control" ng-model="clientJSON.briefDescription">{{clientJSON.briefDescription}}</textarea>
                     </div>
                 </div>
 
                 <div class="detail-form">
                     <label class="detail-form-label">App Launch URL</label>
                     <div class="detail-form-label-input">
-                        <input ng-disabled="!canModify" ng-model="clientJSON.launchUrl" class="form-control"/>
+                        <input ng-disabled="!canModify" ng-model="clientJSON.launchUri" class="form-control"/>
                     </div>
                 </div>
 
