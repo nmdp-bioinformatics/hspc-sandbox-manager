@@ -10,7 +10,6 @@
       if (!(key in window.localStorage)) {
         console.log('Failed to launch app -- no launch key.');
       }
-      debugger;
       onStorage();
       window.addEventListener('storage', onStorage, false);
 

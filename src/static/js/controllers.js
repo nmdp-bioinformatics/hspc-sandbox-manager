@@ -2324,7 +2324,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.canDelete = userServices.canModify($scope.selectedScenario, sandboxManagement.getSandbox());
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
-            debugger
             $scope.isCustom = $scope.selectedScenario.app.customApp;
             if ($scope.selectedScenario.app.logoUri) {
                 $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
@@ -2344,7 +2343,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
             $scope.canDelete = userServices.canModify($scope.selectedScenario, sandboxManagement.getSandbox());
             $scope.editDesc.new = angular.copy(arg.description);
             $scope.editLaunchUri.new = angular.copy(arg.app.launchUri);
-            debugger
             $scope.isCustom = $scope.selectedScenario.app.customApp;
             if ($scope.selectedScenario.app.logoUri) {
                 $scope.selectedScenario.app.logoUri = $scope.selectedScenario.app.logoUri + "?" + new Date().getTime();
@@ -3200,7 +3198,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
 
 
     $rootScope.$on('app-list-update', function () {
-        debugger;
         $scope.all_user_apps = angular.copy(appRegistrationServices.getAppList());
         $scope.all_user_apps = $scope.all_user_apps.concat($scope.default_apps);
         $scope.isAppsPicker = true;
@@ -3331,7 +3328,6 @@ angular.module('sandManApp.controllers', []).controller('navController', [
         if (app.id) {
             sandboxManagement.getLaunchScenarioByApp(app.id).then(function (launchScenarios) {
                 if (!(launchScenarios.length > 0)) {
-                    debugger
                     $scope.canDelete = true;
                 }
                 $scope.canModify = userServices.canModifyApp(app, sandboxManagement.getSandbox());
