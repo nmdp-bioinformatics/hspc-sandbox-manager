@@ -925,11 +925,11 @@ angular.module('sandManApp.services', [])
             if (newSandbox.dataSet  === "NONE") {
                 clonedSandbox.sandboxId = "MasterEmpty";
             } else if (newSandbox.apiEndpointIndex  === "6") {
-                clonedSandbox.sandboxId = "MasterStu3SMART";
+                clonedSandbox.sandboxId = "MasterStu3Smart";
             } else if (newSandbox.apiEndpointIndex  === "7") {
-                clonedSandbox.sandboxId = "MasterR4SMART";
+                clonedSandbox.sandboxId = "MasterR4Smart";
             } else if (newSandbox.apiEndpointIndex  === "5") {
-                clonedSandbox.sandboxId = "MasterDstu2SMART";
+                clonedSandbox.sandboxId = "MasterDstu2Smart";
             }
             var cloneBody = {
                 "clonedSandbox": clonedSandbox,
