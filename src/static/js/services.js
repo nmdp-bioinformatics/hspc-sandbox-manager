@@ -922,14 +922,21 @@ angular.module('sandManApp.services', [])
             };
 
             var clonedSandbox = {};
-            if (newSandbox.dataSet  === "NONE") {
-                clonedSandbox.sandboxId = "MasterEmpty";
+            if (newSandbox.apiEndpointIndex  === "5") {
+                clonedSandbox.sandboxId = "MasterDstu2Smart";
+                if (newSandbox.dataSet  === "NONE") {
+                    clonedSandbox.sandboxId = "MasterDstu2Empty";
+                }
             } else if (newSandbox.apiEndpointIndex  === "6") {
                 clonedSandbox.sandboxId = "MasterStu3Smart";
+                if (newSandbox.dataSet  === "NONE") {
+                    clonedSandbox.sandboxId = "MasterStu3Empty";
+                }
             } else if (newSandbox.apiEndpointIndex  === "7") {
                 clonedSandbox.sandboxId = "MasterR4Smart";
-            } else if (newSandbox.apiEndpointIndex  === "5") {
-                clonedSandbox.sandboxId = "MasterDstu2Smart";
+                if (newSandbox.dataSet  === "NONE") {
+                    clonedSandbox.sandboxId = "MasterR4Empty";
+                }
             }
             var cloneBody = {
                 "clonedSandbox": clonedSandbox,
