@@ -3,9 +3,9 @@
     <div class="appsDetailModalBody container">
         <div class="row">
             <div class="col content-column appButtons">
-                <div class="btn btn-basic btn-md" ng-click="launch(selected.selectedApp, clientJSON.samplePatients)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
-                <div class="btn btn-basic btn-md" ng-show="canModify && !isInbound" ng-click="save(clientJSON)"><i class="fa fa-save fa-lg"></i> Save</div>
-                <div class="btn btn-delete btn-md"  ng-show="canModify" ng-disabled="!canDelete" ng-click="delete()"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
+                <div class="btn btn-basic btn-md" ng-click="launch(selected.selectedApp, selected.selectedApp.samplePatients)"><i class="fa fa-external-link fa-lg"></i> Launch</div>
+                <div class="btn btn-basic btn-md" ng-show="canModify" ng-click="save(clientJSON)"><i class="fa fa-save fa-lg"></i> Save</div>
+                <div class="btn btn-delete btn-md" ng-disabled="!canDelete" ng-click="delete()"><i class="fa fa-trash-o fa-lg"></i> Delete</div>
                 <div class="tool-tip" ng-if="!canDelete" tooltip-placement="right" uib-tooltip="Must remove all app's launch scenarios before deleting" >&nbsp;</div>
             </div>
         </div>
@@ -14,7 +14,7 @@
                 <div class="detail-form">
                     <label class="detail-form-label">App Name</label>
                     <div class="detail-form-label-input">
-                        <input ng-disabled="!canModify || isInbound" ng-model="clientJSON.clientName" class="form-control"/>
+                        <input ng-disabled="!canModify" ng-model="clientJSON.clientName" class="form-control"/>
                     </div>
                 </div>
 
@@ -31,7 +31,7 @@
                 <div class="detail-form" ng-show="isInbound">
                     <label class="detail-form-label">Client Uri</label>
                     <div class="detail-form-label-input">
-                        <input ng-disabled="!canModify || isInbound" ng-model="selected.selectedApp.appManifestUri" class="form-control"/>
+                        <input ng-disabled="!canModify" ng-model="selected.selectedApp.clientUri" class="form-control"/>
                     </div>
                 </div>
 
@@ -39,7 +39,7 @@
                     <label class="detail-form-label">Client Id</label>
                     <div class="detail-form-label-input">
                         <!--<label class="form-control detail-form-value-full">{{clientJSON.clientId}}</label>-->
-                        <textarea style="resize: none; background-color: #fff; cursor: text; border-color:#f4f4f4" class="form-control" ng-model="clientJSON.clientId">{{clientJSON.clientId}}</textarea>
+                        <textarea style="resize: none; background-color: #fff; cursor: text; border-color:#f4f4f4" class="form-control" ng-model="clientJSON.clientId" readonly>{{clientJSON.clientId}}</textarea>
                     </div>
                 </div>
 
@@ -60,21 +60,21 @@
                 <div class="detail-form">
                     <label class="detail-form-label">Brief Description</label>
                     <div class="detail-form-label-input">
-                        <textarea style="resize: none; background-color: #fff; cursor: text; border-color:#f4f4f4" class="form-control" ng-model="clientJSON.briefDescription">{{clientJSON.briefDescription}}</textarea>
+                        <textarea style="resize: none; background-color: #fff; cursor: text; border-color:#f4f4f4" ng-disabled="!canModify" class="form-control" ng-model="clientJSON.briefDescription">{{clientJSON.briefDescription}}</textarea>
                     </div>
                 </div>
 
                 <div class="detail-form">
-                    <label class="detail-form-label">App Launch URI</label>
+                    <label class="detail-form-label">App Launch URL</label>
                     <div class="detail-form-label-input">
-                        <input ng-disabled="!canModify || isInbound" ng-model="clientJSON.launchUri" class="form-control"/>
+                        <input ng-disabled="!canModify" ng-model="clientJSON.launchUri" class="form-control"/>
                     </div>
                 </div>
 
                 <div class="detail-form">
                     <label class="detail-form-label">App Redirect URIs</label>
                     <div class="detail-form-label-input">
-                        <input ng-disabled="!canModify || isInbound" ng-model="clientJSON.redirectUris" class="form-control"/>
+                        <input ng-disabled="!canModify" ng-model="clientJSON.redirectUris" class="form-control"/>
                         <label ng-show="!isInbound" class="create-form-description" style="font-style: italic">Comma separated list of redirect URIs eg. 'http://myhost.com/my-app/,http://myhost.com/my-other-path/app/'</label>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                 <div class="detail-form">
                     <label class="detail-form-label">Scopes</label>
                     <div class="detail-form-label-input with-info">
-                        <input ng-disabled="!canModify || isInbound" ng-model="clientJSON.scope" class="form-control"/>
+                        <input ng-disabled="!canModify" ng-model="clientJSON.scope" class="form-control"/>
                         <label ng-show="!isInbound" class="create-form-description" style="font-style: italic">Space separated list of scopes eg. 'launch patient/*.* openid profile'</label>
                     </div>
                     <a href='https://docs.smarthealthit.org/authorization/scopes-and-launch-context/' target="_blank" class='float-right-dark-btn'>
@@ -122,7 +122,7 @@
                 <div class="detail-form">
                     <label class="detail-form-label">App Logo</label>
                     <div class="detail-form-label-input">
-                        <label ng-disabled="!canModify || isInbound" class="btn btn-basic btn-md"><input type="file" name="file" onchange="angular.element(this).scope().updateFile(this.files)" required/><i class="fa fa-upload fa-lg"></i><span> Upload Image</span></label>
+                        <label ng-disabled="!canModify" class="btn btn-basic btn-md"><input type="file" name="file" onchange="angular.element(this).scope().updateFile(this.files)" required/><i class="fa fa-upload fa-lg"></i><span> Upload Image</span></label>
                         <!--<input ng-disabled="!canModify" type="file" name="file" style="margin-bottom: 5px" onchange="angular.element(this).scope().updateFile(this.files)"/>-->
                         <label style="margin-top: 5px">(Display size 210px W X 150px H)</label>
                         <div class="thumbnail">

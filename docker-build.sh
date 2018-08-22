@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-docker build -t hspconsortium/hspc-sandbox-manager:latest .
+docker build -t hspconsortium/sandbox-manager:latest .

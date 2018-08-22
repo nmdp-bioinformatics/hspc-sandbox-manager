@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+
+  sandman:
+    image: hspconsortium/sandbox-manager:latest
+    deploy:
+      restart_policy:
+        condition: on-failure
+      resources:
+        reservations:
+          memory: 64M
+
+  nginx:
+    depends_on:
+      - sandman
+    image: hspconsortium/sandbox-manager-nginx:latest
+    ports:
+      - "8080:8080"
+    deploy:
+      restart_policy:
+        condition: on-failure
+      resources:
+        reservations:
+          memory: 64M

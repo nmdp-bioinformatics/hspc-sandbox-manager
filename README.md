@@ -16,6 +16,13 @@ Welcome to the HSPC Sandbox Manager!
 #### Build and Deploy Using Docker ####
     ./run-local-docker.sh
 
+#### Docker Install
+    cd docker/nginx
+    ./build.sh
+    cd ..
+    ./build.sh
+    docker-compose up
+
 #### Verify
 
 * http://localhost:8080/

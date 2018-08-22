@@ -629,7 +629,7 @@ angular.module('sandManApp.services', [])
                 type: 'POST',
                 contentType: "application/json",
                 data: JSON.stringify({
-                    client_id: app.authClient.clientId,
+                    client_id: app.clientId,
                     parameters: params
                 })
             });
@@ -915,16 +915,39 @@ angular.module('sandManApp.services', [])
                 sandboxId: newSandbox.sandboxId,
                 description: newSandbox.description,
                 dataSet: newSandbox.dataSet,
+                apps: "DEFAULT",
                 apiEndpointIndex: newSandbox.apiEndpointIndex,
                 allowOpenAccess: newSandbox.allowOpenAccess,
                 users: [userServices.getOAuthUser()]
             };
 
+            var clonedSandbox = {};
+            if (newSandbox.apiEndpointIndex  === "5") {
+                clonedSandbox.sandboxId = "MasterDstu2Smart";
+                if (newSandbox.dataSet  === "NONE") {
+                    clonedSandbox.sandboxId = "MasterDstu2Empty";
+                }
+            } else if (newSandbox.apiEndpointIndex  === "6") {
+                clonedSandbox.sandboxId = "MasterStu3Smart";
+                if (newSandbox.dataSet  === "NONE") {
+                    clonedSandbox.sandboxId = "MasterStu3Empty";
+                }
+            } else if (newSandbox.apiEndpointIndex  === "7") {
+                clonedSandbox.sandboxId = "MasterR4Smart";
+                if (newSandbox.dataSet  === "NONE") {
+                    clonedSandbox.sandboxId = "MasterR4Empty";
+                }
+            }
+            var cloneBody = {
+                "clonedSandbox": clonedSandbox,
+                "newSandbox": createSandbox
+            }
+
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
-                    url: settings.sandboxManagerApiUrl + "/sandbox",
+                    url: settings.sandboxManagerApiUrl + "/sandbox/clone",
                     type: 'POST',
-                    data: JSON.stringify(createSandbox),
+                    data: JSON.stringify(cloneBody),
                     contentType: "application/json",
                     beforeSend: function (xhr) {
                         xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
@@ -1022,26 +1045,26 @@ angular.module('sandManApp.services', [])
             return deferred;
         },
         getUserSandboxesByUserId: function () {
-                    var that = this;
-                    var deferred = $.Deferred();
-                    appsSettings.getSettings().then(function (settings) {
-                        $.ajax({
-                            url: settings.sandboxManagerApiUrl + "/sandbox?userId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId),
-                            type: 'GET',
-                            contentType: "application/json",
-                            beforeSend: function (xhr) {
-                                xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
-                            }
-                        }).done(function (sandboxResult) {
-                            if (sandboxResult.length > 0) {
-                                that.setHasSandbox(true);
-                                sandboxes = sandboxResult;
-                                deferred.resolve(true);
-                            } else {
-                                that.clearSandboxes();
-                                deferred.resolve(false);
-                            }
-                        }).fail(function () {
+            var that = this;
+            var deferred = $.Deferred();
+            appsSettings.getSettings().then(function (settings) {
+                $.ajax({
+                    url: settings.sandboxManagerApiUrl + "/sandbox?userId=" + encodeURIComponent(userServices.getOAuthUser().sbmUserId),
+                    type: 'GET',
+                    contentType: "application/json",
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('Authorization', 'BEARER ' + fhirApiServices.fhirClient().server.auth.token);
+                    }
+                }).done(function (sandboxResult) {
+                    if (sandboxResult.length > 0) {
+                        that.setHasSandbox(true);
+                        sandboxes = sandboxResult;
+                        deferred.resolve(true);
+                    } else {
+                        that.clearSandboxes();
+                        deferred.resolve(false);
+                    }
+                }).fail(function () {
                     that.clearSandboxes();
                     deferred.resolve(false);
                 });
@@ -2482,10 +2505,10 @@ angular.module('sandManApp.services', [])
             // the active_env is set in the pipeline. Otherwise it will run with default
             var active_env = 'replacethiswithcurrentenvironment';
             if (active_env === 'test') {
-              env_properties_file = 'static/js/config/sandbox-manager_test.json';
+                env_properties_file = 'static/js/config/sandbox-manager_test.json';
             }
             if (active_env === 'prod') {
-              env_properties_file = 'static/js/config/sandbox-manager_prod.json';
+                env_properties_file = 'static/js/config/sandbox-manager_prod.json';
             }
 
             $http.get(env_properties_file).success(function (result) {

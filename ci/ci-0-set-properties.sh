@@ -15,3 +15,7 @@ export SPRING_PROFILES_ACTIVE=""
 export AWS_CONTAINER_MEMORY_RESERVE=$(cat ../package.json | jq --raw-output '.config.memory')
 
 export TEMPLATE_FILE="../aws/task-definition.json"
+
+export VERSION_SNAPSHOT_REGEX="^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$"
+
+export VERSION_RELEASE_REGEX="^[0-9]+\.[0-9]+\.[0-9]+$"
