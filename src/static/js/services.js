@@ -1261,7 +1261,7 @@ angular.module('sandManApp.services', [])
             var deferred = $.Deferred();
             appsSettings.getSettings().then(function (settings) {
                 $.ajax({
-                    url: settings.sandboxManagerApiUrl + "/admin?interval=30",
+                    url: settings.sandboxManagerApiUrl + "/analytics?interval=30",
                     type: 'GET',
                     contentType: "application/json",
                     beforeSend: function (xhr) {
